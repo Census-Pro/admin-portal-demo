@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash } from '@tabler/icons-react';
+import { IconDotsVertical, IconTrash, IconKey } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -14,6 +14,7 @@ import { deleteRole } from '@/actions/common/role-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { ManagePermissionsModal } from './manage-permissions-modal';
 
 interface Role {
   id: string;
@@ -77,6 +78,7 @@ export const columns: ColumnDef<Role>[] = [
 
 function ActionsCell({ role }: { role: Role }) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -107,25 +109,46 @@ function ActionsCell({ role }: { role: Role }) {
   };
 
   return (
-    <div className="flex justify-end">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" disabled={isDeleting}>
-            <IconDotsVertical className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="text-destructive focus:text-destructive"
-          >
-            <IconTrash className="mr-2 h-4 w-4" />
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <>
+      {/* Debug: Verify role object */}
+      <span className="sr-only" data-testid="debug-role-id">
+        {JSON.stringify(role)}
+      </span>
+
+      <div className="flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" disabled={isDeleting}>
+              <IconDotsVertical className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setShowPermissionsModal(true)}>
+              <IconKey className="mr-2 h-4 w-4" />
+              Manage Permissions
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="text-destructive focus:text-destructive"
+            >
+              <IconTrash className="mr-2 h-4 w-4" />
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <ManagePermissionsModal
+        isOpen={showPermissionsModal}
+        onClose={() => setShowPermissionsModal(false)}
+        onSuccess={() => {
+          router.refresh();
+          setShowPermissionsModal(false);
+        }}
+        role={role}
+      />
+    </>
   );
 }

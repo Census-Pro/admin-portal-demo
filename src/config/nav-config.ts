@@ -1,4 +1,5 @@
 import { NavItem } from '@/types';
+import * as PERMS from './permissions';
 
 export const navItems: NavItem[] = [
   {
@@ -7,117 +8,246 @@ export const navItems: NavItem[] = [
     icon: 'dashboard',
     isActive: false,
     shortcut: ['d', 'd'],
-    items: []
+    items: [],
+    subject: 'Dashboard', // For ability-based filtering
+    // Everyone with dashboard access can view
+    access: {
+      permissions: [PERMS.MANAGE_ALL, PERMS.VIEW_DASHBOARD]
+    }
   },
   {
     title: 'User',
     url: '/dashboard/user',
     icon: 'teams',
     isActive: false,
-    items: []
-    // Access control example:
-    // access: {
-    //   permission: 'view:users'
-    // }
+    items: [],
+    subject: 'Admin', // For ability-based filtering
+    // Super Admin and Admin can manage users
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.VIEW_USERS,
+        PERMS.MANAGE_USERS,
+        PERMS.EDIT_USERS
+      ]
+    }
   },
   {
-    title: 'Roles & Permissions',
+    title: 'Organization',
+    url: '#',
+    icon: 'billing',
+    isActive: true,
+    superAdminOnly: true, // Only visible to SUPER_ADMIN
+    items: [
+      {
+        title: 'Agencies',
+        url: '/dashboard/master/agencies',
+        shortcut: ['a', 'g'],
+        // Only Super Admin can manage agencies
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Office Locations',
+        url: '/dashboard/organization/office-locations',
+        shortcut: ['o', 'l'],
+        // Only Super Admin can manage office locations
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      }
+    ],
+    // Only Super Admin can access Organization section
+    access: {
+      permissions: [PERMS.MANAGE_ALL]
+    }
+  },
+  {
+    title: 'Roles & Permission',
     url: '#',
     icon: 'shield',
     isActive: true,
+    superAdminOnly: true, // Only visible to SUPER_ADMIN
     items: [
       {
         title: 'Roles',
         url: '/dashboard/master/roles',
-        shortcut: ['r', 'o']
+        shortcut: ['r', 'o'],
+        // Only Super Admin can manage roles
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ROLES, PERMS.VIEW_ROLES]
+        }
       },
       {
         title: 'Permissions',
         url: '/dashboard/master/permissions',
-        shortcut: ['p', 'm']
+        shortcut: ['p', 'm'],
+        // Only Super Admin can manage permissions
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_PERMISSIONS,
+            PERMS.VIEW_PERMISSIONS
+          ]
+        }
       }
-    ]
+    ],
+    // Only Super Admin can access Roles & Permission section
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.MANAGE_ROLES,
+        PERMS.MANAGE_PERMISSIONS
+      ]
+    }
   },
   {
     title: 'Birth Registration',
     url: '/dashboard/birth-registration',
     icon: 'baby',
     isActive: false,
-    items: []
-    // Access control example:
-    // access: {
-    //   permission: 'view:birth-registration'
-    // }
+    items: [],
+    subject: 'Birth Registration', // For ability-based filtering
+    // Super Admin, Admin, and Operators can view birth registration
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.VIEW_BIRTH_REGISTRATION,
+        PERMS.MANAGE_BIRTH_REGISTRATION,
+        PERMS.VERIFY_BIRTH_REGISTRATION,
+        PERMS.APPROVE_BIRTH_REGISTRATION
+      ]
+    }
   },
   {
     title: 'CID Issuance',
     url: '/dashboard/cid-issuance',
     icon: 'idCard',
     isActive: false,
+    subject: 'CID Issuance', // For ability-based filtering
     items: [
       {
         title: 'New CID',
-        url: '/dashboard/master/roles',
-        shortcut: ['r', 'o']
+        url: '/dashboard/cid-issuance/new',
+        shortcut: ['c', 'n'],
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.VIEW_CID_ISSUANCE,
+            PERMS.CREATE_CID_ISSUANCE,
+            PERMS.MANAGE_CID_ISSUANCE
+          ]
+        }
       },
       {
         title: 'Replacement',
-        url: '/dashboard/master/permissions',
-        shortcut: ['p', 'm']
+        url: '/dashboard/cid-issuance/replacement',
+        shortcut: ['c', 'r'],
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.VIEW_CID_ISSUANCE,
+            PERMS.CREATE_CID_ISSUANCE,
+            PERMS.MANAGE_CID_ISSUANCE
+          ]
+        }
       },
       {
         title: 'Renewal',
-        url: '/dashboard/master/permissions',
-        shortcut: ['p', 'm']
+        url: '/dashboard/cid-issuance/renewal',
+        shortcut: ['c', 'e'],
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.VIEW_CID_ISSUANCE,
+            PERMS.CREATE_CID_ISSUANCE,
+            PERMS.MANAGE_CID_ISSUANCE
+          ]
+        }
       }
-    ]
-    // Access control example:
-    // access: {
-    //   permission: 'view:cid-issuance'
-    // }
+    ],
+    // Super Admin, Admin, and Operators can view CID issuance
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.VIEW_CID_ISSUANCE,
+        PERMS.MANAGE_CID_ISSUANCE,
+        PERMS.VERIFY_CID_ISSUANCE,
+        PERMS.APPROVE_CID_ISSUANCE
+      ]
+    }
   },
   {
     title: 'Move In/Move Out',
     url: '/dashboard/move-in-out',
     icon: 'home',
     isActive: false,
-    items: []
-    // Access control example:
-    // access: {
-    //   permission: 'view:move-in-out'
-    // }
+    items: [],
+    subject: 'Move In/Move Out', // For ability-based filtering
+    // Super Admin, Admin, and Operators can view move in/out
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.VIEW_MOVE_IN_OUT,
+        PERMS.MANAGE_MOVE_IN_OUT,
+        PERMS.VERIFY_MOVE_IN_OUT,
+        PERMS.APPROVE_MOVE_IN_OUT
+      ]
+    }
   },
   {
     title: 'Relationships',
     url: '/dashboard/relationships',
     icon: 'family',
     isActive: false,
-    items: []
-    // Access control example:
-    // access: {
-    //   permission: 'view:relationships'
-    // }
+    items: [],
+    subject: 'Relationships', // For ability-based filtering
+    // Super Admin, Admin, and Operators can view relationships
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.VIEW_RELATIONSHIPS,
+        PERMS.MANAGE_RELATIONSHIPS,
+        PERMS.VERIFY_RELATIONSHIPS,
+        PERMS.APPROVE_RELATIONSHIPS
+      ]
+    }
   },
   {
     title: 'Naturalization/Regularization',
     url: '/dashboard/naturalization',
     icon: 'certificate',
     isActive: false,
-    items: []
-    // Access control example:
-    // access: {
-    //   permission: 'view:naturalization'
-    // }
+    items: [],
+    subject: 'Naturalization', // For ability-based filtering
+    // Super Admin, Admin, and Operators can view naturalization
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.VIEW_NATURALIZATION,
+        PERMS.MANAGE_NATURALIZATION,
+        PERMS.VERIFY_NATURALIZATION,
+        PERMS.APPROVE_NATURALIZATION
+      ]
+    }
   },
   {
     title: 'Death Registration',
     url: '/dashboard/death-registration',
     icon: 'grave',
     isActive: false,
-    items: []
-    // Access control example:
-    // access: {
-    //   permission: 'view:death-registration'
-    // }
+    items: [],
+    subject: 'Death Registration', // For ability-based filtering
+    // Super Admin, Admin, and Operators can view death registration
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.VIEW_DEATH_REGISTRATION,
+        PERMS.MANAGE_DEATH_REGISTRATION,
+        PERMS.VERIFY_DEATH_REGISTRATION,
+        PERMS.APPROVE_DEATH_REGISTRATION
+      ]
+    }
   }
 ];

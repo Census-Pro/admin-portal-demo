@@ -1,8 +1,12 @@
 import { Icons } from '@/components/icons';
 
 export interface PermissionCheck {
+  // Single permission or array of permissions (OR logic - user needs ANY of these)
   permission?: string;
+  permissions?: string[];
+  // Single role or array of roles (OR logic - user needs ANY of these)
   role?: string;
+  roles?: string[];
 }
 
 export interface NavItem {
@@ -17,6 +21,8 @@ export interface NavItem {
   isActive?: boolean;
   items?: NavItem[];
   access?: PermissionCheck;
+  subject?: string; // Backend ability subject for dynamic filtering
+  superAdminOnly?: boolean; // Only visible to SUPER_ADMIN roleType
 }
 
 export interface NavItemWithChildren extends NavItem {

@@ -32,26 +32,29 @@ export function useFilteredNavItems(items: NavItem[]) {
 
   // Helper function to check if user has a specific ability
   const hasAbility = useMemo(() => {
-    if (!user?.ability) {
-      console.log('🔍 No abilities found for user');
+    // SUPER_ADMIN bypass - they have access to everything
+    if (user?.roleType === 'SUPER_ADMIN') {
+      return () => {
+        console.log(
+          '🔍 SUPER_ADMIN roleType detected - bypassing permission check, granting access'
+        );
+        return true;
+      };
+    }
+
+    // Use transformed permissions array (action:subject format)
+    const permissions = (user as any)?.permissions || [];
+
+    if (permissions.length === 0) {
+      console.log('🔍 No permissions found for user');
       return () => false;
     }
 
-    // Flatten abilities array in case it's nested: [['manage:all']] -> ['manage:all']
-    const flattenedAbilities = user.ability.flat();
-    console.log('🔍 Flattened abilities:', flattenedAbilities);
+    console.log('🔍 User permissions:', permissions);
 
     return (permission: string) => {
       // Check for 'manage:all' - grants access to everything
-      const hasManageAll = flattenedAbilities.some((ability) => {
-        if (typeof ability === 'string') {
-          return ability === 'manage:all';
-        }
-        return (
-          ability.name === 'manage:all' ||
-          `${ability.action}:${ability.subject}` === 'manage:all'
-        );
-      });
+      const hasManageAll = permissions.includes('manage:all');
 
       if (hasManageAll) {
         console.log(
@@ -60,29 +63,30 @@ export function useFilteredNavItems(items: NavItem[]) {
         return true;
       }
 
-      const result = flattenedAbilities.some((ability) => {
-        if (typeof ability === 'string') {
-          return ability === permission;
-        }
-        // Legacy object format: { name, action, subject }
-        return (
-          ability.name === permission ||
-          `${ability.action}:${ability.subject}` === permission
-        );
-      });
+      const result = permissions.includes(permission);
 
-      console.log(`🔍 Checking ability "${permission}":`, {
+      console.log(`🔍 Checking permission "${permission}":`, {
         result,
         hasManageAll,
-        userAbilities: flattenedAbilities
+        userPermissions: permissions
       });
 
       return result;
     };
-  }, [user?.ability]);
+  }, [user]);
 
   // Helper function to check if user has a specific role
   const hasRole = useMemo(() => {
+    // SUPER_ADMIN bypass - they have all roles
+    if (user?.roleType === 'SUPER_ADMIN') {
+      return () => {
+        console.log(
+          '🔍 SUPER_ADMIN roleType detected - bypassing role check, granting access'
+        );
+        return true;
+      };
+    }
+
     if (!user?.roles) {
       console.log('🔍 No roles found for user');
       return () => false;
@@ -96,7 +100,7 @@ export function useFilteredNavItems(items: NavItem[]) {
       });
       return result;
     };
-  }, [user?.roles]);
+  }, [user?.roles, user?.roleType]);
 
   // Helper function to check if an item passes all access checks
   const checkItemAccess = useMemo(() => {
@@ -108,7 +112,7 @@ export function useFilteredNavItems(items: NavItem[]) {
 
       console.log('🔍 Checking access:', access);
 
-      // Check permission (ability)
+      // Check single permission
       if (access.permission && !hasAbility(access.permission)) {
         console.log(
           `🔍 Access denied: Missing permission "${access.permission}"`
@@ -116,10 +120,34 @@ export function useFilteredNavItems(items: NavItem[]) {
         return false;
       }
 
-      // Check role
+      // Check multiple permissions (OR logic - user needs ANY of these)
+      if (access.permissions && access.permissions.length > 0) {
+        const hasAnyPermission = access.permissions.some((permission: string) =>
+          hasAbility(permission)
+        );
+        if (!hasAnyPermission) {
+          console.log(
+            `🔍 Access denied: Missing any of permissions [${access.permissions.join(', ')}]`
+          );
+          return false;
+        }
+      }
+
+      // Check single role
       if (access.role && !hasRole(access.role)) {
         console.log(`🔍 Access denied: Missing role "${access.role}"`);
         return false;
+      }
+
+      // Check multiple roles (OR logic - user needs ANY of these)
+      if (access.roles && access.roles.length > 0) {
+        const hasAnyRole = access.roles.some((role: string) => hasRole(role));
+        if (!hasAnyRole) {
+          console.log(
+            `🔍 Access denied: Missing any of roles [${access.roles.join(', ')}]`
+          );
+          return false;
+        }
       }
 
       console.log('🔍 Access granted');
@@ -142,17 +170,80 @@ export function useFilteredNavItems(items: NavItem[]) {
       user: session?.user,
       abilities: user?.ability,
       roles: user?.roles,
+      roleType: user?.roleType,
       totalItems: items.length
     });
 
+    // Helper to check subject access from backend abilities
+    const hasSubjectAccess = (subject: string) => {
+      if (!user?.ability) {
+        console.log(`🔍 hasSubjectAccess("${subject}"): No abilities found`);
+        return false;
+      }
+
+      // Normalize subject for comparison (e.g., "Birth Registration" -> "birth registration")
+      const normalizedSubject = subject.toLowerCase();
+
+      console.log(`🔍 hasSubjectAccess: Checking subject "${subject}"`, {
+        normalizedSubject,
+        abilities: user.ability
+      });
+
+      const result = user.ability.some((ability: any) => {
+        const abilitySubject = (ability.subject || '').toLowerCase();
+        console.log(
+          `🔍   - Comparing "${abilitySubject}" with "${normalizedSubject}"`
+        );
+        return abilitySubject === normalizedSubject;
+      });
+
+      console.log(`🔍 hasSubjectAccess("${subject}"): ${result}`);
+      return result;
+    };
+
     const filtered = items
       .filter((item) => {
+        // Check if item is super admin only
+        if (item.superAdminOnly && user?.roleType !== 'SUPER_ADMIN') {
+          console.log(
+            `🔍 Item "${item.title}": Restricted to SUPER_ADMIN only`
+          );
+          return false;
+        }
+
+        // Check subject-based access (from backend abilities)
+        // If item has a subject and user has access to it, grant access
+        if (item.subject) {
+          if (user?.roleType === 'SUPER_ADMIN') {
+            console.log(`🔍 Item "${item.title}": SUPER_ADMIN has access`);
+            return true;
+          }
+
+          const subjectAccess = hasSubjectAccess(item.subject);
+          console.log(
+            `🔍 Item "${item.title}": Subject "${item.subject}" access = ${subjectAccess}`
+          );
+
+          // If subject check passes, grant access (skip permission check)
+          if (subjectAccess) {
+            return true;
+          }
+
+          // If subject check fails, deny access
+          console.log(
+            `🔍 Item "${item.title}": No access to subject "${item.subject}"`
+          );
+          return false;
+        }
+
+        // No subject defined, fall back to traditional permission-based access
         const hasAccess = checkItemAccess(item.access);
         console.log(`🔍 Item "${item.title}":`, {
           access: item.access,
           hasAccess,
           abilities: user?.ability,
-          roles: user?.roles
+          roles: user?.roles,
+          roleType: user?.roleType
         });
         return hasAccess;
       })
@@ -200,7 +291,20 @@ export function useUserAbilities() {
   const user = session?.user;
 
   return useMemo(() => {
-    if (!user?.ability) {
+    // SUPER_ADMIN bypass - they have all abilities
+    if (user?.roleType === 'SUPER_ADMIN') {
+      return {
+        hasAbility: () => true,
+        hasAnyAbility: () => true,
+        hasAllAbilities: () => true,
+        abilities: ['manage:all']
+      };
+    }
+
+    // Use transformed permissions from auth.config.ts
+    const permissions = (user as any)?.permissions || [];
+
+    if (permissions.length === 0) {
       return {
         hasAbility: () => false,
         hasAnyAbility: () => false,
@@ -209,28 +313,19 @@ export function useUserAbilities() {
       };
     }
 
-    // Flatten and process abilities
-    const abilities = user.ability
-      .flat() // Handle nested arrays: [['manage:all']] -> ['manage:all']
-      .map((ability) =>
-        typeof ability === 'string'
-          ? ability
-          : ability.name || `${ability.action}:${ability.subject}`
-      );
-
     // Check if user has 'manage:all' permission
-    const hasManageAll = abilities.includes('manage:all');
+    const hasManageAll = permissions.includes('manage:all');
 
     return {
       hasAbility: (permission: string) =>
-        hasManageAll || abilities.includes(permission),
-      hasAnyAbility: (permissions: string[]) =>
-        hasManageAll || permissions.some((p) => abilities.includes(p)),
-      hasAllAbilities: (permissions: string[]) =>
-        hasManageAll || permissions.every((p) => abilities.includes(p)),
-      abilities
+        hasManageAll || permissions.includes(permission),
+      hasAnyAbility: (permissionList: string[]) =>
+        hasManageAll || permissionList.some((p) => permissions.includes(p)),
+      hasAllAbilities: (permissionList: string[]) =>
+        hasManageAll || permissionList.every((p) => permissions.includes(p)),
+      abilities: permissions
     };
-  }, [user?.ability]);
+  }, [user]);
 }
 
 /**
@@ -241,6 +336,17 @@ export function useUserRoles() {
   const user = session?.user;
 
   return useMemo(() => {
+    // SUPER_ADMIN bypass - they have all roles
+    if (user?.roleType === 'SUPER_ADMIN') {
+      return {
+        hasRole: () => true,
+        hasAnyRole: () => true,
+        hasAllRoles: () => true,
+        roles: [],
+        roleNames: ['SUPER_ADMIN']
+      };
+    }
+
     if (!user?.roles) {
       return {
         hasRole: () => false,
@@ -261,5 +367,5 @@ export function useUserRoles() {
       roles: user.roles,
       roleNames
     };
-  }, [user?.roles]);
+  }, [user?.roles, user?.roleType]);
 }

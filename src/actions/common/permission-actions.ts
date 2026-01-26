@@ -7,12 +7,12 @@ import { instance } from '../instance';
 const API_URL =
   process.env.AUTH_SERVICE || process.env.API_URL || 'http://localhost:5001';
 
-export async function getPermissions() {
+export async function getPermissions(page: number = 1, take: number = 100) {
   try {
     const headers = await instance();
 
     // Backend requires page and take query parameters
-    const url = `${API_URL}/permissions?page=1&take=100`;
+    const url = `${API_URL}/permissions?page=${page}&take=${take}`;
 
     console.log('🔍 [getPermissions] Fetching from:', url);
     console.log('🔍 [getPermissions] Headers:', {

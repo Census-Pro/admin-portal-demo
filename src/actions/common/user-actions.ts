@@ -38,6 +38,7 @@ export async function getUsers(
       try {
         const error = await response.json();
         errorMessage = error.message || error.error || errorMessage;
+        console.error('API Error Details:', error);
       } catch {
         errorMessage = `${response.status}: ${response.statusText}`;
       }

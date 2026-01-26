@@ -53,9 +53,9 @@ const authConfig = {
       },
       async authorize(credentials, req) {
         try {
-          console.log('🔐 Attempting login for:', credentials?.cidNo);
-          console.log('🔐 API URL:', API_URL);
-          console.log('🔐 Full URL:', `${API_URL}/auth/admin/login`);
+          // console.log('🔐 Attempting login for:', credentials?.cidNo);
+          // console.log('🔐 API URL:', API_URL);
+          // console.log('🔐 Full URL:', `${API_URL}/auth/admin/login`);
 
           const response = await fetch(`${API_URL}/auth/admin/login`, {
             method: 'POST',
@@ -66,22 +66,22 @@ const authConfig = {
             })
           });
 
-          console.log('🔐 Response status:', response.status);
-          console.log('🔐 Response ok:', response.ok);
+          // console.log('🔐 Response status:', response.status);
+          // console.log('🔐 Response ok:', response.ok);
 
           if (!response.ok) {
-            const errorText = await response.text();
-            console.log('🔐 Login failed - HTTP status:', response.status);
-            console.log('🔐 Error response:', errorText);
+            // const errorText = await response.text();
+            // console.log('🔐 Login failed - HTTP status:', response.status);
+            // console.log('🔐 Error response:', errorText);
             return null;
           }
 
           const data = await response.json();
-          console.log('🔐 Response data:', JSON.stringify(data, null, 2));
+          // console.log('🔐 Response data:', JSON.stringify(data, null, 2));
 
-          console.log('🔐 Login successful for:', data.user?.cidNo);
-          console.log('🔍 User roles:', data.user?.roles);
-          console.log('🔍 User abilities:', data.ability);
+          // console.log('🔐 Login successful for:', data.user?.cidNo);
+          // console.log('🔍 User roles:', data.user?.roles);
+          // console.log('🔍 User abilities:', data.ability);
 
           if (data?.user && data?.accessToken) {
             const rememberMe = credentials?.rememberMe === 'true';
@@ -91,19 +91,41 @@ const authConfig = {
 
             // Validate required user data structure
             if (!data.user.roles || !Array.isArray(data.user.roles)) {
-              console.warn(
-                '🔍 User missing roles array, defaulting to empty array'
-              );
+              // console.warn(
+              //   '🔍 User missing roles array, defaulting to empty array'
+              // );
               data.user.roles = [];
             }
 
             // Add ability from top-level to user object
             const ability = data.ability || [];
 
+            // Transform backend ability format to frontend permission format
+            // Backend: {action: ["create", "update"], subject: "Birth Registration"}
+            // Frontend: ["create:birth-registration", "update:birth-registration"]
+            const transformedAbilities = ability.flatMap((abilityItem: any) => {
+              if (!abilityItem.action || !abilityItem.subject) {
+                return [];
+              }
+
+              // Normalize subject: "Birth Registration" -> "birth-registration"
+              const normalizedSubject = abilityItem.subject
+                .toLowerCase()
+                .replace(/\s+/g, '-');
+
+              // Map each action to permission format
+              return abilityItem.action.map(
+                (action: string) => `${action}:${normalizedSubject}`
+              );
+            });
+
+            // console.log('🔍 Transformed abilities:', transformedAbilities);
+
             // Store tokens, sessionId, and rememberMe preference in user object for JWT callback
             return {
               ...data.user,
-              ability,
+              ability, // Keep original for subject-based checks
+              permissions: transformedAbilities, // Add transformed permissions
               accessToken: data.accessToken,
               refreshToken: data.refreshToken,
               sessionId: data.user.id, // Use user ID as session ID for activity tracking
@@ -114,7 +136,7 @@ const authConfig = {
 
           return null;
         } catch (error) {
-          console.error('🔐 Login error:', error);
+          // console.error('🔐 Login error:', error);
           return null;
         }
       }
@@ -172,14 +194,14 @@ const authConfig = {
               : SESSION_MAX_AGE_DEFAULT;
             token.tokenExpiry = Math.floor(Date.now() / 1000) + sessionDuration;
           } else {
-            console.log(
-              '🔐 Token refresh failed - HTTP status:',
-              response.status
-            );
+            // console.log(
+            //   '🔐 Token refresh failed - HTTP status:',
+            //   response.status
+            // );
             return null;
           }
         } catch (error) {
-          console.error('🔐 Token refresh error:', error);
+          // console.error('🔐 Token refresh error:', error);
           return null;
         }
       } else if (shouldRefresh && !token.refreshToken) {
