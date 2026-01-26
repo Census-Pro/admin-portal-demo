@@ -1,12 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import {
-  IconArrowRight,
-  IconLock,
-  IconUser,
-  IconAlertCircle
-} from '@tabler/icons-react';
+import { ArrowRight, Lock, User, AlertCircle } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -76,7 +71,7 @@ export function LoginPage() {
 
         {error && (
           <div className="animate-in fade-in slide-in-from-top-2 mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
-            <IconAlertCircle className="h-5 w-5 flex-shrink-0" />
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <p>{error}</p>
           </div>
         )}
@@ -87,7 +82,7 @@ export function LoginPage() {
               CID Number
             </label>
             <div className="relative">
-              <IconUser className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <User className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <input
                 name="cidNo"
                 type="text"
@@ -103,7 +98,7 @@ export function LoginPage() {
               Password
             </label>
             <div className="relative">
-              <IconLock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Lock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <input
                 name="password"
                 type="password"
@@ -123,7 +118,7 @@ export function LoginPage() {
             )}
           >
             {isLoading ? 'Authenticating...' : 'Sign In'}
-            {!isLoading && <IconArrowRight className="h-4 w-4" />}
+            {!isLoading && <ArrowRight className="h-4 w-4" />}
           </button>
         </form>
 

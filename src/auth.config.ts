@@ -121,7 +121,7 @@ const authConfig = {
     })
   ],
   pages: {
-    signIn: '/'
+    signIn: '/login'
   },
   callbacks: {
     async jwt({ token, user, trigger }) {
