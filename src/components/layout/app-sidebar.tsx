@@ -5,15 +5,6 @@ import {
   CollapsibleTrigger
 } from '@/components/ui/collapsible';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -28,37 +19,32 @@ import {
   SidebarMenuSubItem,
   SidebarRail
 } from '@/components/ui/sidebar';
-import { UserAvatarProfile } from '@/components/user-avatar-profile';
 import { navItems } from '@/config/nav-config';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useFilteredNavItems } from '@/hooks/use-nav';
-import {
-  IconChevronRight,
-  IconChevronsDown,
-  IconLogout,
-  IconUserCircle
-} from '@tabler/icons-react';
+import { IconChevronRight } from '@tabler/icons-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import { Icons } from '../icons';
 import { OrgSwitcher } from '../org-switcher';
+import { NavUser } from '../nav-user';
 
 export default function AppSidebar() {
   const pathname = usePathname();
   const { isOpen } = useMediaQuery();
   const { data: session } = useSession();
-  const router = useRouter();
   const filteredItems = useFilteredNavItems(navItems);
-
-  const handleSignOut = async () => {
-    await signOut({ callbackUrl: '/' });
-  };
 
   React.useEffect(() => {
     // Side effects based on sidebar state changes
   }, [isOpen]);
+
+  // Debug: Log session to console
+  React.useEffect(() => {
+    console.log('Session in AppSidebar:', session);
+  }, [session]);
 
   return (
     <Sidebar collapsible="icon">
@@ -126,60 +112,24 @@ export default function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
-                  {session?.user && (
-                    <UserAvatarProfile
-                      className="h-8 w-8 rounded-lg"
-                      showInfo
-                      user={session.user}
-                    />
-                  )}
-                  <IconChevronsDown className="ml-auto size-4" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                side="bottom"
-                align="end"
-                sideOffset={4}
-              >
-                <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="px-1 py-1.5">
-                    {session?.user && (
-                      <UserAvatarProfile
-                        className="h-8 w-8 rounded-lg"
-                        showInfo
-                        user={session.user}
-                      />
-                    )}
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onClick={() => router.push('/dashboard/profile')}
-                  >
-                    <IconUserCircle className="mr-2 h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut}>
-                  <IconLogout className="mr-2 h-4 w-4" />
-                  Sign out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        {session?.user && (
+          <NavUser
+            user={{
+              name: session.user.name || 'User',
+              email: session.user.email || '',
+              avatar: session.user.image || ''
+            }}
+          />
+        )}
+        {!session?.user && (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton>
+                <span>Loading user...</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

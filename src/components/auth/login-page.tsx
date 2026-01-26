@@ -1,62 +1,37 @@
 'use client';
 
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import Image from 'next/image';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Icons } from '@/components/icons';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-
-const loginSchema = z.object({
-  cidNo: z.string().min(1, 'Please enter a cid number'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  rememberMe: z.boolean()
-});
-
-type LoginForm = z.infer<typeof loginSchema>;
+  IconArrowRight,
+  IconLock,
+  IconUser,
+  IconAlertCircle
+} from '@tabler/icons-react';
+import { signIn } from 'next-auth/react';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue
-  } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      rememberMe: false
-    }
-  });
-
-  const onSubmit = async (data: LoginForm) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading(true);
     setError(null);
 
+    const formData = new FormData(e.currentTarget);
+    const cidNo = formData.get('cidNo') as string;
+    const password = formData.get('password') as string;
+
     try {
-      console.log('🔐 Submitting login form with CID:', data.cidNo);
+      console.log('🔐 Submitting login form with CID:', cidNo);
 
       const result = await signIn('credentials', {
-        cidNo: data.cidNo,
-        password: data.password,
-        rememberMe: data.rememberMe.toString(),
+        cidNo,
+        password,
         redirect: false
       });
 
@@ -64,7 +39,8 @@ export function LoginPage() {
 
       if (result?.error) {
         console.error('🔐 Sign in error:', result.error);
-        setError('Invalid CID number or password. Please try again.');
+        setError('Invalid credentials. Please try again.');
+        setIsLoading(false);
       } else if (result?.ok) {
         console.log('🔐 Sign in successful, redirecting to dashboard');
         router.push('/dashboard');
@@ -73,88 +49,90 @@ export function LoginPage() {
     } catch (err) {
       console.error('🔐 Unexpected error during sign in:', err);
       setError('An unexpected error occurred. Please try again.');
-    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="from-background to-muted flex min-h-screen items-center justify-center bg-gradient-to-br p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <div className="mb-4 flex justify-center">
-            <Icons.logo className="h-10 w-10" />
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-50/50 p-4">
+      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-xl">
+        <div className="mb-6 flex flex-col items-center">
+          <div className="relative mb-4 h-20 w-20">
+            <Image
+              src="/logo.png"
+              alt="BCRS Logo"
+              fill
+              className="object-contain"
+            />
           </div>
-          <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your dashboard
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <CardContent className="space-y-4">
-            {error && (
-              <div className="text-destructive bg-destructive/10 border-destructive/20 rounded-md border p-3 text-sm">
-                {error}
-              </div>
-            )}
+          <h1 className="text-foreground text-2xl font-bold tracking-tight">
+            Welcome Back
+          </h1>
+          <p className="text-muted-foreground mt-2 text-center text-sm">
+            Enter your credentials to access the Bhutan Civil Registration
+            System Admin Portal.
+          </p>
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="cidNo">CID Number</Label>
-              <Input
-                id="cidNo"
+        {error && (
+          <div className="animate-in fade-in slide-in-from-top-2 mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+            <IconAlertCircle className="h-5 w-5 flex-shrink-0" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-muted-foreground ml-1 text-xs font-semibold tracking-wider uppercase">
+              CID Number
+            </label>
+            <div className="relative">
+              <IconUser className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <input
+                name="cidNo"
                 type="text"
-                placeholder="Enter your CID number"
-                {...register('cidNo')}
-                disabled={isLoading}
-                className={errors.cidNo ? 'border-destructive' : ''}
+                placeholder="Enter your CID Number"
+                required
+                className="bg-muted/50 focus:bg-background focus:border-primary focus:ring-primary w-full rounded-xl border border-transparent py-3 pr-4 pl-10 text-sm transition-all outline-none focus:ring-1"
               />
-              {errors.cidNo && (
-                <p className="text-destructive text-sm">
-                  {errors.cidNo.message}
-                </p>
-              )}
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
+          <div className="space-y-2">
+            <label className="text-muted-foreground ml-1 text-xs font-semibold tracking-wider uppercase">
+              Password
+            </label>
+            <div className="relative">
+              <IconLock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <input
+                name="password"
                 type="password"
-                placeholder="••••••••"
-                {...register('password')}
-                disabled={isLoading}
-                className={errors.password ? 'border-destructive' : ''}
+                placeholder="Enter your password"
+                required
+                className="bg-muted/50 focus:bg-background focus:border-primary focus:ring-primary w-full rounded-xl border border-transparent py-3 pr-4 pl-10 text-sm transition-all outline-none focus:ring-1"
               />
-              {errors.password && (
-                <p className="text-destructive text-sm">
-                  {errors.password.message}
-                </p>
-              )}
             </div>
+          </div>
 
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="rememberMe"
-                checked={watch('rememberMe')}
-                onCheckedChange={(checked) => setValue('rememberMe', !!checked)}
-                disabled={isLoading}
-              />
-              <Label htmlFor="rememberMe" className="text-sm font-normal">
-                Remember me for 7 days
-              </Label>
-            </div>
-          </CardContent>
-
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="mt-4 w-full" disabled={isLoading}>
-              {isLoading && (
-                <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              Sign in
-            </Button>
-          </CardFooter>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={cn(
+              'bg-primary text-primary-foreground shadow-primary/25 mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3 font-semibold shadow-lg transition-all hover:opacity-90',
+              isLoading && 'cursor-not-allowed opacity-70'
+            )}
+          >
+            {isLoading ? 'Authenticating...' : 'Sign In'}
+            {!isLoading && <IconArrowRight className="h-4 w-4" />}
+          </button>
         </form>
-      </Card>
+
+        <div className="mt-6 text-center">
+          <p className="text-muted-foreground text-xs">
+            Restricted Access. Authorized Personnel Only.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

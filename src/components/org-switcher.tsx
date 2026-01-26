@@ -1,13 +1,17 @@
 'use client';
 
-import { GalleryVerticalEnd } from 'lucide-react';
+import Image from 'next/image';
 import {
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
+  useSidebar
 } from '@/components/ui/sidebar';
 
 export function OrgSwitcher() {
+  const { state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -15,12 +19,23 @@ export function OrgSwitcher() {
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
-          <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-            <GalleryVerticalEnd className="size-4" />
+          <div
+            className={`flex shrink-0 items-center justify-center overflow-hidden rounded-lg ${isCollapsed ? 'size-8' : 'aspect-square size-10'}`}
+          >
+            <Image
+              src="/logo.png"
+              alt="BCRS Logo"
+              width={isCollapsed ? 32 : 40}
+              height={isCollapsed ? 32 : 40}
+              className="object-contain"
+              priority
+            />
           </div>
           <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">Dashboard</span>
-            <span className="truncate text-xs">Personal</span>
+            <span className="truncate font-bold">Bhutan</span>
+            <span className="text-muted-foreground truncate text-[10px] font-semibold tracking-wider uppercase">
+              Census Registration
+            </span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>

@@ -25,6 +25,8 @@ import {
   SidebarMenuItem,
   useSidebar
 } from '@/components/ui/sidebar';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
 
 export function NavUser({
   user
@@ -36,6 +38,10 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/' });
+  };
 
   return (
     <SidebarMenu>
@@ -77,28 +83,30 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <IconSparkles className="mr-2 h-4 w-4" />
                 Upgrade to Pro
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconCircleCheck className="mr-2 h-4 w-4" />
-                Account
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/user" className="cursor-pointer">
+                  <IconCircleCheck className="mr-2 h-4 w-4" />
+                  Account
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              {/* <DropdownMenuItem>
                 <IconCreditCard className="mr-2 h-4 w-4" />
                 Billing
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem>
                 <IconBell className="mr-2 h-4 w-4" />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignOut}>
               <IconLogout className="mr-2 h-4 w-4" />
               Log out
             </DropdownMenuItem>

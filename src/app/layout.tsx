@@ -16,7 +16,7 @@ const META_THEME_COLORS = {
 };
 
 export const metadata: Metadata = {
-  title: 'Next Shadcn',
+  title: 'National Civil Registration',
   description: 'Basic dashboard with Next.js and Shadcn'
 };
 
