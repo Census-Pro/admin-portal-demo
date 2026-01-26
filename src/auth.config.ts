@@ -1,0 +1,204 @@
+import { NextAuthConfig, User } from 'next-auth';
+import { AdapterUser } from 'next-auth/adapters';
+import CredentialProvider from 'next-auth/providers/credentials';
+
+// import { createSession } from './lib/session';
+
+const API_URL = `${process.env.AUTH_SERVICE}`;
+
+// Validate required environment variables
+if (!process.env.AUTH_SERVICE) {
+  throw new Error('AUTH_SERVICE environment variable is required');
+}
+
+if (!process.env.AUTH_SECRET && !process.env.NEXTAUTH_SECRET) {
+  throw new Error(
+    'AUTH_SECRET or NEXTAUTH_SECRET environment variable is required'
+  );
+}
+
+// Session durations
+const SESSION_MAX_AGE_REMEMBER = 7 * 24 * 60 * 60; // 7 days when "Remember Me" checked
+const SESSION_MAX_AGE_DEFAULT = 24 * 60 * 60; // 24 hours when "Remember Me" unchecked
+
+const authConfig = {
+  trustHost: true, // Important for production behind proxy
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: 'jwt',
+    maxAge: SESSION_MAX_AGE_REMEMBER // Max possible, actual expiry controlled in JWT callback
+  },
+  cookies: {
+    sessionToken: {
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-next-auth.session-token'
+          : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
+  },
+  providers: [
+    CredentialProvider({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        cidNo: { label: 'CID', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+        rememberMe: { label: 'Remember Me', type: 'text' }
+      },
+      async authorize(credentials, req) {
+        try {
+          console.log('🔐 Attempting login for:', credentials?.cidNo);
+          console.log('🔐 API URL:', API_URL);
+          console.log('🔐 Full URL:', `${API_URL}/auth/admin/login`);
+
+          const response = await fetch(`${API_URL}/auth/admin/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              cidNo: credentials?.cidNo,
+              password: credentials?.password
+            })
+          });
+
+          console.log('🔐 Response status:', response.status);
+          console.log('🔐 Response ok:', response.ok);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.log('🔐 Login failed - HTTP status:', response.status);
+            console.log('🔐 Error response:', errorText);
+            return null;
+          }
+
+          const data = await response.json();
+          console.log('🔐 Response data:', JSON.stringify(data, null, 2));
+
+          console.log('🔐 Login successful for:', data.user?.cidNo);
+          console.log('🔍 User roles:', data.user?.roles);
+          console.log('🔍 User abilities:', data.ability);
+
+          if (data?.user && data?.accessToken) {
+            const rememberMe = credentials?.rememberMe === 'true';
+            const sessionDuration = rememberMe
+              ? SESSION_MAX_AGE_REMEMBER
+              : SESSION_MAX_AGE_DEFAULT;
+
+            // Validate required user data structure
+            if (!data.user.roles || !Array.isArray(data.user.roles)) {
+              console.warn(
+                '🔍 User missing roles array, defaulting to empty array'
+              );
+              data.user.roles = [];
+            }
+
+            // Add ability from top-level to user object
+            const ability = data.ability || [];
+
+            // Store tokens, sessionId, and rememberMe preference in user object for JWT callback
+            return {
+              ...data.user,
+              ability,
+              accessToken: data.accessToken,
+              refreshToken: data.refreshToken,
+              sessionId: data.user.id, // Use user ID as session ID for activity tracking
+              tokenExpiry: Math.floor(Date.now() / 1000) + sessionDuration,
+              rememberMe
+            };
+          }
+
+          return null;
+        } catch (error) {
+          console.error('🔐 Login error:', error);
+          return null;
+        }
+      }
+    })
+  ],
+  pages: {
+    signIn: '/'
+  },
+  callbacks: {
+    async jwt({ token, user, trigger }) {
+      const now = Math.floor(Date.now() / 1000);
+
+      // Initial sign in - store tokens
+      if (user) {
+        token.user = user;
+        token.accessToken = user.accessToken;
+        token.refreshToken = user.refreshToken;
+        token.sessionId = user.sessionId; // Redis session ID for activity tracking
+        token.tokenExpiry = user.tokenExpiry;
+        token.rememberMe = user.rememberMe;
+      }
+
+      // Handle legacy sessions without accessToken
+      if (!token.accessToken && token.user) {
+        return null;
+      }
+
+      // Check if session has expired (based on rememberMe setting)
+      const timeUntilExpiry = (token.tokenExpiry as number) - now;
+      if (timeUntilExpiry <= 0) {
+        // Session expired - force logout
+        return null;
+      }
+
+      // Check if access token needs refresh (refresh 5 minutes before expiry)
+      // Only refresh if we have more than 5 minutes left on session
+      const shouldRefresh = timeUntilExpiry < 300 && timeUntilExpiry > 0;
+
+      if (shouldRefresh && token.refreshToken) {
+        try {
+          const response = await fetch(`${API_URL}auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken: token.refreshToken })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            // Keep original session expiry based on rememberMe, just refresh access token
+            token.accessToken = data.token.accessToken;
+            token.refreshToken = data.token.refreshToken;
+            // Extend expiry based on rememberMe preference
+            const sessionDuration = token.rememberMe
+              ? SESSION_MAX_AGE_REMEMBER
+              : SESSION_MAX_AGE_DEFAULT;
+            token.tokenExpiry = Math.floor(Date.now() / 1000) + sessionDuration;
+          } else {
+            console.log(
+              '🔐 Token refresh failed - HTTP status:',
+              response.status
+            );
+            return null;
+          }
+        } catch (error) {
+          console.error('🔐 Token refresh error:', error);
+          return null;
+        }
+      } else if (shouldRefresh && !token.refreshToken) {
+        return null;
+      }
+
+      return token;
+    },
+    async session({ session, token }) {
+      session.user = token.user as AdapterUser & User;
+      session.accessToken = token.accessToken as string;
+      session.refreshToken = token.refreshToken as string;
+      session.sessionId = token.sessionId as string; // Redis session ID for activity tracking
+      session.tokenExpiry = token.tokenExpiry as number;
+      session.rememberMe = token.rememberMe as boolean;
+      return session;
+    }
+  }
+  // debug: process.env.NODE_ENV === 'development'
+} satisfies NextAuthConfig;
+
+export default authConfig;
