@@ -53,9 +53,9 @@ const authConfig = {
       },
       async authorize(credentials, req) {
         try {
-          // console.log('🔐 Attempting login for:', credentials?.cidNo);
-          // console.log('🔐 API URL:', API_URL);
-          // console.log('🔐 Full URL:', `${API_URL}/auth/admin/login`);
+          console.log('Attempting login for:', credentials?.cidNo);
+          console.log('API URL:', API_URL);
+          console.log('Full URL:', `${API_URL}/auth/admin/login`);
 
           const response = await fetch(`${API_URL}/auth/admin/login`, {
             method: 'POST',
@@ -66,22 +66,22 @@ const authConfig = {
             })
           });
 
-          // console.log('🔐 Response status:', response.status);
-          // console.log('🔐 Response ok:', response.ok);
+          console.log('Response status:', response.status);
+          console.log('Response ok:', response.ok);
 
           if (!response.ok) {
-            // const errorText = await response.text();
-            // console.log('🔐 Login failed - HTTP status:', response.status);
-            // console.log('🔐 Error response:', errorText);
+            const errorText = await response.text();
+            console.log('Login failed - HTTP status:', response.status);
+            console.log('Error response:', errorText);
             return null;
           }
 
           const data = await response.json();
-          // console.log('🔐 Response data:', JSON.stringify(data, null, 2));
+          console.log('Response data:', JSON.stringify(data, null, 2));
 
-          // console.log('🔐 Login successful for:', data.user?.cidNo);
-          // console.log('🔍 User roles:', data.user?.roles);
-          // console.log('🔍 User abilities:', data.ability);
+          console.log('Login successful for:', data.user?.cidNo);
+          console.log('User roles:', data.user?.roles);
+          console.log('User abilities:', data.ability);
 
           if (data?.user && data?.accessToken) {
             const rememberMe = credentials?.rememberMe === 'true';
@@ -91,37 +91,49 @@ const authConfig = {
 
             // Validate required user data structure
             if (!data.user.roles || !Array.isArray(data.user.roles)) {
-              // console.warn(
-              //   '🔍 User missing roles array, defaulting to empty array'
-              // );
+              console.warn(
+                'User missing roles array, defaulting to empty array'
+              );
               data.user.roles = [];
             }
 
             // Add ability from top-level to user object
             const ability = data.ability || [];
+            console.log('Ability array:', ability);
 
             // Transform backend ability format to frontend permission format
-            // Backend: {action: ["create", "update"], subject: "Birth Registration"}
-            // Frontend: ["create:birth-registration", "update:birth-registration"]
+            // Backend: {action: ["create", "update"], subject: ["Birth Registration", "Death Registration"]}
+            // Frontend: ["create:birth-registration", "update:birth-registration", "create:death-registration", ...]
             const transformedAbilities = ability.flatMap((abilityItem: any) => {
               if (!abilityItem.action || !abilityItem.subject) {
+                console.warn('Invalid ability item:', abilityItem);
                 return [];
               }
 
-              // Normalize subject: "Birth Registration" -> "birth-registration"
-              const normalizedSubject = abilityItem.subject
-                .toLowerCase()
-                .replace(/\s+/g, '-');
+              // Ensure subject is an array
+              const subjects = Array.isArray(abilityItem.subject)
+                ? abilityItem.subject
+                : [abilityItem.subject];
 
-              // Map each action to permission format
-              return abilityItem.action.map(
-                (action: string) => `${action}:${normalizedSubject}`
-              );
+              // Ensure action is an array
+              const actions = Array.isArray(abilityItem.action)
+                ? abilityItem.action
+                : [abilityItem.action];
+
+              // Map each action+subject combination to permission format
+              return subjects.flatMap((subject: string) => {
+                // Normalize subject: "Birth Registration" -> "birth-registration"
+                const normalizedSubject = subject
+                  .toLowerCase()
+                  .replace(/\s+/g, '-');
+
+                return actions.map(
+                  (action: string) => `${action}:${normalizedSubject}`
+                );
+              });
             });
 
-            // console.log('🔍 Transformed abilities:', transformedAbilities);
-
-            // Store tokens, sessionId, and rememberMe preference in user object for JWT callback
+            console.log('Transformed abilities:', transformedAbilities); // Store tokens, sessionId, and rememberMe preference in user object for JWT callback
             return {
               ...data.user,
               ability, // Keep original for subject-based checks
@@ -136,7 +148,7 @@ const authConfig = {
 
           return null;
         } catch (error) {
-          // console.error('🔐 Login error:', error);
+          console.error('Login error:', error);
           return null;
         }
       }
@@ -195,13 +207,13 @@ const authConfig = {
             token.tokenExpiry = Math.floor(Date.now() / 1000) + sessionDuration;
           } else {
             // console.log(
-            //   '🔐 Token refresh failed - HTTP status:',
+            //   'Token refresh failed - HTTP status:',
             //   response.status
             // );
             return null;
           }
         } catch (error) {
-          // console.error('🔐 Token refresh error:', error);
+          // console.error('Token refresh error:', error);
           return null;
         }
       } else if (shouldRefresh && !token.refreshToken) {

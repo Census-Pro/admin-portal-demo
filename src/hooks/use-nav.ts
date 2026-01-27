@@ -36,7 +36,7 @@ export function useFilteredNavItems(items: NavItem[]) {
     if (user?.roleType === 'SUPER_ADMIN') {
       return () => {
         console.log(
-          '🔍 SUPER_ADMIN roleType detected - bypassing permission check, granting access'
+          'SUPER_ADMIN roleType detected - bypassing permission check, granting access'
         );
         return true;
       };
@@ -46,11 +46,11 @@ export function useFilteredNavItems(items: NavItem[]) {
     const permissions = (user as any)?.permissions || [];
 
     if (permissions.length === 0) {
-      console.log('🔍 No permissions found for user');
+      console.log('No permissions found for user');
       return () => false;
     }
 
-    console.log('🔍 User permissions:', permissions);
+    console.log('User permissions:', permissions);
 
     return (permission: string) => {
       // Check for 'manage:all' - grants access to everything
@@ -58,14 +58,14 @@ export function useFilteredNavItems(items: NavItem[]) {
 
       if (hasManageAll) {
         console.log(
-          `🔍 User has 'manage:all' - granting access to "${permission}"`
+          `User has 'manage:all' - granting access to "${permission}"`
         );
         return true;
       }
 
       const result = permissions.includes(permission);
 
-      console.log(`🔍 Checking permission "${permission}":`, {
+      console.log(`Checking permission "${permission}":`, {
         result,
         hasManageAll,
         userPermissions: permissions
@@ -81,20 +81,20 @@ export function useFilteredNavItems(items: NavItem[]) {
     if (user?.roleType === 'SUPER_ADMIN') {
       return () => {
         console.log(
-          '🔍 SUPER_ADMIN roleType detected - bypassing role check, granting access'
+          'SUPER_ADMIN roleType detected - bypassing role check, granting access'
         );
         return true;
       };
     }
 
     if (!user?.roles) {
-      console.log('🔍 No roles found for user');
+      console.log('No roles found for user');
       return () => false;
     }
 
     return (roleName: string) => {
       const result = user.roles.some((role) => role.name === roleName);
-      console.log(`🔍 Checking role "${roleName}":`, {
+      console.log(`Checking role "${roleName}":`, {
         result,
         userRoles: user.roles.map((r) => r.name)
       });
@@ -106,17 +106,15 @@ export function useFilteredNavItems(items: NavItem[]) {
   const checkItemAccess = useMemo(() => {
     return (access: any) => {
       if (!access) {
-        console.log('🔍 No access restrictions, allowing access');
+        console.log('No access restrictions, allowing access');
         return true;
       }
 
-      console.log('🔍 Checking access:', access);
+      console.log('Checking access:', access);
 
       // Check single permission
       if (access.permission && !hasAbility(access.permission)) {
-        console.log(
-          `🔍 Access denied: Missing permission "${access.permission}"`
-        );
+        console.log(`Access denied: Missing permission "${access.permission}"`);
         return false;
       }
 
@@ -127,7 +125,7 @@ export function useFilteredNavItems(items: NavItem[]) {
         );
         if (!hasAnyPermission) {
           console.log(
-            `🔍 Access denied: Missing any of permissions [${access.permissions.join(', ')}]`
+            `Access denied: Missing any of permissions [${access.permissions.join(', ')}]`
           );
           return false;
         }
@@ -135,7 +133,7 @@ export function useFilteredNavItems(items: NavItem[]) {
 
       // Check single role
       if (access.role && !hasRole(access.role)) {
-        console.log(`🔍 Access denied: Missing role "${access.role}"`);
+        console.log(`Access denied: Missing role "${access.role}"`);
         return false;
       }
 
@@ -144,13 +142,13 @@ export function useFilteredNavItems(items: NavItem[]) {
         const hasAnyRole = access.roles.some((role: string) => hasRole(role));
         if (!hasAnyRole) {
           console.log(
-            `🔍 Access denied: Missing any of roles [${access.roles.join(', ')}]`
+            `Access denied: Missing any of roles [${access.roles.join(', ')}]`
           );
           return false;
         }
       }
 
-      console.log('🔍 Access granted');
+      console.log('Access granted');
       return true;
     };
   }, [hasAbility, hasRole]);
@@ -159,14 +157,14 @@ export function useFilteredNavItems(items: NavItem[]) {
   const filteredItems = useMemo(() => {
     // Return empty array if session is loading or no session
     if (status === 'loading' || !session) {
-      console.log('🔍 Navigation Filter Debug: Session loading or no session', {
+      console.log('Navigation Filter Debug: Session loading or no session', {
         status,
         hasSession: !!session
       });
       return [];
     }
 
-    console.log('🔍 Navigation Filter Debug: Processing items', {
+    console.log('Navigation Filter Debug: Processing items', {
       user: session?.user,
       abilities: user?.ability,
       roles: user?.roles,
@@ -177,27 +175,37 @@ export function useFilteredNavItems(items: NavItem[]) {
     // Helper to check subject access from backend abilities
     const hasSubjectAccess = (subject: string) => {
       if (!user?.ability) {
-        console.log(`🔍 hasSubjectAccess("${subject}"): No abilities found`);
+        console.log(`hasSubjectAccess("${subject}"): No abilities found`);
         return false;
       }
 
       // Normalize subject for comparison (e.g., "Birth Registration" -> "birth registration")
       const normalizedSubject = subject.toLowerCase();
 
-      console.log(`🔍 hasSubjectAccess: Checking subject "${subject}"`, {
+      console.log(`hasSubjectAccess: Checking subject "${subject}"`, {
         normalizedSubject,
         abilities: user.ability
       });
 
       const result = user.ability.some((ability: any) => {
-        const abilitySubject = (ability.subject || '').toLowerCase();
-        console.log(
-          `🔍   - Comparing "${abilitySubject}" with "${normalizedSubject}"`
-        );
-        return abilitySubject === normalizedSubject;
+        // Handle subject as either string or array
+        const subjects = Array.isArray(ability.subject)
+          ? ability.subject
+          : [ability.subject || ''];
+
+        // Check if any of the ability subjects match the requested subject
+        const matches = subjects.some((abilitySubject: string) => {
+          const normalizedAbilitySubject = abilitySubject.toLowerCase();
+          console.log(
+            `- Comparing "${normalizedAbilitySubject}" with "${normalizedSubject}"`
+          );
+          return normalizedAbilitySubject === normalizedSubject;
+        });
+
+        return matches;
       });
 
-      console.log(`🔍 hasSubjectAccess("${subject}"): ${result}`);
+      console.log(`hasSubjectAccess("${subject}"): ${result}`);
       return result;
     };
 
@@ -205,9 +213,7 @@ export function useFilteredNavItems(items: NavItem[]) {
       .filter((item) => {
         // Check if item is super admin only
         if (item.superAdminOnly && user?.roleType !== 'SUPER_ADMIN') {
-          console.log(
-            `🔍 Item "${item.title}": Restricted to SUPER_ADMIN only`
-          );
+          console.log(`Item "${item.title}": Restricted to SUPER_ADMIN only`);
           return false;
         }
 
@@ -215,13 +221,13 @@ export function useFilteredNavItems(items: NavItem[]) {
         // If item has a subject and user has access to it, grant access
         if (item.subject) {
           if (user?.roleType === 'SUPER_ADMIN') {
-            console.log(`🔍 Item "${item.title}": SUPER_ADMIN has access`);
+            console.log(`Item "${item.title}": SUPER_ADMIN has access`);
             return true;
           }
 
           const subjectAccess = hasSubjectAccess(item.subject);
           console.log(
-            `🔍 Item "${item.title}": Subject "${item.subject}" access = ${subjectAccess}`
+            `Item "${item.title}": Subject "${item.subject}" access = ${subjectAccess}`
           );
 
           // If subject check passes, grant access (skip permission check)
@@ -231,14 +237,14 @@ export function useFilteredNavItems(items: NavItem[]) {
 
           // If subject check fails, deny access
           console.log(
-            `🔍 Item "${item.title}": No access to subject "${item.subject}"`
+            `Item "${item.title}": No access to subject "${item.subject}"`
           );
           return false;
         }
 
         // No subject defined, fall back to traditional permission-based access
         const hasAccess = checkItemAccess(item.access);
-        console.log(`🔍 Item "${item.title}":`, {
+        console.log(`Item "${item.title}":`, {
           access: item.access,
           hasAccess,
           abilities: user?.ability,
@@ -252,7 +258,7 @@ export function useFilteredNavItems(items: NavItem[]) {
         if (item.items && item.items.length > 0) {
           const filteredChildren = item.items.filter((childItem) => {
             const childHasAccess = checkItemAccess(childItem.access);
-            console.log(`🔍 Child "${childItem.title}" of "${item.title}":`, {
+            console.log(`Child "${childItem.title}" of "${item.title}":`, {
               access: childItem.access,
               hasAccess: childHasAccess
             });
@@ -268,7 +274,7 @@ export function useFilteredNavItems(items: NavItem[]) {
         return item;
       });
 
-    console.log('🔍 Navigation Filter Debug: Final filtered items', {
+    console.log('Navigation Filter Debug: Final filtered items', {
       filteredCount: filtered.length,
       filteredItems: filtered.map((item) => ({
         title: item.title,

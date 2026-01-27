@@ -11,7 +11,7 @@ import {
 interface BackendAbility {
   name: string;
   action: string[];
-  subject: string;
+  subject: string | string[]; // Subject can be a string or array of strings
 }
 
 export function usePermissions() {

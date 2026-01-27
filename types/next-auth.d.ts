@@ -31,8 +31,8 @@ declare module 'next-auth' {
       | string
       | {
           name: string;
-          action: string;
-          subject: string;
+          action: string[];
+          subject: string | string[]; // Subject can be a string or array of strings
         }
     >;
   }

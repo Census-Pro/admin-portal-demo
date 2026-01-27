@@ -6,12 +6,13 @@
 interface BackendAbility {
   name: string;
   action: string[];
-  subject: string;
+  subject: string | string[]; // Subject can be a string or array of strings
 }
 
 /**
  * Maps backend ability to frontend permission strings
  * Backend format: { action: ["create", "read"], subject: "Birth Registration" }
+ * OR: { action: ["create", "read"], subject: ["Birth Registration", "Death Registration"] }
  * Frontend format: ["create:birth-registration", "read:birth-registration"]
  */
 export function mapAbilitiesToPermissions(
@@ -20,10 +21,17 @@ export function mapAbilitiesToPermissions(
   const permissions: string[] = [];
 
   abilities.forEach((ability) => {
-    const subject = normalizeSubject(ability.subject);
-    ability.action.forEach((action) => {
-      const normalizedAction = action.toLowerCase();
-      permissions.push(`${normalizedAction}:${subject}`);
+    // Handle subject as either string or array
+    const subjects = Array.isArray(ability.subject)
+      ? ability.subject
+      : [ability.subject];
+
+    subjects.forEach((subjectItem) => {
+      const subject = normalizeSubject(subjectItem);
+      ability.action.forEach((action) => {
+        const normalizedAction = action.toLowerCase();
+        permissions.push(`${normalizedAction}:${subject}`);
+      });
     });
   });
 
@@ -71,9 +79,17 @@ export function hasSubjectAccess(
 ): boolean {
   const normalizedSubject = normalizeSubject(subject);
 
-  return abilities.some(
-    (ability) => normalizeSubject(ability.subject) === normalizedSubject
-  );
+  return abilities.some((ability) => {
+    // Handle subject as either string or array
+    const subjects = Array.isArray(ability.subject)
+      ? ability.subject
+      : [ability.subject];
+
+    // Check if any of the ability subjects match
+    return subjects.some(
+      (abilitySubject) => normalizeSubject(abilitySubject) === normalizedSubject
+    );
+  });
 }
 
 /**
