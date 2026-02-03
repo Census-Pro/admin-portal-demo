@@ -49,8 +49,8 @@ export function LoginPage() {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gray-50/50 p-4">
-      <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-xl">
+    <div className="dark:bg-background fixed inset-0 flex items-center justify-center bg-gray-50/50 p-4">
+      <div className="bg-card dark:border-border w-full max-w-md rounded-2xl border border-gray-200 p-8 shadow-xl">
         <div className="mb-6 flex flex-col items-center">
           <div className="relative mb-4 h-20 w-20">
             <Image
@@ -70,7 +70,7 @@ export function LoginPage() {
         </div>
 
         {error && (
-          <div className="animate-in fade-in slide-in-from-top-2 mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+          <div className="animate-in fade-in slide-in-from-top-2 mb-6 flex items-center gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <p>{error}</p>
           </div>
