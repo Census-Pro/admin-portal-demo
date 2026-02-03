@@ -1,17 +1,16 @@
 'use client';
 
 import Image from 'next/image';
-import { ArrowRight, Lock, User, AlertCircle } from 'lucide-react';
+import { ArrowRight, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
 import { NDILoginButton } from './ndi-login-button';
 
 export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,8 +38,12 @@ export function LoginPage() {
         setIsLoading(false);
       } else if (result?.ok) {
         console.log('🔐 Sign in successful, redirecting to dashboard');
-        router.push('/dashboard');
-        router.refresh();
+
+        // Add small delay to ensure session is established
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // Use window.location for hard navigation
+        window.location.href = '/dashboard';
       }
     } catch (err) {
       console.error('🔐 Unexpected error during sign in:', err);
@@ -79,12 +82,16 @@ export function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-muted-foreground ml-1 text-xs font-semibold tracking-wider uppercase">
+            <label
+              htmlFor="cidNo"
+              className="text-muted-foreground ml-1 text-xs font-semibold tracking-wider uppercase"
+            >
               CID Number
             </label>
             <div className="relative">
               <User className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <input
+                id="cidNo"
                 name="cidNo"
                 type="text"
                 placeholder="Enter your CID Number"
@@ -95,18 +102,34 @@ export function LoginPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-muted-foreground ml-1 text-xs font-semibold tracking-wider uppercase">
+            <label
+              htmlFor="password"
+              className="text-muted-foreground ml-1 text-xs font-semibold tracking-wider uppercase"
+            >
               Password
             </label>
             <div className="relative">
               <Lock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
               <input
+                id="password"
                 name="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
                 required
-                className="bg-muted/50 focus:bg-background focus:border-primary focus:ring-primary w-full rounded-xl border border-transparent py-3 pr-4 pl-10 text-sm transition-all outline-none focus:ring-1"
+                className="bg-muted/50 focus:bg-background focus:border-primary focus:ring-primary w-full rounded-xl border border-transparent py-3 pr-10 pl-10 text-sm transition-all outline-none focus:ring-1"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors focus:outline-none"
+                tabIndex={-1}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
             </div>
           </div>
 
@@ -137,13 +160,16 @@ export function LoginPage() {
 
         {/* NDI Login Button */}
         <NDILoginButton
-          variant="outline"
           size="md"
           className="w-full"
-          onLoginSuccess={(data) => {
+          onLoginSuccess={async (data) => {
             console.log('🔐 NDI login successful:', data);
-            router.push('/dashboard');
-            router.refresh();
+
+            // Add small delay to ensure session is established
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            // Use window.location for hard navigation
+            window.location.href = '/dashboard';
           }}
           onLoginError={(error) => {
             console.error('🔐 NDI login error:', error);

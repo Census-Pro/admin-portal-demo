@@ -49,10 +49,77 @@ const authConfig = {
       credentials: {
         cidNo: { label: 'CID', type: 'text' },
         password: { label: 'Password', type: 'password' },
-        rememberMe: { label: 'Remember Me', type: 'text' }
+        rememberMe: { label: 'Remember Me', type: 'text' },
+        // For NDI login
+        accessToken: { label: 'Access Token', type: 'text' },
+        refreshToken: { label: 'Refresh Token', type: 'text' },
+        user: { label: 'User', type: 'text' }
       },
       async authorize(credentials, req) {
         try {
+          // NDI Login Flow - If tokens are provided directly
+          if (credentials?.accessToken && credentials?.user) {
+            console.log('🔐 NDI Login - Processing token-based authentication');
+
+            const userData = JSON.parse(credentials.user as string);
+            const rememberMe = credentials?.rememberMe === 'true';
+            const sessionDuration = rememberMe
+              ? SESSION_MAX_AGE_REMEMBER
+              : SESSION_MAX_AGE_DEFAULT;
+
+            // Validate required user data structure
+            if (!userData.roles || !Array.isArray(userData.roles)) {
+              console.warn(
+                'User missing roles array, defaulting to empty array'
+              );
+              userData.roles = [];
+            }
+
+            // Get ability from user data
+            const ability = userData.ability || [];
+            console.log('Ability array:', ability);
+
+            // Transform backend ability format to frontend permission format
+            const transformedAbilities = ability.flatMap((abilityItem: any) => {
+              if (!abilityItem.action || !abilityItem.subject) {
+                console.warn('Invalid ability item:', abilityItem);
+                return [];
+              }
+
+              const subjects = Array.isArray(abilityItem.subject)
+                ? abilityItem.subject
+                : [abilityItem.subject];
+
+              const actions = Array.isArray(abilityItem.action)
+                ? abilityItem.action
+                : [abilityItem.action];
+
+              return subjects.flatMap((subject: string) => {
+                const normalizedSubject = subject
+                  .toLowerCase()
+                  .replace(/\s+/g, '-');
+
+                return actions.map(
+                  (action: string) => `${action}:${normalizedSubject}`
+                );
+              });
+            });
+
+            console.log('Transformed abilities:', transformedAbilities);
+
+            return {
+              ...userData,
+              ability,
+              permissions: transformedAbilities,
+              accessToken: credentials.accessToken,
+              refreshToken: credentials.refreshToken,
+              sessionId: userData.id,
+              tokenExpiry: Math.floor(Date.now() / 1000) + sessionDuration,
+              rememberMe
+            };
+          }
+
+          // Regular Password Login Flow
           console.log('Attempting login for:', credentials?.cidNo);
           console.log('API URL:', API_URL);
           console.log('Full URL:', `${API_URL}/auth/admin/login`);
@@ -163,22 +230,47 @@ const authConfig = {
 
       // Initial sign in - store tokens
       if (user) {
+        console.log('🔐 JWT Callback - Initial sign in, storing user data');
         token.user = user;
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
         token.sessionId = user.sessionId; // Redis session ID for activity tracking
         token.tokenExpiry = user.tokenExpiry;
         token.rememberMe = user.rememberMe;
+        console.log('✅ JWT Callback - User data stored:', {
+          hasUser: !!token.user,
+          hasAccessToken: !!token.accessToken,
+          hasRefreshToken: !!token.refreshToken,
+          tokenExpiry: token.tokenExpiry
+        });
       }
 
-      // Handle legacy sessions without accessToken
-      if (!token.accessToken && token.user) {
+      // Validate we have required data
+      if (!token.accessToken) {
+        console.error(
+          '❌ JWT Callback - Missing accessToken, invalidating session'
+        );
+        return null;
+      }
+
+      if (!token.user) {
+        console.error(
+          '❌ JWT Callback - Missing user data, invalidating session'
+        );
+        return null;
+      }
+
+      if (!token.tokenExpiry) {
+        console.error(
+          '❌ JWT Callback - Missing tokenExpiry, invalidating session'
+        );
         return null;
       }
 
       // Check if session has expired (based on rememberMe setting)
       const timeUntilExpiry = (token.tokenExpiry as number) - now;
       if (timeUntilExpiry <= 0) {
+        console.log('⏰ JWT Callback - Session expired, logging out');
         // Session expired - force logout
         return null;
       }
@@ -223,12 +315,27 @@ const authConfig = {
       return token;
     },
     async session({ session, token }) {
+      if (!token.user || !token.accessToken) {
+        console.error('❌ Session Callback - Missing required data:', {
+          hasUser: !!token.user,
+          hasAccessToken: !!token.accessToken
+        });
+        return null as any; // TypeScript workaround
+      }
+
       session.user = token.user as AdapterUser & User;
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
       session.sessionId = token.sessionId as string; // Redis session ID for activity tracking
       session.tokenExpiry = token.tokenExpiry as number;
       session.rememberMe = token.rememberMe as boolean;
+
+      console.log('✅ Session Callback - Session created:', {
+        userId: session.user.id,
+        hasAccessToken: !!session.accessToken,
+        tokenExpiry: session.tokenExpiry
+      });
+
       return session;
     }
   }

@@ -18,8 +18,33 @@ const baseConfig: NextConfig = {
         protocol: 'https',
         hostname: 'clerk.com',
         port: ''
+      },
+      {
+        protocol: 'https',
+        hostname: 'stage-demo-shortening-url.s3.ap-southeast-1.amazonaws.com',
+        port: '',
+        pathname: '/**'
+      },
+      {
+        protocol: 'https',
+        hostname: 'staging.bhutanndi.com',
+        port: '',
+        pathname: '/**'
+      },
+      {
+        protocol: 'https',
+        hostname: 'demo-client.bhutanndi.com',
+        port: '',
+        pathname: '/**'
+      },
+      {
+        protocol: 'https',
+        hostname: 'bhutanndi.com',
+        port: '',
+        pathname: '/**'
       }
-    ]
+    ],
+    unoptimized: false
   },
   transpilePackages: ['geist']
 };

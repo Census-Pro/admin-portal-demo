@@ -1,24 +1,69 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, Play, ScanLine } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Play, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import QRCode from 'qrcode';
 
 interface NDILoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   qrCodeUrl?: string;
-  onQRCodeExpired?: () => void;
+  threadId?: string;
+  deepLinkUrl?: string;
+  isLoading?: boolean;
+  onRefreshQRCode?: () => void;
+  onLoginSuccess?: (data: any) => void;
+  onLoginError?: (error: string) => void;
 }
 
 export function NDILoginModal({
   isOpen,
   onClose,
   qrCodeUrl,
-  onQRCodeExpired
+  threadId,
+  deepLinkUrl,
+  isLoading = false,
+  onRefreshQRCode,
+  onLoginSuccess,
+  onLoginError
 }: NDILoginModalProps) {
   const [isQRExpired, setIsQRExpired] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [verificationStatus, setVerificationStatus] =
+    useState<string>('pending');
+  const [statusMessage, setStatusMessage] = useState<string>(
+    'Waiting for verification...'
+  );
+  const [generatedQRCode, setGeneratedQRCode] = useState<string>('');
+  const [qrGenerating, setQrGenerating] = useState(false);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const router = useRouter();
+
+  // Create refs for callbacks and state to avoid SSE connection restarts
+  const onLoginSuccessRef = useRef(onLoginSuccess);
+  const onLoginErrorRef = useRef(onLoginError);
+  const onCloseRef = useRef(onClose);
+  const statusRef = useRef(verificationStatus);
+
+  // Keep refs in sync
+  useEffect(() => {
+    onLoginSuccessRef.current = onLoginSuccess;
+  }, [onLoginSuccess]);
+
+  useEffect(() => {
+    onLoginErrorRef.current = onLoginError;
+  }, [onLoginError]);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  useEffect(() => {
+    statusRef.current = verificationStatus;
+  }, [verificationStatus]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -27,23 +72,211 @@ export function NDILoginModal({
     checkMobile();
   }, []);
 
+  // Generate QR code from proof request URL (web URL) or deep link
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    // Use proofRequestURL if available (NDI's intended QR URL), fallback to deepLinkURL
+    const urlForQR = qrCodeUrl || deepLinkUrl;
+
+    if (!urlForQR) {
+      return;
+    }
+
+    const generateQR = async () => {
+      setQrGenerating(true);
+      try {
+        console.log('🎨 Generating QR code for URL:', urlForQR);
+        const qrDataUrl = await QRCode.toDataURL(urlForQR, {
+          width: 400,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          },
+          errorCorrectionLevel: 'M'
+        });
+        setGeneratedQRCode(qrDataUrl);
+        console.log('✅ QR code generated successfully');
+      } catch (error) {
+        console.error('❌ Failed to generate QR code:', error);
+        if (onLoginError) {
+          onLoginError('Failed to generate QR code');
+        }
+      } finally {
+        setQrGenerating(false);
+      }
+    };
+
+    generateQR();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qrCodeUrl, deepLinkUrl, isOpen]);
+
+  // Listen to SSE stream for verification status
+  useEffect(() => {
+    if (!isOpen || !threadId) {
+      return;
+    }
+
+    // Prevent multiple connections
+    if (eventSourceRef.current) {
+      console.log('⚠️ SSE connection already exists, closing old connection');
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+
+    console.log('🔌 Connecting to SSE stream for threadId:', threadId);
+    setVerificationStatus('pending');
+    setStatusMessage('Waiting for verification...');
+
+    let eventSource: EventSource | null = null;
+
+    try {
+      eventSource = new EventSource(`/api/auth/ndi/stream/${threadId}`);
+      eventSourceRef.current = eventSource;
+    } catch (error) {
+      console.error('❌ Failed to create SSE connection:', error);
+      setVerificationStatus('error');
+      setStatusMessage('Failed to establish connection. Please try again.');
+      onLoginErrorRef.current?.('Connection failed');
+      return;
+    }
+
+    eventSource.onmessage = async (event) => {
+      try {
+        // Skip keepalive messages
+        if (event.data.trim() === '' || event.data.startsWith(':')) {
+          console.log('💓 SSE keepalive');
+          return;
+        }
+
+        console.log('📨 Raw SSE data:', event.data);
+        const data = JSON.parse(event.data);
+        console.log('📨 SSE message parsed:', data);
+
+        if (data.status === 'verified' && data.loginData) {
+          setVerificationStatus('verified');
+          setStatusMessage('Verification successful! Logging in...');
+
+          // Close SSE connection immediately upon success
+          if (eventSourceRef.current) {
+            console.log('🔌 Closing SSE connection after verification success');
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+          }
+
+          // Use the tokens from loginData to sign in
+          const { accessToken, refreshToken, user } = data.loginData;
+
+          // Sign in with NextAuth using the tokens
+          const result = await signIn('credentials', {
+            redirect: false,
+            accessToken,
+            refreshToken,
+            user: JSON.stringify(user)
+          });
+
+          if (result?.ok) {
+            console.log('✅ Login successful via NDI');
+            onLoginSuccessRef.current?.(data.loginData);
+            onCloseRef.current();
+
+            // Add a small delay to ensure session is established
+            // before redirecting to dashboard
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            // Use window.location for hard navigation to ensure
+            // middleware sees the new session
+            window.location.href = '/dashboard';
+          } else {
+            console.error('❌ NextAuth sign in failed:', result?.error);
+            setVerificationStatus('failed');
+            setStatusMessage('Login failed. Please try again.');
+            onLoginErrorRef.current?.(result?.error || 'Login failed');
+          }
+        } else if (data.status === 'failed') {
+          setVerificationStatus('failed');
+          setStatusMessage(
+            data.error || 'Verification failed. Please try again.'
+          );
+          onLoginErrorRef.current?.(data.error || 'Verification failed');
+          // Close connection after error
+          if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+          }
+        } else if (data.status === 'rejected') {
+          setVerificationStatus('rejected');
+          setStatusMessage('Verification was rejected.');
+          onLoginErrorRef.current?.('Verification rejected by user');
+          // Close connection after rejection
+          if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+          }
+        } else if (data.status === 'timeout') {
+          setVerificationStatus('timeout');
+          setStatusMessage('Verification timed out. Please try again.');
+          onLoginErrorRef.current?.('Verification timeout');
+          // Close connection after timeout
+          if (eventSourceRef.current) {
+            eventSourceRef.current.close();
+            eventSourceRef.current = null;
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing SSE message:', error);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      const currentStatus = statusRef.current;
+      const readyState = eventSource.readyState;
+
+      console.log('🔌 SSE connection state change:', {
+        readyState,
+        currentStatus,
+        url: eventSource.url
+      });
+
+      // ReadyState: 0 = CONNECTING, 1 = OPEN, 2 = CLOSED
+      // Only show error if:
+      // 1. Connection is permanently closed (readyState === 2)
+      // 2. We haven't received a successful verification yet
+      // 3. We're not already showing an error
+      if (readyState === 2 && currentStatus === 'pending') {
+        console.error('❌ SSE connection failed during pending state');
+        setVerificationStatus('error');
+        setStatusMessage('Connection error. Please try again.');
+        onLoginErrorRef.current?.('Connection error');
+      } else if (readyState === 0) {
+        console.log('🔄 SSE reconnecting...');
+      } else if (currentStatus !== 'pending') {
+        console.log('✅ SSE connection closed after successful verification');
+        // Normal closure after verification - not an error
+      }
+    };
+
+    return () => {
+      if (eventSourceRef.current) {
+        console.log('🔌 Closing SSE connection');
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
+      }
+    };
+  }, [isOpen, threadId, router]);
+
   useEffect(() => {
     if (isOpen) {
       // Reset expired state when modal opens
       setIsQRExpired(false);
 
-      // Set a timer for QR code expiration (e.g., 5 minutes)
-      const timer = setTimeout(
-        () => {
-          setIsQRExpired(true);
-          onQRCodeExpired?.();
-        },
-        5 * 60 * 1000
-      );
-
-      return () => clearTimeout(timer);
+      // Removed frontend QR expiration timer - backend SSE handles timeout
+      // The SSE connection will timeout after 5 minutes and send a 'timeout' status
     }
-  }, [isOpen, onQRCodeExpired]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -53,17 +286,21 @@ export function NDILoginModal({
   };
 
   const handleOpenApp = () => {
+    if (!deepLinkUrl) {
+      console.warn('Deep link URL not available');
+      return;
+    }
+
     const userAgent = navigator.userAgent || navigator.vendor;
     const isAndroid = /android/i.test(userAgent);
     const isIOS = /iPad|iPhone|iPod/.test(userAgent);
 
-    const appScheme = 'bhutanndi://'; // This is a common pattern, if it's different it should be updated
     const playStoreUrl =
-      'https://play.google.com/store/apps/details?id=bt.gov.riti.ndi.wallet';
+      'https://play.google.com/store/search?q=bhutan%20ndi&c=apps&hl=en_IN&gl=US';
     const appStoreUrl = 'https://apps.apple.com/in/app/bhutan-ndi/id1645493166';
 
-    // Try to open the app
-    window.location.href = appScheme;
+    // Try to open the app with the deep link
+    window.location.href = deepLinkUrl;
 
     // Fallback to store after a short delay
     setTimeout(() => {
@@ -83,13 +320,18 @@ export function NDILoginModal({
       <div
         className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
+        onKeyDown={(e) => e.key === 'Escape' && onClose()}
+        role="button"
+        tabIndex={0}
+        aria-label="Close modal"
       />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div
           className="animate-in fade-in zoom-in-95 relative max-h-[90vh] w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl transition-all"
-          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
         >
           {/* Close Button */}
           <button
@@ -124,28 +366,32 @@ export function NDILoginModal({
                   <div className="relative mb-6 sm:mb-8">
                     {/* QR Code Container */}
                     <div className="relative flex h-56 w-56 items-center justify-center rounded-2xl border-2 border-[#4DBB8E] bg-white p-4 sm:h-64 sm:w-64">
-                      {isQRExpired ? (
+                      {isLoading || qrGenerating ? (
+                        <div className="flex flex-col items-center justify-center text-center">
+                          <Loader2 className="mb-4 h-12 w-12 animate-spin text-[#4DBB8E]" />
+                          <p className="text-sm font-medium text-gray-600">
+                            Generating QR Code...
+                          </p>
+                        </div>
+                      ) : isQRExpired ? (
                         <div className="flex flex-col items-center justify-center text-center">
                           <p className="mb-4 text-sm font-medium text-gray-600">
                             QR Code Expired
                           </p>
                           <button
-                            onClick={() => {
-                              setIsQRExpired(false);
-                              // Trigger QR code refresh logic here
-                            }}
+                            onClick={onRefreshQRCode}
                             className="rounded-full bg-[#4DBB8E] px-6 py-2 text-sm font-medium text-white transition-all hover:bg-[#45a87e]"
                           >
                             Refresh
                           </button>
                         </div>
-                      ) : qrCodeUrl ? (
+                      ) : generatedQRCode ? (
                         <div className="relative h-full w-full">
-                          <Image
-                            src={qrCodeUrl}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={generatedQRCode}
                             alt="NDI QR Code"
-                            fill
-                            className="rounded-lg object-contain"
+                            className="h-full w-full rounded-lg object-contain"
                           />
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-lg sm:h-12 sm:w-12">
@@ -204,6 +450,24 @@ export function NDILoginModal({
                       code
                     </p>
                   </div>
+
+                  {/* Verification Status */}
+                  {verificationStatus !== 'pending' && (
+                    <div
+                      className={`mb-4 w-full rounded-lg p-3 text-center text-sm font-medium ${
+                        verificationStatus === 'verified'
+                          ? 'bg-green-50 text-green-700'
+                          : verificationStatus === 'failed' ||
+                              verificationStatus === 'rejected' ||
+                              verificationStatus === 'timeout' ||
+                              verificationStatus === 'error'
+                            ? 'bg-red-50 text-red-700'
+                            : 'bg-blue-50 text-blue-700'
+                      }`}
+                    >
+                      {statusMessage}
+                    </div>
+                  )}
                 </>
               )}
 
@@ -230,18 +494,46 @@ export function NDILoginModal({
 
                   <button
                     onClick={handleOpenApp}
-                    className="group relative flex w-64 items-center justify-center gap-3 overflow-hidden rounded-xl border-2 border-[#4DBB8E] bg-white px-4 py-3.5 font-bold text-[#4DBB8E] shadow-sm transition-all duration-300 hover:bg-[#4DBB8E] hover:text-white hover:shadow-md active:scale-[0.98]"
+                    disabled={isLoading || !deepLinkUrl}
+                    className="group relative flex w-64 items-center justify-center gap-3 overflow-hidden rounded-xl bg-[#124143] px-4 py-3.5 font-bold text-white shadow-lg transition-all duration-300 hover:bg-[#0d3133] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <div className="relative h-5 w-5 transition-transform duration-300 group-hover:scale-110">
-                      <Image
-                        src="/NDI.png"
-                        alt="NDI Logo"
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                    <span>Open NDI Wallet</span>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <span>Loading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="relative h-5 w-5 transition-transform duration-300 group-hover:scale-110">
+                          <Image
+                            src="/NDI.png"
+                            alt="NDI Logo"
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                        <span>Open NDI Wallet</span>
+                      </>
+                    )}
                   </button>
+
+                  {/* Verification Status */}
+                  {verificationStatus !== 'pending' && (
+                    <div
+                      className={`mt-4 w-full rounded-lg p-3 text-center text-sm font-medium ${
+                        verificationStatus === 'verified'
+                          ? 'bg-green-50 text-green-700'
+                          : verificationStatus === 'failed' ||
+                              verificationStatus === 'rejected' ||
+                              verificationStatus === 'timeout' ||
+                              verificationStatus === 'error'
+                            ? 'bg-red-50 text-red-700'
+                            : 'bg-blue-50 text-blue-700'
+                      }`}
+                    >
+                      {statusMessage}
+                    </div>
+                  )}
                 </div>
               )}
               {/* Video Guide Button (Shared) */}
@@ -260,7 +552,7 @@ export function NDILoginModal({
                 <div className="flex items-center justify-center gap-3">
                   {/* Google Play Badge */}
                   <a
-                    href="https://play.google.com/store/apps/details?id=bt.gov.riti.ndi.wallet"
+                    href="https://play.google.com/store/search?q=bhutan%20ndi&c=apps&hl=en_IN&gl=US"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="transition-all hover:scale-[1.02] active:scale-95"
