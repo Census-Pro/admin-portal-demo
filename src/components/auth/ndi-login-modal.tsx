@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import QRCode from 'qrcode';
+import { toast } from 'sonner';
 
 interface NDILoginModalProps {
   isOpen: boolean;
@@ -181,11 +182,15 @@ export function NDILoginModal({
           if (result?.ok) {
             console.log('✅ Login successful via NDI');
             onLoginSuccessRef.current?.(data.loginData);
+            toast.success('Login successful! Redirecting...', {
+              description:
+                'You have been successfully authenticated via Bhutan NDI.'
+            });
             onCloseRef.current();
 
-            // Add a small delay to ensure session is established
+            // Add a delay to ensure the toast is seen and session is established
             // before redirecting to dashboard
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 800));
 
             // Use window.location for hard navigation to ensure
             // middleware sees the new session
@@ -194,6 +199,11 @@ export function NDILoginModal({
             console.error('❌ NextAuth sign in failed:', result?.error);
             setVerificationStatus('failed');
             setStatusMessage('Login failed. Please try again.');
+            toast.error('Login failed', {
+              description:
+                result?.error ||
+                'Could not authenticate with provided credentials.'
+            });
             onLoginErrorRef.current?.(result?.error || 'Login failed');
           }
         } else if (data.status === 'failed') {
@@ -201,6 +211,9 @@ export function NDILoginModal({
           setStatusMessage(
             data.error || 'Verification failed. Please try again.'
           );
+          toast.error('Verification Failed', {
+            description: data.error || 'The authentication process failed.'
+          });
           onLoginErrorRef.current?.(data.error || 'Verification failed');
           // Close connection after error
           if (eventSourceRef.current) {
@@ -210,6 +223,10 @@ export function NDILoginModal({
         } else if (data.status === 'rejected') {
           setVerificationStatus('rejected');
           setStatusMessage('Verification was rejected.');
+          toast.warning('Verification Rejected', {
+            description:
+              'The authentication request was rejected on your device.'
+          });
           onLoginErrorRef.current?.('Verification rejected by user');
           // Close connection after rejection
           if (eventSourceRef.current) {
@@ -219,6 +236,9 @@ export function NDILoginModal({
         } else if (data.status === 'timeout') {
           setVerificationStatus('timeout');
           setStatusMessage('Verification timed out. Please try again.');
+          toast.error('Verification Timed Out', {
+            description: 'The request has expired. Please refresh the QR code.'
+          });
           onLoginErrorRef.current?.('Verification timeout');
           // Close connection after timeout
           if (eventSourceRef.current) {
@@ -341,7 +361,6 @@ export function NDILoginModal({
           >
             <X className="h-5 w-5" />
           </button>
-
           {/* Scrollable Content Container */}
           <div className="scrollbar-hide max-h-[90vh] overflow-y-auto">
             <div className="flex flex-col items-center px-6 py-10 sm:px-8">
@@ -589,6 +608,7 @@ export function NDILoginModal({
               </div>
             </div>
           </div>
+          w{' '}
         </div>
       </div>
     </>

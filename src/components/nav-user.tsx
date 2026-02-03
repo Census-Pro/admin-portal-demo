@@ -6,7 +6,8 @@ import {
   IconChevronsDown,
   IconCreditCard,
   IconLogout,
-  IconSparkles
+  IconSparkles,
+  IconUser
 } from '@tabler/icons-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,6 +36,8 @@ export function NavUser({
     name: string;
     email: string;
     avatar: string;
+    cidNo?: string;
+    roleType?: string;
   };
 }) {
   const { isMobile } = useSidebar();
@@ -54,11 +57,20 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  <IconUser className="size-4" />
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                {/* Name removed as requested */}
+                <span className="truncate text-xs">
+                  {user.cidNo ? `CID: ${user.cidNo}` : user.email}
+                </span>
+                {user.roleType && (
+                  <span className="text-muted-foreground truncate text-[10px] font-medium uppercase">
+                    {user.roleType.replace('_', ' ')}
+                  </span>
+                )}
               </div>
               <IconChevronsDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -73,36 +85,30 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    <IconUser className="size-4" />
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  {/* Name removed as requested */}
+                  <span className="truncate text-xs">
+                    {user.cidNo ? `CID: ${user.cidNo}` : user.email}
+                  </span>
+                  {user.roleType && (
+                    <span className="text-muted-foreground truncate text-[10px] font-medium uppercase">
+                      {user.roleType.replace('_', ' ')}
+                    </span>
+                  )}
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              {/* <DropdownMenuItem>
-                <IconSparkles className="mr-2 h-4 w-4" />
-                Upgrade to Pro
-              </DropdownMenuItem> */}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href="/dashboard/user" className="cursor-pointer">
-                  <IconCircleCheck className="mr-2 h-4 w-4" />
-                  Account
+                <Link href="/dashboard/profile" className="flex items-center">
+                  <IconSparkles className="mr-2 h-4 w-4" />
+                  Profile
                 </Link>
-              </DropdownMenuItem>
-              {/* <DropdownMenuItem>
-                <IconCreditCard className="mr-2 h-4 w-4" />
-                Billing
-              </DropdownMenuItem> */}
-              <DropdownMenuItem>
-                <IconBell className="mr-2 h-4 w-4" />
-                Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

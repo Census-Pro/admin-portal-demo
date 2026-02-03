@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from 'next-auth';
+import { IconUser } from '@tabler/icons-react';
 
 interface UserAvatarProfileProps {
   className?: string;
@@ -17,14 +18,21 @@ export function UserAvatarProfile({
       <Avatar className={className}>
         <AvatarImage src={user?.image || ''} alt={user?.name || ''} />
         <AvatarFallback className="rounded-lg">
-          {user?.name?.slice(0, 2)?.toUpperCase() || 'CN'}
+          <IconUser className="h-4 w-4" />
         </AvatarFallback>
       </Avatar>
 
       {showInfo && (
         <div className="grid flex-1 text-left text-sm leading-tight">
-          <span className="truncate font-semibold">{user?.name || ''}</span>
-          <span className="truncate text-xs">{user?.email || ''}</span>
+          {/* Name removed as requested */}
+          <span className="text-muted-foreground truncate text-xs">
+            {user?.cidNo ? `CID: ${user.cidNo}` : user?.email || ''}
+          </span>
+          {user?.roleType && (
+            <span className="text-muted-foreground truncate text-[10px] font-medium uppercase">
+              {user.roleType.replace('_', ' ')}
+            </span>
+          )}
         </div>
       )}
     </div>

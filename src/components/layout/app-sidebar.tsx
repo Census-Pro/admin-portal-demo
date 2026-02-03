@@ -111,26 +111,7 @@ export default function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        {session?.user && (
-          <NavUser
-            user={{
-              name: session.user.name || 'User',
-              email: session.user.email || '',
-              avatar: session.user.image || ''
-            }}
-          />
-        )}
-        {!session?.user && (
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton>
-                <span>Loading user...</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        )}
-      </SidebarFooter>
+      <SidebarFooter></SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

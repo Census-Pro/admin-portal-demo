@@ -15,6 +15,19 @@ declare module 'next-auth' {
     gewogId?: string;
     departmentId?: string;
     ndiId?: string;
+    cidNo?: string;
+    mobileNo?: string | null;
+    email?: string | null;
+    officeLocationId?: string;
+    agencyId?: string;
+    officeLocation?: {
+      id: string;
+      name: string;
+    };
+    agency?: {
+      id: string;
+      name: string;
+    };
     status: string;
     roles: Array<{
       id: string;

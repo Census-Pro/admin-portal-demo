@@ -37,12 +37,17 @@ export function UserNav() {
         >
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm leading-none font-medium">
-                {session.user.fullName}
-              </p>
+              {/* Name removed as requested */}
               <p className="text-muted-foreground text-xs leading-none">
-                {session.user.email}
+                {session.user.cidNo
+                  ? `CID: ${session.user.cidNo}`
+                  : session.user.email}
               </p>
+              {session.user.roleType && (
+                <p className="text-muted-foreground pt-1 text-[10px] leading-none font-medium uppercase">
+                  {session.user.roleType.replace('_', ' ')}
+                </p>
+              )}
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -50,7 +55,6 @@ export function UserNav() {
             <DropdownMenuItem onClick={() => router.push('/dashboard/profile')}>
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut}>Sign out</DropdownMenuItem>

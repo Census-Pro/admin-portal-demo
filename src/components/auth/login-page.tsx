@@ -6,6 +6,7 @@ import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { NDILoginButton } from './ndi-login-button';
+import { toast } from 'sonner';
 
 export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -38,9 +39,12 @@ export function LoginPage() {
         setIsLoading(false);
       } else if (result?.ok) {
         console.log('🔐 Sign in successful, redirecting to dashboard');
+        toast.success('Login successful!', {
+          description: 'Welcome to the BCRS Admin Portal.'
+        });
 
         // Add small delay to ensure session is established
-        await new Promise((resolve) => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         // Use window.location for hard navigation
         window.location.href = '/dashboard';
