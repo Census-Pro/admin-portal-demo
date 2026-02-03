@@ -6,6 +6,7 @@ import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { NDILoginButton } from './ndi-login-button';
 
 export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -121,6 +122,34 @@ export function LoginPage() {
             {!isLoading && <ArrowRight className="h-4 w-4" />}
           </button>
         </form>
+
+        {/* Divider */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card text-muted-foreground px-2">
+              Or continue with
+            </span>
+          </div>
+        </div>
+
+        {/* NDI Login Button */}
+        <NDILoginButton
+          variant="outline"
+          size="md"
+          className="w-full"
+          onLoginSuccess={(data) => {
+            console.log('🔐 NDI login successful:', data);
+            router.push('/dashboard');
+            router.refresh();
+          }}
+          onLoginError={(error) => {
+            console.error('🔐 NDI login error:', error);
+            setError(error);
+          }}
+        />
 
         <div className="mt-6 text-center">
           <p className="text-muted-foreground text-xs">
