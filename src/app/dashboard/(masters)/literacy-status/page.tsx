@@ -1,16 +1,14 @@
 import PageContainer from '@/components/layout/page-container';
-import { getLiteracyStatuses } from '@/actions/common/literacy-status-actions';
-import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from './_components/columns';
-import { Suspense } from 'react';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddLiteracyStatusButton } from './_components/add-literacy-status-button';
+import { LiteracyStatusesTable } from './_components/literacy-statuses-table';
+import { Suspense } from 'react';
 
 export const metadata = {
   title: 'Dashboard: Literacy Status Management'
 };
 
-export default async function LiteracyStatusManagementPage() {
+export default function LiteracyStatusManagementPage() {
   return (
     <PageContainer
       pageTitle="Literacy Status Management"
@@ -21,24 +19,9 @@ export default async function LiteracyStatusManagementPage() {
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >
-          <LiteracyStatusTable />
+          <LiteracyStatusesTable />
         </Suspense>
       </div>
     </PageContainer>
-  );
-}
-
-async function LiteracyStatusTable() {
-  const result = await getLiteracyStatuses();
-
-  const literacyStatuses = result.literacyStatuses || [];
-  const totalItems = result.totalLiteracyStatuses || literacyStatuses.length;
-
-  return (
-    <DataTable
-      columns={columns}
-      data={literacyStatuses}
-      totalItems={totalItems}
-    />
   );
 }

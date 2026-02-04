@@ -1,16 +1,14 @@
 import PageContainer from '@/components/layout/page-container';
-import { getRelationships } from '@/actions/common/relationship-actions';
-import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from './_components/columns';
-import { Suspense } from 'react';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddRelationshipButton } from './_components/add-relationship-button';
+import { RelationshipsTable } from './_components/relationships-table';
+import { Suspense } from 'react';
 
 export const metadata = {
   title: 'Dashboard: Relationship Management'
 };
 
-export default async function RelationshipManagementPage() {
+export default function RelationshipManagementPage() {
   return (
     <PageContainer
       pageTitle="Relationship Management"
@@ -25,24 +23,5 @@ export default async function RelationshipManagementPage() {
         </Suspense>
       </div>
     </PageContainer>
-  );
-}
-
-async function RelationshipsTable() {
-  const result = await getRelationships();
-
-  if (!result.success) {
-    return (
-      <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-6 text-center">
-        <p className="text-destructive">{result.error}</p>
-      </div>
-    );
-  }
-
-  const relationships = result.data || [];
-  const totalItems = result.meta?.itemCount ?? relationships.length;
-
-  return (
-    <DataTable columns={columns} data={relationships} totalItems={totalItems} />
   );
 }

@@ -1,16 +1,14 @@
 import PageContainer from '@/components/layout/page-container';
-import { getRelationshipCertificatePurposes } from '@/actions/common/relationship-certificate-purpose-actions';
-import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from './_components/columns';
-import { Suspense } from 'react';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddRelationshipCertificatePurposeButton } from './_components/add-relationship-certificate-purpose-button';
+import { RelationshipCertificatePurposesTable } from './_components/relationship-certificate-purposes-table';
+import { Suspense } from 'react';
 
 export const metadata = {
   title: 'Dashboard: Relationship Certificate Purpose Management'
 };
 
-export default async function RelationshipCertificatePurposeManagementPage() {
+export default function RelationshipCertificatePurposeManagementPage() {
   return (
     <PageContainer
       pageTitle="Relationship Certificate Purpose Management"
@@ -21,26 +19,9 @@ export default async function RelationshipCertificatePurposeManagementPage() {
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >
-          <RelationshipCertificatePurposeTable />
+          <RelationshipCertificatePurposesTable />
         </Suspense>
       </div>
     </PageContainer>
-  );
-}
-
-async function RelationshipCertificatePurposeTable() {
-  const result = await getRelationshipCertificatePurposes();
-
-  // Handle the structure returned by getRelationshipCertificatePurposes
-  const relationshipCertificatePurposes = result.data || [];
-  const totalItems =
-    result.totalItems || relationshipCertificatePurposes.length;
-
-  return (
-    <DataTable
-      columns={columns}
-      data={relationshipCertificatePurposes}
-      totalItems={totalItems}
-    />
   );
 }

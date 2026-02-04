@@ -6,10 +6,21 @@ import { instance } from '../instance';
 const API_URL =
   process.env.AUTH_SERVICE || process.env.API_URL || 'http://localhost:5001';
 
-export async function getAgencies() {
+export async function getAgencies({
+  page,
+  limit,
+  search
+}: {
+  page?: number;
+  limit?: number;
+  search?: string;
+} = {}) {
   try {
     const headers = await instance();
-    const url = `${API_URL}/agencies`;
+    let url = `${API_URL}/agencies?page=${page}&take=${limit}`;
+    if (search) {
+      url += `&q=${search}`;
+    }
 
     const response = await fetch(url, {
       method: 'GET',
@@ -45,7 +56,8 @@ export async function getAgencies() {
 
     return {
       success: true,
-      data: result.data || []
+      data: result.data || [],
+      totalItems: result.meta?.itemCount || (result.data || []).length
     };
   } catch (error) {
     console.error('getAgencies error:', error);

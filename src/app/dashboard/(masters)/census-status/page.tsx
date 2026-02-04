@@ -1,16 +1,14 @@
 import PageContainer from '@/components/layout/page-container';
-import { getCensusStatuses } from '@/actions/common/census-status-actions';
-import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from './_components/columns';
-import { Suspense } from 'react';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddCensusStatusButton } from './_components/add-census-status-button';
+import { CensusStatusesTable } from './_components/census-statuses-table';
+import { Suspense } from 'react';
 
 export const metadata = {
   title: 'Dashboard: Census Status Management'
 };
 
-export default async function CensusStatusManagementPage() {
+export default function CensusStatusManagementPage() {
   return (
     <PageContainer
       pageTitle="Census Status Management"
@@ -21,24 +19,9 @@ export default async function CensusStatusManagementPage() {
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >
-          <CensusStatusTable />
+          <CensusStatusesTable />
         </Suspense>
       </div>
     </PageContainer>
-  );
-}
-
-async function CensusStatusTable() {
-  const result = await getCensusStatuses();
-
-  const censusStatuses = result.censusStatuses || [];
-  const totalItems = result.totalCensusStatuses || censusStatuses.length;
-
-  return (
-    <DataTable
-      columns={columns}
-      data={censusStatuses}
-      totalItems={totalItems}
-    />
   );
 }
