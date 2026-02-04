@@ -123,6 +123,117 @@ export const DELETE_COUNTRIES = 'delete:countries' as const;
 export const MANAGE_COUNTRIES = 'manage:countries' as const;
 
 // ============================================================================
+// DZONGKHAG PERMISSIONS
+// ============================================================================
+
+export const VIEW_DZONGKHAGS = 'view:dzongkhags' as const;
+export const CREATE_DZONGKHAGS = 'create:dzongkhags' as const;
+export const EDIT_DZONGKHAGS = 'edit:dzongkhags' as const;
+export const DELETE_DZONGKHAGS = 'delete:dzongkhags' as const;
+export const MANAGE_DZONGKHAGS = 'manage:dzongkhags' as const;
+
+// ============================================================================
+// GEWOG PERMISSIONS
+// ============================================================================
+
+export const VIEW_GEWOGS = 'view:gewogs' as const;
+export const CREATE_GEWOGS = 'create:gewogs' as const;
+export const EDIT_GEWOGS = 'edit:gewogs' as const;
+export const DELETE_GEWOGS = 'delete:gewogs' as const;
+export const MANAGE_GEWOGS = 'manage:gewogs' as const;
+
+// ============================================================================
+// CITY PERMISSIONS
+// ============================================================================
+
+export const VIEW_CITIES = 'view:cities' as const;
+export const CREATE_CITIES = 'create:cities' as const;
+export const EDIT_CITIES = 'edit:cities' as const;
+export const DELETE_CITIES = 'delete:cities' as const;
+export const MANAGE_CITIES = 'manage:cities' as const;
+
+// ============================================================================
+// GENDER PERMISSIONS
+// ============================================================================
+
+export const VIEW_GENDERS = 'view:genders' as const;
+export const CREATE_GENDERS = 'create:genders' as const;
+export const EDIT_GENDERS = 'edit:genders' as const;
+export const DELETE_GENDERS = 'delete:genders' as const;
+export const MANAGE_GENDERS = 'manage:genders' as const;
+
+// ============================================================================
+// MARITAL STATUS PERMISSIONS
+// ============================================================================
+
+export const VIEW_MARITAL_STATUS = 'view:marital-status' as const;
+export const CREATE_MARITAL_STATUS = 'create:marital-status' as const;
+export const EDIT_MARITAL_STATUS = 'edit:marital-status' as const;
+export const DELETE_MARITAL_STATUS = 'delete:marital-status' as const;
+export const MANAGE_MARITAL_STATUS = 'manage:marital-status' as const;
+
+// ============================================================================
+// LITERACY STATUS PERMISSIONS
+// ============================================================================
+
+export const VIEW_LITERACY_STATUS = 'view:literacy-status' as const;
+export const CREATE_LITERACY_STATUS = 'create:literacy-status' as const;
+export const EDIT_LITERACY_STATUS = 'edit:literacy-status' as const;
+export const DELETE_LITERACY_STATUS = 'delete:literacy-status' as const;
+export const MANAGE_LITERACY_STATUS = 'manage:literacy-status' as const;
+
+// ============================================================================
+// CENSUS STATUS PERMISSIONS
+// ============================================================================
+
+export const VIEW_CENSUS_STATUS = 'view:census-status' as const;
+export const CREATE_CENSUS_STATUS = 'create:census-status' as const;
+export const EDIT_CENSUS_STATUS = 'edit:census-status' as const;
+export const DELETE_CENSUS_STATUS = 'delete:census-status' as const;
+export const MANAGE_CENSUS_STATUS = 'manage:census-status' as const;
+
+// ============================================================================
+// NATURALIZATION TYPE PERMISSIONS
+// ============================================================================
+
+export const VIEW_NATURALIZATION_TYPES = 'view:naturalization-types' as const;
+export const CREATE_NATURALIZATION_TYPES =
+  'create:naturalization-types' as const;
+export const EDIT_NATURALIZATION_TYPES = 'edit:naturalization-types' as const;
+export const DELETE_NATURALIZATION_TYPES =
+  'delete:naturalization-types' as const;
+export const MANAGE_NATURALIZATION_TYPES =
+  'manage:naturalization-types' as const;
+
+// ============================================================================
+// REGULARIZATION TYPE PERMISSIONS
+// ============================================================================
+
+export const VIEW_REGULARIZATION_TYPES = 'view:regularization-types' as const;
+export const CREATE_REGULARIZATION_TYPES =
+  'create:regularization-types' as const;
+export const EDIT_REGULARIZATION_TYPES = 'edit:regularization-types' as const;
+export const DELETE_REGULARIZATION_TYPES =
+  'delete:regularization-types' as const;
+export const MANAGE_REGULARIZATION_TYPES =
+  'manage:regularization-types' as const;
+
+// ============================================================================
+// RELATIONSHIP CERTIFICATE PURPOSE PERMISSIONS
+// ============================================================================
+
+export const VIEW_RELATIONSHIP_CERTIFICATE_PURPOSES =
+  'view:relationship-certificate-purposes' as const;
+export const CREATE_RELATIONSHIP_CERTIFICATE_PURPOSES =
+  'create:relationship-certificate-purposes' as const;
+export const EDIT_RELATIONSHIP_CERTIFICATE_PURPOSES =
+  'edit:relationship-certificate-purposes' as const;
+export const DELETE_RELATIONSHIP_CERTIFICATE_PURPOSES =
+  'delete:relationship-certificate-purposes' as const;
+export const MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES =
+  'manage:relationship-certificate-purposes' as const;
+
+// ============================================================================
 // DASHBOARD PERMISSIONS
 // ============================================================================
 
@@ -265,6 +376,56 @@ export type Permission =
   | typeof EDIT_COUNTRIES
   | typeof DELETE_COUNTRIES
   | typeof MANAGE_COUNTRIES
+  | typeof VIEW_DZONGKHAGS
+  | typeof CREATE_DZONGKHAGS
+  | typeof EDIT_DZONGKHAGS
+  | typeof DELETE_DZONGKHAGS
+  | typeof MANAGE_DZONGKHAGS
+  | typeof VIEW_GEWOGS
+  | typeof CREATE_GEWOGS
+  | typeof EDIT_GEWOGS
+  | typeof DELETE_GEWOGS
+  | typeof MANAGE_GEWOGS
+  | typeof VIEW_CITIES
+  | typeof CREATE_CITIES
+  | typeof EDIT_CITIES
+  | typeof DELETE_CITIES
+  | typeof MANAGE_CITIES
+  | typeof VIEW_GENDERS
+  | typeof CREATE_GENDERS
+  | typeof EDIT_GENDERS
+  | typeof DELETE_GENDERS
+  | typeof MANAGE_GENDERS
+  | typeof VIEW_MARITAL_STATUS
+  | typeof CREATE_MARITAL_STATUS
+  | typeof EDIT_MARITAL_STATUS
+  | typeof DELETE_MARITAL_STATUS
+  | typeof MANAGE_MARITAL_STATUS
+  | typeof VIEW_LITERACY_STATUS
+  | typeof CREATE_LITERACY_STATUS
+  | typeof EDIT_LITERACY_STATUS
+  | typeof DELETE_LITERACY_STATUS
+  | typeof MANAGE_LITERACY_STATUS
+  | typeof VIEW_CENSUS_STATUS
+  | typeof CREATE_CENSUS_STATUS
+  | typeof EDIT_CENSUS_STATUS
+  | typeof DELETE_CENSUS_STATUS
+  | typeof MANAGE_CENSUS_STATUS
+  | typeof VIEW_NATURALIZATION_TYPES
+  | typeof CREATE_NATURALIZATION_TYPES
+  | typeof EDIT_NATURALIZATION_TYPES
+  | typeof DELETE_NATURALIZATION_TYPES
+  | typeof MANAGE_NATURALIZATION_TYPES
+  | typeof VIEW_REGULARIZATION_TYPES
+  | typeof CREATE_REGULARIZATION_TYPES
+  | typeof EDIT_REGULARIZATION_TYPES
+  | typeof DELETE_REGULARIZATION_TYPES
+  | typeof MANAGE_REGULARIZATION_TYPES
+  | typeof VIEW_RELATIONSHIP_CERTIFICATE_PURPOSES
+  | typeof CREATE_RELATIONSHIP_CERTIFICATE_PURPOSES
+  | typeof EDIT_RELATIONSHIP_CERTIFICATE_PURPOSES
+  | typeof DELETE_RELATIONSHIP_CERTIFICATE_PURPOSES
+  | typeof MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES
   | typeof VIEW_DASHBOARD;
 
 // ============================================================================

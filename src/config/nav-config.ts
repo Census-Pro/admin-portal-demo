@@ -72,6 +72,86 @@ export const navItems: NavItem[] = [
         access: {
           permissions: [PERMS.MANAGE_ALL]
         }
+      },
+      {
+        title: 'Dzongkhags',
+        url: '/dashboard/dzongkhags',
+        shortcut: ['d', 'z'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Gewogs',
+        url: '/dashboard/gewogs',
+        shortcut: ['g', 'w'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Cities',
+        url: '/dashboard/cities',
+        shortcut: ['c', 't'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Genders',
+        url: '/dashboard/genders',
+        shortcut: ['g', 'n'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Marital Status',
+        url: '/dashboard/marital-status',
+        shortcut: ['m', 's'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Literacy Status',
+        url: '/dashboard/literacy-status',
+        shortcut: ['l', 's'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Census Status',
+        url: '/dashboard/census-status',
+        shortcut: ['c', 's'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Naturalization Types',
+        url: '/dashboard/naturalization-types',
+        shortcut: ['n', 't'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Regularization Types',
+        url: '/dashboard/regularization-types',
+        shortcut: ['r', 't'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Certificate Purposes',
+        url: '/dashboard/relationship-certificate-purposes',
+        shortcut: ['c', 'p'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
       }
     ],
     // Only Super Admin can access Masters section
