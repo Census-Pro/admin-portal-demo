@@ -113,6 +113,16 @@ export const APPROVE_DEATH_REGISTRATION = 'approve:death-registration' as const;
 export const MANAGE_DEATH_REGISTRATION = 'manage:death-registration' as const;
 
 // ============================================================================
+// COUNTRY PERMISSIONS
+// ============================================================================
+
+export const VIEW_COUNTRIES = 'view:countries' as const;
+export const CREATE_COUNTRIES = 'create:countries' as const;
+export const EDIT_COUNTRIES = 'edit:countries' as const;
+export const DELETE_COUNTRIES = 'delete:countries' as const;
+export const MANAGE_COUNTRIES = 'manage:countries' as const;
+
+// ============================================================================
 // DASHBOARD PERMISSIONS
 // ============================================================================
 
@@ -250,6 +260,11 @@ export type Permission =
   | typeof VERIFY_DEATH_REGISTRATION
   | typeof APPROVE_DEATH_REGISTRATION
   | typeof MANAGE_DEATH_REGISTRATION
+  | typeof VIEW_COUNTRIES
+  | typeof CREATE_COUNTRIES
+  | typeof EDIT_COUNTRIES
+  | typeof DELETE_COUNTRIES
+  | typeof MANAGE_COUNTRIES
   | typeof VIEW_DASHBOARD;
 
 // ============================================================================

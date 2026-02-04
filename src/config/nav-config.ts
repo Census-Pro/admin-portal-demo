@@ -33,7 +33,7 @@ export const navItems: NavItem[] = [
     }
   },
   {
-    title: 'Organization',
+    title: 'Masters',
     url: '#',
     icon: 'billing',
     isActive: true,
@@ -50,15 +50,31 @@ export const navItems: NavItem[] = [
       },
       {
         title: 'Office Locations',
-        url: '/dashboard/organization/office-locations',
+        url: '/dashboard/office-locations',
         shortcut: ['o', 'l'],
         // Only Super Admin can manage office locations
         access: {
           permissions: [PERMS.MANAGE_ALL]
         }
+      },
+      {
+        title: 'Relationships',
+        url: '/dashboard/relationship-types',
+        shortcut: ['r', 'l'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
+      },
+      {
+        title: 'Countries',
+        url: '/dashboard/countries',
+        shortcut: ['c', 'u'],
+        access: {
+          permissions: [PERMS.MANAGE_ALL]
+        }
       }
     ],
-    // Only Super Admin can access Organization section
+    // Only Super Admin can access Masters section
     access: {
       permissions: [PERMS.MANAGE_ALL]
     }
@@ -196,24 +212,7 @@ export const navItems: NavItem[] = [
       ]
     }
   },
-  {
-    title: 'Relationships',
-    url: '/dashboard/relationships',
-    icon: 'family',
-    isActive: false,
-    items: [],
-    subject: 'Relationships', // For ability-based filtering
-    // Super Admin, Admin, and Operators can view relationships
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.VIEW_RELATIONSHIPS,
-        PERMS.MANAGE_RELATIONSHIPS,
-        PERMS.VERIFY_RELATIONSHIPS,
-        PERMS.APPROVE_RELATIONSHIPS
-      ]
-    }
-  },
+
   {
     title: 'Naturalization/Regularization',
     url: '/dashboard/naturalization',
