@@ -41,7 +41,7 @@ export const navItems: NavItem[] = [
     items: [
       {
         title: 'Agencies',
-        url: '/dashboard/master/agencies',
+        url: '/dashboard/agencies',
         shortcut: ['a', 'g'],
         // Only Super Admin can manage agencies
         access: {
@@ -72,7 +72,7 @@ export const navItems: NavItem[] = [
     items: [
       {
         title: 'Roles',
-        url: '/dashboard/master/roles',
+        url: '/dashboard/roles',
         shortcut: ['r', 'o'],
         // Only Super Admin can manage roles
         access: {
@@ -81,7 +81,7 @@ export const navItems: NavItem[] = [
       },
       {
         title: 'Permissions',
-        url: '/dashboard/master/permissions',
+        url: '/dashboard/permissions',
         shortcut: ['p', 'm'],
         // Only Super Admin can manage permissions
         access: {

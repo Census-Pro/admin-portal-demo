@@ -162,7 +162,7 @@ export async function createPermission(data: {
       '✅ [createPermission] Permission created successfully:',
       result
     );
-    revalidatePath('/dashboard/master/permissions');
+    revalidatePath('/dashboard/permissions');
 
     return {
       success: true,
@@ -212,7 +212,7 @@ export async function updatePermission(data: {
     }
 
     const result = await response.json();
-    revalidatePath('/dashboard/master/permissions');
+    revalidatePath('/dashboard/permissions');
 
     return {
       success: true,
@@ -253,7 +253,7 @@ export async function deletePermission(id: string) {
     }
 
     const result = await response.json();
-    revalidatePath('/dashboard/master/permissions');
+    revalidatePath('/dashboard/permissions');
 
     return {
       success: true,

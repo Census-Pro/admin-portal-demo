@@ -151,7 +151,7 @@ export async function createRole(data: { name: string; description: string }) {
 
     const result = await response.json();
     console.log('[createRole] Role created successfully:', result);
-    revalidatePath('/dashboard/master/roles');
+    revalidatePath('/dashboard/roles');
 
     return {
       success: true,
@@ -199,7 +199,7 @@ export async function updateRole(data: {
     }
 
     const result = await response.json();
-    revalidatePath('/dashboard/master/roles');
+    revalidatePath('/dashboard/roles');
 
     return {
       success: true,
@@ -240,7 +240,7 @@ export async function deleteRole(id: string) {
     }
 
     const result = await response.json();
-    revalidatePath('/dashboard/master/roles');
+    revalidatePath('/dashboard/roles');
 
     return {
       success: true,
@@ -412,8 +412,8 @@ export async function assignPermissionToRole(data: {
     console.log('[assignPermissionToRole] ✅ Success! Response:', result);
     console.log('========================================');
 
-    revalidatePath('/dashboard/master/roles');
-    revalidatePath('/dashboard/master/permissions');
+    revalidatePath('/dashboard/roles');
+    revalidatePath('/dashboard/permissions');
 
     return {
       success: true,

@@ -92,7 +92,7 @@ export async function createAgency(data: { name: string; code?: string }) {
     }
 
     const result = await response.json();
-    revalidatePath('/dashboard/master/agencies');
+    revalidatePath('/dashboard/agencies');
 
     return {
       success: true,
@@ -140,7 +140,7 @@ export async function updateAgency(data: {
     }
 
     const result = await response.json();
-    revalidatePath('/dashboard/master/agencies');
+    revalidatePath('/dashboard/agencies');
 
     return {
       success: true,
@@ -181,7 +181,7 @@ export async function deleteAgency(id: string) {
     }
 
     const result = await response.json();
-    revalidatePath('/dashboard/master/agencies');
+    revalidatePath('/dashboard/agencies');
 
     return {
       success: true,
