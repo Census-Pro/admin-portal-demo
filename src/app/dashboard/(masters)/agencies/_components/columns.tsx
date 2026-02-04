@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteAgency } from '@/actions/common/agency-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -77,23 +78,21 @@ export const columns: ColumnDef<Agency>[] = [
 
 function ActionsCell({ agency }: { agency: Agency }) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const router = useRouter();
 
-  const handleDelete = async () => {
-    if (
-      !confirm(
-        `Are you sure you want to delete the agency "${agency.name}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
     setIsDeleting(true);
     try {
       const result = await deleteAgency(agency.id);
 
       if (result.success) {
         toast.success(result.message || 'Agency deleted successfully');
+        setDeleteDialogOpen(false);
         router.refresh();
       } else {
         toast.error(result.error || 'Failed to delete agency');
@@ -107,25 +106,28 @@ function ActionsCell({ agency }: { agency: Agency }) {
   };
 
   return (
-    <div className="flex justify-end">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" disabled={isDeleting}>
-            <IconDotsVertical className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="text-destructive focus:text-destructive"
-          >
-            <IconTrash className="mr-2 h-4 w-4" />
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title={`Delete "${agency.name}"`}
+        description="Are you sure you want to delete this agency? This action cannot be undone."
+        confirmText="Delete Agency"
+      />
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+          className="text-destructive hover:text-destructive"
+        >
+          <IconTrash className="h-4 w-4" />
+          <span className="sr-only">Delete</span>
+        </Button>
+      </div>
+    </>
   );
 }

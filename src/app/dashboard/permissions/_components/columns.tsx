@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deletePermission } from '@/actions/common/permission-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -109,23 +110,21 @@ export const columns: ColumnDef<Permission>[] = [
 
 function ActionsCell({ permission }: { permission: Permission }) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const router = useRouter();
 
-  const handleDelete = async () => {
-    if (
-      !confirm(
-        `Are you sure you want to delete the permission "${permission.name}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
     setIsDeleting(true);
     try {
       const result = await deletePermission(permission.id);
 
       if (result.success) {
         toast.success(result.message || 'Permission deleted successfully');
+        setDeleteDialogOpen(false);
         router.refresh();
       } else {
         toast.error(result.error || 'Failed to delete permission');
@@ -139,25 +138,28 @@ function ActionsCell({ permission }: { permission: Permission }) {
   };
 
   return (
-    <div className="flex justify-end">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" disabled={isDeleting}>
-            <IconDotsVertical className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="text-destructive focus:text-destructive"
-          >
-            <IconTrash className="mr-2 h-4 w-4" />
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title={`Delete "${permission.name}"`}
+        description="Are you sure you want to delete this permission? This action cannot be undone."
+        confirmText="Delete Permission"
+      />
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+          className="text-destructive hover:text-destructive"
+        >
+          <IconTrash className="h-4 w-4" />
+          <span className="sr-only">Delete</span>
+        </Button>
+      </div>
+    </>
   );
 }

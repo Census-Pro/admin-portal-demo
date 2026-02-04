@@ -6,10 +6,17 @@ import { instance } from '../instance';
 const API_URL =
   process.env.AUTH_SERVICE || process.env.API_URL || 'http://localhost:5001';
 
-export async function getOfficeLocations(page: number = 1, take: number = 10) {
+export async function getOfficeLocations(
+  page: number = 1,
+  take: number = 10,
+  search?: string
+) {
   try {
     const headers = await instance();
-    const url = `${API_URL}/office-locations?page=${page}&take=${take}`;
+    let url = `${API_URL}/office-locations?page=${page}&take=${take}`;
+    if (search) {
+      url += `&q=${search}`;
+    }
 
     const response = await fetch(url, {
       method: 'GET',

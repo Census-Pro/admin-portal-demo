@@ -9,6 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteDzongkhag } from '@/actions/common/dzongkhag-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -48,18 +49,15 @@ export const columns: ColumnDef<Dzongkhag>[] = [
 
 function ActionsCell({ dzongkhag }: { dzongkhag: Dzongkhag }) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const router = useRouter();
 
-  const handleDelete = async () => {
-    if (
-      !confirm(
-        `Are you sure you want to delete the dzongkhag "${dzongkhag.name}"? This action cannot be undone.`
-      )
-    ) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
 
+  const handleConfirmDelete = async () => {
     setIsDeleting(true);
     try {
       const result = await deleteDzongkhag(dzongkhag.id);
@@ -67,6 +65,7 @@ function ActionsCell({ dzongkhag }: { dzongkhag: Dzongkhag }) {
       // result is undefined on success in dzongkhag-actions.ts
       if (!result || !result.error) {
         toast.success('Dzongkhag deleted successfully');
+        setDeleteDialogOpen(false);
         router.refresh();
       } else {
         toast.error(result.message || 'Failed to delete dzongkhag');
@@ -80,29 +79,37 @@ function ActionsCell({ dzongkhag }: { dzongkhag: Dzongkhag }) {
   };
 
   return (
-    <div className="flex justify-end">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" disabled={isDeleting}>
-            <IconDotsVertical className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => setIsEditOpen(true)}>
-            <IconEdit className="mr-2 h-4 w-4" />
-            Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="text-destructive focus:text-destructive"
-          >
-            <IconTrash className="mr-2 h-4 w-4" />
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title={`Delete "${dzongkhag.name}"`}
+        description="Are you sure you want to delete this dzongkhag? This action cannot be undone."
+        confirmText="Delete Dzongkhag"
+      />
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsEditOpen(true)}
+          disabled={isDeleting}
+        >
+          <IconEdit className="h-4 w-4" />
+          <span className="sr-only">Edit</span>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+          className="text-destructive hover:text-destructive"
+        >
+          <IconTrash className="h-4 w-4" />
+          <span className="sr-only">Delete</span>
+        </Button>
+      </div>
 
       <AddDzongkhagModal
         isOpen={isEditOpen}
@@ -113,6 +120,6 @@ function ActionsCell({ dzongkhag }: { dzongkhag: Dzongkhag }) {
         }}
         initialData={dzongkhag}
       />
-    </div>
+    </>
   );
 }
