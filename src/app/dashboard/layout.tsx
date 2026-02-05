@@ -4,6 +4,7 @@ import Header from '@/components/layout/header';
 import { InfoSidebar } from '@/components/layout/info-sidebar';
 import { InfobarProvider } from '@/components/ui/infobar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SessionMonitor } from '@/components/session-monitor';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -32,6 +33,7 @@ export default async function DashboardLayout({
     <KBar>
       <SidebarProvider defaultOpen={defaultOpen}>
         <InfobarProvider defaultOpen={false}>
+          <SessionMonitor />
           <AppSidebar />
           <SidebarInset>
             <Header />

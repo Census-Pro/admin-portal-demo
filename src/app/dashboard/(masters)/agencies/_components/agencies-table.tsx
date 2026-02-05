@@ -6,6 +6,7 @@ import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './columns';
 import { getAgencies } from '@/actions/common/agency-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
+import { useSessionExpired } from '@/hooks/use-session-expired';
 
 interface Agency {
   id: string;
@@ -30,6 +31,7 @@ export function AgenciesTable({
   const [data, setData] = useState<Agency[]>(initialData);
   const [totalItems, setTotalItems] = useState(initialTotalItems);
   const [error, setError] = useState<string | null>(null);
+  const { checkSessionExpired, SessionExpiredDialog } = useSessionExpired();
 
   const [searchParams, setSearchParams] = useQueryStates(
     {
@@ -55,6 +57,11 @@ export function AgenciesTable({
           setTotalItems(result.totalItems || 0);
           setError(null);
         } else {
+          // Check if session expired - if so, show dialog instead of error in table
+          if (result.error && checkSessionExpired(result.error)) {
+            return; // Dialog will handle the UI
+          }
+
           setError(result.error || 'Failed to fetch agencies');
           setData([]);
           setTotalItems(0);
@@ -83,5 +90,10 @@ export function AgenciesTable({
     return <DataTableSkeleton columnCount={4} rowCount={10} />;
   }
 
-  return <DataTable columns={columns} data={data} totalItems={totalItems} />;
+  return (
+    <>
+      <DataTable columns={columns} data={data} totalItems={totalItems} />
+      <SessionExpiredDialog />
+    </>
+  );
 }

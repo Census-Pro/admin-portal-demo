@@ -23,13 +23,16 @@ export const columns: ColumnDef<User>[] = [
     header: 'User',
     cell: ({ row }) => {
       const user = row.original;
+      const displayName = user.name || user.cidNo || 'N/A';
+      const initial = displayName.charAt(0).toUpperCase();
+
       return (
         <div className="flex items-center gap-3">
           <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {user.name.charAt(0).toUpperCase()}
+            {initial}
           </div>
           <div>
-            <div className="font-medium">{user.name}</div>
+            <div className="font-medium">{displayName}</div>
             {user.email && (
               <div className="text-muted-foreground text-xs">{user.email}</div>
             )}
@@ -112,6 +115,8 @@ function ActionsCell({ user }: { user: User }) {
     }
   };
 
+  const displayName = user.name || user.cidNo || 'this user';
+
   return (
     <>
       <SessionExpiredDialog />
@@ -120,7 +125,7 @@ function ActionsCell({ user }: { user: User }) {
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
-        title={`Delete "${user.name}"`}
+        title={`Delete "${displayName}"`}
         description="Are you sure you want to delete this user? This action cannot be undone."
         confirmText="Delete User"
       />

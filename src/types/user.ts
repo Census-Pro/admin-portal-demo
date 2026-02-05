@@ -1,6 +1,7 @@
 export interface User {
   id: string;
-  name: string;
+  name?: string;
+  cidNo?: string;
   email?: string;
   role: string;
   agencyName?: string;
