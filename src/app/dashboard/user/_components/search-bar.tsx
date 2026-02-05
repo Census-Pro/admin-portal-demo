@@ -40,7 +40,7 @@ export function UsersSearchBar() {
 
   return (
     <Input
-      placeholder="Search by CID, email, or name..."
+      placeholder="Search by CID, name, or email..."
       defaultValue={searchParams.q}
       onChange={(e) => handleSearch(e.target.value)}
       className={cn('w-full md:max-w-sm', isLoading && 'animate-pulse')}

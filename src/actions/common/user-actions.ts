@@ -61,10 +61,20 @@ export async function getUsers(
     const result = await response.json();
     console.log('Users fetched successfully:', result.data?.length);
 
+    // Transform the data to flatten nested objects
+    const transformedData = (result.data || []).map((user: any) => ({
+      ...user,
+      name: user.fullName || user.name,
+      cidNo: user.cidNo,
+      role: user.roleType || user.role,
+      agencyName: user.agency?.name || user.agencyName,
+      officeLocationName: user.officeLocation?.name || user.officeLocationName
+    }));
+
     return {
       success: true,
-      data: result.data || [],
-      count: result.count || 0
+      data: transformedData,
+      count: result.meta?.itemCount || result.count || 0
     };
   } catch (error) {
     console.error('Error in getUsers:', error);

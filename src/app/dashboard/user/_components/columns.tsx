@@ -1,15 +1,9 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { User } from '@/types/user';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteUser } from '@/actions/common/user-actions';
@@ -17,7 +11,7 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { useSessionExpired } from '@/hooks/use-session-expired';
 
-export const columns: ColumnDef<User>[] = [
+export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
   {
     accessorKey: 'name',
     header: 'User',
@@ -25,6 +19,7 @@ export const columns: ColumnDef<User>[] = [
       const user = row.original;
       const displayName = user.name || user.cidNo || 'N/A';
       const initial = displayName.charAt(0).toUpperCase();
+      const isCurrentUser = currentUserCidNo && user.cidNo === currentUserCidNo;
 
       return (
         <div className="flex items-center gap-3">
@@ -32,7 +27,14 @@ export const columns: ColumnDef<User>[] = [
             {initial}
           </div>
           <div>
-            <div className="font-medium">{displayName}</div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{displayName}</span>
+              {isCurrentUser && (
+                <Badge variant="secondary" className="text-xs">
+                  You
+                </Badge>
+              )}
+            </div>
             {user.email && (
               <div className="text-muted-foreground text-xs">{user.email}</div>
             )}
