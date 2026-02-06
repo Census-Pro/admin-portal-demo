@@ -4,11 +4,15 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { IconPlus } from '@tabler/icons-react';
 import { AddOfficeLocationModal } from './add-office-location-modal';
-import { useRouter } from 'next/navigation';
 
-export function AddOfficeLocationButton() {
+interface AddOfficeLocationButtonProps {
+  onSuccess?: () => void;
+}
+
+export function AddOfficeLocationButton({
+  onSuccess
+}: AddOfficeLocationButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
 
   return (
     <>
@@ -20,7 +24,7 @@ export function AddOfficeLocationButton() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onSuccess={() => {
-          router.refresh();
+          onSuccess?.();
           setIsOpen(false);
         }}
       />

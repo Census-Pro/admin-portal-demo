@@ -1,16 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { toast } from 'sonner';
+import { useState } from 'react';
+import { EditCountryModal } from './edit-country-modal';
+import { deleteCountry } from '@/actions/common/country-actions';
 
 export interface Country {
   id: string;
@@ -19,81 +16,135 @@ export interface Country {
   isActive?: boolean;
 }
 
-export const columns: ColumnDef<Country>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Country Name',
-    cell: ({ row }) => {
-      const country = row.original;
-      return (
-        <div className="flex items-center gap-3">
-          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {country.name.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <div className="font-medium">{country.name}</div>
-          </div>
-        </div>
-      );
-    }
-  },
-  {
-    accessorKey: 'nationality',
-    header: 'Nationality',
-    cell: ({ row }) => {
-      return (
-        <span className="text-muted-foreground text-sm">
-          {row.getValue('nationality')}
-        </span>
-      );
-    }
-  },
-  {
-    accessorKey: 'isActive',
-    header: 'Status',
-    cell: ({ row }) => {
-      const isActive = row.getValue('isActive');
-      return (
-        <Badge variant={isActive !== false ? 'default' : 'secondary'}>
-          {isActive !== false ? 'Active' : 'Inactive'}
-        </Badge>
-      );
-    }
-  },
-  {
-    id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
-    cell: ({ row }) => {
-      const country = row.original;
-      return <ActionsCell country={country} />;
-    }
-  }
-];
+interface CreateColumnsProps {
+  onRefresh?: () => void;
+}
 
-function ActionsCell({ country }: { country: Country }) {
-  const handleDelete = () => {
-    toast.info('Integration pending: Delete action for ' + country.name);
+export function createColumns({
+  onRefresh
+}: CreateColumnsProps = {}): ColumnDef<Country>[] {
+  return [
+    {
+      accessorKey: 'name',
+      header: 'Country Name',
+      cell: ({ row }) => {
+        const country = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+              {country.name.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div className="font-medium">{country.name}</div>
+            </div>
+          </div>
+        );
+      }
+    },
+    {
+      accessorKey: 'nationality',
+      header: 'Nationality',
+      cell: ({ row }) => {
+        return (
+          <span className="text-muted-foreground text-sm">
+            {row.getValue('nationality')}
+          </span>
+        );
+      }
+    },
+    {
+      id: 'actions',
+      header: () => <div className="text-right">Actions</div>,
+      cell: ({ row }) => {
+        const country = row.original;
+        return <ActionsCell country={country} onRefresh={onRefresh} />;
+      }
+    }
+  ];
+}
+
+function ActionsCell({
+  country,
+  onRefresh
+}: {
+  country: Country;
+  onRefresh?: () => void;
+}) {
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteCountry(country.id);
+
+      if (result.success) {
+        toast.success(result.message || 'Country deleted successfully');
+        setDeleteDialogOpen(false);
+        if (onRefresh) {
+          onRefresh();
+        } else {
+          window.location.reload();
+        }
+      } else {
+        toast.error(result.error || 'Failed to delete country');
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
-    <div className="flex justify-end">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <IconDotsVertical className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            onClick={handleDelete}
-            className="text-destructive focus:text-destructive"
-          >
-            <IconTrash className="mr-2 h-4 w-4" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <>
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        isLoading={isDeleting}
+        title={`Delete "${country.name}"`}
+        description="Are you sure you want to delete this country? This action cannot be undone."
+        confirmText="Delete Country"
+      />
+      <EditCountryModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        country={country}
+        onSuccess={() => {
+          if (onRefresh) {
+            onRefresh();
+          } else {
+            window.location.reload();
+          }
+        }}
+      />
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setEditModalOpen(true)}
+          className="h-8 w-8"
+        >
+          <IconEdit className="h-4 w-4" />
+          <span className="sr-only">Edit</span>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleDeleteClick}
+          disabled={isDeleting}
+          className="text-destructive hover:text-destructive h-8 w-8"
+        >
+          <IconTrash className="h-4 w-4" />
+          <span className="sr-only">Delete</span>
+        </Button>
+      </div>
+    </>
   );
 }

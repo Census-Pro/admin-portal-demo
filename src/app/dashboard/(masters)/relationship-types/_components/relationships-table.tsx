@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs';
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition, useCallback } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './columns';
 import { getRelationships } from '@/actions/common/relationship-actions';
@@ -19,11 +19,15 @@ interface Relationship {
 interface RelationshipsTableProps {
   initialData?: Relationship[];
   initialTotalItems?: number;
+  refreshTrigger?: number;
+  onDataChange?: () => void;
 }
 
 export function RelationshipsTable({
   initialData = [],
-  initialTotalItems = 0
+  initialTotalItems = 0,
+  refreshTrigger = 0,
+  onDataChange
 }: RelationshipsTableProps) {
   const [isLoading, startTransition] = useTransition();
   const [data, setData] = useState<Relationship[]>(initialData);
@@ -41,7 +45,7 @@ export function RelationshipsTable({
     }
   );
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     startTransition(async () => {
       try {
         const result = await getRelationships({
@@ -64,11 +68,17 @@ export function RelationshipsTable({
         setTotalItems(0);
       }
     });
-  };
+  }, [searchParams.page, searchParams.limit]);
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit]);
+  }, [searchParams.page, searchParams.limit, fetchData]);
+
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      fetchData();
+    }
+  }, [refreshTrigger, fetchData]);
 
   if (error) {
     return (
@@ -82,5 +92,11 @@ export function RelationshipsTable({
     return <DataTableSkeleton columnCount={4} rowCount={10} />;
   }
 
-  return <DataTable columns={columns} data={data} totalItems={totalItems} />;
+  return (
+    <DataTable
+      columns={columns(onDataChange)}
+      data={data}
+      totalItems={totalItems}
+    />
+  );
 }

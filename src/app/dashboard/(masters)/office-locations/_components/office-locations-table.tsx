@@ -1,7 +1,7 @@
 'use client';
 
 import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs';
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition, useCallback } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './columns';
 import { getOfficeLocations } from '@/actions/common/office-location-actions';
@@ -20,11 +20,15 @@ interface OfficeLocation {
 interface OfficeLocationsTableProps {
   initialData?: OfficeLocation[];
   initialTotalItems?: number;
+  refreshTrigger?: number;
+  onDataChange?: () => void;
 }
 
 export function OfficeLocationsTable({
   initialData = [],
-  initialTotalItems = 0
+  initialTotalItems = 0,
+  refreshTrigger = 0,
+  onDataChange
 }: OfficeLocationsTableProps) {
   const [isLoading, startTransition] = useTransition();
   const [data, setData] = useState<OfficeLocation[]>(initialData);
@@ -43,7 +47,7 @@ export function OfficeLocationsTable({
     }
   );
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     startTransition(async () => {
       try {
         const result = await getOfficeLocations(
@@ -67,11 +71,17 @@ export function OfficeLocationsTable({
         setTotalItems(0);
       }
     });
-  };
+  }, [searchParams.page, searchParams.limit, searchParams.q]);
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit, searchParams.q]);
+  }, [searchParams.page, searchParams.limit, searchParams.q, fetchData]);
+
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      fetchData();
+    }
+  }, [refreshTrigger, fetchData]);
 
   if (error) {
     return (
@@ -85,5 +95,11 @@ export function OfficeLocationsTable({
     return <DataTableSkeleton columnCount={3} rowCount={10} />;
   }
 
-  return <DataTable columns={columns} data={data} totalItems={totalItems} />;
+  return (
+    <DataTable
+      columns={columns(onDataChange)}
+      data={data}
+      totalItems={totalItems}
+    />
+  );
 }

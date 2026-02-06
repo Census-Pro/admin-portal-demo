@@ -4,11 +4,15 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { IconPlus } from '@tabler/icons-react';
 import { AddRelationshipModal } from './add-relationship-modal';
-import { useRouter } from 'next/navigation';
 
-export function AddRelationshipButton() {
+interface AddRelationshipButtonProps {
+  onSuccess?: () => void;
+}
+
+export function AddRelationshipButton({
+  onSuccess
+}: AddRelationshipButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
 
   return (
     <>
@@ -20,7 +24,7 @@ export function AddRelationshipButton() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onSuccess={() => {
-          router.refresh();
+          onSuccess?.();
           setIsOpen(false);
         }}
       />

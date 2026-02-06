@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash } from '@tabler/icons-react';
+import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -15,6 +15,7 @@ import { deleteAgency } from '@/actions/common/agency-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { EditAgencyModal } from './edit-agency-modal';
 
 interface Agency {
   id: string;
@@ -25,7 +26,7 @@ interface Agency {
   updatedAt?: string;
 }
 
-export const columns: ColumnDef<Agency>[] = [
+export const columns = (onDataChange?: () => void): ColumnDef<Agency>[] => [
   {
     accessorKey: 'name',
     header: 'Agency Name',
@@ -55,34 +56,33 @@ export const columns: ColumnDef<Agency>[] = [
     }
   },
   {
-    accessorKey: 'isActive',
-    header: 'Status',
-    cell: ({ row }) => {
-      const isActive = row.getValue('isActive');
-      return (
-        <Badge variant={isActive !== false ? 'default' : 'secondary'}>
-          {isActive !== false ? 'Active' : 'Inactive'}
-        </Badge>
-      );
-    }
-  },
-  {
     id: 'actions',
     header: () => <div className="text-right">Actions</div>,
     cell: ({ row }) => {
       const agency = row.original;
-      return <ActionsCell agency={agency} />;
+      return <ActionsCell agency={agency} onDataChange={onDataChange} />;
     }
   }
 ];
 
-function ActionsCell({ agency }: { agency: Agency }) {
+function ActionsCell({
+  agency,
+  onDataChange
+}: {
+  agency: Agency;
+  onDataChange?: () => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
+  };
+
+  const handleEditClick = () => {
+    setEditDialogOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -93,7 +93,7 @@ function ActionsCell({ agency }: { agency: Agency }) {
       if (result.success) {
         toast.success(result.message || 'Agency deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
+        onDataChange?.();
       } else {
         toast.error(result.error || 'Failed to delete agency');
       }
@@ -116,7 +116,25 @@ function ActionsCell({ agency }: { agency: Agency }) {
         description="Are you sure you want to delete this agency? This action cannot be undone."
         confirmText="Delete Agency"
       />
+      <EditAgencyModal
+        isOpen={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        onSuccess={() => {
+          onDataChange?.();
+          setEditDialogOpen(false);
+        }}
+        agency={agency}
+      />
       <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleEditClick}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <IconEdit className="h-4 w-4" />
+          <span className="sr-only">Edit</span>
+        </Button>
         <Button
           variant="ghost"
           size="icon"

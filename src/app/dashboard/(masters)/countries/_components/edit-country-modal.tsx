@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -12,39 +12,59 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { createCountry } from '@/actions/common/country-actions';
+import { updateCountry } from '@/actions/common/country-actions';
 
-interface AddCountryModalProps {
+interface EditCountryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  country: {
+    id: string;
+    name: string;
+    nationality: string;
+  } | null;
   onSuccess?: () => void;
 }
 
-export function AddCountryModal({
+export function EditCountryModal({
   open,
   onOpenChange,
+  country,
   onSuccess
-}: AddCountryModalProps) {
+}: EditCountryModalProps) {
   const [formData, setFormData] = useState({
     name: '',
     nationality: ''
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    if (country) {
+      setFormData({
+        name: country.name,
+        nationality: country.nationality
+      });
+    }
+  }, [country]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!country) return;
+
     setIsLoading(true);
 
     try {
-      const result = await createCountry(formData);
+      const result = await updateCountry({
+        id: country.id,
+        name: formData.name,
+        nationality: formData.nationality
+      });
 
       if (result.success) {
-        toast.success(result.message || 'Country created successfully');
+        toast.success(result.message || 'Country updated successfully');
         onOpenChange(false);
-        setFormData({ name: '', nationality: '' });
         onSuccess?.();
       } else {
-        toast.error(result.error || 'Failed to create country');
+        toast.error(result.error || 'Failed to update country');
       }
     } catch (error) {
       toast.error('An unexpected error occurred');
@@ -57,9 +77,9 @@ export function AddCountryModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add New Country</DialogTitle>
+          <DialogTitle>Edit Country</DialogTitle>
           <DialogDescription>
-            Create a new country in the system.
+            Update country information in the system.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,7 +121,7 @@ export function AddCountryModal({
               Cancel
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create Country'}
+              {isLoading ? 'Updating...' : 'Update Country'}
             </Button>
           </div>
         </form>

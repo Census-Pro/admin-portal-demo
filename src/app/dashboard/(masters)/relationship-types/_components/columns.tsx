@@ -1,27 +1,22 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteRelationship } from '@/actions/common/relationship-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { AddRelationshipModal } from './add-relationship-modal';
+import { EditRelationshipModal } from './edit-relationship-modal';
 
 interface Relationship {
   id: string;
   name: string;
 }
 
-export const columns: ColumnDef<Relationship>[] = [
+export const columns = (
+  onDataChange?: () => void
+): ColumnDef<Relationship>[] => [
   {
     accessorKey: 'name',
     header: 'Relationship Name',
@@ -42,16 +37,27 @@ export const columns: ColumnDef<Relationship>[] = [
     header: () => <div className="text-right">Actions</div>,
     cell: ({ row }) => {
       const relationship = row.original;
-      return <ActionsCell relationship={relationship} />;
+      return (
+        <ActionsCell relationship={relationship} onDataChange={onDataChange} />
+      );
     }
   }
 ];
 
-function ActionsCell({ relationship }: { relationship: Relationship }) {
+function ActionsCell({
+  relationship,
+  onDataChange
+}: {
+  relationship: Relationship;
+  onDataChange?: () => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const handleEditClick = () => {
+    setEditModalOpen(true);
+  };
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -65,7 +71,7 @@ function ActionsCell({ relationship }: { relationship: Relationship }) {
       if (result.success) {
         toast.success(result.message || 'Relationship deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
+        onDataChange?.();
       } else {
         toast.error(result.error || 'Failed to delete relationship');
       }
@@ -77,8 +83,18 @@ function ActionsCell({ relationship }: { relationship: Relationship }) {
     }
   };
 
+  const handleEditSuccess = () => {
+    onDataChange?.();
+  };
+
   return (
     <>
+      <EditRelationshipModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+        relationship={relationship}
+      />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -92,8 +108,8 @@ function ActionsCell({ relationship }: { relationship: Relationship }) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setIsEditOpen(true)}
-          disabled={isDeleting}
+          onClick={handleEditClick}
+          className="text-muted-foreground hover:text-foreground"
         >
           <IconEdit className="h-4 w-4" />
           <span className="sr-only">Edit</span>
@@ -109,16 +125,6 @@ function ActionsCell({ relationship }: { relationship: Relationship }) {
           <span className="sr-only">Delete</span>
         </Button>
       </div>
-
-      <AddRelationshipModal
-        isOpen={isEditOpen}
-        onClose={() => setIsEditOpen(false)}
-        onSuccess={() => {
-          router.refresh();
-          setIsEditOpen(false);
-        }}
-        initialData={relationship}
-      />
     </>
   );
 }

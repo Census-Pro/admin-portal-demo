@@ -1,20 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteOfficeLocation } from '@/actions/common/office-location-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { EditOfficeLocationModal } from './edit-office-location-modal';
 
 interface OfficeLocation {
   id: string;
@@ -24,7 +17,9 @@ interface OfficeLocation {
   updatedAt?: string;
 }
 
-export const columns: ColumnDef<OfficeLocation>[] = [
+export const columns = (
+  onDataChange?: () => void
+): ColumnDef<OfficeLocation>[] => [
   {
     accessorKey: 'name',
     header: 'Office Location Name',
@@ -43,31 +38,29 @@ export const columns: ColumnDef<OfficeLocation>[] = [
     }
   },
   {
-    accessorKey: 'isActive',
-    header: 'Status',
-    cell: ({ row }) => {
-      const isActive = row.getValue('isActive');
-      return (
-        <Badge variant={isActive !== false ? 'default' : 'secondary'}>
-          {isActive !== false ? 'Active' : 'Inactive'}
-        </Badge>
-      );
-    }
-  },
-  {
     id: 'actions',
     header: () => <div className="text-right">Actions</div>,
     cell: ({ row }) => {
       const location = row.original;
-      return <ActionsCell location={location} />;
+      return <ActionsCell location={location} onDataChange={onDataChange} />;
     }
   }
 ];
 
-function ActionsCell({ location }: { location: OfficeLocation }) {
+function ActionsCell({
+  location,
+  onDataChange
+}: {
+  location: OfficeLocation;
+  onDataChange?: () => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const router = useRouter();
+  const [editModalOpen, setEditModalOpen] = useState(false);
+
+  const handleEditClick = () => {
+    setEditModalOpen(true);
+  };
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -81,7 +74,7 @@ function ActionsCell({ location }: { location: OfficeLocation }) {
       if (result.success) {
         toast.success(result.message || 'Office location deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
+        onDataChange?.();
       } else {
         toast.error(result.error || 'Failed to delete office location');
       }
@@ -93,8 +86,18 @@ function ActionsCell({ location }: { location: OfficeLocation }) {
     }
   };
 
+  const handleEditSuccess = () => {
+    onDataChange?.();
+  };
+
   return (
     <>
+      <EditOfficeLocationModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+        officeLocation={location}
+      />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -105,6 +108,15 @@ function ActionsCell({ location }: { location: OfficeLocation }) {
         confirmText="Delete Location"
       />
       <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleEditClick}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <IconEdit className="h-4 w-4" />
+          <span className="sr-only">Edit</span>
+        </Button>
         <Button
           variant="ghost"
           size="icon"

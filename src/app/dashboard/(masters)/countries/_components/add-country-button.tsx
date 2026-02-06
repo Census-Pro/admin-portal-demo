@@ -14,7 +14,11 @@ export function AddCountryButton() {
         <IconPlus className="h-4 w-4" />
         Add Country
       </Button>
-      <AddCountryModal open={open} onOpenChange={setOpen} />
+      <AddCountryModal
+        open={open}
+        onOpenChange={setOpen}
+        onSuccess={() => window.location.reload()}
+      />
     </>
   );
 }

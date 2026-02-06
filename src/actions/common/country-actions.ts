@@ -4,12 +4,12 @@ import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 
 const API_URL =
-  process.env.AUTH_SERVICE || process.env.API_URL || 'http://localhost:5001';
+  process.env.COMMON_SERVICE || process.env.API_URL || 'http://localhost:3000';
 
-export async function getCountries() {
+export async function getCountries(page: number = 1, take: number = 100) {
   try {
     const headers = await instance();
-    const url = `${API_URL}/countries`;
+    const url = `${API_URL}/countries?page=${page}&take=${take}`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -119,11 +119,12 @@ export async function updateCountry(data: {
   isActive?: boolean;
 }) {
   try {
+    const { id, ...updateData } = data;
     const headers = await instance();
-    const response = await fetch(`${API_URL}/countries/${data.id}`, {
-      method: 'PUT',
+    const response = await fetch(`${API_URL}/countries/${id}`, {
+      method: 'PATCH',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(updateData)
     });
 
     if (!response.ok) {
@@ -177,18 +178,41 @@ export async function deleteCountry(id: string) {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
+      // Handle 404 - Country not found (might have been already deleted)
+      if (response.status === 404) {
+        // Treat as success since the country doesn't exist anyway
+        revalidatePath('/dashboard/countries');
+        return {
+          success: true,
+          message: 'Country has already been deleted'
+        };
+      }
+
       return {
         success: false,
         error: errorMessage
       };
     }
 
-    const result = await response.json();
+    // Handle empty response body
+    let result = null;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      const text = await response.text();
+      if (text) {
+        try {
+          result = JSON.parse(text);
+        } catch {
+          // Response is not valid JSON, but request was successful
+        }
+      }
+    }
+
     revalidatePath('/dashboard/countries');
 
     return {
       success: true,
-      message: result.message || 'Country deleted successfully'
+      message: result?.message || 'Country deleted successfully'
     };
   } catch (error) {
     console.error('deleteCountry error:', error);

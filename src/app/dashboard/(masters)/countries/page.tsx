@@ -1,10 +1,8 @@
 import PageContainer from '@/components/layout/page-container';
-import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from './_components/columns';
 import { AddCountryButton } from './_components/add-country-button';
-import { getCountries } from '@/actions/common/country-actions';
 import { Suspense } from 'react';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
+import CountriesTable from './_components/countries-table';
 
 export const metadata = {
   title: 'Dashboard: Country Management'
@@ -26,13 +24,4 @@ export default async function CountryManagementPage() {
       </div>
     </PageContainer>
   );
-}
-
-async function CountriesTable() {
-  const result = await getCountries();
-
-  const data = result.success ? result.data : [];
-  const totalItems = data.length;
-
-  return <DataTable columns={columns} data={data} totalItems={totalItems} />;
 }

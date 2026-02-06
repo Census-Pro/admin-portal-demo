@@ -126,10 +126,12 @@ export async function updateOfficeLocation(data: {
 }) {
   try {
     const headers = await instance();
-    const response = await fetch(`${API_URL}/office-locations/${data.id}`, {
-      method: 'PUT',
+    // Only send the updatable fields in the body
+    const { id, ...updateData } = data;
+    const response = await fetch(`${API_URL}/office-locations/${id}`, {
+      method: 'PATCH',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(updateData)
     });
 
     if (!response.ok) {

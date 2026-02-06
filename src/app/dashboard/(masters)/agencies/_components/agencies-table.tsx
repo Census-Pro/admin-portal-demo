@@ -21,11 +21,15 @@ interface Agency {
 interface AgenciesTableProps {
   initialData?: Agency[];
   initialTotalItems?: number;
+  refreshTrigger?: number;
+  onDataChange?: () => void;
 }
 
 export function AgenciesTable({
   initialData = [],
-  initialTotalItems = 0
+  initialTotalItems = 0,
+  refreshTrigger = 0,
+  onDataChange
 }: AgenciesTableProps) {
   const [isLoading, startTransition] = useTransition();
   const [data, setData] = useState<Agency[]>(initialData);
@@ -76,7 +80,7 @@ export function AgenciesTable({
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit]);
+  }, [searchParams.page, searchParams.limit, refreshTrigger]);
 
   if (error) {
     return (
@@ -87,12 +91,16 @@ export function AgenciesTable({
   }
 
   if (isLoading && data.length === 0) {
-    return <DataTableSkeleton columnCount={4} rowCount={10} />;
+    return <DataTableSkeleton columnCount={3} rowCount={10} />;
   }
 
   return (
     <>
-      <DataTable columns={columns} data={data} totalItems={totalItems} />
+      <DataTable
+        columns={columns(onDataChange)}
+        data={data}
+        totalItems={totalItems}
+      />
       <SessionExpiredDialog />
     </>
   );

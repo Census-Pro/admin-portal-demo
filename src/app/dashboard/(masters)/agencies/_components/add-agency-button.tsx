@@ -6,7 +6,7 @@ import { IconPlus } from '@tabler/icons-react';
 import { AddAgencyModal } from './add-agency-modal';
 import { useRouter } from 'next/navigation';
 
-export function AddAgencyButton() {
+export function AddAgencyButton({ onSuccess }: { onSuccess?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -20,7 +20,7 @@ export function AddAgencyButton() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onSuccess={() => {
-          router.refresh();
+          onSuccess?.();
           setIsOpen(false);
         }}
       />

@@ -128,11 +128,12 @@ export async function updateAgency(data: {
   isActive?: boolean;
 }) {
   try {
+    const { id, ...updateData } = data;
     const headers = await instance();
-    const response = await fetch(`${API_URL}/agencies/${data.id}`, {
-      method: 'PUT',
+    const response = await fetch(`${API_URL}/agencies/${id}`, {
+      method: 'PATCH',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(updateData)
     });
 
     if (!response.ok) {
