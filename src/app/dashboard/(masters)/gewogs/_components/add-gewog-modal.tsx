@@ -13,12 +13,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createGewogs, updateGewog } from '@/actions/common/gewog-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface AddGewogModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
   initialData?: { id: string; name: string } | null;
 }
 
@@ -30,7 +29,6 @@ export function AddGewogModal({
 }: AddGewogModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
-  const router = useRouter();
 
   useEffect(() => {
     if (initialData) {
@@ -56,8 +54,7 @@ export function AddGewogModal({
         toast.success(
           `Gewog ${initialData ? 'updated' : 'created'} successfully`
         );
-        onSuccess();
-        router.refresh();
+        onSuccess?.();
         onClose();
         setName('');
       } else {

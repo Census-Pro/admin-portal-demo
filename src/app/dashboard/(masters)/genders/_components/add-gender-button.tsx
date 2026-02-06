@@ -19,7 +19,7 @@ export function AddGenderButton() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onSuccess={() => {
-          setIsOpen(false);
+          window.location.reload();
         }}
       />
     </>

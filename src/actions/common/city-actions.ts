@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -22,7 +22,7 @@ export async function createCities(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('cities');
+    revalidatePath('/dashboard/cities');
     return data;
   } catch (error) {
     console.error('Error creating city:', error);
@@ -48,7 +48,7 @@ export async function getCities({
 
     const response = await fetch(url, {
       headers: await instance(),
-      next: { tags: ['cities'] }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -86,7 +86,7 @@ export async function getAllCities() {
   try {
     const response = await fetch(`${API_URL}/cities/all`, {
       headers: await instance(),
-      next: { tags: ['cities'] }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -116,7 +116,7 @@ export async function deleteCity(id?: string) {
       };
     }
 
-    updateTag('cities');
+    revalidatePath('/dashboard/cities');
   } catch (error) {
     console.error('Error deleting city:', error);
     return null;
@@ -138,6 +138,6 @@ export async function updateCity(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  updateTag('cities');
+  revalidatePath('/dashboard/cities');
   return res;
 }

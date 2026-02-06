@@ -13,7 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createGenders, updateGender } from '@/actions/common/gender-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface AddGenderModalProps {
   isOpen: boolean;
@@ -30,7 +29,6 @@ export function AddGenderModal({
 }: AddGenderModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
-  const router = useRouter();
 
   useEffect(() => {
     if (initialData) {
@@ -57,7 +55,6 @@ export function AddGenderModal({
           `Gender ${initialData ? 'updated' : 'created'} successfully`
         );
         onSuccess();
-        router.refresh();
         onClose();
         setName('');
       } else {

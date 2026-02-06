@@ -19,7 +19,7 @@ export function AddDzongkhagButton() {
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onSuccess={() => {
-          setIsOpen(false);
+          window.location.reload();
         }}
       />
     </>

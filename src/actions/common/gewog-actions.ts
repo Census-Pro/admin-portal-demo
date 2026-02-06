@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -22,7 +22,7 @@ export async function createGewogs(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('gewogs');
+    revalidatePath('/dashboard/gewogs');
     return data;
   } catch (error) {
     console.error('Error creating gewog:', error);
@@ -48,7 +48,7 @@ export async function getGewogs({
 
     const response = await fetch(url, {
       headers: await instance(),
-      next: { tags: ['gewogs'] }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -86,7 +86,7 @@ export async function getAllGewogs() {
   try {
     const response = await fetch(`${API_URL}/gewogs/all`, {
       headers: await instance(),
-      next: { tags: ['gewogs'] }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -116,7 +116,7 @@ export async function deleteGewog(id?: string) {
       };
     }
 
-    updateTag('gewogs');
+    revalidatePath('/dashboard/gewogs');
   } catch (error) {
     console.error('Error deleting gewog:', error);
     return null;
@@ -138,6 +138,6 @@ export async function updateGewog(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  updateTag('gewogs');
+  revalidatePath('/dashboard/gewogs');
   return res;
 }

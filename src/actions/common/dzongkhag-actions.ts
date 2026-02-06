@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -23,7 +23,7 @@ export async function createDzongkhags(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('dzongkhags');
+    revalidatePath('/dashboard/dzongkhag');
     return data;
   } catch (error) {
     console.error('Error creating dzongkhag:', error);
@@ -49,7 +49,7 @@ export async function getDzongkhags({
 
     const response = await fetch(url, {
       headers: await instance(),
-      next: { tags: ['dzongkhags'] }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -87,7 +87,7 @@ export async function getAllDzongkhags() {
   try {
     const response = await fetch(`${API_URL}/dzongkhags/all`, {
       headers: await instance(),
-      next: { tags: ['dzongkhags'] }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -117,7 +117,7 @@ export async function deleteDzongkhag(id?: string) {
       };
     }
 
-    updateTag('dzongkhags');
+    revalidatePath('/dashboard/dzongkhag');
   } catch (error) {
     console.error('Error deleting dzongkhag:', error);
     return null;
@@ -139,6 +139,6 @@ export async function updateDzongkhag(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  updateTag('dzongkhags');
+  revalidatePath('/dashboard/dzongkhag');
   return res;
 }

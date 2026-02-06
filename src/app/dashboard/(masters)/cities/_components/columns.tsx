@@ -1,19 +1,12 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteCity } from '@/actions/common/city-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AddCityModal } from './add-city-modal';
 
 interface City {
@@ -51,7 +44,6 @@ function ActionsCell({ city }: { city: City }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -65,7 +57,6 @@ function ActionsCell({ city }: { city: City }) {
       if (!result || !result.error) {
         toast.success('City deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
       } else {
         toast.error(result.message || 'Failed to delete city');
       }
@@ -113,10 +104,7 @@ function ActionsCell({ city }: { city: City }) {
       <AddCityModal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        onSuccess={() => {
-          router.refresh();
-          setIsEditOpen(false);
-        }}
+        onSuccess={() => setIsEditOpen(false)}
         initialData={city}
       />
     </>

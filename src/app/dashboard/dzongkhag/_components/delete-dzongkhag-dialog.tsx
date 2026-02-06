@@ -11,7 +11,6 @@ import {
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { deleteDzongkhag } from '@/actions/common/dzongkhag-actions';
 
 interface DeleteDzongkhagDialogProps {
@@ -27,7 +26,6 @@ export function DeleteDzongkhagDialog({
   open,
   setOpen
 }: DeleteDzongkhagDialogProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [confirmText, setConfirmText] = useState('');
 
@@ -41,7 +39,6 @@ export function DeleteDzongkhagDialog({
       await deleteDzongkhag(dzongkhagId);
       toast.success('Dzongkhag deleted successfully');
       setOpen(false);
-      router.refresh();
     } catch (error) {
       toast.error('Failed to delete dzongkhag');
       console.error('Failed to delete dzongkhag:', error);

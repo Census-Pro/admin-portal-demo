@@ -1,14 +1,23 @@
 import PageContainer from '@/components/layout/page-container';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddCityButton } from './_components/add-city-button';
-import { CitiesTable } from './_components/cities-table';
+import { CitiesListing } from './_components/cities-listing';
 import { Suspense } from 'react';
+import { searchParamsCache } from '@/lib/searchparams';
+import { SearchParams } from 'nuqs/server';
 
 export const metadata = {
   title: 'Dashboard: City Management'
 };
 
-export default function CityManagementPage() {
+type PageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+export default async function CityManagementPage(props: PageProps) {
+  const searchParams = await props.searchParams;
+  searchParamsCache.parse(searchParams);
+
   return (
     <PageContainer
       pageTitle="City Management"
@@ -19,7 +28,7 @@ export default function CityManagementPage() {
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >
-          <CitiesTable />
+          <CitiesListing />
         </Suspense>
       </div>
     </PageContainer>

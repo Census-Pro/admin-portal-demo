@@ -10,7 +10,6 @@ import {
 import { Form } from '@/components/ui/form';
 import { FormInput } from '@/components/forms/form-input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -37,7 +36,6 @@ export function UpdateDzongkhagDialog({
   open,
   setOpen
 }: UpdateDzongkhagDialogProps) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -66,7 +64,6 @@ export function UpdateDzongkhagDialog({
       }
       toast.success('Dzongkhag updated successfully');
       setOpen(false);
-      router.refresh();
     } catch (error) {
       toast.error('Failed to update dzongkhag');
       console.error('Failed to update dzongkhag:', error);

@@ -1,14 +1,23 @@
 import PageContainer from '@/components/layout/page-container';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddGewogButton } from './_components/add-gewog-button';
-import { GewogsTable } from './_components/gewogs-table';
+import { GewogsListing } from './_components/gewogs-listing';
 import { Suspense } from 'react';
+import { searchParamsCache } from '@/lib/searchparams';
+import { SearchParams } from 'nuqs/server';
 
 export const metadata = {
   title: 'Dashboard: Gewog Management'
 };
 
-export default function GewogManagementPage() {
+type PageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+export default async function GewogManagementPage(props: PageProps) {
+  const searchParams = await props.searchParams;
+  searchParamsCache.parse(searchParams);
+
   return (
     <PageContainer
       pageTitle="Gewog Management"
@@ -19,7 +28,7 @@ export default function GewogManagementPage() {
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >
-          <GewogsTable />
+          <GewogsListing />
         </Suspense>
       </div>
     </PageContainer>

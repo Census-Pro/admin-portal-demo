@@ -16,7 +16,6 @@ import {
   updateDzongkhag
 } from '@/actions/common/dzongkhag-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface AddDzongkhagModalProps {
   isOpen: boolean;
@@ -33,7 +32,6 @@ export function AddDzongkhagModal({
 }: AddDzongkhagModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
-  const router = useRouter();
 
   // Update name when initialData changes
   useEffect(() => {
@@ -61,7 +59,6 @@ export function AddDzongkhagModal({
           `Dzongkhag ${initialData ? 'updated' : 'created'} successfully`
         );
         onSuccess();
-        router.refresh();
         onClose();
         setName('');
       } else {

@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -22,7 +22,7 @@ export async function createGenders(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('genders');
+    revalidatePath('/dashboard/genders');
     return data;
   } catch (error) {
     console.error('Error creating gender:', error);
@@ -48,7 +48,7 @@ export async function getGenders({
 
     const response = await fetch(url, {
       headers: await instance(),
-      next: { tags: ['genders'] }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -86,7 +86,7 @@ export async function getAllGenders() {
   try {
     const response = await fetch(`${API_URL}/genders/all`, {
       headers: await instance(),
-      next: { tags: ['genders'] }
+      cache: 'no-store'
     });
 
     if (!response.ok) {
@@ -116,7 +116,7 @@ export async function deleteGender(id?: string) {
       };
     }
 
-    updateTag('genders');
+    revalidatePath('/dashboard/genders');
   } catch (error) {
     console.error('Error deleting gender:', error);
     return null;
@@ -138,6 +138,6 @@ export async function updateGender(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  updateTag('genders');
+  revalidatePath('/dashboard/genders');
   return res;
 }

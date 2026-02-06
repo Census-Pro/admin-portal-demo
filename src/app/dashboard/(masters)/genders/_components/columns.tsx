@@ -1,19 +1,12 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteGender } from '@/actions/common/gender-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AddGenderModal } from './add-gender-modal';
 
 interface Gender {
@@ -21,37 +14,50 @@ interface Gender {
   name: string;
 }
 
-export const columns: ColumnDef<Gender>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Gender Name',
-    cell: ({ row }) => {
-      const gender = row.original;
-      return (
-        <div className="flex items-center gap-3">
-          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {gender.name.charAt(0).toUpperCase()}
-          </div>
-          <div className="font-medium">{gender.name}</div>
-        </div>
-      );
-    }
-  },
-  {
-    id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
-    cell: ({ row }) => {
-      const gender = row.original;
-      return <ActionsCell gender={gender} />;
-    }
-  }
-];
+interface CreateColumnsProps {
+  onRefresh?: () => void;
+}
 
-function ActionsCell({ gender }: { gender: Gender }) {
+export function createColumns({
+  onRefresh
+}: CreateColumnsProps = {}): ColumnDef<Gender>[] {
+  return [
+    {
+      accessorKey: 'name',
+      header: 'Gender Name',
+      cell: ({ row }) => {
+        const gender = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+              {gender.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="font-medium">{gender.name}</div>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'actions',
+      header: () => <div className="text-right">Actions</div>,
+      cell: ({ row }) => {
+        const gender = row.original;
+        return <ActionsCell gender={gender} onRefresh={onRefresh} />;
+      }
+    }
+  ];
+}
+
+function ActionsCell({
+  gender,
+  onRefresh
+}: {
+  gender: Gender;
+  onRefresh?: () => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -65,7 +71,11 @@ function ActionsCell({ gender }: { gender: Gender }) {
       if (!result || !result.error) {
         toast.success('Gender deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
+        if (onRefresh) {
+          onRefresh();
+        } else {
+          window.location.reload();
+        }
       } else {
         toast.error(result.message || 'Failed to delete gender');
       }
@@ -114,7 +124,9 @@ function ActionsCell({ gender }: { gender: Gender }) {
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         onSuccess={() => {
-          router.refresh();
+          if (onRefresh) {
+            onRefresh();
+          }
           setIsEditOpen(false);
         }}
         initialData={gender}

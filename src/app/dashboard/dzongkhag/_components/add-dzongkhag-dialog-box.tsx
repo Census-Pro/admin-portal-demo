@@ -12,7 +12,6 @@ import { Form } from '@/components/ui/form';
 import { FormInput } from '@/components/forms/form-input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -25,7 +24,6 @@ const formSchema = z.object({
 });
 
 export function CreateDzongkhagDialog() {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -48,7 +46,6 @@ export function CreateDzongkhagDialog() {
       toast.success('Dzongkhag added successfully');
       setOpen(false);
       form.reset();
-      router.refresh();
     } catch (error) {
       toast.error('Failed to add dzongkhag');
       console.error('Failed to create dzongkhag:', error);

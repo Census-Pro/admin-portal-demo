@@ -1,19 +1,12 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteDzongkhag } from '@/actions/common/dzongkhag-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AddDzongkhagModal } from './add-dzongkhag-modal';
 
 interface Dzongkhag {
@@ -21,37 +14,50 @@ interface Dzongkhag {
   name: string;
 }
 
-export const columns: ColumnDef<Dzongkhag>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Dzongkhag Name',
-    cell: ({ row }) => {
-      const dzongkhag = row.original;
-      return (
-        <div className="flex items-center gap-3">
-          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {dzongkhag.name.charAt(0).toUpperCase()}
-          </div>
-          <div className="font-medium">{dzongkhag.name}</div>
-        </div>
-      );
-    }
-  },
-  {
-    id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
-    cell: ({ row }) => {
-      const dzongkhag = row.original;
-      return <ActionsCell dzongkhag={dzongkhag} />;
-    }
-  }
-];
+interface CreateColumnsProps {
+  onRefresh?: () => void;
+}
 
-function ActionsCell({ dzongkhag }: { dzongkhag: Dzongkhag }) {
+export function createColumns({
+  onRefresh
+}: CreateColumnsProps = {}): ColumnDef<Dzongkhag>[] {
+  return [
+    {
+      accessorKey: 'name',
+      header: 'Dzongkhag Name',
+      cell: ({ row }) => {
+        const dzongkhag = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+              {dzongkhag.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="font-medium">{dzongkhag.name}</div>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'actions',
+      header: () => <div className="text-right">Actions</div>,
+      cell: ({ row }) => {
+        const dzongkhag = row.original;
+        return <ActionsCell dzongkhag={dzongkhag} onRefresh={onRefresh} />;
+      }
+    }
+  ];
+}
+
+function ActionsCell({
+  dzongkhag,
+  onRefresh
+}: {
+  dzongkhag: Dzongkhag;
+  onRefresh?: () => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -66,7 +72,11 @@ function ActionsCell({ dzongkhag }: { dzongkhag: Dzongkhag }) {
       if (!result || !result.error) {
         toast.success('Dzongkhag deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
+        if (onRefresh) {
+          onRefresh();
+        } else {
+          window.location.reload();
+        }
       } else {
         toast.error(result.message || 'Failed to delete dzongkhag');
       }
@@ -115,7 +125,9 @@ function ActionsCell({ dzongkhag }: { dzongkhag: Dzongkhag }) {
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         onSuccess={() => {
-          router.refresh();
+          if (onRefresh) {
+            onRefresh();
+          }
           setIsEditOpen(false);
         }}
         initialData={dzongkhag}

@@ -1,9 +1,9 @@
 'use client';
 
-import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs';
-import { useEffect, useState, useTransition } from 'react';
+import { useQueryStates, parseAsInteger } from 'nuqs';
+import { useEffect, useState, useTransition, useCallback } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from './columns';
+import { createColumns } from './columns';
 import { getGenders } from '@/actions/common/gender-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 
@@ -30,7 +30,7 @@ export function GendersTable({
   const [totalItems, setTotalItems] = useState(initialTotalItems);
   const [error, setError] = useState<string | null>(null);
 
-  const [searchParams, setSearchParams] = useQueryStates(
+  const [searchParams] = useQueryStates(
     {
       page: parseAsInteger.withDefault(1),
       limit: parseAsInteger.withDefault(10)
@@ -41,7 +41,7 @@ export function GendersTable({
     }
   );
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     startTransition(async () => {
       try {
         const result = await getGenders({
@@ -64,11 +64,13 @@ export function GendersTable({
         setTotalItems(0);
       }
     });
-  };
+  }, [searchParams.page, searchParams.limit]);
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit]);
+  }, [fetchData]);
+
+  const columns = createColumns({ onRefresh: fetchData });
 
   if (error) {
     return (
