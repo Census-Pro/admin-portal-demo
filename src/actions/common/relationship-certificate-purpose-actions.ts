@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -26,7 +26,7 @@ export async function createRelationshipCertificatePurpose(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('relationship-certificate-purposes');
+    revalidatePath('/dashboard/(masters)/relationship-certificate-purposes');
     return data;
   } catch (error) {
     console.error('Error creating relationship certificate purpose:', error);
@@ -128,10 +128,17 @@ export async function deleteRelationshipCertificatePurpose(id?: string) {
       };
     }
 
-    updateTag('relationship-certificate-purposes');
+    revalidatePath('/dashboard/(masters)/relationship-certificate-purposes');
+    return {
+      error: false,
+      message: 'Relationship certificate purpose deleted successfully'
+    };
   } catch (error) {
     console.error('Error deleting relationship certificate purpose:', error);
-    return null;
+    return {
+      error: true,
+      message: 'Failed to delete relationship certificate purpose'
+    };
   }
 }
 
@@ -147,7 +154,6 @@ export async function updateRelationshipCertificatePurpose(
       body: JSON.stringify(data)
     }
   );
-
   const res = await response.json();
 
   if (!response.ok || res?.error) {
@@ -157,6 +163,6 @@ export async function updateRelationshipCertificatePurpose(
     return { error: true, message: errorMessage };
   }
 
-  updateTag('relationship-certificate-purposes');
+  revalidatePath('/dashboard/(masters)/relationship-certificate-purposes');
   return res;
 }

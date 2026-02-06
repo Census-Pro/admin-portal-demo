@@ -16,12 +16,11 @@ import {
   updateRelationshipCertificatePurpose
 } from '@/actions/common/relationship-certificate-purpose-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface AddRelationshipCertificatePurposeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (result?: any) => void;
   initialData?: { id: string; name: string } | null;
 }
 
@@ -33,7 +32,6 @@ export function AddRelationshipCertificatePurposeModal({
 }: AddRelationshipCertificatePurposeModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
-  const router = useRouter();
 
   // Update name when initialData changes
   useEffect(() => {
@@ -62,8 +60,7 @@ export function AddRelationshipCertificatePurposeModal({
         toast.success(
           `Relationship certificate purpose ${initialData ? 'updated' : 'created'} successfully`
         );
-        onSuccess();
-        router.refresh();
+        onSuccess(result);
         onClose();
         setName('');
       } else {

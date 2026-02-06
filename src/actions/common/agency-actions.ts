@@ -38,9 +38,7 @@ export async function getAgencies({
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to view agencies. Please contact your administrator.";
       }
@@ -90,9 +88,7 @@ export async function createAgency(data: { name: string; code?: string }) {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to create agencies. Please contact your administrator.";
       }

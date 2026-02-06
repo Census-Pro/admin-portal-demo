@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -23,7 +23,7 @@ export async function createNaturalizationType(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('naturalization-types');
+    revalidatePath('/dashboard/(masters)/naturalization-types');
     return data;
   } catch (error) {
     console.error('Error creating naturalization type:', error);
@@ -116,10 +116,14 @@ export async function deleteNaturalizationType(id?: string) {
       };
     }
 
-    updateTag('naturalization-types');
+    revalidatePath('/dashboard/(masters)/naturalization-types');
+    return {
+      error: false,
+      message: 'Naturalization type deleted successfully'
+    };
   } catch (error) {
     console.error('Error deleting naturalization type:', error);
-    return null;
+    return { error: true, message: 'Failed to delete naturalization type' };
   }
 }
 
@@ -139,6 +143,6 @@ export async function updateNaturalizationType(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  updateTag('naturalization-types');
+  revalidatePath('/dashboard/(masters)/naturalization-types');
   return res;
 }

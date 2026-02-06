@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -23,7 +23,7 @@ export async function createRegularizationType(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('regularization-types');
+    revalidatePath('/dashboard/(masters)/regularization-types');
     return data;
   } catch (error) {
     console.error('Error creating regularization type:', error);
@@ -116,13 +116,16 @@ export async function deleteRegularizationType(id?: string) {
       };
     }
 
-    updateTag('regularization-types');
+    revalidatePath('/dashboard/(masters)/regularization-types');
+    return {
+      error: false,
+      message: 'Regularization type deleted successfully'
+    };
   } catch (error) {
     console.error('Error deleting regularization type:', error);
-    return null;
+    return { error: true, message: 'Failed to delete regularization type' };
   }
 }
-
 export async function updateRegularizationType(id: string, data: any) {
   const response = await fetch(`${API_URL}/regularization-types/${id}`, {
     method: 'PATCH',
@@ -139,6 +142,6 @@ export async function updateRegularizationType(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  updateTag('regularization-types');
+  revalidatePath('/dashboard/(masters)/regularization-types');
   return res;
 }

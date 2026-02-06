@@ -62,9 +62,7 @@ export async function getRoles() {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to view roles. Please contact your administrator.";
       } else if (response.status === 404) {
@@ -131,14 +129,14 @@ export async function createRole(data: { name: string; description: string }) {
         console.error(
           '[createRole] HTTP Error:',
           response.status,
+          '[createRole] HTTP Error:',
+          response.status,
           response.statusText
         );
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to create roles. Please contact your administrator.";
       }

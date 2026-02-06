@@ -8,6 +8,12 @@ import { AddNaturalizationTypeModal } from './add-naturalization-type-modal';
 export function AddNaturalizationTypeButton() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSuccess = () => {
+    setIsOpen(false);
+    // Dispatch custom event to notify table to refresh
+    window.dispatchEvent(new Event('naturalization-type-created'));
+  };
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>
@@ -18,9 +24,7 @@ export function AddNaturalizationTypeButton() {
       <AddNaturalizationTypeModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        onSuccess={() => {
-          setIsOpen(false);
-        }}
+        onSuccess={handleSuccess}
       />
     </>
   );

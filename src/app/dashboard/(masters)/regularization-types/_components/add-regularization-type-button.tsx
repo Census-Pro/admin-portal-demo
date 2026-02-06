@@ -8,6 +8,15 @@ import { AddRegularizationTypeModal } from './add-regularization-type-modal';
 export function AddRegularizationTypeButton() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSuccess = (result: any) => {
+    if (result) {
+      window.dispatchEvent(
+        new CustomEvent('regularization-type-created', { detail: result })
+      );
+    }
+    setIsOpen(false);
+  };
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>
@@ -18,9 +27,7 @@ export function AddRegularizationTypeButton() {
       <AddRegularizationTypeModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        onSuccess={() => {
-          setIsOpen(false);
-        }}
+        onSuccess={handleSuccess}
       />
     </>
   );

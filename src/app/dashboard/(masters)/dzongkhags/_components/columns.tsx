@@ -12,48 +12,55 @@ import { AddDzongkhagModal } from './add-dzongkhag-modal';
 interface Dzongkhag {
   id: string;
   name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-interface CreateColumnsProps {
-  onRefresh?: () => void;
-}
-
-export function createColumns({
-  onRefresh
-}: CreateColumnsProps = {}): ColumnDef<Dzongkhag>[] {
-  return [
-    {
-      accessorKey: 'name',
-      header: 'Dzongkhag Name',
-      cell: ({ row }) => {
-        const dzongkhag = row.original;
-        return (
-          <div className="flex items-center gap-3">
-            <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-              {dzongkhag.name.charAt(0).toUpperCase()}
-            </div>
-            <div className="font-medium">{dzongkhag.name}</div>
+export const createColumns = (
+  onUpdate: (id: string, updatedItem: Dzongkhag) => void,
+  onDelete: (id: string) => void
+): ColumnDef<Dzongkhag>[] => [
+  {
+    accessorKey: 'name',
+    header: 'Dzongkhag Name',
+    cell: ({ row }) => {
+      const dzongkhag = row.original;
+      return (
+        <div className="flex items-center gap-3">
+          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+            {dzongkhag.name.charAt(0).toUpperCase()}
           </div>
-        );
-      }
-    },
-    {
-      id: 'actions',
-      header: () => <div className="text-right">Actions</div>,
-      cell: ({ row }) => {
-        const dzongkhag = row.original;
-        return <ActionsCell dzongkhag={dzongkhag} onRefresh={onRefresh} />;
-      }
+          <div className="font-medium">{dzongkhag.name}</div>
+        </div>
+      );
     }
-  ];
-}
+  },
+  {
+    id: 'actions',
+    header: () => <div className="text-right">Actions</div>,
+    cell: ({ row }) => {
+      const dzongkhag = row.original;
+      return (
+        <ActionsCell
+          dzongkhag={dzongkhag}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
+        />
+      );
+    }
+  }
+];
 
 function ActionsCell({
   dzongkhag,
-  onRefresh
+  onUpdate,
+  onDelete
 }: {
   dzongkhag: Dzongkhag;
-  onRefresh?: () => void;
+  onUpdate: (id: string, updatedItem: Dzongkhag) => void;
+  onDelete: (id: string) => void;
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -68,15 +75,10 @@ function ActionsCell({
     try {
       const result = await deleteDzongkhag(dzongkhag.id);
 
-      // result is undefined on success in dzongkhag-actions.ts
       if (!result || !result.error) {
         toast.success('Dzongkhag deleted successfully');
+        onDelete(dzongkhag.id);
         setDeleteDialogOpen(false);
-        if (onRefresh) {
-          onRefresh();
-        } else {
-          window.location.reload();
-        }
       } else {
         toast.error(result.message || 'Failed to delete dzongkhag');
       }
@@ -124,9 +126,9 @@ function ActionsCell({
       <AddDzongkhagModal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        onSuccess={() => {
-          if (onRefresh) {
-            onRefresh();
+        onSuccess={(updatedItem) => {
+          if (updatedItem) {
+            onUpdate(dzongkhag.id, updatedItem);
           }
           setIsEditOpen(false);
         }}

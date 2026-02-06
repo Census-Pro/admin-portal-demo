@@ -22,7 +22,7 @@ interface EditCountryModalProps {
     name: string;
     nationality: string;
   } | null;
-  onSuccess?: () => void;
+  onSuccess?: (result?: any) => void;
 }
 
 export function EditCountryModal({
@@ -62,7 +62,12 @@ export function EditCountryModal({
       if (result.success) {
         toast.success(result.message || 'Country updated successfully');
         onOpenChange(false);
-        onSuccess?.();
+        // Pass the updated data back
+        onSuccess?.({
+          id: country.id,
+          name: formData.name,
+          nationality: formData.nationality
+        });
       } else {
         toast.error(result.error || 'Failed to update country');
       }

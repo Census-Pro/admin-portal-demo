@@ -1,57 +1,75 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteNaturalizationType } from '@/actions/common/naturalization-type-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AddNaturalizationTypeModal } from './add-naturalization-type-modal';
 
 interface NaturalizationType {
   id: string;
   name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const columns: ColumnDef<NaturalizationType>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Naturalization Type',
-    cell: ({ row }) => {
-      const type = row.original;
-      return (
-        <div className="flex items-center gap-3">
-          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {type.name.charAt(0).toUpperCase()}
-          </div>
-          <div className="font-medium">{type.name}</div>
-        </div>
-      );
-    }
-  },
-  {
-    id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
-    cell: ({ row }) => {
-      const type = row.original;
-      return <ActionsCell type={type} />;
-    }
-  }
-];
+interface CreateColumnsProps {
+  onUpdate?: (item: NaturalizationType) => void;
+  onDelete?: (id: string) => void;
+  onCreate?: () => void;
+}
 
-function ActionsCell({ type }: { type: NaturalizationType }) {
+export function createColumns({
+  onUpdate,
+  onDelete,
+  onCreate
+}: CreateColumnsProps): ColumnDef<NaturalizationType>[] {
+  return [
+    {
+      accessorKey: 'name',
+      header: 'Naturalization Type',
+      cell: ({ row }) => {
+        const type = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+              {type.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="font-medium">{type.name}</div>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'actions',
+      header: () => <div className="text-right">Actions</div>,
+      cell: ({ row }) => {
+        const type = row.original;
+        return (
+          <ActionsCell type={type} onUpdate={onUpdate} onDelete={onDelete} />
+        );
+      }
+    }
+  ];
+}
+
+function ActionsCell({
+  type,
+  onUpdate,
+  onDelete
+}: {
+  type: NaturalizationType;
+  onUpdate?: (item: NaturalizationType) => void;
+  onDelete?: (id: string) => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -65,7 +83,10 @@ function ActionsCell({ type }: { type: NaturalizationType }) {
       if (!result || !result.error) {
         toast.success('Naturalization type deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
+        // Instant update
+        if (onDelete) {
+          onDelete(type.id);
+        }
       } else {
         toast.error(result.message || 'Failed to delete naturalization type');
       }
@@ -75,6 +96,13 @@ function ActionsCell({ type }: { type: NaturalizationType }) {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleUpdateSuccess = (updatedItem: NaturalizationType) => {
+    if (onUpdate) {
+      onUpdate(updatedItem);
+    }
+    setIsEditOpen(false);
   };
 
   return (
@@ -113,10 +141,7 @@ function ActionsCell({ type }: { type: NaturalizationType }) {
       <AddNaturalizationTypeModal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        onSuccess={() => {
-          router.refresh();
-          setIsEditOpen(false);
-        }}
+        onSuccess={handleUpdateSuccess}
         initialData={type}
       />
     </>

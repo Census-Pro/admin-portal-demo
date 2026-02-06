@@ -70,7 +70,38 @@ export function DzongkhagsTable({
     fetchData();
   }, [fetchData]);
 
-  const columns = createColumns({ onRefresh: fetchData });
+  const handleUpdate = useCallback((id: string, updatedItem: Dzongkhag) => {
+    setData((prevData) =>
+      prevData.map((item) => (item.id === id ? updatedItem : item))
+    );
+  }, []);
+
+  const handleDelete = useCallback((id: string) => {
+    setData((prevData) => prevData.filter((item) => item.id !== id));
+    setTotalItems((prev) => prev - 1);
+  }, []);
+
+  const handleCreate = useCallback((newItem: Dzongkhag) => {
+    setData((prevData) => [newItem, ...prevData]);
+    setTotalItems((prev) => prev + 1);
+  }, []);
+
+  useEffect(() => {
+    const handleDzongkhagCreated = (event: Event) => {
+      const customEvent = event as CustomEvent<Dzongkhag>;
+      if (customEvent.detail) {
+        handleCreate(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('dzongkhag-created', handleDzongkhagCreated);
+
+    return () => {
+      window.removeEventListener('dzongkhag-created', handleDzongkhagCreated);
+    };
+  }, [handleCreate]);
+
+  const columns = createColumns(handleUpdate, handleDelete);
 
   if (error) {
     return (

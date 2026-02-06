@@ -1,27 +1,27 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteRelationshipCertificatePurpose } from '@/actions/common/relationship-certificate-purpose-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AddRelationshipCertificatePurposeModal } from './add-relationship-certificate-purpose-modal';
 
 interface RelationshipCertificatePurpose {
   id: string;
   name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const columns: ColumnDef<RelationshipCertificatePurpose>[] = [
+export const createColumns = (
+  onUpdate: (id: string, updatedItem: RelationshipCertificatePurpose) => void,
+  onDelete: (id: string) => void
+): ColumnDef<RelationshipCertificatePurpose>[] => [
   {
     accessorKey: 'name',
     header: 'Certificate Purpose',
@@ -42,16 +42,29 @@ export const columns: ColumnDef<RelationshipCertificatePurpose>[] = [
     header: () => <div className="text-right">Actions</div>,
     cell: ({ row }) => {
       const purpose = row.original;
-      return <ActionsCell purpose={purpose} />;
+      return (
+        <ActionsCell
+          purpose={purpose}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
+        />
+      );
     }
   }
 ];
 
-function ActionsCell({ purpose }: { purpose: RelationshipCertificatePurpose }) {
+function ActionsCell({
+  purpose,
+  onUpdate,
+  onDelete
+}: {
+  purpose: RelationshipCertificatePurpose;
+  onUpdate: (id: string, updatedItem: RelationshipCertificatePurpose) => void;
+  onDelete: (id: string) => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -64,8 +77,8 @@ function ActionsCell({ purpose }: { purpose: RelationshipCertificatePurpose }) {
 
       if (!result || !result.error) {
         toast.success('Certificate purpose deleted successfully');
+        onDelete(purpose.id);
         setDeleteDialogOpen(false);
-        router.refresh();
       } else {
         toast.error(result.message || 'Failed to delete certificate purpose');
       }
@@ -113,8 +126,10 @@ function ActionsCell({ purpose }: { purpose: RelationshipCertificatePurpose }) {
       <AddRelationshipCertificatePurposeModal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        onSuccess={() => {
-          router.refresh();
+        onSuccess={(updatedItem) => {
+          if (updatedItem) {
+            onUpdate(purpose.id, updatedItem);
+          }
           setIsEditOpen(false);
         }}
         initialData={purpose}

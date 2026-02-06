@@ -1,9 +1,9 @@
 'use client';
 
-import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs';
-import { useEffect, useState, useTransition } from 'react';
+import { useQueryStates, parseAsInteger } from 'nuqs';
+import { useEffect, useState, useTransition, useCallback } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from './columns';
+import { createColumns } from './columns';
 import { getRelationshipCertificatePurposes } from '@/actions/common/relationship-certificate-purpose-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 
@@ -31,7 +31,7 @@ export function RelationshipCertificatePurposesTable({
   const [totalItems, setTotalItems] = useState(initialTotalItems);
   const [error, setError] = useState<string | null>(null);
 
-  const [searchParams, setSearchParams] = useQueryStates(
+  const [searchParams] = useQueryStates(
     {
       page: parseAsInteger.withDefault(1),
       limit: parseAsInteger.withDefault(10)
@@ -42,7 +42,7 @@ export function RelationshipCertificatePurposesTable({
     }
   );
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     startTransition(async () => {
       try {
         const result = await getRelationshipCertificatePurposes({
@@ -65,11 +65,56 @@ export function RelationshipCertificatePurposesTable({
         setTotalItems(0);
       }
     });
-  };
+  }, [searchParams.page, searchParams.limit]);
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit]);
+  }, [fetchData]);
+
+  const handleUpdate = useCallback(
+    (id: string, updatedItem: RelationshipCertificatePurpose) => {
+      setData((prevData) =>
+        prevData.map((item) => (item.id === id ? updatedItem : item))
+      );
+    },
+    []
+  );
+
+  const handleDelete = useCallback((id: string) => {
+    setData((prevData) => prevData.filter((item) => item.id !== id));
+    setTotalItems((prev) => prev - 1);
+  }, []);
+
+  const handleCreate = useCallback(
+    (newItem: RelationshipCertificatePurpose) => {
+      setData((prevData) => [newItem, ...prevData]);
+      setTotalItems((prev) => prev + 1);
+    },
+    []
+  );
+
+  useEffect(() => {
+    const handleCertificatePurposeCreated = (event: Event) => {
+      const customEvent = event as CustomEvent<RelationshipCertificatePurpose>;
+      if (customEvent.detail) {
+        handleCreate(customEvent.detail);
+      }
+    };
+
+    window.addEventListener(
+      'relationship-certificate-purpose-created',
+      handleCertificatePurposeCreated
+    );
+
+    return () => {
+      window.removeEventListener(
+        'relationship-certificate-purpose-created',
+        handleCertificatePurposeCreated
+      );
+    };
+  }, [handleCreate]);
+
+  const columns = createColumns(handleUpdate, handleDelete);
 
   if (error) {
     return (

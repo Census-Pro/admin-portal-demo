@@ -70,7 +70,38 @@ export function GendersTable({
     fetchData();
   }, [fetchData]);
 
-  const columns = createColumns({ onRefresh: fetchData });
+  const handleUpdate = useCallback((id: string, updatedItem: Gender) => {
+    setData((prevData) =>
+      prevData.map((item) => (item.id === id ? updatedItem : item))
+    );
+  }, []);
+
+  const handleDelete = useCallback((id: string) => {
+    setData((prevData) => prevData.filter((item) => item.id !== id));
+    setTotalItems((prev) => prev - 1);
+  }, []);
+
+  const handleCreate = useCallback((newItem: Gender) => {
+    setData((prevData) => [newItem, ...prevData]);
+    setTotalItems((prev) => prev + 1);
+  }, []);
+
+  useEffect(() => {
+    const handleGenderCreated = (event: Event) => {
+      const customEvent = event as CustomEvent<Gender>;
+      if (customEvent.detail) {
+        handleCreate(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('gender-created', handleGenderCreated);
+
+    return () => {
+      window.removeEventListener('gender-created', handleGenderCreated);
+    };
+  }, [handleCreate]);
+
+  const columns = createColumns(handleUpdate, handleDelete);
 
   if (error) {
     return (

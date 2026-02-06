@@ -14,61 +14,66 @@ export interface Country {
   name: string;
   nationality: string;
   isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-interface CreateColumnsProps {
-  onRefresh?: () => void;
-}
-
-export function createColumns({
-  onRefresh
-}: CreateColumnsProps = {}): ColumnDef<Country>[] {
-  return [
-    {
-      accessorKey: 'name',
-      header: 'Country Name',
-      cell: ({ row }) => {
-        const country = row.original;
-        return (
-          <div className="flex items-center gap-3">
-            <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-              {country.name.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <div className="font-medium">{country.name}</div>
-            </div>
+export const createColumns = (
+  onUpdate: (id: string, updatedItem: Country) => void,
+  onDelete: (id: string) => void
+): ColumnDef<Country>[] => [
+  {
+    accessorKey: 'name',
+    header: 'Country Name',
+    cell: ({ row }) => {
+      const country = row.original;
+      return (
+        <div className="flex items-center gap-3">
+          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+            {country.name.charAt(0).toUpperCase()}
           </div>
-        );
-      }
-    },
-    {
-      accessorKey: 'nationality',
-      header: 'Nationality',
-      cell: ({ row }) => {
-        return (
-          <span className="text-muted-foreground text-sm">
-            {row.getValue('nationality')}
-          </span>
-        );
-      }
-    },
-    {
-      id: 'actions',
-      header: () => <div className="text-right">Actions</div>,
-      cell: ({ row }) => {
-        const country = row.original;
-        return <ActionsCell country={country} onRefresh={onRefresh} />;
-      }
+          <div>
+            <div className="font-medium">{country.name}</div>
+          </div>
+        </div>
+      );
     }
-  ];
-}
+  },
+  {
+    accessorKey: 'nationality',
+    header: 'Nationality',
+    cell: ({ row }) => {
+      return (
+        <span className="text-muted-foreground text-sm">
+          {row.getValue('nationality')}
+        </span>
+      );
+    }
+  },
+  {
+    id: 'actions',
+    header: () => <div className="text-right">Actions</div>,
+    cell: ({ row }) => {
+      const country = row.original;
+      return (
+        <ActionsCell
+          country={country}
+          onUpdate={onUpdate}
+          onDelete={onDelete}
+        />
+      );
+    }
+  }
+];
 
 function ActionsCell({
   country,
-  onRefresh
+  onUpdate,
+  onDelete
 }: {
   country: Country;
-  onRefresh?: () => void;
+  onUpdate: (id: string, updatedItem: Country) => void;
+  onDelete: (id: string) => void;
 }) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -85,12 +90,8 @@ function ActionsCell({
 
       if (result.success) {
         toast.success(result.message || 'Country deleted successfully');
+        onDelete(country.id);
         setDeleteDialogOpen(false);
-        if (onRefresh) {
-          onRefresh();
-        } else {
-          window.location.reload();
-        }
       } else {
         toast.error(result.error || 'Failed to delete country');
       }
@@ -116,12 +117,11 @@ function ActionsCell({
         open={editModalOpen}
         onOpenChange={setEditModalOpen}
         country={country}
-        onSuccess={() => {
-          if (onRefresh) {
-            onRefresh();
-          } else {
-            window.location.reload();
+        onSuccess={(updatedItem) => {
+          if (updatedItem) {
+            onUpdate(country.id, updatedItem);
           }
+          setEditModalOpen(false);
         }}
       />
       <div className="flex justify-end gap-2">

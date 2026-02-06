@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 interface AddDzongkhagModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (result?: any) => void;
   initialData?: { id: string; name: string } | null;
 }
 
@@ -58,7 +58,7 @@ export function AddDzongkhagModal({
         toast.success(
           `Dzongkhag ${initialData ? 'updated' : 'created'} successfully`
         );
-        onSuccess();
+        onSuccess(result);
         onClose();
         setName('');
       } else {

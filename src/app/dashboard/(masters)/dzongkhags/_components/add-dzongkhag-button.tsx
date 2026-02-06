@@ -8,6 +8,15 @@ import { AddDzongkhagModal } from './add-dzongkhag-modal';
 export function AddDzongkhagButton() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSuccess = (result: any) => {
+    if (result) {
+      window.dispatchEvent(
+        new CustomEvent('dzongkhag-created', { detail: result })
+      );
+    }
+    setIsOpen(false);
+  };
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>
@@ -18,9 +27,7 @@ export function AddDzongkhagButton() {
       <AddDzongkhagModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        onSuccess={() => {
-          window.location.reload();
-        }}
+        onSuccess={handleSuccess}
       />
     </>
   );

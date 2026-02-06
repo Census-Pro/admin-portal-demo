@@ -118,9 +118,10 @@ export async function deleteDzongkhag(id?: string) {
     }
 
     revalidatePath('/dashboard/dzongkhag');
+    return { error: false, message: 'Dzongkhag deleted successfully' };
   } catch (error) {
     console.error('Error deleting dzongkhag:', error);
-    return null;
+    return { error: true, message: 'Failed to delete dzongkhag' };
   }
 }
 

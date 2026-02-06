@@ -17,7 +17,7 @@ import { createCountry } from '@/actions/common/country-actions';
 interface AddCountryModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSuccess?: () => void;
+  onSuccess?: (result?: any) => void;
 }
 
 export function AddCountryModal({
@@ -42,7 +42,7 @@ export function AddCountryModal({
         toast.success(result.message || 'Country created successfully');
         onOpenChange(false);
         setFormData({ name: '', nationality: '' });
-        onSuccess?.();
+        onSuccess?.(result.data);
       } else {
         toast.error(result.error || 'Failed to create country');
       }

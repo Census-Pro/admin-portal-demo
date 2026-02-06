@@ -43,9 +43,7 @@ export async function getUsers(
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to view users. Please contact your administrator.";
       }

@@ -16,12 +16,11 @@ import {
   updateNaturalizationType
 } from '@/actions/common/naturalization-type-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface AddNaturalizationTypeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (item?: any) => void;
   initialData?: { id: string; name: string } | null;
 }
 
@@ -33,7 +32,6 @@ export function AddNaturalizationTypeModal({
 }: AddNaturalizationTypeModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
-  const router = useRouter();
 
   // Update name when initialData changes
   useEffect(() => {
@@ -60,8 +58,8 @@ export function AddNaturalizationTypeModal({
         toast.success(
           `Naturalization type ${initialData ? 'updated' : 'created'} successfully`
         );
-        onSuccess();
-        router.refresh();
+        // Pass the updated/created item back
+        onSuccess(result);
         onClose();
         setName('');
       } else {

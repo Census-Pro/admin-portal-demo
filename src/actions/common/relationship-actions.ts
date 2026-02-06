@@ -38,9 +38,7 @@ export async function getRelationships({
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to view relationships. Please contact your administrator.";
       }
@@ -171,9 +169,7 @@ export async function createRelationship(data: { name: string }) {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to create relationships. Please contact your administrator.";
       } else if (response.status === 409) {
@@ -223,9 +219,7 @@ export async function updateRelationship(data: { id: string; name: string }) {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to update relationships. Please contact your administrator.";
       } else if (response.status === 409) {
@@ -274,9 +268,7 @@ export async function deleteRelationship(id: string) {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to delete relationships. Please contact your administrator.";
       }

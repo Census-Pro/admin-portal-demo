@@ -117,9 +117,10 @@ export async function deleteGender(id?: string) {
     }
 
     revalidatePath('/dashboard/genders');
+    return { error: false, message: 'Gender deleted successfully' };
   } catch (error) {
     console.error('Error deleting gender:', error);
-    return null;
+    return { error: true, message: 'Failed to delete gender' };
   }
 }
 

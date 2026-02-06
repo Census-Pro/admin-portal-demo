@@ -16,12 +16,11 @@ import {
   updateRegularizationType
 } from '@/actions/common/regularization-type-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface AddRegularizationTypeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (result?: any) => void;
   initialData?: { id: string; name: string } | null;
 }
 
@@ -33,7 +32,6 @@ export function AddRegularizationTypeModal({
 }: AddRegularizationTypeModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
-  const router = useRouter();
 
   // Update name when initialData changes
   useEffect(() => {
@@ -60,8 +58,7 @@ export function AddRegularizationTypeModal({
         toast.success(
           `Regularization type ${initialData ? 'updated' : 'created'} successfully`
         );
-        onSuccess();
-        router.refresh();
+        onSuccess(result);
         onClose();
         setName('');
       } else {
@@ -77,7 +74,6 @@ export function AddRegularizationTypeModal({
       setIsLoading(false);
     }
   };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px]">

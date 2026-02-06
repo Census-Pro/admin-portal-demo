@@ -8,6 +8,17 @@ import { AddRelationshipCertificatePurposeModal } from './add-relationship-certi
 export function AddRelationshipCertificatePurposeButton() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSuccess = (result: any) => {
+    if (result) {
+      window.dispatchEvent(
+        new CustomEvent('relationship-certificate-purpose-created', {
+          detail: result
+        })
+      );
+    }
+    setIsOpen(false);
+  };
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>
@@ -18,9 +29,7 @@ export function AddRelationshipCertificatePurposeButton() {
       <AddRelationshipCertificatePurposeModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        onSuccess={() => {
-          setIsOpen(false);
-        }}
+        onSuccess={handleSuccess}
       />
     </>
   );

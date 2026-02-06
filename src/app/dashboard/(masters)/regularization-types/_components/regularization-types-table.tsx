@@ -1,9 +1,9 @@
 'use client';
 
-import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs';
-import { useEffect, useState, useTransition } from 'react';
+import { useQueryStates, parseAsInteger } from 'nuqs';
+import { useEffect, useState, useTransition, useCallback } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from './columns';
+import { createColumns } from './columns';
 import { getRegularizationTypes } from '@/actions/common/regularization-type-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 
@@ -30,7 +30,7 @@ export function RegularizationTypesTable({
   const [totalItems, setTotalItems] = useState(initialTotalItems);
   const [error, setError] = useState<string | null>(null);
 
-  const [searchParams, setSearchParams] = useQueryStates(
+  const [searchParams] = useQueryStates(
     {
       page: parseAsInteger.withDefault(1),
       limit: parseAsInteger.withDefault(10)
@@ -41,7 +41,7 @@ export function RegularizationTypesTable({
     }
   );
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     startTransition(async () => {
       try {
         const result = await getRegularizationTypes({
@@ -64,11 +64,53 @@ export function RegularizationTypesTable({
         setTotalItems(0);
       }
     });
-  };
+  }, [searchParams.page, searchParams.limit]);
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit]);
+  }, [fetchData]);
+
+  const handleUpdate = useCallback(
+    (id: string, updatedItem: RegularizationType) => {
+      setData((prevData) =>
+        prevData.map((item) => (item.id === id ? updatedItem : item))
+      );
+    },
+    []
+  );
+
+  const handleDelete = useCallback((id: string) => {
+    setData((prevData) => prevData.filter((item) => item.id !== id));
+    setTotalItems((prev) => prev - 1);
+  }, []);
+
+  const handleCreate = useCallback((newItem: RegularizationType) => {
+    setData((prevData) => [newItem, ...prevData]);
+    setTotalItems((prev) => prev + 1);
+  }, []);
+
+  useEffect(() => {
+    const handleRegularizationTypeCreated = (event: Event) => {
+      const customEvent = event as CustomEvent<RegularizationType>;
+      if (customEvent.detail) {
+        handleCreate(customEvent.detail);
+      }
+    };
+
+    window.addEventListener(
+      'regularization-type-created',
+      handleRegularizationTypeCreated
+    );
+
+    return () => {
+      window.removeEventListener(
+        'regularization-type-created',
+        handleRegularizationTypeCreated
+      );
+    };
+  }, [handleCreate]);
+
+  const columns = createColumns(handleUpdate, handleDelete);
 
   if (error) {
     return (

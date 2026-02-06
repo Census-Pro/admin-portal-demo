@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 interface AddGenderModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (result?: any) => void;
   initialData?: { id: string; name: string } | null;
 }
 
@@ -54,7 +54,7 @@ export function AddGenderModal({
         toast.success(
           `Gender ${initialData ? 'updated' : 'created'} successfully`
         );
-        onSuccess();
+        onSuccess(result);
         onClose();
         setName('');
       } else {

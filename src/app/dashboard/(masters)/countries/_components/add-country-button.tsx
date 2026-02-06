@@ -8,6 +8,14 @@ import { AddCountryModal } from './add-country-modal';
 export function AddCountryButton() {
   const [open, setOpen] = useState(false);
 
+  const handleSuccess = (result: any) => {
+    if (result) {
+      window.dispatchEvent(
+        new CustomEvent('country-created', { detail: result })
+      );
+    }
+  };
+
   return (
     <>
       <Button onClick={() => setOpen(true)} className="gap-2">
@@ -17,7 +25,7 @@ export function AddCountryButton() {
       <AddCountryModal
         open={open}
         onOpenChange={setOpen}
-        onSuccess={() => window.location.reload()}
+        onSuccess={handleSuccess}
       />
     </>
   );

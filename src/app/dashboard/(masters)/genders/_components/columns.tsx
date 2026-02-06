@@ -12,48 +12,51 @@ import { AddGenderModal } from './add-gender-modal';
 interface Gender {
   id: string;
   name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-interface CreateColumnsProps {
-  onRefresh?: () => void;
-}
-
-export function createColumns({
-  onRefresh
-}: CreateColumnsProps = {}): ColumnDef<Gender>[] {
-  return [
-    {
-      accessorKey: 'name',
-      header: 'Gender Name',
-      cell: ({ row }) => {
-        const gender = row.original;
-        return (
-          <div className="flex items-center gap-3">
-            <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-              {gender.name.charAt(0).toUpperCase()}
-            </div>
-            <div className="font-medium">{gender.name}</div>
+export const createColumns = (
+  onUpdate: (id: string, updatedItem: Gender) => void,
+  onDelete: (id: string) => void
+): ColumnDef<Gender>[] => [
+  {
+    accessorKey: 'name',
+    header: 'Gender Name',
+    cell: ({ row }) => {
+      const gender = row.original;
+      return (
+        <div className="flex items-center gap-3">
+          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+            {gender.name.charAt(0).toUpperCase()}
           </div>
-        );
-      }
-    },
-    {
-      id: 'actions',
-      header: () => <div className="text-right">Actions</div>,
-      cell: ({ row }) => {
-        const gender = row.original;
-        return <ActionsCell gender={gender} onRefresh={onRefresh} />;
-      }
+          <div className="font-medium">{gender.name}</div>
+        </div>
+      );
     }
-  ];
-}
+  },
+  {
+    id: 'actions',
+    header: () => <div className="text-right">Actions</div>,
+    cell: ({ row }) => {
+      const gender = row.original;
+      return (
+        <ActionsCell gender={gender} onUpdate={onUpdate} onDelete={onDelete} />
+      );
+    }
+  }
+];
 
 function ActionsCell({
   gender,
-  onRefresh
+  onUpdate,
+  onDelete
 }: {
   gender: Gender;
-  onRefresh?: () => void;
+  onUpdate: (id: string, updatedItem: Gender) => void;
+  onDelete: (id: string) => void;
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -70,12 +73,8 @@ function ActionsCell({
 
       if (!result || !result.error) {
         toast.success('Gender deleted successfully');
+        onDelete(gender.id);
         setDeleteDialogOpen(false);
-        if (onRefresh) {
-          onRefresh();
-        } else {
-          window.location.reload();
-        }
       } else {
         toast.error(result.message || 'Failed to delete gender');
       }
@@ -123,9 +122,9 @@ function ActionsCell({
       <AddGenderModal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        onSuccess={() => {
-          if (onRefresh) {
-            onRefresh();
+        onSuccess={(updatedItem) => {
+          if (updatedItem) {
+            onUpdate(gender.id, updatedItem);
           }
           setIsEditOpen(false);
         }}

@@ -1,27 +1,27 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteRegularizationType } from '@/actions/common/regularization-type-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AddRegularizationTypeModal } from './add-regularization-type-modal';
 
 interface RegularizationType {
   id: string;
   name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const columns: ColumnDef<RegularizationType>[] = [
+export const createColumns = (
+  onUpdate: (id: string, updatedItem: RegularizationType) => void,
+  onDelete: (id: string) => void
+): ColumnDef<RegularizationType>[] => [
   {
     accessorKey: 'name',
     header: 'Regularization Type',
@@ -42,16 +42,25 @@ export const columns: ColumnDef<RegularizationType>[] = [
     header: () => <div className="text-right">Actions</div>,
     cell: ({ row }) => {
       const type = row.original;
-      return <ActionsCell type={type} />;
+      return (
+        <ActionsCell type={type} onUpdate={onUpdate} onDelete={onDelete} />
+      );
     }
   }
 ];
 
-function ActionsCell({ type }: { type: RegularizationType }) {
+function ActionsCell({
+  type,
+  onUpdate,
+  onDelete
+}: {
+  type: RegularizationType;
+  onUpdate: (id: string, updatedItem: RegularizationType) => void;
+  onDelete: (id: string) => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -64,8 +73,8 @@ function ActionsCell({ type }: { type: RegularizationType }) {
 
       if (!result || !result.error) {
         toast.success('Regularization type deleted successfully');
+        onDelete(type.id);
         setDeleteDialogOpen(false);
-        router.refresh();
       } else {
         toast.error(result.message || 'Failed to delete regularization type');
       }
@@ -113,8 +122,10 @@ function ActionsCell({ type }: { type: RegularizationType }) {
       <AddRegularizationTypeModal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        onSuccess={() => {
-          router.refresh();
+        onSuccess={(updatedItem) => {
+          if (updatedItem) {
+            onUpdate(type.id, updatedItem);
+          }
           setIsEditOpen(false);
         }}
         initialData={type}

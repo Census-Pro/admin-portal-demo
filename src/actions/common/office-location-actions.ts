@@ -34,9 +34,7 @@ export async function getOfficeLocations(
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to view office locations. Please contact your administrator.";
       }
@@ -88,9 +86,7 @@ export async function createOfficeLocation(data: { name: string }) {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to create office locations. Please contact your administrator.";
       }

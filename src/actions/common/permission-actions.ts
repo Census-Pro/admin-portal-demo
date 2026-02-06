@@ -65,9 +65,7 @@ export async function getPermissions(page: number = 1, take: number = 100) {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to view permissions. Please contact your administrator.";
       } else if (response.status === 404) {
@@ -144,9 +142,7 @@ export async function createPermission(data: {
         errorMessage = `${response.status}: ${response.statusText}`;
       }
 
-      if (response.status === 401) {
-        errorMessage = 'Your session has expired. Please log in again.';
-      } else if (response.status === 403) {
+      if (response.status === 403) {
         errorMessage =
           "You don't have permission to create permissions. Please contact your administrator.";
       }
@@ -158,10 +154,7 @@ export async function createPermission(data: {
     }
 
     const result = await response.json();
-    console.log(
-      '✅ [createPermission] Permission created successfully:',
-      result
-    );
+    console.log('[createPermission] Permission created successfully:', result);
     revalidatePath('/dashboard/permissions');
 
     return {

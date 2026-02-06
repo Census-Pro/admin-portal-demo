@@ -1,13 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { createColumns } from './columns';
 import { getCountries } from '@/actions/common/country-actions';
 import { toast } from 'sonner';
 
+interface Country {
+  id: string;
+  name: string;
+  nationality: string;
+  isActive?: boolean;
+}
+
 export default function CountriesTable() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Country[]>([]);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,7 +44,38 @@ export default function CountriesTable() {
     fetchCountries();
   }, []);
 
-  const columns = createColumns({ onRefresh: fetchCountries });
+  const handleUpdate = useCallback((id: string, updatedItem: Country) => {
+    setData((prevData) =>
+      prevData.map((item) => (item.id === id ? updatedItem : item))
+    );
+  }, []);
+
+  const handleDelete = useCallback((id: string) => {
+    setData((prevData) => prevData.filter((item) => item.id !== id));
+    setTotalItems((prev) => prev - 1);
+  }, []);
+
+  const handleCreate = useCallback((newItem: Country) => {
+    setData((prevData) => [newItem, ...prevData]);
+    setTotalItems((prev) => prev + 1);
+  }, []);
+
+  useEffect(() => {
+    const handleCountryCreated = (event: Event) => {
+      const customEvent = event as CustomEvent<Country>;
+      if (customEvent.detail) {
+        handleCreate(customEvent.detail);
+      }
+    };
+
+    window.addEventListener('country-created', handleCountryCreated);
+
+    return () => {
+      window.removeEventListener('country-created', handleCountryCreated);
+    };
+  }, [handleCreate]);
+
+  const columns = createColumns(handleUpdate, handleDelete);
 
   if (isLoading) {
     return <DataTable columns={columns} data={[]} totalItems={0} />;
