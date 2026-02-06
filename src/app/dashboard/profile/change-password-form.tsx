@@ -21,6 +21,7 @@ import {
   IconEye,
   IconEyeOff
 } from '@tabler/icons-react';
+import { changePassword } from '@/actions/auth-actions';
 
 const passwordSchema = z
   .object({
@@ -53,12 +54,19 @@ export function ChangePasswordForm() {
   async function onSubmit(data: PasswordFormValues) {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      console.log('Password change requested:', data);
-      toast.success('Password updated successfully');
-      form.reset();
+      const result = await changePassword({
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword
+      });
+
+      if (result.error) {
+        toast.error(result.message);
+      } else {
+        toast.success(result.message);
+        form.reset();
+      }
     } catch (error) {
+      console.error('Password change error:', error);
       toast.error('Failed to update password');
     } finally {
       setLoading(false);

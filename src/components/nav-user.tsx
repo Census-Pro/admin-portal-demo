@@ -63,10 +63,16 @@ export function NavUser({
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 {/* Name removed as requested */}
-                <span className="truncate text-xs">
-                  {user.cidNo ? `CID: ${user.cidNo}` : user.email}
-                </span>
-                {user.roleType && (
+                {user.cidNo && user.roleType ? (
+                  <span className="truncate text-xs font-black text-gray-900">
+                    CID: {user.cidNo} {user.roleType.replace('_', ' ')}
+                  </span>
+                ) : (
+                  <span className="truncate text-xs">
+                    {user.cidNo ? `CID: ${user.cidNo}` : user.email}
+                  </span>
+                )}
+                {!user.cidNo && user.roleType && (
                   <span className="text-muted-foreground truncate text-[10px] font-medium uppercase">
                     {user.roleType.replace('_', ' ')}
                   </span>
@@ -91,10 +97,16 @@ export function NavUser({
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   {/* Name removed as requested */}
-                  <span className="truncate text-xs">
-                    {user.cidNo ? `CID: ${user.cidNo}` : user.email}
-                  </span>
-                  {user.roleType && (
+                  {user.cidNo && user.roleType ? (
+                    <span className="truncate text-xs font-black text-gray-900">
+                      CID: {user.cidNo} {user.roleType.replace('_', ' ')}
+                    </span>
+                  ) : (
+                    <span className="truncate text-xs">
+                      {user.cidNo ? `CID: ${user.cidNo}` : user.email}
+                    </span>
+                  )}
+                  {!user.cidNo && user.roleType && (
                     <span className="text-muted-foreground truncate text-[10px] font-medium uppercase">
                       {user.roleType.replace('_', ' ')}
                     </span>

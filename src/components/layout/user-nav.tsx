@@ -38,13 +38,13 @@ export function UserNav() {
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
               {/* Name removed as requested */}
-              <p className="text-muted-foreground text-xs leading-none">
+              <p className="text-xs leading-none font-bold text-gray-900">
                 {session.user.cidNo
                   ? `CID: ${session.user.cidNo}`
                   : session.user.email}
               </p>
               {session.user.roleType && (
-                <p className="text-muted-foreground pt-1 text-[10px] leading-none font-medium uppercase">
+                <p className="pt-1 text-[10px] leading-none font-bold text-gray-900 uppercase">
                   {session.user.roleType.replace('_', ' ')}
                 </p>
               )}
