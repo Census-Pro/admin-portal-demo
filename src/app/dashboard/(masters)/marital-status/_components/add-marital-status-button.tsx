@@ -8,6 +8,12 @@ import { AddMaritalStatusModal } from './add-marital-status-modal';
 export function AddMaritalStatusButton() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSuccess = () => {
+    setIsOpen(false);
+    // Dispatch custom event to notify table to refresh
+    window.dispatchEvent(new Event('marital-status-created'));
+  };
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>
@@ -18,9 +24,7 @@ export function AddMaritalStatusButton() {
       <AddMaritalStatusModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        onSuccess={() => {
-          setIsOpen(false);
-        }}
+        onSuccess={handleSuccess}
       />
     </>
   );

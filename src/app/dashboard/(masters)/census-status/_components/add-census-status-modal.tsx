@@ -16,12 +16,11 @@ import {
   updateCensusStatus
 } from '@/actions/common/census-status-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface AddCensusStatusModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (item?: any) => void;
   initialData?: { id: string; name: string } | null;
 }
 
@@ -33,7 +32,6 @@ export function AddCensusStatusModal({
 }: AddCensusStatusModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
-  const router = useRouter();
 
   useEffect(() => {
     if (initialData) {
@@ -59,8 +57,8 @@ export function AddCensusStatusModal({
         toast.success(
           `Census status ${initialData ? 'updated' : 'created'} successfully`
         );
-        onSuccess();
-        router.refresh();
+        // Pass the updated/created item back
+        onSuccess(result);
         onClose();
         setName('');
       } else {

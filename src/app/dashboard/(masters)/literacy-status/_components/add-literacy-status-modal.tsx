@@ -16,12 +16,11 @@ import {
   updateLiteracyStatus
 } from '@/actions/common/literacy-status-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface AddLiteracyStatusModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (item?: any) => void;
   initialData?: { id: string; name: string } | null;
 }
 
@@ -33,7 +32,6 @@ export function AddLiteracyStatusModal({
 }: AddLiteracyStatusModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
-  const router = useRouter();
 
   useEffect(() => {
     if (initialData) {
@@ -59,8 +57,8 @@ export function AddLiteracyStatusModal({
         toast.success(
           `Literacy status ${initialData ? 'updated' : 'created'} successfully`
         );
-        onSuccess();
-        router.refresh();
+        // Pass the updated/created item back
+        onSuccess(result);
         onClose();
         setName('');
       } else {

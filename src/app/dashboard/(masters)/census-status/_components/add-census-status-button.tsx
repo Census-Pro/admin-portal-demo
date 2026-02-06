@@ -8,6 +8,12 @@ import { AddCensusStatusModal } from './add-census-status-modal';
 export function AddCensusStatusButton() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSuccess = () => {
+    setIsOpen(false);
+    // Dispatch custom event to notify table to refresh
+    window.dispatchEvent(new Event('census-status-created'));
+  };
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>
@@ -18,9 +24,7 @@ export function AddCensusStatusButton() {
       <AddCensusStatusModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        onSuccess={() => {
-          setIsOpen(false);
-        }}
+        onSuccess={handleSuccess}
       />
     </>
   );

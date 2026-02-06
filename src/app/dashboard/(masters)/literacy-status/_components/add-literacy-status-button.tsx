@@ -8,6 +8,12 @@ import { AddLiteracyStatusModal } from './add-literacy-status-modal';
 export function AddLiteracyStatusButton() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleSuccess = () => {
+    setIsOpen(false);
+    // Dispatch custom event to notify table to refresh
+    window.dispatchEvent(new Event('literacy-status-created'));
+  };
+
   return (
     <>
       <Button onClick={() => setIsOpen(true)}>
@@ -18,9 +24,7 @@ export function AddLiteracyStatusButton() {
       <AddLiteracyStatusModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
-        onSuccess={() => {
-          setIsOpen(false);
-        }}
+        onSuccess={handleSuccess}
       />
     </>
   );

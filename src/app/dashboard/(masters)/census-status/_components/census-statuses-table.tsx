@@ -1,9 +1,9 @@
 'use client';
 
-import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs';
-import { useEffect, useState, useTransition } from 'react';
+import { useQueryStates, parseAsInteger } from 'nuqs';
+import { useEffect, useState, useTransition, useCallback } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from './columns';
+import { createColumns } from './columns';
 import { getCensusStatuses } from '@/actions/common/census-status-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 
@@ -30,7 +30,7 @@ export function CensusStatusesTable({
   const [totalItems, setTotalItems] = useState(initialTotalItems);
   const [error, setError] = useState<string | null>(null);
 
-  const [searchParams, setSearchParams] = useQueryStates(
+  const [searchParams] = useQueryStates(
     {
       page: parseAsInteger.withDefault(1),
       limit: parseAsInteger.withDefault(10)
@@ -41,7 +41,7 @@ export function CensusStatusesTable({
     }
   );
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     startTransition(async () => {
       try {
         const result = await getCensusStatuses({
@@ -66,11 +66,46 @@ export function CensusStatusesTable({
         setTotalItems(0);
       }
     });
-  };
+  }, [searchParams.page, searchParams.limit]);
+
+  const handleUpdate = useCallback((updatedItem: CensusStatus) => {
+    setData((prevData) =>
+      prevData.map((item) => (item.id === updatedItem.id ? updatedItem : item))
+    );
+  }, []);
+
+  const handleDelete = useCallback((deletedId: string) => {
+    setData((prevData) => prevData.filter((item) => item.id !== deletedId));
+    setTotalItems((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  const handleCreate = useCallback(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit]);
+  }, [fetchData]);
+
+  // Listen for census status created events
+  useEffect(() => {
+    const handleCensusStatusCreated = () => {
+      fetchData();
+    };
+
+    window.addEventListener('census-status-created', handleCensusStatusCreated);
+    return () =>
+      window.removeEventListener(
+        'census-status-created',
+        handleCensusStatusCreated
+      );
+  }, [fetchData]);
+
+  const columns = createColumns({
+    onUpdate: handleUpdate,
+    onDelete: handleDelete,
+    onCreate: handleCreate
+  });
 
   if (error) {
     return (

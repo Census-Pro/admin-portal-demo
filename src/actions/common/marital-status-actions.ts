@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -23,7 +23,7 @@ export async function createMaritalStatus(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('marital-status');
+    revalidatePath('/dashboard/(masters)/marital-status');
     return data;
   } catch (error) {
     console.error('Error creating marital status:', error);
@@ -117,10 +117,11 @@ export async function deleteMaritalStatus(id?: string) {
       };
     }
 
-    updateTag('marital-status');
+    revalidatePath('/dashboard/(masters)/marital-status');
+    return { error: false, message: 'Marital status deleted successfully' };
   } catch (error) {
     console.error('Error deleting marital status:', error);
-    return null;
+    return { error: true, message: 'Failed to delete marital status' };
   }
 }
 
@@ -140,6 +141,6 @@ export async function updateMaritalStatus(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  updateTag('marital-status');
+  revalidatePath('/dashboard/(masters)/marital-status');
   return res;
 }

@@ -1,57 +1,79 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteCensusStatus } from '@/actions/common/census-status-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AddCensusStatusModal } from './add-census-status-modal';
 
 interface CensusStatus {
   id: string;
   name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const columns: ColumnDef<CensusStatus>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Census Status Name',
-    cell: ({ row }) => {
-      const censusStatus = row.original;
-      return (
-        <div className="flex items-center gap-3">
-          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {censusStatus.name.charAt(0).toUpperCase()}
-          </div>
-          <div className="font-medium">{censusStatus.name}</div>
-        </div>
-      );
-    }
-  },
-  {
-    id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
-    cell: ({ row }) => {
-      const censusStatus = row.original;
-      return <ActionsCell censusStatus={censusStatus} />;
-    }
-  }
-];
+interface CreateColumnsProps {
+  onUpdate?: (item: CensusStatus) => void;
+  onDelete?: (id: string) => void;
+  onCreate?: () => void;
+}
 
-function ActionsCell({ censusStatus }: { censusStatus: CensusStatus }) {
+export function createColumns({
+  onUpdate,
+  onDelete,
+  onCreate
+}: CreateColumnsProps): ColumnDef<CensusStatus>[] {
+  return [
+    {
+      accessorKey: 'name',
+      header: 'Census Status Name',
+      cell: ({ row }) => {
+        const censusStatus = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+              {censusStatus.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="font-medium">{censusStatus.name}</div>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'actions',
+      header: () => <div className="text-right">Actions</div>,
+      cell: ({ row }) => {
+        const censusStatus = row.original;
+        return (
+          <ActionsCell
+            censusStatus={censusStatus}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+          />
+        );
+      }
+    }
+  ];
+}
+
+function ActionsCell({
+  censusStatus,
+  onUpdate,
+  onDelete
+}: {
+  censusStatus: CensusStatus;
+  onUpdate?: (item: CensusStatus) => void;
+  onDelete?: (id: string) => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -65,7 +87,10 @@ function ActionsCell({ censusStatus }: { censusStatus: CensusStatus }) {
       if (!result || !result.error) {
         toast.success('Census status deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
+        // Instant update
+        if (onDelete) {
+          onDelete(censusStatus.id);
+        }
       } else {
         toast.error(result.message || 'Failed to delete census status');
       }
@@ -75,6 +100,13 @@ function ActionsCell({ censusStatus }: { censusStatus: CensusStatus }) {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleUpdateSuccess = (updatedItem: CensusStatus) => {
+    if (onUpdate) {
+      onUpdate(updatedItem);
+    }
+    setIsEditOpen(false);
   };
 
   return (
@@ -113,10 +145,7 @@ function ActionsCell({ censusStatus }: { censusStatus: CensusStatus }) {
       <AddCensusStatusModal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        onSuccess={() => {
-          router.refresh();
-          setIsEditOpen(false);
-        }}
+        onSuccess={handleUpdateSuccess}
         initialData={censusStatus}
       />
     </>

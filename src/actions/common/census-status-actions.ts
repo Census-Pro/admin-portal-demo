@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -23,7 +23,7 @@ export async function createCensusStatus(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('census-status');
+    revalidatePath('/dashboard/(masters)/census-status');
     return data;
   } catch (error) {
     console.error('Error creating census status:', error);
@@ -117,10 +117,11 @@ export async function deleteCensusStatus(id?: string) {
       };
     }
 
-    updateTag('census-status');
+    revalidatePath('/dashboard/(masters)/census-status');
+    return { error: false, message: 'Census status deleted successfully' };
   } catch (error) {
     console.error('Error deleting census status:', error);
-    return null;
+    return { error: true, message: 'Failed to delete census status' };
   }
 }
 
@@ -140,6 +141,6 @@ export async function updateCensusStatus(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  updateTag('census-status');
+  revalidatePath('/dashboard/(masters)/census-status');
   return res;
 }

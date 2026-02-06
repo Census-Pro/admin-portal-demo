@@ -1,57 +1,79 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteLiteracyStatus } from '@/actions/common/literacy-status-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { AddLiteracyStatusModal } from './add-literacy-status-modal';
 
 interface LiteracyStatus {
   id: string;
   name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const columns: ColumnDef<LiteracyStatus>[] = [
-  {
-    accessorKey: 'name',
-    header: 'Literacy Status Name',
-    cell: ({ row }) => {
-      const literacyStatus = row.original;
-      return (
-        <div className="flex items-center gap-3">
-          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {literacyStatus.name.charAt(0).toUpperCase()}
-          </div>
-          <div className="font-medium">{literacyStatus.name}</div>
-        </div>
-      );
-    }
-  },
-  {
-    id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
-    cell: ({ row }) => {
-      const literacyStatus = row.original;
-      return <ActionsCell literacyStatus={literacyStatus} />;
-    }
-  }
-];
+interface CreateColumnsProps {
+  onUpdate?: (item: LiteracyStatus) => void;
+  onDelete?: (id: string) => void;
+  onCreate?: () => void;
+}
 
-function ActionsCell({ literacyStatus }: { literacyStatus: LiteracyStatus }) {
+export function createColumns({
+  onUpdate,
+  onDelete,
+  onCreate
+}: CreateColumnsProps): ColumnDef<LiteracyStatus>[] {
+  return [
+    {
+      accessorKey: 'name',
+      header: 'Literacy Status Name',
+      cell: ({ row }) => {
+        const literacyStatus = row.original;
+        return (
+          <div className="flex items-center gap-3">
+            <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+              {literacyStatus.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="font-medium">{literacyStatus.name}</div>
+          </div>
+        );
+      }
+    },
+    {
+      id: 'actions',
+      header: () => <div className="text-right">Actions</div>,
+      cell: ({ row }) => {
+        const literacyStatus = row.original;
+        return (
+          <ActionsCell
+            literacyStatus={literacyStatus}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+          />
+        );
+      }
+    }
+  ];
+}
+
+function ActionsCell({
+  literacyStatus,
+  onUpdate,
+  onDelete
+}: {
+  literacyStatus: LiteracyStatus;
+  onUpdate?: (item: LiteracyStatus) => void;
+  onDelete?: (id: string) => void;
+}) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -65,7 +87,10 @@ function ActionsCell({ literacyStatus }: { literacyStatus: LiteracyStatus }) {
       if (!result || !result.error) {
         toast.success('Literacy status deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
+        // Instant update
+        if (onDelete) {
+          onDelete(literacyStatus.id);
+        }
       } else {
         toast.error(result.message || 'Failed to delete literacy status');
       }
@@ -75,6 +100,13 @@ function ActionsCell({ literacyStatus }: { literacyStatus: LiteracyStatus }) {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleUpdateSuccess = (updatedItem: LiteracyStatus) => {
+    if (onUpdate) {
+      onUpdate(updatedItem);
+    }
+    setIsEditOpen(false);
   };
 
   return (
@@ -113,10 +145,7 @@ function ActionsCell({ literacyStatus }: { literacyStatus: LiteracyStatus }) {
       <AddLiteracyStatusModal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
-        onSuccess={() => {
-          router.refresh();
-          setIsEditOpen(false);
-        }}
+        onSuccess={handleUpdateSuccess}
         initialData={literacyStatus}
       />
     </>

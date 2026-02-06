@@ -1,6 +1,6 @@
 'use server';
 
-import { updateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 import { ApiErrorResponse } from '@/types/api-error-reponse';
 
@@ -23,7 +23,7 @@ export async function createLiteracyStatus(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    updateTag('literacy-status');
+    revalidatePath('/dashboard/(masters)/literacy-status');
     return data;
   } catch (error) {
     console.error('Error creating literacy status:', error);
@@ -117,10 +117,11 @@ export async function deleteLiteracyStatus(id?: string) {
       };
     }
 
-    updateTag('literacy-status');
+    revalidatePath('/dashboard/(masters)/literacy-status');
+    return { error: false, message: 'Literacy status deleted successfully' };
   } catch (error) {
     console.error('Error deleting literacy status:', error);
-    return null;
+    return { error: true, message: 'Failed to delete literacy status' };
   }
 }
 
@@ -140,6 +141,6 @@ export async function updateLiteracyStatus(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  updateTag('literacy-status');
+  revalidatePath('/dashboard/(masters)/literacy-status');
   return res;
 }
