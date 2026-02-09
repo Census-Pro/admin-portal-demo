@@ -9,13 +9,15 @@ import { auth } from '@/auth';
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const { id: adminId } = await params;
 
     // Check if user can manage admins
     const canManageAdmins =
@@ -37,7 +39,6 @@ export async function PUT(
     }
 
     const { abilities } = await request.json();
-    const adminId = params.id;
 
     const authServiceUrl =
       process.env.AUTH_SERVICE_URL || 'http://localhost:3000';

@@ -5,7 +5,7 @@ const AUTH_SERVICE_URL = process.env.AUTH_SERVICE || 'http://localhost:5001';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { adminId: string; roleId: string } }
+  { params }: { params: Promise<{ adminId: string; roleId: string }> }
 ) {
   try {
     const session = await auth();
@@ -17,7 +17,7 @@ export async function DELETE(
       );
     }
 
-    const { adminId, roleId } = params;
+    const { adminId, roleId } = await params;
 
     // Call the backend DELETE endpoint: /admin-role/admin/:adminId/role/:roleId
     const response = await fetch(

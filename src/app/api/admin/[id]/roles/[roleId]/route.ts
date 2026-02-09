@@ -7,7 +7,7 @@ import { auth } from '@/auth';
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; roleId: string } }
+  { params }: { params: Promise<{ id: string; roleId: string }> }
 ) {
   try {
     const session = await auth();
@@ -15,8 +15,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const adminId = params.id;
-    const roleId = params.roleId;
+    const { id: adminId, roleId } = await params;
     const authServiceUrl =
       process.env.AUTH_SERVICE_URL || 'http://localhost:5001';
 
