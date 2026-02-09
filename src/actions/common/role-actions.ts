@@ -105,6 +105,59 @@ export async function getRoles() {
   }
 }
 
+export async function getRoleById(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${API_URL}/roles/${id}`;
+
+    console.log('[getRoleById] Fetching role from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch role';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      if (response.status === 404) {
+        errorMessage = 'Role not found';
+      }
+
+      console.error('[getRoleById] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage,
+        data: null
+      };
+    }
+
+    const result = await response.json();
+    console.log('[getRoleById] Role fetched successfully:', result.data?.name);
+
+    return {
+      success: true,
+      data: result.data || result
+    };
+  } catch (error) {
+    console.error('[getRoleById] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: null
+    };
+  }
+}
+
 export async function createRole(data: { name: string; description: string }) {
   try {
     const headers = await instance();

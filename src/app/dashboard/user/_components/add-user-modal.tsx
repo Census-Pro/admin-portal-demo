@@ -61,9 +61,11 @@ export function AddUserModal({
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     cidNo: '',
+    fullName: '',
     email: '',
     password: '',
     mobileNo: '',
+    roleType: 'ADMIN' as 'ADMIN' | 'SUPER_ADMIN',
     officeLocationId: '',
     agencyId: ''
   });
@@ -208,9 +210,11 @@ export function AddUserModal({
       // Reset form
       setFormData({
         cidNo: '',
+        fullName: '',
         email: '',
         password: '',
         mobileNo: '',
+        roleType: 'ADMIN',
         officeLocationId: '',
         agencyId: ''
       });
@@ -234,6 +238,19 @@ export function AddUserModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-2">
+            <Label htmlFor="fullName">Full Name *</Label>
+            <Input
+              id="fullName"
+              required
+              value={formData.fullName}
+              onChange={(e) =>
+                setFormData({ ...formData, fullName: e.target.value })
+              }
+              placeholder="Enter full name"
+            />
+          </div>
+
+          <div className="grid gap-2">
             <Label htmlFor="cidNo">CID Number *</Label>
             <Input
               id="cidNo"
@@ -244,6 +261,28 @@ export function AddUserModal({
               }
               placeholder="Enter CID number"
             />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="roleType">Role Type *</Label>
+            <Select
+              value={formData.roleType}
+              onValueChange={(value: 'ADMIN' | 'SUPER_ADMIN') =>
+                setFormData({ ...formData, roleType: value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select role type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ADMIN">ADMIN</SelectItem>
+                <SelectItem value="SUPER_ADMIN">SUPER_ADMIN</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-muted-foreground text-xs">
+              SUPER_ADMIN has full system access. ADMIN requires custom role
+              assignment below.
+            </p>
           </div>
 
           <div className="grid gap-2">

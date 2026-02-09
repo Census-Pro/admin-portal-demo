@@ -1,7 +1,12 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconKey } from '@tabler/icons-react';
+import {
+  IconDotsVertical,
+  IconTrash,
+  IconKey,
+  IconEye
+} from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -125,6 +130,15 @@ function ActionsCell({ role }: { role: Role }) {
       />
 
       <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.push(`/dashboard/roles/${role.id}`)}
+          disabled={isDeleting}
+        >
+          <IconEye className="h-4 w-4" />
+          <span className="sr-only">View Role</span>
+        </Button>
         <Button
           variant="ghost"
           size="icon"

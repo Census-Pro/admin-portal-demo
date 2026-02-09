@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconEye } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User } from '@/types/user';
@@ -10,6 +10,7 @@ import { deleteUser } from '@/actions/common/user-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useSessionExpired } from '@/hooks/use-session-expired';
+import { ViewUserModal } from './view-user-modal';
 
 export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
   {
@@ -85,10 +86,15 @@ export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
 function ActionsCell({ user }: { user: User }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const { checkSessionExpired, SessionExpiredDialog } = useSessionExpired();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
+  };
+
+  const handleViewClick = () => {
+    setViewModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -122,6 +128,11 @@ function ActionsCell({ user }: { user: User }) {
   return (
     <>
       <SessionExpiredDialog />
+      <ViewUserModal
+        user={user}
+        open={viewModalOpen}
+        onOpenChange={setViewModalOpen}
+      />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -132,6 +143,16 @@ function ActionsCell({ user }: { user: User }) {
         confirmText="Delete User"
       />
       <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleViewClick}
+          disabled={isDeleting}
+          title="View user details and assign roles"
+        >
+          <IconEye className="h-4 w-4" />
+          <span className="sr-only">View</span>
+        </Button>
         <Button
           variant="ghost"
           size="icon"

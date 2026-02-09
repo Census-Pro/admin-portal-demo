@@ -110,7 +110,7 @@ export async function getPermissions(page: number = 1, take: number = 100) {
 
 export async function createPermission(data: {
   name: string;
-  description: string;
+  description?: string;
   actions: string[];
   subjects: string[];
 }) {

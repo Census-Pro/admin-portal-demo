@@ -18,25 +18,25 @@ export const MANAGE_ALL = 'manage:all' as const;
 // USER MANAGEMENT PERMISSIONS
 // ============================================================================
 
-export const VIEW_USERS = 'view:users' as const;
-export const CREATE_USERS = 'create:users' as const;
-export const EDIT_USERS = 'edit:users' as const;
-export const DELETE_USERS = 'delete:users' as const;
-export const MANAGE_USERS = 'manage:users' as const;
+export const VIEW_USERS = 'read:user' as const;
+export const CREATE_USERS = 'create:user' as const;
+export const EDIT_USERS = 'update:user' as const;
+export const DELETE_USERS = 'delete:user' as const;
+export const MANAGE_USERS = 'manage:user' as const;
 
 // ============================================================================
 // ROLE & PERMISSION MANAGEMENT
 // ============================================================================
 
-export const VIEW_ROLES = 'view:roles' as const;
+export const VIEW_ROLES = 'read:roles' as const;
 export const CREATE_ROLES = 'create:roles' as const;
-export const EDIT_ROLES = 'edit:roles' as const;
+export const EDIT_ROLES = 'update:roles' as const;
 export const DELETE_ROLES = 'delete:roles' as const;
 export const MANAGE_ROLES = 'manage:roles' as const;
 
-export const VIEW_PERMISSIONS = 'view:permissions' as const;
+export const VIEW_PERMISSIONS = 'read:permissions' as const;
 export const CREATE_PERMISSIONS = 'create:permissions' as const;
-export const EDIT_PERMISSIONS = 'edit:permissions' as const;
+export const EDIT_PERMISSIONS = 'update:permissions' as const;
 export const DELETE_PERMISSIONS = 'delete:permissions' as const;
 export const MANAGE_PERMISSIONS = 'manage:permissions' as const;
 
@@ -44,9 +44,9 @@ export const MANAGE_PERMISSIONS = 'manage:permissions' as const;
 // BIRTH REGISTRATION PERMISSIONS
 // ============================================================================
 
-export const VIEW_BIRTH_REGISTRATION = 'view:birth-registration' as const;
+export const VIEW_BIRTH_REGISTRATION = 'read:birth-registration' as const;
 export const CREATE_BIRTH_REGISTRATION = 'create:birth-registration' as const;
-export const EDIT_BIRTH_REGISTRATION = 'edit:birth-registration' as const;
+export const EDIT_BIRTH_REGISTRATION = 'update:birth-registration' as const;
 export const DELETE_BIRTH_REGISTRATION = 'delete:birth-registration' as const;
 export const VERIFY_BIRTH_REGISTRATION = 'verify:birth-registration' as const;
 export const APPROVE_BIRTH_REGISTRATION = 'approve:birth-registration' as const;
@@ -56,9 +56,9 @@ export const MANAGE_BIRTH_REGISTRATION = 'manage:birth-registration' as const;
 // CID ISSUANCE PERMISSIONS
 // ============================================================================
 
-export const VIEW_CID_ISSUANCE = 'view:cid-issuance' as const;
+export const VIEW_CID_ISSUANCE = 'read:cid-issuance' as const;
 export const CREATE_CID_ISSUANCE = 'create:cid-issuance' as const;
-export const EDIT_CID_ISSUANCE = 'edit:cid-issuance' as const;
+export const EDIT_CID_ISSUANCE = 'update:cid-issuance' as const;
 export const DELETE_CID_ISSUANCE = 'delete:cid-issuance' as const;
 export const VERIFY_CID_ISSUANCE = 'verify:cid-issuance' as const;
 export const APPROVE_CID_ISSUANCE = 'approve:cid-issuance' as const;
@@ -68,21 +68,51 @@ export const MANAGE_CID_ISSUANCE = 'manage:cid-issuance' as const;
 // MOVE IN/OUT PERMISSIONS
 // ============================================================================
 
-export const VIEW_MOVE_IN_OUT = 'view:move-in-out' as const;
+export const VIEW_MOVE_IN_OUT = 'read:move-in-out' as const;
 export const CREATE_MOVE_IN_OUT = 'create:move-in-out' as const;
-export const EDIT_MOVE_IN_OUT = 'edit:move-in-out' as const;
+export const EDIT_MOVE_IN_OUT = 'update:move-in-out' as const;
 export const DELETE_MOVE_IN_OUT = 'delete:move-in-out' as const;
 export const VERIFY_MOVE_IN_OUT = 'verify:move-in-out' as const;
 export const APPROVE_MOVE_IN_OUT = 'approve:move-in-out' as const;
 export const MANAGE_MOVE_IN_OUT = 'manage:move-in-out' as const;
 
 // ============================================================================
+// AGENCY PERMISSIONS
+// ============================================================================
+
+export const VIEW_AGENCIES = 'read:agencies' as const;
+export const CREATE_AGENCIES = 'create:agencies' as const;
+export const EDIT_AGENCIES = 'update:agencies' as const;
+export const DELETE_AGENCIES = 'delete:agencies' as const;
+export const MANAGE_AGENCIES = 'manage:agencies' as const;
+
+// ============================================================================
+// OFFICE LOCATION PERMISSIONS
+// ============================================================================
+
+export const VIEW_OFFICE_LOCATIONS = 'read:office-locations' as const;
+export const CREATE_OFFICE_LOCATIONS = 'create:office-locations' as const;
+export const EDIT_OFFICE_LOCATIONS = 'update:office-locations' as const;
+export const DELETE_OFFICE_LOCATIONS = 'delete:office-locations' as const;
+export const MANAGE_OFFICE_LOCATIONS = 'manage:office-locations' as const;
+
+// ============================================================================
+// RELATIONSHIP TYPES PERMISSIONS
+// ============================================================================
+
+export const VIEW_RELATIONSHIP_TYPES = 'read:relationship-types' as const;
+export const CREATE_RELATIONSHIP_TYPES = 'create:relationship-types' as const;
+export const EDIT_RELATIONSHIP_TYPES = 'update:relationship-types' as const;
+export const DELETE_RELATIONSHIP_TYPES = 'delete:relationship-types' as const;
+export const MANAGE_RELATIONSHIP_TYPES = 'manage:relationship-types' as const;
+
+// ============================================================================
 // RELATIONSHIPS PERMISSIONS
 // ============================================================================
 
-export const VIEW_RELATIONSHIPS = 'view:relationships' as const;
+export const VIEW_RELATIONSHIPS = 'read:relationships' as const;
 export const CREATE_RELATIONSHIPS = 'create:relationships' as const;
-export const EDIT_RELATIONSHIPS = 'edit:relationships' as const;
+export const EDIT_RELATIONSHIPS = 'update:relationships' as const;
 export const DELETE_RELATIONSHIPS = 'delete:relationships' as const;
 export const VERIFY_RELATIONSHIPS = 'verify:relationships' as const;
 export const APPROVE_RELATIONSHIPS = 'approve:relationships' as const;
@@ -92,9 +122,9 @@ export const MANAGE_RELATIONSHIPS = 'manage:relationships' as const;
 // NATURALIZATION/REGULARIZATION PERMISSIONS
 // ============================================================================
 
-export const VIEW_NATURALIZATION = 'view:naturalization' as const;
+export const VIEW_NATURALIZATION = 'read:naturalization' as const;
 export const CREATE_NATURALIZATION = 'create:naturalization' as const;
-export const EDIT_NATURALIZATION = 'edit:naturalization' as const;
+export const EDIT_NATURALIZATION = 'update:naturalization' as const;
 export const DELETE_NATURALIZATION = 'delete:naturalization' as const;
 export const VERIFY_NATURALIZATION = 'verify:naturalization' as const;
 export const APPROVE_NATURALIZATION = 'approve:naturalization' as const;
@@ -104,9 +134,9 @@ export const MANAGE_NATURALIZATION = 'manage:naturalization' as const;
 // DEATH REGISTRATION PERMISSIONS
 // ============================================================================
 
-export const VIEW_DEATH_REGISTRATION = 'view:death-registration' as const;
+export const VIEW_DEATH_REGISTRATION = 'read:death-registration' as const;
 export const CREATE_DEATH_REGISTRATION = 'create:death-registration' as const;
-export const EDIT_DEATH_REGISTRATION = 'edit:death-registration' as const;
+export const EDIT_DEATH_REGISTRATION = 'update:death-registration' as const;
 export const DELETE_DEATH_REGISTRATION = 'delete:death-registration' as const;
 export const VERIFY_DEATH_REGISTRATION = 'verify:death-registration' as const;
 export const APPROVE_DEATH_REGISTRATION = 'approve:death-registration' as const;
@@ -116,9 +146,9 @@ export const MANAGE_DEATH_REGISTRATION = 'manage:death-registration' as const;
 // COUNTRY PERMISSIONS
 // ============================================================================
 
-export const VIEW_COUNTRIES = 'view:countries' as const;
+export const VIEW_COUNTRIES = 'read:countries' as const;
 export const CREATE_COUNTRIES = 'create:countries' as const;
-export const EDIT_COUNTRIES = 'edit:countries' as const;
+export const EDIT_COUNTRIES = 'update:countries' as const;
 export const DELETE_COUNTRIES = 'delete:countries' as const;
 export const MANAGE_COUNTRIES = 'manage:countries' as const;
 
@@ -126,9 +156,9 @@ export const MANAGE_COUNTRIES = 'manage:countries' as const;
 // DZONGKHAG PERMISSIONS
 // ============================================================================
 
-export const VIEW_DZONGKHAGS = 'view:dzongkhags' as const;
+export const VIEW_DZONGKHAGS = 'read:dzongkhags' as const;
 export const CREATE_DZONGKHAGS = 'create:dzongkhags' as const;
-export const EDIT_DZONGKHAGS = 'edit:dzongkhags' as const;
+export const EDIT_DZONGKHAGS = 'update:dzongkhags' as const;
 export const DELETE_DZONGKHAGS = 'delete:dzongkhags' as const;
 export const MANAGE_DZONGKHAGS = 'manage:dzongkhags' as const;
 
@@ -136,9 +166,9 @@ export const MANAGE_DZONGKHAGS = 'manage:dzongkhags' as const;
 // GEWOG PERMISSIONS
 // ============================================================================
 
-export const VIEW_GEWOGS = 'view:gewogs' as const;
+export const VIEW_GEWOGS = 'read:gewogs' as const;
 export const CREATE_GEWOGS = 'create:gewogs' as const;
-export const EDIT_GEWOGS = 'edit:gewogs' as const;
+export const EDIT_GEWOGS = 'update:gewogs' as const;
 export const DELETE_GEWOGS = 'delete:gewogs' as const;
 export const MANAGE_GEWOGS = 'manage:gewogs' as const;
 
@@ -146,9 +176,9 @@ export const MANAGE_GEWOGS = 'manage:gewogs' as const;
 // CITY PERMISSIONS
 // ============================================================================
 
-export const VIEW_CITIES = 'view:cities' as const;
+export const VIEW_CITIES = 'read:cities' as const;
 export const CREATE_CITIES = 'create:cities' as const;
-export const EDIT_CITIES = 'edit:cities' as const;
+export const EDIT_CITIES = 'update:cities' as const;
 export const DELETE_CITIES = 'delete:cities' as const;
 export const MANAGE_CITIES = 'manage:cities' as const;
 
@@ -156,9 +186,9 @@ export const MANAGE_CITIES = 'manage:cities' as const;
 // GENDER PERMISSIONS
 // ============================================================================
 
-export const VIEW_GENDERS = 'view:genders' as const;
+export const VIEW_GENDERS = 'read:genders' as const;
 export const CREATE_GENDERS = 'create:genders' as const;
-export const EDIT_GENDERS = 'edit:genders' as const;
+export const EDIT_GENDERS = 'update:genders' as const;
 export const DELETE_GENDERS = 'delete:genders' as const;
 export const MANAGE_GENDERS = 'manage:genders' as const;
 
@@ -166,9 +196,9 @@ export const MANAGE_GENDERS = 'manage:genders' as const;
 // MARITAL STATUS PERMISSIONS
 // ============================================================================
 
-export const VIEW_MARITAL_STATUS = 'view:marital-status' as const;
+export const VIEW_MARITAL_STATUS = 'read:marital-status' as const;
 export const CREATE_MARITAL_STATUS = 'create:marital-status' as const;
-export const EDIT_MARITAL_STATUS = 'edit:marital-status' as const;
+export const EDIT_MARITAL_STATUS = 'update:marital-status' as const;
 export const DELETE_MARITAL_STATUS = 'delete:marital-status' as const;
 export const MANAGE_MARITAL_STATUS = 'manage:marital-status' as const;
 
@@ -176,9 +206,9 @@ export const MANAGE_MARITAL_STATUS = 'manage:marital-status' as const;
 // LITERACY STATUS PERMISSIONS
 // ============================================================================
 
-export const VIEW_LITERACY_STATUS = 'view:literacy-status' as const;
+export const VIEW_LITERACY_STATUS = 'read:literacy-status' as const;
 export const CREATE_LITERACY_STATUS = 'create:literacy-status' as const;
-export const EDIT_LITERACY_STATUS = 'edit:literacy-status' as const;
+export const EDIT_LITERACY_STATUS = 'update:literacy-status' as const;
 export const DELETE_LITERACY_STATUS = 'delete:literacy-status' as const;
 export const MANAGE_LITERACY_STATUS = 'manage:literacy-status' as const;
 
@@ -186,9 +216,9 @@ export const MANAGE_LITERACY_STATUS = 'manage:literacy-status' as const;
 // CENSUS STATUS PERMISSIONS
 // ============================================================================
 
-export const VIEW_CENSUS_STATUS = 'view:census-status' as const;
+export const VIEW_CENSUS_STATUS = 'read:census-status' as const;
 export const CREATE_CENSUS_STATUS = 'create:census-status' as const;
-export const EDIT_CENSUS_STATUS = 'edit:census-status' as const;
+export const EDIT_CENSUS_STATUS = 'update:census-status' as const;
 export const DELETE_CENSUS_STATUS = 'delete:census-status' as const;
 export const MANAGE_CENSUS_STATUS = 'manage:census-status' as const;
 
@@ -196,10 +226,10 @@ export const MANAGE_CENSUS_STATUS = 'manage:census-status' as const;
 // NATURALIZATION TYPE PERMISSIONS
 // ============================================================================
 
-export const VIEW_NATURALIZATION_TYPES = 'view:naturalization-types' as const;
+export const VIEW_NATURALIZATION_TYPES = 'read:naturalization-types' as const;
 export const CREATE_NATURALIZATION_TYPES =
   'create:naturalization-types' as const;
-export const EDIT_NATURALIZATION_TYPES = 'edit:naturalization-types' as const;
+export const EDIT_NATURALIZATION_TYPES = 'update:naturalization-types' as const;
 export const DELETE_NATURALIZATION_TYPES =
   'delete:naturalization-types' as const;
 export const MANAGE_NATURALIZATION_TYPES =
@@ -209,10 +239,10 @@ export const MANAGE_NATURALIZATION_TYPES =
 // REGULARIZATION TYPE PERMISSIONS
 // ============================================================================
 
-export const VIEW_REGULARIZATION_TYPES = 'view:regularization-types' as const;
+export const VIEW_REGULARIZATION_TYPES = 'read:regularization-types' as const;
 export const CREATE_REGULARIZATION_TYPES =
   'create:regularization-types' as const;
-export const EDIT_REGULARIZATION_TYPES = 'edit:regularization-types' as const;
+export const EDIT_REGULARIZATION_TYPES = 'update:regularization-types' as const;
 export const DELETE_REGULARIZATION_TYPES =
   'delete:regularization-types' as const;
 export const MANAGE_REGULARIZATION_TYPES =
@@ -223,11 +253,11 @@ export const MANAGE_REGULARIZATION_TYPES =
 // ============================================================================
 
 export const VIEW_RELATIONSHIP_CERTIFICATE_PURPOSES =
-  'view:relationship-certificate-purposes' as const;
+  'read:relationship-certificate-purposes' as const;
 export const CREATE_RELATIONSHIP_CERTIFICATE_PURPOSES =
   'create:relationship-certificate-purposes' as const;
 export const EDIT_RELATIONSHIP_CERTIFICATE_PURPOSES =
-  'edit:relationship-certificate-purposes' as const;
+  'update:relationship-certificate-purposes' as const;
 export const DELETE_RELATIONSHIP_CERTIFICATE_PURPOSES =
   'delete:relationship-certificate-purposes' as const;
 export const MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES =
@@ -237,7 +267,7 @@ export const MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES =
 // DASHBOARD PERMISSIONS
 // ============================================================================
 
-export const VIEW_DASHBOARD = 'view:dashboard' as const;
+export const VIEW_DASHBOARD = 'read:dashboard' as const;
 
 // ============================================================================
 // PERMISSION GROUPS (for convenience)
