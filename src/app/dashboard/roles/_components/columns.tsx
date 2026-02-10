@@ -1,26 +1,14 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import {
-  IconDotsVertical,
-  IconTrash,
-  IconKey,
-  IconEye
-} from '@tabler/icons-react';
+import { IconTrash, IconEye } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteRole } from '@/actions/common/role-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ManagePermissionsModal } from './manage-permissions-modal';
 
 interface Role {
   id: string;
@@ -85,7 +73,6 @@ export const columns: ColumnDef<Role>[] = [
 function ActionsCell({ role }: { role: Role }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const router = useRouter();
 
   const handleDeleteClick = () => {
@@ -133,20 +120,11 @@ function ActionsCell({ role }: { role: Role }) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => router.push(`/dashboard/roles/${role.id}`)}
+          onClick={() => router.push(`/dashboard/roles/${role.id}/permissions`)}
           disabled={isDeleting}
         >
           <IconEye className="h-4 w-4" />
-          <span className="sr-only">View Role</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setShowPermissionsModal(true)}
-          disabled={isDeleting}
-        >
-          <IconKey className="h-4 w-4" />
-          <span className="sr-only">Manage Permissions</span>
+          <span className="sr-only">View Permissions</span>
         </Button>
         <Button
           variant="ghost"
@@ -159,16 +137,6 @@ function ActionsCell({ role }: { role: Role }) {
           <span className="sr-only">Delete</span>
         </Button>
       </div>
-
-      <ManagePermissionsModal
-        isOpen={showPermissionsModal}
-        onClose={() => setShowPermissionsModal(false)}
-        onSuccess={() => {
-          router.refresh();
-          setShowPermissionsModal(false);
-        }}
-        role={role}
-      />
     </>
   );
 }

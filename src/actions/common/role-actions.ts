@@ -366,6 +366,131 @@ export async function assignRoleToAdmin(data: {
   }
 }
 
+// Get role permissions
+export async function getRolePermissions(roleId: string) {
+  try {
+    const headers = await instance();
+    // Use the get role by ID endpoint which includes permissions
+    const url = `${API_URL}/roles/${roleId}`;
+
+    console.log(
+      '[getRolePermissions] Fetching role with permissions from:',
+      url
+    );
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch role permissions';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[getRolePermissions] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage,
+        data: []
+      };
+    }
+
+    const result = await response.json();
+    console.log('[getRolePermissions] Role data:', result);
+
+    // Extract permissions from the role object
+    const roleData = result.data || result;
+    const permissions = roleData.permissions || roleData.rolePermissions || [];
+
+    console.log(
+      '[getRolePermissions] Permissions extracted:',
+      permissions.length,
+      permissions
+    );
+
+    return {
+      success: true,
+      data: permissions
+    };
+  } catch (error) {
+    console.error('[getRolePermissions] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: []
+    };
+  }
+}
+
+// Remove permission from role
+export async function removePermissionFromRole(data: {
+  roleId: string;
+  permissionId: string;
+}) {
+  try {
+    const headers = await instance();
+    const url = `${API_URL}/role-permission`;
+
+    console.log('[removePermissionFromRole] Removing permission from role');
+    console.log('[removePermissionFromRole] URL:', url);
+    console.log('[removePermissionFromRole] Data:', data);
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    console.log('[removePermissionFromRole] Response status:', response.status);
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to remove permission from role';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[removePermissionFromRole] Error:', errorMessage);
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
+
+    const result = await response.json();
+    console.log('[removePermissionFromRole] Success:', result);
+
+    revalidatePath('/dashboard/roles');
+    revalidatePath('/dashboard/permissions');
+
+    return {
+      success: true,
+      data: result,
+      message: 'Permission removed from role successfully'
+    };
+  } catch (error) {
+    console.error('[removePermissionFromRole] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}
+
 // Assign permission to role
 export async function assignPermissionToRole(data: {
   roleId: string;
