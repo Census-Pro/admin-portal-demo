@@ -426,7 +426,9 @@ export function BirthRegistrationApproveView({
                       className={
                         data.status === 'SUBMITTED'
                           ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
-                          : ''
+                          : data.status === 'VERIFIED'
+                            ? 'border-green-500 bg-green-50 text-green-700'
+                            : ''
                       }
                     >
                       {data.status}

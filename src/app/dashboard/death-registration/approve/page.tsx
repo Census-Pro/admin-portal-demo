@@ -1,45 +1,60 @@
 import PageContainer from '@/components/layout/page-container';
-import { DeathRegistrationApproveView } from './_components/death-registration-approve-view';
+import { DataTable } from '@/components/ui/table/data-table';
+import { columns } from './_components/approve-columns';
 
 export const metadata = {
-  title: 'Death Registration - Approve (HQ)'
+  title: 'Death Registration - Approve (DG)'
 };
 
-// Dummy data for testing
-const dummyData = {
-  applicant_cid: '10304001088',
-  deceased_cid: '11101001234',
-  first_name: 'Dorji',
-  middle_name: 'Wangchuk',
-  last_name: 'Namgyal',
-  date_of_birth: '1990-01-01',
-  gender: 'male',
-  dzongkhag_id: 'Pema Gatshel',
-  gewog_id: 'Nanong',
-  village_id: 'Terphu',
-  house_hold_no: '112674',
-  house_no: 'Ga-3-879',
-  is_health_registered: false,
-  date_of_death: '2026-02-05',
-  time_of_death: '14:30:00',
-  cause_of_death: 'Natural causes',
-  place_of_death: 'Thimphu',
-  country_of_death_id: 'Bhutan',
-  dzongkhag_of_death_id: 'Pema Gatshel',
-  gewog_of_death_id: 'Nanong',
-  village_of_death_id: 'Terphu',
-  city_id: 'Pema Gatshel',
-  death_certificate_url: 'https://example.com/certificate.pdf',
-  status: 'SUBMITTED'
-};
+// Dummy data - only showing registrations ready for approval (VERIFIED status)
+const approvalList = [
+  {
+    id: '2',
+    first_name: 'Kinley',
+    middle_name: 'Zangmo',
+    last_name: 'Dorji',
+    deceased_cid: '10304002345',
+    date_of_death: '2026-01-18',
+    status: 'VERIFIED',
+    created_at: '2026-01-19T11:00:00Z',
+    verified_at: '2026-01-22T10:30:00Z'
+  },
+  {
+    id: '3',
+    first_name: 'Ugyen',
+    last_name: 'Penjor',
+    deceased_cid: '10506009012',
+    date_of_death: '2026-01-25',
+    status: 'VERIFIED',
+    created_at: '2026-01-26T13:20:00Z',
+    verified_at: '2026-01-28T09:15:00Z'
+  },
+  {
+    id: '7',
+    first_name: 'Dechen',
+    middle_name: 'Lhamo',
+    last_name: 'Tshomo',
+    deceased_cid: '11104003210',
+    date_of_death: '2026-02-01',
+    status: 'VERIFIED',
+    created_at: '2026-02-02T15:40:00Z',
+    verified_at: '2026-02-04T14:20:00Z'
+  }
+];
 
 export default function DeathRegistrationApprovePage() {
   return (
     <PageContainer
-      pageTitle="Death Registration - Approve (HQ)"
-      pageDescription="Review and approve death registration applications"
+      pageTitle="Death Registration - Approve (DG)"
+      pageDescription="Review and approve verified death registration applications"
     >
-      <DeathRegistrationApproveView data={dummyData} />
+      <div className="space-y-4">
+        <DataTable
+          columns={columns}
+          data={approvalList}
+          totalItems={approvalList.length}
+        />
+      </div>
     </PageContainer>
   );
 }

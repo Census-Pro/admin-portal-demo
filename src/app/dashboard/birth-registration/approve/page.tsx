@@ -1,49 +1,57 @@
 import PageContainer from '@/components/layout/page-container';
-import { BirthRegistrationApproveView } from './_components/birth-registration-approve-view';
+import { DataTable } from '@/components/ui/table/data-table';
+import { columns } from './_components/approve-columns';
 
 export const metadata = {
   title: 'Birth Registration - Approve (HQ)'
 };
 
-// Dummy data for testing
-const dummyData = {
-  applicant_cid: '10304001088',
-  is_born_in_bhutan: true,
-  is_applicant_parent: true,
-  is_epis_registered: false,
-  birth_country_id: 'Bhutan',
-  birth_city_id: 'a5ae8e48-51f2-434e-95dd-810d9fb2f1dc',
-  birth_dzongkhag_id: 'Tsirang',
-  birth_gewog_id: 'Damphu',
-  birth_village_id: 'Dumi',
-  first_name: 'Jigme',
-  middle_name: 'Phuntsho',
-  last_name: 'Chonjure',
-  date_of_birth: '2026-02-04',
-  time_of_birth: '10:30:00',
-  gender: 'male',
-  weight: 3.5,
-  is_mc_valid: true,
-  father_cid: '11101001234',
-  mother_cid: '10304001088',
-  guarantor_cid: '12003004567',
-  relationship: 'Uncle',
-  house_hold_no: '112674',
-  house_no: 'Ga-3-879',
-  dzongkhag_id: 'Pema Gatshel',
-  gewog_id: 'Nanong',
-  village_id: 'Terphu',
-  birth_certificate_url: './certificate.com',
-  status: 'SUBMITTED'
-};
+// Dummy data - only showing registrations that are verified and need approval
+const approvalList = [
+  {
+    id: '2',
+    first_name: 'Pema',
+    middle_name: 'Dorji',
+    last_name: 'Wangchuk',
+    applicant_cid: '11101002345',
+    date_of_birth: '2026-01-15',
+    status: 'VERIFIED',
+    created_at: '2026-01-16T14:20:00Z'
+  },
+  {
+    id: '7',
+    first_name: 'Tenzin',
+    last_name: 'Namgyal',
+    applicant_cid: '10208007890',
+    date_of_birth: '2026-01-22',
+    status: 'VERIFIED',
+    created_at: '2026-01-23T10:15:00Z'
+  },
+  {
+    id: '8',
+    first_name: 'Sangay',
+    middle_name: 'Choden',
+    last_name: 'Dorji',
+    applicant_cid: '11506009012',
+    date_of_birth: '2026-02-06',
+    status: 'VERIFIED',
+    created_at: '2026-02-07T13:30:00Z'
+  }
+];
 
 export default function BirthRegistrationApprovePage() {
   return (
     <PageContainer
       pageTitle="Birth Registration - Approve (HQ)"
-      pageDescription="Review and approve birth registration applications"
+      pageDescription="Review and approve verified birth registration applications"
     >
-      <BirthRegistrationApproveView data={dummyData} />
+      <div className="space-y-4">
+        <DataTable
+          columns={columns}
+          data={approvalList}
+          totalItems={approvalList.length}
+        />
+      </div>
     </PageContainer>
   );
 }
