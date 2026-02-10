@@ -6,6 +6,7 @@ import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './columns';
 import { getPermissions } from '@/actions/common/permission-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
+import { PermissionsProvider } from './permissions-context';
 
 interface Permission {
   id: string;
@@ -21,11 +22,13 @@ interface Permission {
 interface PermissionsTableProps {
   initialData?: Permission[];
   initialTotalItems?: number;
+  refreshTrigger?: number; // Add a refresh trigger prop
 }
 
 export function PermissionsTable({
   initialData = [],
-  initialTotalItems = 0
+  initialTotalItems = 0,
+  refreshTrigger = 0
 }: PermissionsTableProps) {
   const [isLoading, startTransition] = useTransition();
   const [data, setData] = useState<Permission[]>(initialData);
@@ -70,7 +73,7 @@ export function PermissionsTable({
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit]);
+  }, [searchParams.page, searchParams.limit, refreshTrigger]); // Add refreshTrigger to dependencies
 
   if (error) {
     return (
@@ -84,5 +87,9 @@ export function PermissionsTable({
     return <DataTableSkeleton columnCount={5} rowCount={10} />;
   }
 
-  return <DataTable columns={columns} data={data} totalItems={totalItems} />;
+  return (
+    <PermissionsProvider refreshData={fetchData}>
+      <DataTable columns={columns} data={data} totalItems={totalItems} />
+    </PermissionsProvider>
+  );
 }

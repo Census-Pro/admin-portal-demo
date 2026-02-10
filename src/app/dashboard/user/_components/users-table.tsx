@@ -1,7 +1,13 @@
 'use client';
 
 import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs';
-import { useEffect, useState, useTransition } from 'react';
+import {
+  useEffect,
+  useState,
+  useTransition,
+  useMemo,
+  useCallback
+} from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { getColumns } from './columns';
 import { getUsers } from '@/actions/common/user-actions';
@@ -23,6 +29,7 @@ export function UsersTable({
   const [data, setData] = useState<User[]>(initialData);
   const [totalItems, setTotalItems] = useState(initialTotalItems);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   const [searchParams, setSearchParams] = useQueryStates(
     {
@@ -36,7 +43,7 @@ export function UsersTable({
     }
   );
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     startTransition(async () => {
       try {
         const result = await getUsers(
@@ -46,7 +53,9 @@ export function UsersTable({
         );
 
         if (result.success) {
-          setData(result.data || []);
+          const users = result.data || [];
+
+          setData(users);
           setTotalItems(result.count || 0);
           setError(null);
         } else {
@@ -60,27 +69,89 @@ export function UsersTable({
         setTotalItems(0);
       }
     });
-  };
-
-  useEffect(() => {
-    fetchData();
   }, [searchParams.page, searchParams.limit, searchParams.q]);
 
-  if (error) {
-    return (
-      <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-6 text-center">
-        <p className="text-destructive">{error}</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-  if (isLoading && data.length === 0) {
-    return <DataTableSkeleton columnCount={5} rowCount={10} />;
-  }
+  useEffect(() => {
+    if (isMounted) {
+      fetchData();
+    }
+  }, [isMounted, fetchData]);
+
+  // Listen for user creation events
+  const handleUserCreated = useCallback(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    window.addEventListener('userCreated', handleUserCreated);
+
+    return () => {
+      window.removeEventListener('userCreated', handleUserCreated);
+    };
+  }, [handleUserCreated]);
+
+  // Listen for user deletion events
+  const handleUserDeleted = useCallback(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    window.addEventListener('userDeleted', handleUserDeleted);
+
+    return () => {
+      window.removeEventListener('userDeleted', handleUserDeleted);
+    };
+  }, [handleUserDeleted]);
 
   // Get columns with current user info
   const currentUserCidNo = session?.user?.cidNo;
   const columns = getColumns(currentUserCidNo);
 
-  return <DataTable columns={columns} data={data} totalItems={totalItems} />;
+  const sortedData = useMemo(() => {
+    if (!isMounted || !session?.user?.cidNo) {
+      return data;
+    }
+
+    const currentUserCidNo = session.user.cidNo;
+    const currentUserIndex = data.findIndex(
+      (user) => user.cidNo === currentUserCidNo
+    );
+
+    if (currentUserIndex > -1) {
+      const newData = [...data];
+      const [currentUser] = newData.splice(currentUserIndex, 1);
+      newData.unshift(currentUser);
+      return newData;
+    }
+
+    return data;
+  }, [data, isMounted, session?.user?.cidNo]);
+
+  return (
+    <div>
+      {error && (
+        <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-6 text-center">
+          <p className="text-destructive">{error}</p>
+        </div>
+      )}
+      {isLoading && data.length === 0 && !error && (
+        <DataTableSkeleton columnCount={5} rowCount={10} />
+      )}
+      <div
+        style={{
+          display: error || (isLoading && data.length === 0) ? 'none' : 'block'
+        }}
+      >
+        <DataTable
+          columns={columns}
+          data={sortedData}
+          totalItems={totalItems}
+        />
+      </div>
+    </div>
+  );
 }

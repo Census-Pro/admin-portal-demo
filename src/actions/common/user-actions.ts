@@ -161,7 +161,7 @@ export async function getAgencies() {
   try {
     const headers = await instance();
 
-    const url = `${API_URL}/agencies?page=1&take=100`;
+    const url = `${API_URL}/agencies/all`;
     const response = await fetch(url, {
       method: 'GET',
       headers,
@@ -189,7 +189,7 @@ export async function getOfficeLocations() {
   try {
     const headers = await instance();
 
-    const url = `${API_URL}/office-locations?page=1&take=100`;
+    const url = `${API_URL}/office-locations/all`;
     const response = await fetch(url, {
       method: 'GET',
       headers,
@@ -198,41 +198,17 @@ export async function getOfficeLocations() {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Office locations API error:', {
-        status: response.status,
-        statusText: response.statusText,
-        body: errorText
-      });
-
-      if (response.status === 401) {
-        return {
-          success: false,
-          error: 'Unauthorized: Please check your permissions'
-        };
-      } else if (response.status === 404) {
-        return {
-          success: false,
-          error: 'Office locations endpoint not found'
-        };
-      }
-
-      return {
-        success: false,
-        error: `Failed to fetch office locations: ${response.status} ${response.statusText}`
-      };
+      console.error('Failed to fetch office locations:', errorText);
+      throw new Error('Failed to fetch office locations');
     }
 
     const data = await response.json();
     return {
       success: true,
-      data: data.data || data,
-      meta: data.meta
+      data: data.data || data
     };
   } catch (error) {
     console.error('getOfficeLocations error:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Internal server error'
-    };
+    return { success: false, error: 'Internal server error' };
   }
 }

@@ -16,7 +16,8 @@ export default async function OverviewPage() {
       iconName: 'users' as const,
       trend: '+12% from last month',
       trendUp: true,
-      color: 'text-blue-600'
+      color: 'text-blue-600',
+      href: '/dashboard/user'
     },
     {
       label: 'Active Roles',
@@ -27,7 +28,8 @@ export default async function OverviewPage() {
           ? `${statsData.pendingRoles} pending approval`
           : 'All active',
       trendUp: false,
-      color: 'text-emerald-600'
+      color: 'text-emerald-600',
+      href: '/dashboard/roles'
     },
     {
       label: 'Permissions',
@@ -35,7 +37,8 @@ export default async function OverviewPage() {
       iconName: 'lock' as const,
       trend: 'All configured',
       trendUp: true,
-      color: 'text-indigo-600'
+      color: 'text-indigo-600',
+      href: '/dashboard/permissions'
     },
     {
       label: 'System Health',

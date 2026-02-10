@@ -14,7 +14,7 @@ import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmati
 import { deletePermission } from '@/actions/common/permission-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePermissionsContext } from './permissions-context';
 
 interface Permission {
   id: string;
@@ -111,7 +111,7 @@ export const columns: ColumnDef<Permission>[] = [
 function ActionsCell({ permission }: { permission: Permission }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const router = useRouter();
+  const { refreshData } = usePermissionsContext();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -125,7 +125,7 @@ function ActionsCell({ permission }: { permission: Permission }) {
       if (result.success) {
         toast.success(result.message || 'Permission deleted successfully');
         setDeleteDialogOpen(false);
-        router.refresh();
+        refreshData(); // Use context refresh instead of router.refresh()
       } else {
         toast.error(result.error || 'Failed to delete permission');
       }

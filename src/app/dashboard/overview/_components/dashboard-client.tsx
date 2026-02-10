@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AlertCircle, Users, Shield, Lock, Activity } from 'lucide-react';
+import Link from 'next/link';
 
 interface DashboardStat {
   label: string;
@@ -12,6 +13,7 @@ interface DashboardStat {
   trend?: string;
   trendUp?: boolean;
   color?: string;
+  href?: string;
 }
 
 interface DashboardClientProps {
@@ -53,14 +55,19 @@ export function DashboardClient({ stats, error }: DashboardClientProps) {
       >
         {stats.map((stat, index) => {
           const Icon = stat.iconName ? iconMap[stat.iconName] : null;
-          return (
+          const cardContent = (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
             >
-              <Card>
+              <Card
+                className={cn(
+                  stat.href &&
+                    'cursor-pointer transition-shadow hover:shadow-md'
+                )}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
                     {stat.label}
@@ -86,6 +93,14 @@ export function DashboardClient({ stats, error }: DashboardClientProps) {
                 </CardContent>
               </Card>
             </motion.div>
+          );
+
+          return stat.href ? (
+            <Link key={index} href={stat.href}>
+              {cardContent}
+            </Link>
+          ) : (
+            cardContent
           );
         })}
       </div>

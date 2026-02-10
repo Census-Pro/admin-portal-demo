@@ -205,6 +205,10 @@ export function AddUserModal({
       }
 
       toast.success('User created successfully with roles assigned');
+
+      // Dispatch custom event to trigger table refresh
+      window.dispatchEvent(new CustomEvent('userCreated'));
+
       onSuccess();
       onClose();
       // Reset form

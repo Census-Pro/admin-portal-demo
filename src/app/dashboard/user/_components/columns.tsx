@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconEdit, IconTrash, IconEye } from '@tabler/icons-react';
+import { IconTrash, IconEye } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User } from '@/types/user';
@@ -10,7 +10,7 @@ import { deleteUser } from '@/actions/common/user-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useSessionExpired } from '@/hooks/use-session-expired';
-import { ViewUserModal } from './view-user-modal';
+import { useRouter } from 'next/navigation';
 
 export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
   {
@@ -84,17 +84,13 @@ export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
 ];
 
 function ActionsCell({ user }: { user: User }) {
+  const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [viewModalOpen, setViewModalOpen] = useState(false);
   const { checkSessionExpired, SessionExpiredDialog } = useSessionExpired();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
-  };
-
-  const handleViewClick = () => {
-    setViewModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -105,8 +101,8 @@ function ActionsCell({ user }: { user: User }) {
       if (result.success) {
         toast.success(result.message || 'User deleted successfully');
         setDeleteDialogOpen(false);
-        // Refresh the page to update the list
-        window.location.reload();
+        // Dispatch event to refresh the table
+        window.dispatchEvent(new CustomEvent('userDeleted'));
       } else {
         // Check if session expired
         if (result.error && checkSessionExpired(result.error)) {
@@ -128,11 +124,6 @@ function ActionsCell({ user }: { user: User }) {
   return (
     <>
       <SessionExpiredDialog />
-      <ViewUserModal
-        user={user}
-        open={viewModalOpen}
-        onOpenChange={setViewModalOpen}
-      />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -146,32 +137,26 @@ function ActionsCell({ user }: { user: User }) {
         <Button
           variant="ghost"
           size="icon"
-          onClick={handleViewClick}
+          onClick={() => router.push(`/dashboard/user/${user.id}`)}
           disabled={isDeleting}
           title="View user details and assign roles"
         >
           <IconEye className="h-4 w-4" />
           <span className="sr-only">View</span>
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => toast.info('Edit functionality coming soon')}
-          disabled={isDeleting}
-        >
-          <IconEdit className="h-4 w-4" />
-          <span className="sr-only">Edit</span>
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleDeleteClick}
-          disabled={isDeleting}
-          className="text-destructive hover:text-destructive"
-        >
-          <IconTrash className="h-4 w-4" />
-          <span className="sr-only">Delete</span>
-        </Button>
+
+        {user.role !== 'SUPER_ADMIN' && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleDeleteClick}
+            disabled={isDeleting}
+            className="text-destructive hover:text-destructive"
+          >
+            <IconTrash className="h-4 w-4" />
+            <span className="sr-only">Delete</span>
+          </Button>
+        )}
       </div>
     </>
   );

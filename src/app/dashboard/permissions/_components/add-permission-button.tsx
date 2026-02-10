@@ -4,14 +4,16 @@ import { useState } from 'react';
 import { IconPlus } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { AddPermissionModal } from './add-permission-modal';
-import { useRouter } from 'next/navigation';
 
-export function AddPermissionButton() {
+interface AddPermissionButtonProps {
+  onSuccess?: () => void;
+}
+
+export function AddPermissionButton({ onSuccess }: AddPermissionButtonProps) {
   const [showAddPermissionModal, setShowAddPermissionModal] = useState(false);
-  const router = useRouter();
 
   const handlePermissionCreated = () => {
-    router.refresh(); // Refresh the server component data
+    onSuccess?.(); // Call the refresh callback
   };
 
   return (
