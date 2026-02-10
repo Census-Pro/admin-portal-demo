@@ -15,6 +15,9 @@ import { useRouter } from 'next/navigation';
 
 interface UserRolesSectionProps {
   userId: string;
+  user: {
+    roleType?: string;
+  };
 }
 
 interface Role {
@@ -23,7 +26,7 @@ interface Role {
   description?: string;
 }
 
-export function UserRolesSection({ userId }: UserRolesSectionProps) {
+export function UserRolesSection({ userId, user }: UserRolesSectionProps) {
   const router = useRouter();
   const [allRoles, setAllRoles] = useState<Role[]>([]);
   const [userRoleIds, setUserRoleIds] = useState<string[]>([]);
@@ -32,32 +35,39 @@ export function UserRolesSection({ userId }: UserRolesSectionProps) {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    const isSuperAdmin = user.roleType === 'SUPER_ADMIN';
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Fetch all available roles
+        const rolesResult = await getRoles();
+        if (rolesResult.success) {
+          setAllRoles(rolesResult.data || []);
+        }
+
+        // Fetch user's current roles
+        const userRolesResult = await getAdminRoles(userId);
+        if (userRolesResult.success) {
+          const roleIds = userRolesResult.data?.map((r: Role) => r.id) || [];
+          setUserRoleIds(roleIds);
+          // If super admin, select all available roles
+          if (isSuperAdmin) {
+            setSelectedRoles(rolesResult.data?.map((r: Role) => r.id) || []);
+          } else {
+            setSelectedRoles(roleIds);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+        toast.error('Failed to load roles');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
-  }, [userId]);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      // Fetch all available roles
-      const rolesResult = await getRoles();
-      if (rolesResult.success) {
-        setAllRoles(rolesResult.data || []);
-      }
-
-      // Fetch user's current roles
-      const userRolesResult = await getAdminRoles(userId);
-      if (userRolesResult.success) {
-        const roleIds = userRolesResult.data?.map((r: Role) => r.id) || [];
-        setUserRoleIds(roleIds);
-        setSelectedRoles(roleIds);
-      }
-    } catch (error) {
-      console.error('Failed to fetch data:', error);
-      toast.error('Failed to load roles');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [userId, user]);
 
   const handleRoleToggle = (roleId: string) => {
     setSelectedRoles((prev) =>
@@ -96,7 +106,6 @@ export function UserRolesSection({ userId }: UserRolesSectionProps) {
       toast.success('Roles updated successfully');
 
       // Refresh data
-      await fetchData();
       router.refresh();
     } catch (error) {
       console.error('Failed to update roles:', error);
@@ -140,8 +149,9 @@ export function UserRolesSection({ userId }: UserRolesSectionProps) {
       </div>
 
       <p className="text-muted-foreground mb-4 text-sm">
-        Select roles to grant this user access to specific features and
-        permissions
+        {user.roleType === 'SUPER_ADMIN'
+          ? 'Super Admin has access to all roles and permissions by default'
+          : 'Select roles to grant this user access to specific features and permissions'}
       </p>
 
       {allRoles.length === 0 ? (
@@ -164,7 +174,7 @@ export function UserRolesSection({ userId }: UserRolesSectionProps) {
                   id={`role-${role.id}`}
                   checked={selectedRoles.includes(role.id)}
                   onCheckedChange={() => handleRoleToggle(role.id)}
-                  disabled={saving}
+                  disabled={saving || user.roleType === 'SUPER_ADMIN'}
                 />
                 <Label
                   htmlFor={`role-${role.id}`}

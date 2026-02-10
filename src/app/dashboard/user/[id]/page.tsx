@@ -43,7 +43,7 @@ export default async function UserDetailPage({ params }: UserDetailPageProps) {
     >
       <div className="space-y-6">
         <UserDetailsSection user={user} />
-        <UserRolesSection userId={id} />
+        <UserRolesSection userId={id} user={user} />
       </div>
     </PageContainer>
   );

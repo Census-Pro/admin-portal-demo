@@ -186,7 +186,7 @@ export async function updateAdmin(
     console.log('[updateAdmin] Updating admin at:', url);
 
     const response = await fetch(url, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         ...headers,
         'Content-Type': 'application/json'

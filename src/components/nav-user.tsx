@@ -64,7 +64,7 @@ export function NavUser({
               <div className="grid flex-1 text-left text-sm leading-tight">
                 {/* Name removed as requested */}
                 {user.cidNo && user.roleType ? (
-                  <span className="truncate text-xs font-black text-gray-900">
+                  <span className="text-primary truncate text-xs font-black">
                     CID: {user.cidNo} {user.roleType.replace('_', ' ')}
                   </span>
                 ) : (
@@ -98,7 +98,7 @@ export function NavUser({
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   {/* Name removed as requested */}
                   {user.cidNo && user.roleType ? (
-                    <span className="truncate text-xs font-black text-gray-900">
+                    <span className="text-primary truncate text-xs font-black">
                       CID: {user.cidNo} {user.roleType.replace('_', ' ')}
                     </span>
                   ) : (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,6 +43,7 @@ interface OfficeLocation {
 }
 
 export function UserDetailsSection({ user }: UserDetailsSectionProps) {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
@@ -106,7 +108,7 @@ export function UserDetailsSection({ user }: UserDetailsSectionProps) {
         toast.success('Admin updated successfully');
         setIsEditing(false);
         // Refresh the page to get updated data
-        window.location.reload();
+        router.refresh();
       } else {
         toast.error(result.error || 'Failed to update admin');
       }
