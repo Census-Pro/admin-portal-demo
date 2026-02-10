@@ -8,8 +8,7 @@ export async function GET() {
     if (result.success) {
       return NextResponse.json({
         success: true,
-        data: result.data,
-        meta: result.meta
+        data: result.data
       });
     } else {
       return NextResponse.json(

@@ -286,11 +286,36 @@ export const navItems: NavItem[] = [
   },
   {
     title: 'Birth Registration',
-    url: '/dashboard/birth-registration',
+    url: '#',
     icon: 'baby',
     isActive: false,
-    items: [],
     subject: 'Birth Registration', // For ability-based filtering
+    items: [
+      {
+        title: 'Verify (LG)',
+        url: '/dashboard/birth-registration/verify',
+        subject: 'Birth Registration',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.VIEW_BIRTH_REGISTRATION,
+            PERMS.VERIFY_BIRTH_REGISTRATION
+          ]
+        }
+      },
+      {
+        title: 'Approve (HQ)',
+        url: '/dashboard/birth-registration/approve',
+        subject: 'Birth Registration',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.VIEW_BIRTH_REGISTRATION,
+            PERMS.APPROVE_BIRTH_REGISTRATION
+          ]
+        }
+      }
+    ],
     // Super Admin, Admin, and Operators can view birth registration
     access: {
       permissions: [
@@ -303,107 +328,37 @@ export const navItems: NavItem[] = [
     }
   },
   {
-    title: 'CID Issuance',
-    url: '/dashboard/cid-issuance',
-    icon: 'idCard',
+    title: 'Death Registration',
+    url: '#',
+    icon: 'grave',
     isActive: false,
-    subject: 'CID Issuance', // For ability-based filtering
+    subject: 'Death Registration', // For ability-based filtering
     items: [
       {
-        title: 'New CID',
-        url: '/dashboard/cid-issuance/new',
-        shortcut: ['c', 'n'],
+        title: 'Verify (LG)',
+        url: '/dashboard/death-registration/verify',
+        subject: 'Death Registration',
         access: {
           permissions: [
             PERMS.MANAGE_ALL,
-            PERMS.VIEW_CID_ISSUANCE,
-            PERMS.CREATE_CID_ISSUANCE,
-            PERMS.MANAGE_CID_ISSUANCE
+            PERMS.VIEW_DEATH_REGISTRATION,
+            PERMS.VERIFY_DEATH_REGISTRATION
           ]
         }
       },
       {
-        title: 'Replacement',
-        url: '/dashboard/cid-issuance/replacement',
-        shortcut: ['c', 'r'],
+        title: 'Approve (HQ)',
+        url: '/dashboard/death-registration/approve',
+        subject: 'Death Registration',
         access: {
           permissions: [
             PERMS.MANAGE_ALL,
-            PERMS.VIEW_CID_ISSUANCE,
-            PERMS.CREATE_CID_ISSUANCE,
-            PERMS.MANAGE_CID_ISSUANCE
-          ]
-        }
-      },
-      {
-        title: 'Renewal',
-        url: '/dashboard/cid-issuance/renewal',
-        shortcut: ['c', 'e'],
-        access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.VIEW_CID_ISSUANCE,
-            PERMS.CREATE_CID_ISSUANCE,
-            PERMS.MANAGE_CID_ISSUANCE
+            PERMS.VIEW_DEATH_REGISTRATION,
+            PERMS.APPROVE_DEATH_REGISTRATION
           ]
         }
       }
     ],
-    // Super Admin, Admin, and Operators can view CID issuance
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.VIEW_CID_ISSUANCE,
-        PERMS.MANAGE_CID_ISSUANCE,
-        PERMS.VERIFY_CID_ISSUANCE,
-        PERMS.APPROVE_CID_ISSUANCE
-      ]
-    }
-  },
-  {
-    title: 'Move In/Move Out',
-    url: '/dashboard/move-in-out',
-    icon: 'home',
-    isActive: false,
-    items: [],
-    subject: 'Move In/Move Out', // For ability-based filtering
-    // Super Admin, Admin, and Operators can view move in/out
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.VIEW_MOVE_IN_OUT,
-        PERMS.MANAGE_MOVE_IN_OUT,
-        PERMS.VERIFY_MOVE_IN_OUT,
-        PERMS.APPROVE_MOVE_IN_OUT
-      ]
-    }
-  },
-
-  {
-    title: 'Naturalization/Regularization',
-    url: '/dashboard/naturalization',
-    icon: 'certificate',
-    isActive: false,
-    items: [],
-    subject: 'Naturalization', // For ability-based filtering
-    // Super Admin, Admin, and Operators can view naturalization
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.VIEW_NATURALIZATION,
-        PERMS.MANAGE_NATURALIZATION,
-        PERMS.VERIFY_NATURALIZATION,
-        PERMS.APPROVE_NATURALIZATION
-      ]
-    }
-  },
-  {
-    title: 'Death Registration',
-    url: '/dashboard/death-registration',
-    icon: 'grave',
-    isActive: false,
-    items: [],
-    subject: 'Death Registration', // For ability-based filtering
     // Super Admin, Admin, and Operators can view death registration
     access: {
       permissions: [
