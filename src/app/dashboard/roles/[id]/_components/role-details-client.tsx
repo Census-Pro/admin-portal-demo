@@ -25,8 +25,8 @@ import PageContainer from '@/components/layout/page-container';
 interface Permission {
   id: string;
   name: string;
-  actions: string[];
-  subjects: string[];
+  actions: string | string[]; // Can be string (from backend) or array
+  subjects: string | string[]; // Can be string (from backend) or array
 }
 
 interface Role {
@@ -87,8 +87,21 @@ export function RoleDetailsClient({ roleId }: { roleId: string }) {
         const mappedPermissions = result.data.map((p: any) => ({
           id: p.id,
           name: p.name || p.permissionName || 'Unknown Permission',
-          actions: p.actions || [],
-          subjects: p.subjects || []
+          // Convert string to array if needed (backend returns comma-separated string)
+          actions:
+            typeof p.actions === 'string'
+              ? p.actions
+                  .split(',')
+                  .map((a: string) => a.trim())
+                  .filter(Boolean)
+              : p.actions || [],
+          subjects:
+            typeof p.subjects === 'string'
+              ? p.subjects
+                  .split(',')
+                  .map((s: string) => s.trim())
+                  .filter(Boolean)
+              : p.subjects || []
         }));
         setPermissions(mappedPermissions);
       }

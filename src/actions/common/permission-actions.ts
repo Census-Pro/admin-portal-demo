@@ -120,10 +120,23 @@ export async function createPermission(data: {
     console.log('🔍 [createPermission] Creating permission:', data);
     console.log('🔍 [createPermission] URL:', `${API_URL}/permissions`);
 
+    // Convert arrays to comma-separated strings for backend
+    const payload = {
+      ...data,
+      actions: Array.isArray(data.actions)
+        ? data.actions.join(',')
+        : data.actions,
+      subjects: Array.isArray(data.subjects)
+        ? data.subjects.join(',')
+        : data.subjects
+    };
+
+    console.log('🔍 [createPermission] Sending payload:', payload);
+
     const response = await fetch(`${API_URL}/permissions`, {
       method: 'POST',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
@@ -182,10 +195,28 @@ export async function updatePermission(data: {
 }) {
   try {
     const headers = await instance();
-    const response = await fetch(`${API_URL}/permissions/${data.id}`, {
-      method: 'PUT',
+
+    // Remove id from the body data
+    const { id, ...updateData } = data;
+
+    // Convert arrays to comma-separated strings for backend
+    const payload = {
+      ...updateData,
+      ...(updateData.actions && Array.isArray(updateData.actions)
+        ? { actions: updateData.actions.join(',') }
+        : {}),
+      ...(updateData.subjects && Array.isArray(updateData.subjects)
+        ? { subjects: updateData.subjects.join(',') }
+        : {})
+    };
+
+    console.log('🔍 [updatePermission] Updating permission:', id, payload);
+    console.log('🔍 [updatePermission] URL:', `${API_URL}/permissions/${id}`);
+
+    const response = await fetch(`${API_URL}/permissions/${id}`, {
+      method: 'PATCH',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
@@ -193,9 +224,20 @@ export async function updatePermission(data: {
 
       try {
         const error = await response.json();
+        console.error('🔴 [updatePermission] API Error:', error);
         errorMessage = error.message || error.error || errorMessage;
       } catch {
+        console.error(
+          '🔴 [updatePermission] HTTP Error:',
+          response.status,
+          response.statusText
+        );
         errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      if (response.status === 403) {
+        errorMessage =
+          "You don't have permission to update permissions. Please contact your administrator.";
       }
 
       return {
@@ -205,11 +247,16 @@ export async function updatePermission(data: {
     }
 
     const result = await response.json();
+    console.log(
+      '✅ [updatePermission] Permission updated successfully:',
+      result
+    );
     revalidatePath('/dashboard/permissions');
 
     return {
       success: true,
-      message: result.message || 'Permission updated successfully'
+      message: result.message || 'Permission updated successfully',
+      data: result.data
     };
   } catch (error) {
     console.error('🔴 [updatePermission] Unexpected error:', error);

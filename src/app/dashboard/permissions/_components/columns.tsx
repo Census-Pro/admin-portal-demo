@@ -1,20 +1,15 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash } from '@tabler/icons-react';
+import { IconTrash, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deletePermission } from '@/actions/common/permission-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { usePermissionsContext } from './permissions-context';
+import { EditPermissionModal } from './edit-permission-modal';
 
 interface Permission {
   id: string;
@@ -46,21 +41,18 @@ export const columns: ColumnDef<Permission>[] = [
     }
   },
   {
-    accessorKey: 'description',
-    header: 'Description',
-    cell: ({ row }) => {
-      return (
-        <span className="text-muted-foreground text-sm">
-          {row.getValue('description') || 'No description'}
-        </span>
-      );
-    }
-  },
-  {
     accessorKey: 'actions',
     header: 'Actions',
     cell: ({ row }) => {
-      const actions = row.getValue('actions') as string[];
+      const actionsValue = row.getValue('actions') as string | string[];
+      // Convert string to array if needed (backend returns comma-separated string)
+      const actions =
+        typeof actionsValue === 'string'
+          ? actionsValue
+              .split(',')
+              .map((a) => a.trim())
+              .filter(Boolean)
+          : actionsValue;
       return (
         <div className="flex flex-wrap gap-1">
           {actions?.slice(0, 3).map((action, index) => (
@@ -81,7 +73,15 @@ export const columns: ColumnDef<Permission>[] = [
     accessorKey: 'subjects',
     header: 'Subjects',
     cell: ({ row }) => {
-      const subjects = row.getValue('subjects') as string[];
+      const subjectsValue = row.getValue('subjects') as string | string[];
+      // Convert string to array if needed (backend returns comma-separated string)
+      const subjects =
+        typeof subjectsValue === 'string'
+          ? subjectsValue
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : subjectsValue;
       return (
         <div className="flex flex-wrap gap-1">
           {subjects?.slice(0, 2).map((subject, index) => (
@@ -111,7 +111,12 @@ export const columns: ColumnDef<Permission>[] = [
 function ActionsCell({ permission }: { permission: Permission }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const { refreshData } = usePermissionsContext();
+
+  const handleEditClick = () => {
+    setEditModalOpen(true);
+  };
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -137,8 +142,18 @@ function ActionsCell({ permission }: { permission: Permission }) {
     }
   };
 
+  const handleEditSuccess = () => {
+    refreshData();
+  };
+
   return (
     <>
+      <EditPermissionModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+        permission={permission}
+      />
       <DeleteConfirmationDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
@@ -149,6 +164,15 @@ function ActionsCell({ permission }: { permission: Permission }) {
         confirmText="Delete Permission"
       />
       <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleEditClick}
+          className="text-foreground hover:text-foreground"
+        >
+          <IconEdit className="h-4 w-4" />
+          <span className="sr-only">Edit</span>
+        </Button>
         <Button
           variant="ghost"
           size="icon"
