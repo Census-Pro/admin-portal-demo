@@ -170,7 +170,7 @@ export function AddPermissionModal({
             </Label>
             <Textarea
               id="actions"
-              placeholder="Type action names separated by commas or new lines (e.g., manage, read, update)"
+              placeholder="Type action names separated by commas or new lines (e.g., manage)"
               value={actionInput}
               onChange={handleActionInputChange}
               disabled={isLoading}

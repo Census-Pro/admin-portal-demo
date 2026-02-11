@@ -49,18 +49,6 @@ export const columns: ColumnDef<Role>[] = [
     }
   },
   {
-    accessorKey: 'isActive',
-    header: 'Status',
-    cell: ({ row }) => {
-      const isActive = row.getValue('isActive');
-      return (
-        <Badge variant={isActive !== false ? 'default' : 'secondary'}>
-          {isActive !== false ? 'Active' : 'Inactive'}
-        </Badge>
-      );
-    }
-  },
-  {
     id: 'actions',
     header: () => <div className="text-right">Actions</div>,
     cell: ({ row }) => {
