@@ -3,7 +3,7 @@ import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './_components/verify-columns';
 
 export const metadata = {
-  title: 'Death Registration - Verify (LG)'
+  title: 'Death Registration - Verify'
 };
 
 // Dummy data - only showing registrations that need verification (SUBMITTED status)
@@ -42,7 +42,7 @@ const verificationList = [
 export default function DeathRegistrationVerifyPage() {
   return (
     <PageContainer
-      pageTitle="Death Registration - Verify (LG)"
+      pageTitle="Death Registration - Verify"
       pageDescription="Review and verify death registration applications pending verification"
     >
       <div className="space-y-4">

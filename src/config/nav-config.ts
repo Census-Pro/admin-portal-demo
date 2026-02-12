@@ -9,8 +9,7 @@ export const navItems: NavItem[] = [
     isActive: false,
     shortcut: ['d', 'd'],
     items: [],
-    subject: 'Dashboard', // For ability-based filtering
-    // Everyone with dashboard access can view
+    subject: 'Dashboard',
     access: {
       permissions: [PERMS.MANAGE_ALL, PERMS.VIEW_DASHBOARD]
     }
@@ -21,17 +20,9 @@ export const navItems: NavItem[] = [
     icon: 'teams',
     isActive: false,
     items: [],
-    subject: 'User', // For ability-based filtering (changed from 'Admin' to match backend)
-    // Super Admin and Admin can manage users
+    subject: 'User',
     access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.MANAGE_USERS,
-        PERMS.VIEW_USERS,
-        PERMS.CREATE_USERS,
-        PERMS.EDIT_USERS,
-        PERMS.DELETE_USERS
-      ]
+      permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_USERS]
     }
   },
   {
@@ -39,7 +30,7 @@ export const navItems: NavItem[] = [
     url: '#',
     icon: 'billing',
     isActive: true,
-    subject: 'Masters', // For ability-based filtering
+    subject: 'Masters',
     items: [
       {
         title: 'Agencies',
@@ -47,14 +38,7 @@ export const navItems: NavItem[] = [
         shortcut: ['a', 'g'],
         subject: 'Agencies',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_AGENCIES,
-            PERMS.VIEW_AGENCIES,
-            PERMS.CREATE_AGENCIES,
-            PERMS.EDIT_AGENCIES,
-            PERMS.DELETE_AGENCIES
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_AGENCIES]
         }
       },
       {
@@ -63,14 +47,7 @@ export const navItems: NavItem[] = [
         shortcut: ['o', 'l'],
         subject: 'Office Locations',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_OFFICE_LOCATIONS,
-            PERMS.VIEW_OFFICE_LOCATIONS,
-            PERMS.CREATE_OFFICE_LOCATIONS,
-            PERMS.EDIT_OFFICE_LOCATIONS,
-            PERMS.DELETE_OFFICE_LOCATIONS
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_OFFICE_LOCATIONS]
         }
       },
       {
@@ -79,14 +56,7 @@ export const navItems: NavItem[] = [
         shortcut: ['r', 'l'],
         subject: 'Relationship Types',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_RELATIONSHIP_TYPES,
-            PERMS.VIEW_RELATIONSHIP_TYPES,
-            PERMS.CREATE_RELATIONSHIP_TYPES,
-            PERMS.EDIT_RELATIONSHIP_TYPES,
-            PERMS.DELETE_RELATIONSHIP_TYPES
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_RELATIONSHIP_TYPES]
         }
       },
       {
@@ -95,14 +65,7 @@ export const navItems: NavItem[] = [
         shortcut: ['c', 'u'],
         subject: 'Countries',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_COUNTRIES,
-            PERMS.VIEW_COUNTRIES,
-            PERMS.CREATE_COUNTRIES,
-            PERMS.EDIT_COUNTRIES,
-            PERMS.DELETE_COUNTRIES
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_COUNTRIES]
         }
       },
       {
@@ -111,14 +74,7 @@ export const navItems: NavItem[] = [
         shortcut: ['d', 'z'],
         subject: 'Dzongkhags',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_DZONGKHAGS,
-            PERMS.VIEW_DZONGKHAGS,
-            PERMS.CREATE_DZONGKHAGS,
-            PERMS.EDIT_DZONGKHAGS,
-            PERMS.DELETE_DZONGKHAGS
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_DZONGKHAGS]
         }
       },
       {
@@ -127,14 +83,7 @@ export const navItems: NavItem[] = [
         shortcut: ['g', 'w'],
         subject: 'Gewogs',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_GEWOGS,
-            PERMS.VIEW_GEWOGS,
-            PERMS.CREATE_GEWOGS,
-            PERMS.EDIT_GEWOGS,
-            PERMS.DELETE_GEWOGS
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_GEWOGS]
         }
       },
       {
@@ -143,14 +92,7 @@ export const navItems: NavItem[] = [
         shortcut: ['c', 't'],
         subject: 'Cities',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_CITIES,
-            PERMS.VIEW_CITIES,
-            PERMS.CREATE_CITIES,
-            PERMS.EDIT_CITIES,
-            PERMS.DELETE_CITIES
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CITIES]
         }
       },
       {
@@ -159,14 +101,7 @@ export const navItems: NavItem[] = [
         shortcut: ['g', 'n'],
         subject: 'Genders',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_GENDERS,
-            PERMS.VIEW_GENDERS,
-            PERMS.CREATE_GENDERS,
-            PERMS.EDIT_GENDERS,
-            PERMS.DELETE_GENDERS
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_GENDERS]
         }
       },
       {
@@ -175,14 +110,7 @@ export const navItems: NavItem[] = [
         shortcut: ['m', 's'],
         subject: 'Marital Status',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_MARITAL_STATUS,
-            PERMS.VIEW_MARITAL_STATUS,
-            PERMS.CREATE_MARITAL_STATUS,
-            PERMS.EDIT_MARITAL_STATUS,
-            PERMS.DELETE_MARITAL_STATUS
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MARITAL_STATUS]
         }
       },
       {
@@ -191,14 +119,7 @@ export const navItems: NavItem[] = [
         shortcut: ['l', 's'],
         subject: 'Literacy Status',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_LITERACY_STATUS,
-            PERMS.VIEW_LITERACY_STATUS,
-            PERMS.CREATE_LITERACY_STATUS,
-            PERMS.EDIT_LITERACY_STATUS,
-            PERMS.DELETE_LITERACY_STATUS
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_LITERACY_STATUS]
         }
       },
       {
@@ -207,14 +128,7 @@ export const navItems: NavItem[] = [
         shortcut: ['c', 's'],
         subject: 'Census Status',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_CENSUS_STATUS,
-            PERMS.VIEW_CENSUS_STATUS,
-            PERMS.CREATE_CENSUS_STATUS,
-            PERMS.EDIT_CENSUS_STATUS,
-            PERMS.DELETE_CENSUS_STATUS
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CENSUS_STATUS]
         }
       },
       {
@@ -223,14 +137,7 @@ export const navItems: NavItem[] = [
         shortcut: ['n', 't'],
         subject: 'Naturalization Types',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_NATURALIZATION_TYPES,
-            PERMS.VIEW_NATURALIZATION_TYPES,
-            PERMS.CREATE_NATURALIZATION_TYPES,
-            PERMS.EDIT_NATURALIZATION_TYPES,
-            PERMS.DELETE_NATURALIZATION_TYPES
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_NATURALIZATION_TYPES]
         }
       },
       {
@@ -239,14 +146,7 @@ export const navItems: NavItem[] = [
         shortcut: ['r', 't'],
         subject: 'Regularization Types',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_REGULARIZATION_TYPES,
-            PERMS.VIEW_REGULARIZATION_TYPES,
-            PERMS.CREATE_REGULARIZATION_TYPES,
-            PERMS.EDIT_REGULARIZATION_TYPES,
-            PERMS.DELETE_REGULARIZATION_TYPES
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_REGULARIZATION_TYPES]
         }
       },
       {
@@ -257,33 +157,28 @@ export const navItems: NavItem[] = [
         access: {
           permissions: [
             PERMS.MANAGE_ALL,
-            PERMS.MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES,
-            PERMS.VIEW_RELATIONSHIP_CERTIFICATE_PURPOSES,
-            PERMS.CREATE_RELATIONSHIP_CERTIFICATE_PURPOSES,
-            PERMS.EDIT_RELATIONSHIP_CERTIFICATE_PURPOSES,
-            PERMS.DELETE_RELATIONSHIP_CERTIFICATE_PURPOSES
+            PERMS.MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES
           ]
         }
       }
     ],
-    // Parent Masters section - visible if user has access to any master data
     access: {
       permissions: [
         PERMS.MANAGE_ALL,
-        PERMS.VIEW_AGENCIES,
-        PERMS.VIEW_OFFICE_LOCATIONS,
-        PERMS.VIEW_RELATIONSHIP_TYPES,
-        PERMS.VIEW_COUNTRIES,
-        PERMS.VIEW_DZONGKHAGS,
-        PERMS.VIEW_GEWOGS,
-        PERMS.VIEW_CITIES,
-        PERMS.VIEW_GENDERS,
-        PERMS.VIEW_MARITAL_STATUS,
-        PERMS.VIEW_LITERACY_STATUS,
-        PERMS.VIEW_CENSUS_STATUS,
-        PERMS.VIEW_NATURALIZATION_TYPES,
-        PERMS.VIEW_REGULARIZATION_TYPES,
-        PERMS.VIEW_RELATIONSHIP_CERTIFICATE_PURPOSES
+        PERMS.MANAGE_AGENCIES,
+        PERMS.MANAGE_OFFICE_LOCATIONS,
+        PERMS.MANAGE_RELATIONSHIP_TYPES,
+        PERMS.MANAGE_COUNTRIES,
+        PERMS.MANAGE_DZONGKHAGS,
+        PERMS.MANAGE_GEWOGS,
+        PERMS.MANAGE_CITIES,
+        PERMS.MANAGE_GENDERS,
+        PERMS.MANAGE_MARITAL_STATUS,
+        PERMS.MANAGE_LITERACY_STATUS,
+        PERMS.MANAGE_CENSUS_STATUS,
+        PERMS.MANAGE_NATURALIZATION_TYPES,
+        PERMS.MANAGE_REGULARIZATION_TYPES,
+        PERMS.MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES
       ]
     }
   },
@@ -292,7 +187,7 @@ export const navItems: NavItem[] = [
     url: '#',
     icon: 'shield',
     isActive: true,
-    subject: 'Roles & Permissions', // For ability-based filtering
+    subject: 'Roles & Permissions',
     items: [
       {
         title: 'Roles',
@@ -300,14 +195,7 @@ export const navItems: NavItem[] = [
         shortcut: ['r', 'o'],
         subject: 'Roles',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_ROLES,
-            PERMS.VIEW_ROLES,
-            PERMS.CREATE_ROLES,
-            PERMS.EDIT_ROLES,
-            PERMS.DELETE_ROLES
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ROLES]
         }
       },
       {
@@ -316,25 +204,15 @@ export const navItems: NavItem[] = [
         shortcut: ['p', 'm'],
         subject: 'Permissions',
         access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_PERMISSIONS,
-            PERMS.VIEW_PERMISSIONS,
-            PERMS.CREATE_PERMISSIONS,
-            PERMS.EDIT_PERMISSIONS,
-            PERMS.DELETE_PERMISSIONS
-          ]
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_PERMISSIONS]
         }
       }
     ],
-    // Parent Roles & Permissions section - visible if user has access to roles or permissions
     access: {
       permissions: [
         PERMS.MANAGE_ALL,
         PERMS.MANAGE_ROLES,
-        PERMS.VIEW_ROLES,
-        PERMS.MANAGE_PERMISSIONS,
-        PERMS.VIEW_PERMISSIONS
+        PERMS.MANAGE_PERMISSIONS
       ]
     }
   },
@@ -343,14 +221,17 @@ export const navItems: NavItem[] = [
     url: '#',
     icon: 'baby',
     isActive: false,
-    subject: 'Birth Registration', // For ability-based filtering
     items: [
       {
         title: 'Endorse',
         url: '/dashboard/birth-registration/endorse',
         subject: 'Birth Registration Endorse',
         access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.ENDORSE_BIRTH_REGISTRATION]
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
+            PERMS.MANAGE_BIRTH_REGISTRATION
+          ]
         }
       },
       {
@@ -358,7 +239,11 @@ export const navItems: NavItem[] = [
         url: '/dashboard/birth-registration/verify',
         subject: 'Birth Registration Verify',
         access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.VERIFY_BIRTH_REGISTRATION]
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_BIRTH_REGISTRATION_VERIFY,
+            PERMS.MANAGE_BIRTH_REGISTRATION
+          ]
         }
       },
       {
@@ -366,22 +251,22 @@ export const navItems: NavItem[] = [
         url: '/dashboard/birth-registration/approve',
         subject: 'Birth Registration Approve',
         access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.APPROVE_BIRTH_REGISTRATION]
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_BIRTH_REGISTRATION_APPROVE,
+            PERMS.MANAGE_BIRTH_REGISTRATION
+          ]
         }
       }
     ],
-    // Super Admin, Admin, and Operators can view birth registration
+    // Parent menu shows if user has ANY workflow permission
     access: {
       permissions: [
         PERMS.MANAGE_ALL,
         PERMS.MANAGE_BIRTH_REGISTRATION,
-        PERMS.VIEW_BIRTH_REGISTRATION,
-        PERMS.CREATE_BIRTH_REGISTRATION,
-        PERMS.EDIT_BIRTH_REGISTRATION,
-        PERMS.DELETE_BIRTH_REGISTRATION,
-        PERMS.ENDORSE_BIRTH_REGISTRATION,
-        PERMS.VERIFY_BIRTH_REGISTRATION,
-        PERMS.APPROVE_BIRTH_REGISTRATION
+        PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
+        PERMS.MANAGE_BIRTH_REGISTRATION_VERIFY,
+        PERMS.MANAGE_BIRTH_REGISTRATION_APPROVE
       ]
     }
   },
@@ -390,14 +275,17 @@ export const navItems: NavItem[] = [
     url: '#',
     icon: 'grave',
     isActive: false,
-    subject: 'Death Registration', // For ability-based filtering
     items: [
       {
         title: 'Endorse',
         url: '/dashboard/death-registration/endorse',
         subject: 'Death Registration Endorse',
         access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.ENDORSE_DEATH_REGISTRATION]
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
+            PERMS.MANAGE_DEATH_REGISTRATION
+          ]
         }
       },
       {
@@ -405,7 +293,11 @@ export const navItems: NavItem[] = [
         url: '/dashboard/death-registration/verify',
         subject: 'Death Registration Verify',
         access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.VERIFY_DEATH_REGISTRATION]
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_DEATH_REGISTRATION_VERIFY,
+            PERMS.MANAGE_DEATH_REGISTRATION
+          ]
         }
       },
       {
@@ -413,22 +305,22 @@ export const navItems: NavItem[] = [
         url: '/dashboard/death-registration/approve',
         subject: 'Death Registration Approve',
         access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.APPROVE_DEATH_REGISTRATION]
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_DEATH_REGISTRATION_APPROVE,
+            PERMS.MANAGE_DEATH_REGISTRATION
+          ]
         }
       }
     ],
-    // Super Admin, Admin, and Operators can view death registration
+    // Parent menu shows if user has ANY workflow permission
     access: {
       permissions: [
         PERMS.MANAGE_ALL,
         PERMS.MANAGE_DEATH_REGISTRATION,
-        PERMS.VIEW_DEATH_REGISTRATION,
-        PERMS.CREATE_DEATH_REGISTRATION,
-        PERMS.EDIT_DEATH_REGISTRATION,
-        PERMS.DELETE_DEATH_REGISTRATION,
-        PERMS.ENDORSE_DEATH_REGISTRATION,
-        PERMS.VERIFY_DEATH_REGISTRATION,
-        PERMS.APPROVE_DEATH_REGISTRATION
+        PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
+        PERMS.MANAGE_DEATH_REGISTRATION_VERIFY,
+        PERMS.MANAGE_DEATH_REGISTRATION_APPROVE
       ]
     }
   }

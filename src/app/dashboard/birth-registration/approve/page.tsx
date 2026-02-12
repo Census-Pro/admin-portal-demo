@@ -3,7 +3,7 @@ import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './_components/approve-columns';
 
 export const metadata = {
-  title: 'Birth Registration - Approve (HQ)'
+  title: 'Birth Registration - Approve'
 };
 
 // Dummy data - only showing registrations that are verified and need approval
@@ -42,7 +42,7 @@ const approvalList = [
 export default function BirthRegistrationApprovePage() {
   return (
     <PageContainer
-      pageTitle="Birth Registration - Approve (HQ)"
+      pageTitle="Birth Registration - Approve"
       pageDescription="Review and approve verified birth registration applications"
     >
       <div className="space-y-4">

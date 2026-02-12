@@ -3,7 +3,7 @@ import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './_components/approve-columns';
 
 export const metadata = {
-  title: 'Death Registration - Approve (DG)'
+  title: 'Death Registration - Approve'
 };
 
 // Dummy data - only showing registrations ready for approval (VERIFIED status)
@@ -45,7 +45,7 @@ const approvalList = [
 export default function DeathRegistrationApprovePage() {
   return (
     <PageContainer
-      pageTitle="Death Registration - Approve (DG)"
+      pageTitle="Death Registration - Approve"
       pageDescription="Review and approve verified death registration applications"
     >
       <div className="space-y-4">

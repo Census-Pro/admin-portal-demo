@@ -3,24 +3,16 @@
  * These actions define what operations can be performed
  */
 export const AVAILABLE_ACTIONS = [
+  'manage', // Full control - includes all CRUD operations
   'create',
   'read',
   'update',
   'delete',
-  'manage', // Full control
   'approve',
-  'reject',
   'verify',
+  'endorse',
   'export',
-  'print',
-  'review',
-  'assess',
-  'payment',
-  'issue',
-  'add',
-  'scan',
-  'registration',
-  'vetting'
+  'print'
 ] as const;
 
 /**
@@ -30,99 +22,45 @@ export const AVAILABLE_ACTIONS = [
  */
 export const AVAILABLE_SUBJECTS = [
   // Core System
+  'all',
   'Dashboard',
   'User',
-  'Role Permission',
 
-  // Masters
-  'Master',
-  'Flight',
-  'Checkpoints',
+  // Roles & Permissions
+  'Roles',
+  'Permissions',
+  'Roles & Permissions',
 
-  // Visa & Permits
-  'Visa',
-  'Tourist Visa',
-  'Regional Tourist Visa',
-  'International Tourist Visa',
-  'Fast Track Visa',
-  'Regional Fast Track Visa',
-  'International Fast Track Visa',
-  'Non Tourist Visa',
-  'Non Tourist Conversion',
-  'BIF',
+  // Master Data
+  'Masters',
+  'Agencies',
+  'Office Locations',
+  'Relationship Types',
+  'Countries',
+  'Dzongkhags',
+  'Gewogs',
+  'Cities',
+  'Genders',
+  'Marital Status',
+  'Literacy Status',
+  'Census Status',
+  'Naturalization Types',
+  'Regularization Types',
+  'Relationship Certificate Purposes',
 
-  // On Arrival
-  'Air Arrival',
-  'Land Arrival',
-  'On Arrival Extension',
-  'On Arrival Pre Registration',
+  // Birth Registration
+  'Birth Registration',
+  'Birth Registration Endorse',
+  'Birth Registration Verify',
+  'Birth Registration Approve',
 
-  // Border Management
-  'Border Management',
-  'Land BMS',
-  'Air BMS',
-  'Internal Checkpoint',
-  'Casual Visitor',
-  'Bhutanese Casual Visitor',
-  'Vehicle Registration',
-  'Vehicle Report',
+  // Death Registration
+  'Death Registration',
+  'Death Registration Endorse',
+  'Death Registration Verify',
+  'Death Registration Approve'
 
-  // Personal Guest
-  'International Personal Guest',
-  'Regional Personal Guest',
-
-  // Route Permit
-  'Route Permit',
-
-  // Work Permit & Related
-  'Work Permit',
-  'Student Permit',
-  'Dependent Permit',
-  'Investor Permit',
-  'Immigration Card',
-  'Temporary Stay Permit',
-  'Trader Permit',
-  'Travel Permit',
-
-  // Card & Registration
-  'Card Printing',
-  'Register Child',
-  'Permit Replacement',
-  'Permit Cancellation',
-
-  // Enforcement
-  'Deportation',
-  'Repatriation',
-  'Watchlist',
-  'Blacklist',
-  'Offence',
-
-  // Information & Reports
-  'Individual Information',
-  'Report',
-  'Challan Report',
-  'Flight Report',
-  'Individual Challan',
-  'On Arrival Report',
-  'TCB Report',
-  'Non Tourist Report',
-  'Permit Report',
-  'Arrival Report',
-
-  // Data Management
-  'Data Correction',
-  'Permit Correction',
-  'Visa Correction',
-  'Record Entry/Exit',
-  'Application History',
-  'Work Permit History',
-
-  // Tools & Utilities
-  'Tools',
-  'Save Mode',
-  'Enrollment'
-
-  // Add more subjects as your system grows
+  // Add more subjects as your Census system grows
 ] as const;
 
 export type PermissionAction = (typeof AVAILABLE_ACTIONS)[number];

@@ -3,7 +3,7 @@ import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './_components/verify-columns';
 
 export const metadata = {
-  title: 'Birth Registration - Verify (LG)'
+  title: 'Birth Registration - Verify'
 };
 
 // Dummy data - only showing registrations that need verification (SUBMITTED status)

@@ -44,6 +44,18 @@ export const MANAGE_PERMISSIONS = 'manage:permissions' as const;
 // BIRTH REGISTRATION PERMISSIONS
 // ============================================================================
 
+// Workflow-specific permissions (match subject names in nav-config)
+export const MANAGE_BIRTH_REGISTRATION_ENDORSE =
+  'manage:birth-registration-endorse' as const;
+export const MANAGE_BIRTH_REGISTRATION_VERIFY =
+  'manage:birth-registration-verify' as const;
+export const MANAGE_BIRTH_REGISTRATION_APPROVE =
+  'manage:birth-registration-approve' as const;
+
+// General birth registration permission (grants access to all workflow steps)
+export const MANAGE_BIRTH_REGISTRATION = 'manage:birth-registration' as const;
+
+// Legacy permissions (kept for backward compatibility, can be removed later)
 export const VIEW_BIRTH_REGISTRATION = 'read:birth-registration' as const;
 export const CREATE_BIRTH_REGISTRATION = 'create:birth-registration' as const;
 export const EDIT_BIRTH_REGISTRATION = 'update:birth-registration' as const;
@@ -51,7 +63,6 @@ export const DELETE_BIRTH_REGISTRATION = 'delete:birth-registration' as const;
 export const VERIFY_BIRTH_REGISTRATION = 'verify:birth-registration' as const;
 export const APPROVE_BIRTH_REGISTRATION = 'approve:birth-registration' as const;
 export const ENDORSE_BIRTH_REGISTRATION = 'endorse:birth-registration' as const;
-export const MANAGE_BIRTH_REGISTRATION = 'manage:birth-registration' as const;
 
 // ============================================================================
 // CID ISSUANCE PERMISSIONS
@@ -123,18 +134,22 @@ export const MANAGE_RELATIONSHIPS = 'manage:relationships' as const;
 // NATURALIZATION/REGULARIZATION PERMISSIONS
 // ============================================================================
 
-export const VIEW_NATURALIZATION = 'read:naturalization' as const;
-export const CREATE_NATURALIZATION = 'create:naturalization' as const;
-export const EDIT_NATURALIZATION = 'update:naturalization' as const;
-export const DELETE_NATURALIZATION = 'delete:naturalization' as const;
-export const VERIFY_NATURALIZATION = 'verify:naturalization' as const;
-export const APPROVE_NATURALIZATION = 'approve:naturalization' as const;
-export const MANAGE_NATURALIZATION = 'manage:naturalization' as const;
-
 // ============================================================================
 // DEATH REGISTRATION PERMISSIONS
 // ============================================================================
 
+// Workflow-specific permissions (match subject names in nav-config)
+export const MANAGE_DEATH_REGISTRATION_ENDORSE =
+  'manage:death-registration-endorse' as const;
+export const MANAGE_DEATH_REGISTRATION_VERIFY =
+  'manage:death-registration-verify' as const;
+export const MANAGE_DEATH_REGISTRATION_APPROVE =
+  'manage:death-registration-approve' as const;
+
+// General death registration permission (grants access to all workflow steps)
+export const MANAGE_DEATH_REGISTRATION = 'manage:death-registration' as const;
+
+// Legacy permissions (kept for backward compatibility, can be removed later)
 export const VIEW_DEATH_REGISTRATION = 'read:death-registration' as const;
 export const CREATE_DEATH_REGISTRATION = 'create:death-registration' as const;
 export const EDIT_DEATH_REGISTRATION = 'update:death-registration' as const;
@@ -142,7 +157,6 @@ export const DELETE_DEATH_REGISTRATION = 'delete:death-registration' as const;
 export const VERIFY_DEATH_REGISTRATION = 'verify:death-registration' as const;
 export const APPROVE_DEATH_REGISTRATION = 'approve:death-registration' as const;
 export const ENDORSE_DEATH_REGISTRATION = 'endorse:death-registration' as const;
-export const MANAGE_DEATH_REGISTRATION = 'manage:death-registration' as const;
 
 // ============================================================================
 // COUNTRY PERMISSIONS
@@ -309,11 +323,11 @@ export const ADMIN_PERMISSIONS = [
   EDIT_RELATIONSHIPS,
   VERIFY_RELATIONSHIPS,
   APPROVE_RELATIONSHIPS,
-  VIEW_NATURALIZATION,
-  CREATE_NATURALIZATION,
-  EDIT_NATURALIZATION,
-  VERIFY_NATURALIZATION,
-  APPROVE_NATURALIZATION,
+  // VIEW_NATURALIZATION,
+  // CREATE_NATURALIZATION,
+  // EDIT_NATURALIZATION,
+  // VERIFY_NATURALIZATION,
+  // APPROVE_NATURALIZATION,
   VIEW_DEATH_REGISTRATION,
   CREATE_DEATH_REGISTRATION,
   EDIT_DEATH_REGISTRATION,
@@ -334,8 +348,8 @@ export const OPERATOR_PERMISSIONS = [
   VERIFY_MOVE_IN_OUT,
   VIEW_RELATIONSHIPS,
   VERIFY_RELATIONSHIPS,
-  VIEW_NATURALIZATION,
-  VERIFY_NATURALIZATION,
+  // VIEW_NATURALIZATION,
+  // VERIFY_NATURALIZATION,
   VIEW_DEATH_REGISTRATION,
   VERIFY_DEATH_REGISTRATION
 ] as const;
@@ -367,6 +381,14 @@ export type Permission =
   | typeof DELETE_BIRTH_REGISTRATION
   | typeof VERIFY_BIRTH_REGISTRATION
   | typeof APPROVE_BIRTH_REGISTRATION
+  | typeof ENDORSE_BIRTH_REGISTRATION
+  | typeof MANAGE_BIRTH_REGISTRATION
+  | typeof MANAGE_BIRTH_REGISTRATION_ENDORSE
+  | typeof MANAGE_BIRTH_REGISTRATION_VERIFY
+  | typeof MANAGE_BIRTH_REGISTRATION_APPROVE
+  | typeof VIEW_CID_ISSUANCE
+  | typeof VERIFY_BIRTH_REGISTRATION
+  | typeof APPROVE_BIRTH_REGISTRATION
   | typeof MANAGE_BIRTH_REGISTRATION
   | typeof VIEW_CID_ISSUANCE
   | typeof CREATE_CID_ISSUANCE
@@ -389,20 +411,24 @@ export type Permission =
   | typeof VERIFY_RELATIONSHIPS
   | typeof APPROVE_RELATIONSHIPS
   | typeof MANAGE_RELATIONSHIPS
-  | typeof VIEW_NATURALIZATION
-  | typeof CREATE_NATURALIZATION
-  | typeof EDIT_NATURALIZATION
-  | typeof DELETE_NATURALIZATION
-  | typeof VERIFY_NATURALIZATION
-  | typeof APPROVE_NATURALIZATION
-  | typeof MANAGE_NATURALIZATION
+  // | typeof VIEW_NATURALIZATION
+  // | typeof CREATE_NATURALIZATION
+  // | typeof EDIT_NATURALIZATION
+  // | typeof DELETE_NATURALIZATION
+  // | typeof VERIFY_NATURALIZATION
+  // | typeof APPROVE_NATURALIZATION
+  // | typeof MANAGE_NATURALIZATION
   | typeof VIEW_DEATH_REGISTRATION
   | typeof CREATE_DEATH_REGISTRATION
   | typeof EDIT_DEATH_REGISTRATION
   | typeof DELETE_DEATH_REGISTRATION
   | typeof VERIFY_DEATH_REGISTRATION
   | typeof APPROVE_DEATH_REGISTRATION
+  | typeof ENDORSE_DEATH_REGISTRATION
   | typeof MANAGE_DEATH_REGISTRATION
+  | typeof MANAGE_DEATH_REGISTRATION_ENDORSE
+  | typeof MANAGE_DEATH_REGISTRATION_VERIFY
+  | typeof MANAGE_DEATH_REGISTRATION_APPROVE
   | typeof VIEW_COUNTRIES
   | typeof CREATE_COUNTRIES
   | typeof EDIT_COUNTRIES

@@ -61,7 +61,7 @@ export default function AppSidebar() {
                 <Collapsible
                   key={item.title}
                   asChild
-                  defaultOpen={item.isActive}
+                  defaultOpen={false}
                   className="group/collapsible"
                 >
                   <SidebarMenuItem>
