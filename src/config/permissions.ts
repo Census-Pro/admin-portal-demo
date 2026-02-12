@@ -68,13 +68,24 @@ export const ENDORSE_BIRTH_REGISTRATION = 'endorse:birth-registration' as const;
 // CID ISSUANCE PERMISSIONS
 // ============================================================================
 
+// Workflow-specific permissions (match subject names in nav-config)
+export const MANAGE_CID_ISSUANCE_PENDING =
+  'manage:cid-issuance-pending' as const;
+export const MANAGE_CID_ISSUANCE_VERIFY = 'manage:cid-issuance-verify' as const;
+export const MANAGE_CID_ISSUANCE_APPROVE =
+  'manage:cid-issuance-approve' as const;
+export const MANAGE_CID_ISSUANCE_PRINT = 'manage:cid-issuance-print' as const;
+
+// General CID issuance permission (grants access to all workflow steps)
+export const MANAGE_CID_ISSUANCE = 'manage:cid-issuance' as const;
+
+// Legacy permissions (kept for backward compatibility)
 export const VIEW_CID_ISSUANCE = 'read:cid-issuance' as const;
 export const CREATE_CID_ISSUANCE = 'create:cid-issuance' as const;
 export const EDIT_CID_ISSUANCE = 'update:cid-issuance' as const;
 export const DELETE_CID_ISSUANCE = 'delete:cid-issuance' as const;
 export const VERIFY_CID_ISSUANCE = 'verify:cid-issuance' as const;
 export const APPROVE_CID_ISSUANCE = 'approve:cid-issuance' as const;
-export const MANAGE_CID_ISSUANCE = 'manage:cid-issuance' as const;
 
 // ============================================================================
 // MOVE IN/OUT PERMISSIONS

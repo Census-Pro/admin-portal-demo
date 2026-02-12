@@ -227,3 +227,53 @@ export async function updateAdmin(
     };
   }
 }
+
+export async function resetAdminPassword(adminId: string, newPassword: string) {
+  try {
+    const headers = await instance();
+    const url = `${API_URL}/admin/${adminId}/reset-password`;
+
+    console.log('[resetAdminPassword] Resetting password for admin:', adminId);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ newPassword })
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to reset password';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[resetAdminPassword] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
+
+    const result = await response.json();
+    console.log('[resetAdminPassword] Password reset successfully');
+
+    return {
+      success: true,
+      message: result.message || 'Password reset successfully'
+    };
+  } catch (error) {
+    console.error('[resetAdminPassword] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}

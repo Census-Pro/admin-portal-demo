@@ -323,5 +323,72 @@ export const navItems: NavItem[] = [
         PERMS.MANAGE_DEATH_REGISTRATION_APPROVE
       ]
     }
+  },
+  {
+    title: 'CID Issuance',
+    url: '#',
+    icon: 'idCard',
+    isActive: false,
+    items: [
+      {
+        title: 'Pending Applications',
+        url: '/dashboard/cid-issuance/pending',
+        subject: 'CID Issuance Pending',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_CID_ISSUANCE_PENDING,
+            PERMS.MANAGE_CID_ISSUANCE
+          ]
+        }
+      },
+      {
+        title: 'Verify',
+        url: '/dashboard/cid-issuance/verify',
+        subject: 'CID Issuance Verify',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_CID_ISSUANCE_VERIFY,
+            PERMS.MANAGE_CID_ISSUANCE
+          ]
+        }
+      },
+      {
+        title: 'Approve',
+        url: '/dashboard/cid-issuance/approve',
+        subject: 'CID Issuance Approve',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_CID_ISSUANCE_APPROVE,
+            PERMS.MANAGE_CID_ISSUANCE
+          ]
+        }
+      },
+      {
+        title: 'Print CID',
+        url: '/dashboard/cid-issuance/print',
+        subject: 'CID Issuance Print',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_CID_ISSUANCE_PRINT,
+            PERMS.MANAGE_CID_ISSUANCE
+          ]
+        }
+      }
+    ],
+    // Parent menu shows if user has ANY workflow permission
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.MANAGE_CID_ISSUANCE,
+        PERMS.MANAGE_CID_ISSUANCE_PENDING,
+        PERMS.MANAGE_CID_ISSUANCE_VERIFY,
+        PERMS.MANAGE_CID_ISSUANCE_APPROVE,
+        PERMS.MANAGE_CID_ISSUANCE_PRINT
+      ]
+    }
   }
 ];
