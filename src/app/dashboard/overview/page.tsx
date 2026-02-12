@@ -1,8 +1,24 @@
 import PageContainer from '@/components/layout/page-container';
 import { getDashboardStats } from '@/actions/dashboard/stats-actions';
 import { DashboardClient } from './_components/dashboard-client';
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+import { checkPermission } from '@/lib/permission-check';
 
 export default async function OverviewPage() {
+  const session = await auth();
+
+  // Check if user has permission to view dashboard
+  const permissionCheck = checkPermission(session, [
+    'read:dashboard',
+    'manage:all'
+  ]);
+
+  // If user doesn't have permission, redirect to unauthorized page
+  if (!permissionCheck.hasAccess) {
+    redirect('/dashboard/unauthorized');
+  }
+
   // Fetch real data from auth_service
   const statsResult = await getDashboardStats();
 
