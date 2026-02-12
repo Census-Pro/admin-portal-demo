@@ -50,6 +50,7 @@ export const EDIT_BIRTH_REGISTRATION = 'update:birth-registration' as const;
 export const DELETE_BIRTH_REGISTRATION = 'delete:birth-registration' as const;
 export const VERIFY_BIRTH_REGISTRATION = 'verify:birth-registration' as const;
 export const APPROVE_BIRTH_REGISTRATION = 'approve:birth-registration' as const;
+export const ENDORSE_BIRTH_REGISTRATION = 'endorse:birth-registration' as const;
 export const MANAGE_BIRTH_REGISTRATION = 'manage:birth-registration' as const;
 
 // ============================================================================
@@ -140,6 +141,7 @@ export const EDIT_DEATH_REGISTRATION = 'update:death-registration' as const;
 export const DELETE_DEATH_REGISTRATION = 'delete:death-registration' as const;
 export const VERIFY_DEATH_REGISTRATION = 'verify:death-registration' as const;
 export const APPROVE_DEATH_REGISTRATION = 'approve:death-registration' as const;
+export const ENDORSE_DEATH_REGISTRATION = 'endorse:death-registration' as const;
 export const MANAGE_DEATH_REGISTRATION = 'manage:death-registration' as const;
 
 // ============================================================================

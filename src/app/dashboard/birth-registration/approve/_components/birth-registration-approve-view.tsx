@@ -259,12 +259,12 @@ export function BirthRegistrationApproveView({
               <div
                 className={`relative space-y-2 rounded-lg border-2 p-4 ${data.is_mc_valid ? 'border-green-500' : 'border-yellow-500'}`}
               >
-                {/* EPIS Label */}
+                {/* Data Source Label */}
                 <div className="bg-background absolute -top-3 right-4 px-2">
                   <span
                     className={`text-xs font-medium ${data.is_mc_valid ? 'text-green-600' : 'text-yellow-600'}`}
                   >
-                    EPIS
+                    {data.is_mc_valid ? 'Trusted Source' : 'Manual Entry'}
                   </span>
                 </div>
 

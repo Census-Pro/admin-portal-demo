@@ -9,58 +9,50 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
   IconUser,
-  IconCalendar,
-  IconClock,
   IconMapPin,
   IconHome,
-  IconUsers,
-  IconWeight,
   IconShieldCheck,
   IconFileText,
   IconCheck,
-  IconX,
   IconChevronLeft,
-  IconChevronRight
+  IconChevronRight,
+  IconSkull
 } from '@tabler/icons-react';
 
-interface BirthRegistrationData {
+interface DeathRegistrationData {
   applicant_cid: string;
-  is_born_in_bhutan: boolean;
-  is_applicant_parent: boolean;
-  is_epis_registered: boolean;
-  birth_country_id: string;
-  birth_city_id: string;
-  birth_dzongkhag_id: string;
-  birth_gewog_id: string;
-  birth_village_id: string;
+  deceased_cid: string;
   first_name: string;
   middle_name: string;
   last_name: string;
   date_of_birth: string;
-  time_of_birth: string;
   gender: string;
-  weight: number;
-  is_mc_valid: boolean;
-  father_cid: string;
-  mother_cid: string;
-  guarantor_cid: string;
-  relationship: string;
-  house_hold_no: string;
-  house_no: string;
   dzongkhag_id: string;
   gewog_id: string;
   village_id: string;
-  birth_certificate_url: string;
+  house_hold_no: string;
+  house_no: string;
+  is_health_registered: boolean;
+  date_of_death: string;
+  time_of_death: string;
+  cause_of_death: string;
+  place_of_death: string;
+  country_of_death_id: string;
+  dzongkhag_of_death_id: string;
+  gewog_of_death_id: string;
+  village_of_death_id: string;
+  city_id: string;
+  death_certificate_url: string;
   status: string;
 }
 
-interface BirthRegistrationVerifyViewProps {
-  data: BirthRegistrationData;
+interface DeathRegistrationEndorseViewProps {
+  data: DeathRegistrationData;
 }
 
-export function BirthRegistrationVerifyView({
+export function DeathRegistrationEndorseView({
   data
-}: BirthRegistrationVerifyViewProps) {
+}: DeathRegistrationEndorseViewProps) {
   const [currentDocIndex, setCurrentDocIndex] = useState(0);
 
   const documents = [
@@ -86,16 +78,10 @@ export function BirthRegistrationVerifyView({
     );
   };
 
-  const handleVerify = () => {
-    toast.success('Birth registration verified successfully!');
-    console.log('Verifying birth registration...');
-    // TODO: Implement verification logic
-  };
-
-  const handleReject = () => {
-    toast.error('Birth registration rejected');
-    console.log('Rejecting birth registration...');
-    // TODO: Implement rejection logic
+  const handleEndorse = () => {
+    toast.success('Death registration endorsed successfully!');
+    console.log('Endorsing death registration...');
+    // TODO: Implement endorsement logic
   };
 
   return (
@@ -104,29 +90,39 @@ export function BirthRegistrationVerifyView({
       <div className="space-y-6 lg:col-span-2">
         <Card>
           <CardHeader>
-            <CardTitle>Birth Registration Information</CardTitle>
+            <CardTitle>Death Registration Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Child Information & Birth Location - Combined */}
+            {/* Deceased Information & Death Details - Combined */}
             <div
-              className={`relative space-y-4 rounded-lg border-2 p-4 ${data.is_epis_registered ? 'border-green-500' : 'border-yellow-500'}`}
+              className={`relative space-y-4 rounded-lg border-2 p-4 ${data.is_health_registered ? 'border-green-500' : 'border-yellow-500'}`}
             >
               {/* Data Source Label */}
               <div className="bg-background absolute -top-3 right-4 px-2">
                 <span
-                  className={`text-xs font-medium ${data.is_epis_registered ? 'text-green-600' : 'text-yellow-600'}`}
+                  className={`text-xs font-medium ${data.is_health_registered ? 'text-green-600' : 'text-yellow-600'}`}
                 >
-                  {data.is_epis_registered ? 'Trusted Source' : 'Manual Entry'}
+                  {data.is_health_registered
+                    ? 'Trusted Source'
+                    : 'Manual Entry'}
                 </span>
               </div>
 
-              {/* Child Information */}
+              {/* Deceased Information */}
               <div className="space-y-3">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <IconUser className="h-4 w-4" />
-                  Child Information
+                  Deceased Information
                 </h3>
                 <div className="space-y-2">
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Deceased CID
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.deceased_cid}
+                    </p>
+                  </div>
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                       First Name
@@ -174,72 +170,63 @@ export function BirthRegistrationVerifyView({
                       )}
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Time of Birth
-                    </Label>
-                    <p className="flex-1 text-sm font-medium">
-                      {data.time_of_birth}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Weight (kg)
-                    </Label>
-                    <p className="flex-1 text-sm font-medium">
-                      {data.weight} kg
-                    </p>
-                  </div>
                 </div>
               </div>
 
               <Separator className="my-4" />
 
-              {/* Birth Location */}
+              {/* Death Details */}
               <div className="space-y-3">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
-                  <IconMapPin className="h-4 w-4" />
-                  Birth Location
+                  <IconSkull className="h-4 w-4" />
+                  Death Details
                 </h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Born in Bhutan
+                      Date of Death
                     </Label>
                     <p className="flex-1 text-sm font-medium">
-                      {data.is_born_in_bhutan ? 'Yes' : 'No'}
+                      {new Date(data.date_of_death).toLocaleDateString(
+                        'en-GB',
+                        {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric'
+                        }
+                      )}
                     </p>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Country ID
-                    </Label>
-                    <p className="flex-1 text-sm">{data.birth_country_id}</p>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Dzongkhag ID
-                    </Label>
-                    <p className="flex-1 text-sm">{data.birth_dzongkhag_id}</p>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Gewog ID
-                    </Label>
-                    <p className="flex-1 text-sm">{data.birth_gewog_id}</p>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Village ID
-                    </Label>
-                    <p className="flex-1 text-sm">{data.birth_village_id}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      EPIS Registered
+                      Time of Death
                     </Label>
                     <p className="flex-1 text-sm font-medium">
-                      {data.is_epis_registered ? 'Yes' : 'No'}
+                      {data.time_of_death}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Cause of Death
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.cause_of_death}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Place of Death
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.place_of_death}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Health Registered
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.is_health_registered ? 'Yes' : 'No'}
                     </p>
                   </div>
                 </div>
@@ -248,109 +235,42 @@ export function BirthRegistrationVerifyView({
 
             <Separator />
 
-            {/* Parent Information */}
+            {/* Death Location */}
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
-                <IconUsers className="h-4 w-4" />
-                Parent Information
+                <IconMapPin className="h-4 w-4" />
+                Death Location
               </h3>
-
-              {/* Father, Mother, Marriage Certificate - Bordered Section */}
-              <div
-                className={`relative space-y-2 rounded-lg border-2 p-4 ${data.is_mc_valid ? 'border-green-500' : 'border-yellow-500'}`}
-              >
-                {/* Data Source Label */}
-                <div className="bg-background absolute -top-3 right-4 px-2">
-                  <span
-                    className={`text-xs font-medium ${data.is_mc_valid ? 'text-green-600' : 'text-yellow-600'}`}
-                  >
-                    {data.is_mc_valid ? 'Trusted Source' : 'Manual Entry'}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Father's CID
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.father_cid}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Mother's CID
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.mother_cid}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Marriage Certificate Valid
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.is_mc_valid ? 'Yes' : 'No'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Rest of Parent Information - Outside Border */}
               <div className="space-y-2">
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Father's CID
+                    Country ID
                   </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.father_cid}
-                  </p>
+                  <p className="flex-1 text-sm">{data.country_of_death_id}</p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Mother's CID
+                    Dzongkhag ID
                   </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.mother_cid}
-                  </p>
+                  <p className="flex-1 text-sm">{data.dzongkhag_of_death_id}</p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Marriage Certificate Valid
+                    Gewog ID
                   </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.is_mc_valid ? 'Yes' : 'No'}
-                  </p>
+                  <p className="flex-1 text-sm">{data.gewog_of_death_id}</p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Applicant CID
+                    Village ID
                   </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.applicant_cid}
-                  </p>
+                  <p className="flex-1 text-sm">{data.village_of_death_id}</p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Is Applicant Parent
+                    City ID
                   </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.is_applicant_parent ? 'Yes' : 'No'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Guarantor CID
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.guarantor_cid}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Relationship
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.relationship}
-                  </p>
+                  <p className="flex-1 text-sm">{data.city_id}</p>
                 </div>
               </div>
             </div>
@@ -364,6 +284,14 @@ export function BirthRegistrationVerifyView({
                 Address Information
               </h3>
               <div className="space-y-2">
+                <div className="flex items-center gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Applicant CID
+                  </Label>
+                  <p className="flex-1 text-sm font-medium">
+                    {data.applicant_cid}
+                  </p>
+                </div>
                 <div className="flex items-center gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     Household No.
@@ -401,11 +329,11 @@ export function BirthRegistrationVerifyView({
 
             <Separator />
 
-            {/* Application Status & Verification Details */}
+            {/* Application Status & Endorsement Details */}
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <IconShieldCheck className="h-4 w-4" />
-                Status & Verification
+                Status & Endorsement
               </h3>
               <div className="space-y-2">
                 <div className="flex items-center gap-4">
@@ -419,7 +347,7 @@ export function BirthRegistrationVerifyView({
                           ? 'secondary'
                           : data.status === 'SUBMITTED'
                             ? 'outline'
-                            : data.status === 'VERIFIED'
+                            : data.status === 'ENDORSED'
                               ? 'default'
                               : 'destructive'
                       }
@@ -435,22 +363,14 @@ export function BirthRegistrationVerifyView({
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
+              {/* Action Button */}
+              <div className="pt-4">
                 <Button
-                  onClick={handleVerify}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={handleEndorse}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
                 >
                   <IconCheck className="mr-2 h-4 w-4" />
-                  Verify
-                </Button>
-                <Button
-                  onClick={handleReject}
-                  variant="destructive"
-                  className="flex-1"
-                >
-                  <IconX className="mr-2 h-4 w-4" />
-                  Reject
+                  Endorse
                 </Button>
               </div>
             </div>

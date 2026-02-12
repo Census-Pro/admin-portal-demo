@@ -9,16 +9,12 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
   IconUser,
-  IconCalendar,
-  IconClock,
   IconMapPin,
   IconHome,
   IconUsers,
-  IconWeight,
   IconShieldCheck,
   IconFileText,
   IconCheck,
-  IconX,
   IconChevronLeft,
   IconChevronRight
 } from '@tabler/icons-react';
@@ -54,13 +50,13 @@ interface BirthRegistrationData {
   status: string;
 }
 
-interface BirthRegistrationVerifyViewProps {
+interface BirthRegistrationEndorseViewProps {
   data: BirthRegistrationData;
 }
 
-export function BirthRegistrationVerifyView({
+export function BirthRegistrationEndorseView({
   data
-}: BirthRegistrationVerifyViewProps) {
+}: BirthRegistrationEndorseViewProps) {
   const [currentDocIndex, setCurrentDocIndex] = useState(0);
 
   const documents = [
@@ -86,16 +82,10 @@ export function BirthRegistrationVerifyView({
     );
   };
 
-  const handleVerify = () => {
-    toast.success('Birth registration verified successfully!');
-    console.log('Verifying birth registration...');
-    // TODO: Implement verification logic
-  };
-
-  const handleReject = () => {
-    toast.error('Birth registration rejected');
-    console.log('Rejecting birth registration...');
-    // TODO: Implement rejection logic
+  const handleEndorse = () => {
+    toast.success('Birth registration endorsed successfully!');
+    console.log('Endorsing birth registration...');
+    // TODO: Implement endorsement logic
   };
 
   return (
@@ -111,12 +101,12 @@ export function BirthRegistrationVerifyView({
             <div
               className={`relative space-y-4 rounded-lg border-2 p-4 ${data.is_epis_registered ? 'border-green-500' : 'border-yellow-500'}`}
             >
-              {/* Data Source Label */}
+              {/* Manual Entry Label */}
               <div className="bg-background absolute -top-3 right-4 px-2">
                 <span
                   className={`text-xs font-medium ${data.is_epis_registered ? 'text-green-600' : 'text-yellow-600'}`}
                 >
-                  {data.is_epis_registered ? 'Trusted Source' : 'Manual Entry'}
+                  Manual Entry
                 </span>
               </div>
 
@@ -401,11 +391,11 @@ export function BirthRegistrationVerifyView({
 
             <Separator />
 
-            {/* Application Status & Verification Details */}
+            {/* Application Status & Endorsement Details */}
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <IconShieldCheck className="h-4 w-4" />
-                Status & Verification
+                Status & Endorsement
               </h3>
               <div className="space-y-2">
                 <div className="flex items-center gap-4">
@@ -419,7 +409,7 @@ export function BirthRegistrationVerifyView({
                           ? 'secondary'
                           : data.status === 'SUBMITTED'
                             ? 'outline'
-                            : data.status === 'VERIFIED'
+                            : data.status === 'ENDORSED'
                               ? 'default'
                               : 'destructive'
                       }
@@ -435,22 +425,14 @@ export function BirthRegistrationVerifyView({
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
+              {/* Action Button */}
+              <div className="pt-4">
                 <Button
-                  onClick={handleVerify}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={handleEndorse}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
                 >
                   <IconCheck className="mr-2 h-4 w-4" />
-                  Verify
-                </Button>
-                <Button
-                  onClick={handleReject}
-                  variant="destructive"
-                  className="flex-1"
-                >
-                  <IconX className="mr-2 h-4 w-4" />
-                  Reject
+                  Endorse
                 </Button>
               </div>
             </div>
