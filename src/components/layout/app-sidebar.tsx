@@ -1,4 +1,5 @@
 'use client';
+import { cn } from '@/lib/utils';
 import {
   Collapsible,
   CollapsibleContent,
@@ -98,6 +99,7 @@ export default function AppSidebar() {
                       <SidebarMenuButton
                         tooltip={item.title}
                         isActive={pathname === item.url || isChildActive}
+                        className="hover:bg-primary/10 transition-colors duration-200"
                       >
                         {item.icon && <Icon />}
                         <span>{item.title}</span>
@@ -105,19 +107,50 @@ export default function AppSidebar() {
                       </SidebarMenuButton>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                      <SidebarMenuSub>
-                        {item.items?.map((subItem) => (
-                          <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton
-                              asChild
-                              isActive={pathname === subItem.url}
+                      <SidebarMenuSub className="border-l-0">
+                        {item.items?.map((subItem, index) => {
+                          const isSubItemActive = pathname === subItem.url;
+                          const isLast = index === item.items!.length - 1;
+                          return (
+                            <SidebarMenuSubItem
+                              key={subItem.title}
+                              className="relative"
                             >
-                              <Link href={subItem.url}>
-                                <span>{subItem.title}</span>
-                              </Link>
-                            </SidebarMenuSubButton>
-                          </SidebarMenuSubItem>
-                        ))}
+                              <svg
+                                className={cn(
+                                  'absolute inset-y-0 -left-[12px] h-full w-4 transition-colors duration-300',
+                                  isSubItemActive
+                                    ? 'text-primary'
+                                    : 'text-primary/30'
+                                )}
+                                viewBox="0 0 16 32"
+                                preserveAspectRatio="none"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  d={
+                                    isLast
+                                      ? 'M1 0 V16 H14'
+                                      : 'M1 0 V32 M1 16 H14'
+                                  }
+                                  stroke="currentColor"
+                                  strokeWidth="2.5"
+                                  vectorEffect="non-scaling-stroke"
+                                />
+                              </svg>
+                              <SidebarMenuSubButton
+                                asChild
+                                isActive={isSubItemActive}
+                                className="hover:bg-primary/10 transition-colors duration-200"
+                              >
+                                <Link href={subItem.url} className="ml-3">
+                                  <span>{subItem.title}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          );
+                        })}
                       </SidebarMenuSub>
                     </CollapsibleContent>
                   </SidebarMenuItem>
@@ -128,6 +161,7 @@ export default function AppSidebar() {
                     asChild
                     tooltip={item.title}
                     isActive={pathname === item.url}
+                    className="hover:bg-primary/10 transition-colors duration-200"
                   >
                     <Link href={item.url}>
                       <Icon />
