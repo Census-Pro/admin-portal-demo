@@ -26,13 +26,34 @@ function PrintActionsCell({
   application: ApprovedCIDApplication;
 }) {
   const handlePrint = () => {
-    // TODO: Implement print functionality
-    console.log('Print CID for:', application.cid_number);
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print CID - ${application.cid_number}</title>
+            <style>
+              body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+              img { max-width: 100%; height: auto; }
+              @page { size: auto; margin: 0mm; }
+            </style>
+          </head>
+          <body>
+            <img src="/sampleCid.png" onload="window.print(); setTimeout(() => { window.close(); }, 500);" />
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
   };
 
   const handleDownload = () => {
-    // TODO: Implement download functionality
-    console.log('Download CID details for:', application.cid_number);
+    const link = document.createElement('a');
+    link.href = '/sampleCid.png';
+    link.download = `CID_${application.cid_number}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (

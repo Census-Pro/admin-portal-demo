@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   IconArrowLeft,
   IconUser,
@@ -16,17 +17,35 @@ import {
   IconPhone,
   IconFileText,
   IconUsers,
-  IconChevronLeft,
-  IconChevronRight
+  IconCheck,
+  IconX,
+  IconShieldCheck
 } from '@tabler/icons-react';
 import { getStatusColor, getTypeColor } from '@/lib/status-utils';
 
 // Dummy detailed data - In real app, fetch from API
 const getApplicationDetails = (id: string) => {
+  const dummyData: Record<string, any> = {
+    '1': { status: 'SUBMITTED', name: 'Tshering Dorji' },
+    '2': { status: 'SUBMITTED', name: 'Pema Lhamo' },
+    '3': { status: 'SUBMITTED', name: 'Kinley Wangchuk' },
+    '4': { status: 'SUBMITTED', name: 'Sonam Choden' },
+    '5': { status: 'SUBMITTED', name: 'Ugyen Tshomo' },
+    '6': { status: 'SUBMITTED', name: 'Chencho Namgay' },
+    '7': { status: 'PENDING_VERIFICATION', name: 'Dechen Zangmo' },
+    '8': { status: 'PENDING_VERIFICATION', name: 'Tenzin Phuntsho' },
+    '9': { status: 'PENDING_VERIFICATION', name: 'Namgay Dema' },
+    '10': { status: 'VERIFIED', name: 'Karma Tshering' },
+    '11': { status: 'VERIFIED', name: 'Sangay Dema' },
+    '12': { status: 'VERIFIED', name: 'Dorji Wangmo' }
+  };
+
+  const data = dummyData[id] || { status: 'SUBMITTED', name: 'Tshering Dorji' };
+
   return {
     id: id,
-    applicant_name: 'Tshering Dorji',
-    applicant_cid: null,
+    applicant_name: data.name,
+    applicant_cid: id === '1' ? null : '11505001234',
     date_of_birth: '2008-03-15',
     gender: 'Male',
     blood_group: 'O+',
@@ -35,7 +54,7 @@ const getApplicationDetails = (id: string) => {
     gewog: 'Chang',
     village: 'Kabesa',
     application_type: 'NEW',
-    status: 'SUBMITTED',
+    status: data.status,
     created_at: '2026-02-10T09:30:00Z',
     phone_number: '17123456',
     email: 'tshering.dorji@gmail.com',
@@ -86,18 +105,56 @@ export default function ApplicationDetailPage() {
   const statusStyle = getStatusColor(application.status);
   const typeStyle = getTypeColor(application.application_type);
 
-  const [currentDocIndex, setCurrentDocIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState('birth_certificate');
 
-  const documents = application.supporting_documents;
-
-  const handleNextDoc = () => {
-    setCurrentDocIndex((prev) => (prev + 1) % documents.length);
-  };
-
-  const handlePrevDoc = () => {
-    setCurrentDocIndex(
-      (prev) => (prev - 1 + documents.length) % documents.length
-    );
+  const renderActionButtons = () => {
+    switch (application.status) {
+      case 'PENDING_VERIFICATION':
+        return (
+          <>
+            <Button
+              variant="default"
+              className="flex-1 bg-green-600 hover:bg-green-700"
+            >
+              <IconCheck className="mr-2 h-4 w-4" />
+              Verify
+            </Button>
+            <Button variant="destructive" className="flex-1">
+              <IconX className="mr-2 h-4 w-4" />
+              Reject
+            </Button>
+          </>
+        );
+      case 'VERIFIED':
+        return (
+          <>
+            <Button
+              variant="default"
+              className="flex-1 bg-green-600 hover:bg-green-700"
+            >
+              <IconCheck className="mr-2 h-4 w-4" />
+              Approve
+            </Button>
+            <Button variant="destructive" className="flex-1">
+              <IconX className="mr-2 h-4 w-4" />
+              Reject
+            </Button>
+          </>
+        );
+      default:
+        return (
+          <>
+            <Button variant="default" className="flex-1">
+              <IconCheck className="mr-2 h-4 w-4" />
+              Forward to Next Stage
+            </Button>
+            <Button variant="destructive" className="flex-1">
+              <IconX className="mr-2 h-4 w-4" />
+              Reject
+            </Button>
+          </>
+        );
+    }
   };
 
   return (
@@ -313,65 +370,52 @@ export default function ApplicationDetailPage() {
 
                 <Separator />
 
-                {/* Additional Information */}
-                <div className="space-y-3">
+                {/* Status & Verification Section - Action Buttons Moved Here */}
+                <div className="space-y-4">
                   <h3 className="flex items-center gap-2 text-sm font-semibold">
-                    <IconCalendar className="h-4 w-4" />
-                    Additional Information
+                    <IconShieldCheck className="h-4 w-4" />
+                    Status & Verification
                   </h3>
+
                   <div className="space-y-2">
                     <div className="flex items-center gap-4">
                       <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                        Birth Certificate No.
+                        Application type
                       </Label>
-                      <p className="flex-1 font-mono text-sm">
-                        {application.birth_certificate_number}
-                      </p>
+                      <div className="flex-1">
+                        <Badge
+                          variant={typeStyle.variant}
+                          className={`uppercase ${typeStyle.className}`}
+                        >
+                          {application.application_type}
+                        </Badge>
+                      </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                        Application Date
+                        Current status
                       </Label>
-                      <p className="flex-1 text-sm font-medium">
-                        {new Date(application.created_at).toLocaleDateString(
-                          'en-GB',
-                          {
-                            day: '2-digit',
-                            month: 'long',
-                            year: 'numeric'
-                          }
-                        )}
-                      </p>
+                      <div className="flex-1">
+                        <Badge
+                          variant={statusStyle.variant}
+                          className={`uppercase ${statusStyle.className}`}
+                        >
+                          {application.status}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="flex items-start gap-4">
-                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                        Remarks
-                      </Label>
-                      <p className="flex-1 text-sm">{application.remarks}</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                        as type :
-                      </Label>
-                      <Badge
-                        variant={typeStyle.variant}
-                        className={`uppercase ${typeStyle.className}`}
-                      >
-                        {application.application_type}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                        status :
-                      </Label>
-                      <Badge
-                        variant={statusStyle.variant}
-                        className={`uppercase ${statusStyle.className}`}
-                      >
-                        {application.status}
-                      </Badge>
-                    </div>
+                    {application.remarks && (
+                      <div className="flex items-start gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Remarks
+                        </Label>
+                        <p className="flex-1 text-sm">{application.remarks}</p>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">{renderActionButtons()}</div>
                 </div>
               </CardContent>
             </Card>
@@ -382,89 +426,102 @@ export default function ApplicationDetailPage() {
             {/* Supporting Documents */}
             <Card className="h-full">
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <IconFileText className="h-5 w-5" />
-                    Supporting Documents
-                  </CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handlePrevDoc}
-                      disabled={documents.length <= 1}
-                    >
-                      <IconChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <span className="text-muted-foreground text-sm">
-                      {currentDocIndex + 1} / {documents.length}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleNextDoc}
-                      disabled={documents.length <= 1}
-                    >
-                      <IconChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+                <CardTitle className="flex items-center gap-2">
+                  <IconFileText className="h-5 w-5" />
+                  Supporting Documents
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {/* Document Selector Badges */}
-                  <div className="flex flex-wrap gap-2">
-                    {documents.map((doc, index) => (
-                      <Badge
-                        key={index}
-                        variant={
-                          currentDocIndex === index ? 'default' : 'outline'
-                        }
-                        className="cursor-pointer"
-                        onClick={() => setCurrentDocIndex(index)}
-                      >
-                        {doc.name}
-                      </Badge>
-                    ))}
-                  </div>
+                <Tabs
+                  value={activeTab}
+                  onValueChange={setActiveTab}
+                  className="w-full"
+                >
+                  <TabsList className="mb-4 grid w-full grid-cols-2 lg:grid-cols-4">
+                    <TabsTrigger value="birth_certificate" className="text-xs">
+                      Birth Certificate
+                    </TabsTrigger>
+                    <TabsTrigger value="census_certificate" className="text-xs">
+                      Census Certificate
+                    </TabsTrigger>
+                    <TabsTrigger value="passport_photo" className="text-xs">
+                      Passport Photo
+                    </TabsTrigger>
+                    <TabsTrigger value="parent_cid" className="text-xs">
+                      Parent CID Copies
+                    </TabsTrigger>
+                  </TabsList>
 
-                  {/* Document Name */}
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium">
-                      {documents[currentDocIndex].name}
-                    </p>
-                    <Badge variant="secondary">
-                      {documents[currentDocIndex].type.toUpperCase()}
-                    </Badge>
-                  </div>
+                  <TabsContent value="birth_certificate" className="mt-0">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium">Birth Certificate</p>
+                        <Badge variant="secondary">PDF</Badge>
+                      </div>
+                      <div className="border-muted overflow-hidden rounded-lg border">
+                        <iframe
+                          src="/samepleCeritificate.pdf"
+                          className="h-[600px] w-full"
+                          title="Birth Certificate"
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
 
-                  {/* Document Viewer */}
-                  <div className="border-muted overflow-hidden rounded-lg border">
-                    {documents[currentDocIndex].type === 'image' ? (
-                      <img
-                        src={documents[currentDocIndex].url}
-                        alt={documents[currentDocIndex].name}
-                        className="h-auto w-full object-contain"
-                        style={{ maxHeight: '600px' }}
-                      />
-                    ) : (
-                      <iframe
-                        src={documents[currentDocIndex].url}
-                        className="h-[600px] w-full"
-                        title={documents[currentDocIndex].name}
-                      />
-                    )}
-                  </div>
-                </div>
+                  <TabsContent value="census_certificate" className="mt-0">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium">
+                          Census Certificate
+                        </p>
+                        <Badge variant="secondary">PDF</Badge>
+                      </div>
+                      <div className="border-muted overflow-hidden rounded-lg border">
+                        <iframe
+                          src="/sample_census_certificate.pdf"
+                          className="h-[600px] w-full"
+                          title="Census Certificate"
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="passport_photo" className="mt-0">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium">Passport Photo</p>
+                        <Badge variant="secondary">IMAGE</Badge>
+                      </div>
+                      <div className="border-muted overflow-hidden rounded-lg border">
+                        <img
+                          src="/sampleCid.png"
+                          alt="Passport Photo"
+                          className="h-auto w-full object-contain"
+                          style={{ maxHeight: '600px' }}
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="parent_cid" className="mt-0">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium">Parent CID Copies</p>
+                        <Badge variant="secondary">PDF</Badge>
+                      </div>
+                      <div className="border-muted overflow-hidden rounded-lg border">
+                        <iframe
+                          src="/sample_parent_cid_copies.pdf"
+                          className="h-[600px] w-full"
+                          title="Parent CID Copies"
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-4">
-          <Button variant="outline">Reject</Button>
-          <Button variant="default">Forward to Next Stage</Button>
         </div>
       </div>
     </PageContainer>
