@@ -100,7 +100,7 @@ export const columns: ColumnDef<Permission>[] = [
   },
   {
     id: 'menu',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => {
       const permission = row.original;
       return <ActionsCell permission={permission} />;
@@ -163,7 +163,7 @@ function ActionsCell({ permission }: { permission: Permission }) {
         description="Are you sure you want to delete this permission? This action cannot be undone."
         confirmText="Delete Permission"
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"

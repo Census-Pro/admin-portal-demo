@@ -34,7 +34,7 @@ export const columns = (
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => {
       const relationship = row.original;
       return (
@@ -104,7 +104,7 @@ function ActionsCell({
         description="Are you sure you want to delete this relationship? This action cannot be undone."
         confirmText="Delete Relationship"
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"

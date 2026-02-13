@@ -23,7 +23,7 @@ function ActionsCell({ registration }: { registration: BirthRegistration }) {
   const router = useRouter();
 
   return (
-    <div className="flex justify-end gap-2">
+    <div className="flex items-center gap-2">
       <Button
         variant="ghost"
         size="icon"
@@ -45,19 +45,20 @@ export const columns: ColumnDef<BirthRegistration>[] = [
     }
   },
   {
-    accessorKey: 'child_name',
-    header: 'Child Name',
+    accessorKey: 'first_name',
+    header: 'First Name'
+  },
+  {
+    accessorKey: 'middle_name',
+    header: 'Middle Name',
     cell: ({ row }) => {
-      const registration = row.original;
-      const fullName = [
-        registration.first_name,
-        registration.middle_name,
-        registration.last_name
-      ]
-        .filter(Boolean)
-        .join(' ');
-      return <div className="font-medium">{fullName}</div>;
+      const middleName = row.getValue('middle_name') as string;
+      return middleName || '-';
     }
+  },
+  {
+    accessorKey: 'last_name',
+    header: 'Last Name'
   },
   {
     accessorKey: 'date_of_birth',
@@ -65,7 +66,7 @@ export const columns: ColumnDef<BirthRegistration>[] = [
     cell: ({ row }) => {
       const date = row.getValue('date_of_birth') as string;
       try {
-        return format(new Date(date), 'dd MMM yyyy');
+        return format(new Date(date), 'MMM dd, yyyy');
       } catch {
         return date;
       }
@@ -78,7 +79,7 @@ export const columns: ColumnDef<BirthRegistration>[] = [
       const date = row.getValue('created_at') as string;
       if (!date) return '-';
       try {
-        return format(new Date(date), 'dd MMM yyyy');
+        return format(new Date(date), 'MMM dd, yyyy');
       } catch {
         return date;
       }
@@ -92,15 +93,15 @@ export const columns: ColumnDef<BirthRegistration>[] = [
       const { variant, className } = getStatusColor(status);
 
       return (
-        <Badge variant={variant} className={className}>
-          {status.replace(/_/g, ' ')}
+        <Badge variant={variant} className={`uppercase ${className}`}>
+          {status}
         </Badge>
       );
     }
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => {
       const registration = row.original;
       return <ActionsCell registration={registration} />;

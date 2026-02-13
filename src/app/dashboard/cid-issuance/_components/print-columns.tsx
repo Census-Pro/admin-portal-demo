@@ -57,7 +57,7 @@ function PrintActionsCell({
   };
 
   return (
-    <div className="flex justify-end gap-2">
+    <div className="flex items-center gap-2">
       <Button variant="ghost" size="icon" onClick={handleDownload}>
         <IconDownload className="h-4 w-4" />
         <span className="sr-only">Download</span>
@@ -102,7 +102,7 @@ export const printColumns: ColumnDef<ApprovedCIDApplication>[] = [
     cell: ({ row }) => {
       const date = row.getValue('date_of_birth') as string;
       try {
-        return format(new Date(date), 'dd MMM yyyy');
+        return format(new Date(date), 'MMM dd, yyyy');
       } catch {
         return date;
       }
@@ -146,7 +146,7 @@ export const printColumns: ColumnDef<ApprovedCIDApplication>[] = [
     cell: ({ row }) => {
       const date = row.getValue('approved_at') as string;
       try {
-        return format(new Date(date), 'dd MMM yyyy');
+        return format(new Date(date), 'MMM dd, yyyy');
       } catch {
         return date;
       }
@@ -160,15 +160,15 @@ export const printColumns: ColumnDef<ApprovedCIDApplication>[] = [
       const { variant, className } = getStatusColor(status);
 
       return (
-        <Badge variant={variant} className={className}>
-          {status.replace(/_/g, ' ')}
+        <Badge variant={variant} className={`uppercase ${className}`}>
+          {status}
         </Badge>
       );
     }
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => <PrintActionsCell application={row.original} />
   }
 ];

@@ -75,7 +75,7 @@ export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => {
       const user = row.original;
       return <ActionsCell user={user} />;
@@ -133,7 +133,7 @@ function ActionsCell({ user }: { user: User }) {
         description="Are you sure you want to delete this user? This action cannot be undone."
         confirmText="Delete User"
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"

@@ -39,7 +39,7 @@ export const createColumns = (
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => {
       const dzongkhag = row.original;
       return (
@@ -101,7 +101,7 @@ function ActionsCell({
         description="Are you sure you want to delete this dzongkhag? This action cannot be undone."
         confirmText="Delete Dzongkhag"
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"

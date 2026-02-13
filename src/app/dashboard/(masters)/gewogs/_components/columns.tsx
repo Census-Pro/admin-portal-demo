@@ -32,7 +32,7 @@ export const columns: ColumnDef<Gewog>[] = [
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => {
       const gewog = row.original;
       return <ActionsCell gewog={gewog} />;
@@ -79,7 +79,7 @@ function ActionsCell({ gewog }: { gewog: Gewog }) {
         description="Are you sure you want to delete this gewog? This action cannot be undone."
         confirmText="Delete Gewog"
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"

@@ -27,7 +27,7 @@ function ActionsCell({ application }: { application: CIDApplication }) {
   const router = useRouter();
 
   return (
-    <div className="flex justify-end gap-2">
+    <div className="flex items-center gap-2">
       <Button
         variant="ghost"
         size="icon"
@@ -66,7 +66,7 @@ export const columns: ColumnDef<CIDApplication>[] = [
     cell: ({ row }) => {
       const date = row.getValue('date_of_birth') as string;
       try {
-        return format(new Date(date), 'dd MMM yyyy');
+        return format(new Date(date), 'MMM dd, yyyy');
       } catch {
         return date;
       }
@@ -111,7 +111,7 @@ export const columns: ColumnDef<CIDApplication>[] = [
       const date = row.getValue('created_at') as string;
       if (!date) return '-';
       try {
-        return format(new Date(date), 'dd MMM yyyy');
+        return format(new Date(date), 'MMM dd, yyyy');
       } catch {
         return date;
       }
@@ -125,15 +125,15 @@ export const columns: ColumnDef<CIDApplication>[] = [
       const { variant, className } = getStatusColor(status);
 
       return (
-        <Badge variant={variant} className={className}>
-          {status.replace(/_/g, ' ')}
+        <Badge variant={variant} className={`uppercase ${className}`}>
+          {status}
         </Badge>
       );
     }
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => <ActionsCell application={row.original} />
   }
 ];

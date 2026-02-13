@@ -57,7 +57,7 @@ export const columns = (onDataChange?: () => void): ColumnDef<Agency>[] => [
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => {
       const agency = row.original;
       return <ActionsCell agency={agency} onDataChange={onDataChange} />;
@@ -125,7 +125,7 @@ function ActionsCell({
         }}
         agency={agency}
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"

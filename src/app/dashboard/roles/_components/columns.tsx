@@ -50,7 +50,7 @@ export const columns: ColumnDef<Role>[] = [
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => {
       const role = row.original;
       return <ActionsCell role={role} />;
@@ -104,7 +104,7 @@ function ActionsCell({ role }: { role: Role }) {
         confirmText="Delete Role"
       />
 
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"

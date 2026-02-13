@@ -52,7 +52,7 @@ export const createColumns = (
   },
   {
     id: 'actions',
-    header: () => <div className="text-right">Actions</div>,
+    header: 'Actions',
     cell: ({ row }) => {
       const country = row.original;
       return (
@@ -124,7 +124,7 @@ function ActionsCell({
           setEditModalOpen(false);
         }}
       />
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
