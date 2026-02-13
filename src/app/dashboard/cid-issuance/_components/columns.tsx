@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import { getStatusColor, getTypeColor } from '@/lib/status-utils';
 
 export interface CIDApplication {
   id: string;
@@ -94,18 +95,10 @@ export const columns: ColumnDef<CIDApplication>[] = [
     header: 'Type',
     cell: ({ row }) => {
       const type = row.getValue('application_type') as string;
-      let variant: 'default' | 'secondary' | 'outline' = 'default';
-
-      if (type === 'NEW') {
-        variant = 'default';
-      } else if (type === 'RENEWAL') {
-        variant = 'secondary';
-      } else if (type === 'REPLACEMENT' || type === 'UPDATE') {
-        variant = 'outline';
-      }
+      const { variant, className } = getTypeColor(type);
 
       return (
-        <Badge variant={variant} className="whitespace-nowrap">
+        <Badge variant={variant} className={`whitespace-nowrap ${className}`}>
           {type}
         </Badge>
       );
@@ -129,24 +122,11 @@ export const columns: ColumnDef<CIDApplication>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
-      const statusLower = status?.toLowerCase() || '';
-
-      let variant: 'default' | 'secondary' | 'destructive' | 'outline' =
-        'default';
-      let customClass = '';
-
-      if (statusLower === 'approved' || statusLower === 'verified') {
-        variant = 'outline';
-        customClass = 'border-green-500 text-green-700 bg-green-50';
-      } else if (statusLower === 'rejected' || statusLower === 'cancelled') {
-        variant = 'destructive';
-      } else if (statusLower === 'pending' || statusLower === 'submitted') {
-        variant = 'secondary';
-      }
+      const { variant, className } = getStatusColor(status);
 
       return (
-        <Badge variant={variant} className={customClass}>
-          {status}
+        <Badge variant={variant} className={className}>
+          {status.replace(/_/g, ' ')}
         </Badge>
       );
     }

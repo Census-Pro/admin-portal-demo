@@ -20,6 +20,7 @@ import {
   IconChevronRight,
   IconSkull
 } from '@tabler/icons-react';
+import { getStatusColor } from '@/lib/status-utils';
 
 interface DeathRegistrationData {
   applicant_cid: string;
@@ -91,6 +92,8 @@ export function DeathRegistrationVerifyView({
     console.log('Rejecting death registration...');
     // TODO: Implement rejection logic
   };
+
+  const { variant, className: statusClassName } = getStatusColor(data.status);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
@@ -349,22 +352,7 @@ export function DeathRegistrationVerifyView({
                     Application Status
                   </Label>
                   <div className="flex-1">
-                    <Badge
-                      variant={
-                        data.status === 'PENDING'
-                          ? 'secondary'
-                          : data.status === 'SUBMITTED'
-                            ? 'outline'
-                            : data.status === 'VERIFIED'
-                              ? 'default'
-                              : 'destructive'
-                      }
-                      className={
-                        data.status === 'SUBMITTED'
-                          ? 'border-yellow-500 bg-yellow-50 text-yellow-700'
-                          : ''
-                      }
-                    >
+                    <Badge variant={variant} className={statusClassName}>
                       {data.status}
                     </Badge>
                   </div>

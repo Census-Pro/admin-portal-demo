@@ -36,6 +36,15 @@ const approvalList = [
     date_of_birth: '2026-02-06',
     status: 'VERIFIED',
     created_at: '2026-02-07T13:30:00Z'
+  },
+  {
+    id: '9',
+    first_name: 'Lobzang',
+    last_name: 'Tshering',
+    applicant_cid: '10704005678',
+    date_of_birth: '2026-01-30',
+    status: 'APPROVED',
+    created_at: '2026-01-31T11:00:00Z'
   }
 ];
 

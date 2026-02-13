@@ -5,6 +5,7 @@ import { IconPrinter, IconDownload } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { getStatusColor, getTypeColor } from '@/lib/status-utils';
 
 export interface ApprovedCIDApplication {
   id: string;
@@ -109,18 +110,10 @@ export const printColumns: ColumnDef<ApprovedCIDApplication>[] = [
     header: 'Type',
     cell: ({ row }) => {
       const type = row.getValue('application_type') as string;
-      let variant: 'default' | 'secondary' | 'outline' = 'default';
-
-      if (type === 'NEW') {
-        variant = 'default';
-      } else if (type === 'RENEWAL') {
-        variant = 'secondary';
-      } else if (type === 'REPLACEMENT' || type === 'UPDATE') {
-        variant = 'outline';
-      }
+      const { variant, className } = getTypeColor(type);
 
       return (
-        <Badge variant={variant} className="whitespace-nowrap">
+        <Badge variant={variant} className={`whitespace-nowrap ${className}`}>
           {type}
         </Badge>
       );
@@ -143,21 +136,10 @@ export const printColumns: ColumnDef<ApprovedCIDApplication>[] = [
     header: 'Print Status',
     cell: ({ row }) => {
       const status = row.getValue('print_status') as string;
-      let variant: 'default' | 'secondary' | 'outline' = 'default';
-      let customClass = '';
-
-      if (status === 'READY_TO_PRINT') {
-        variant = 'secondary';
-      } else if (status === 'PRINTED') {
-        variant = 'outline';
-        customClass = 'border-blue-500 text-blue-700 bg-blue-50';
-      } else if (status === 'COLLECTED') {
-        variant = 'outline';
-        customClass = 'border-green-500 text-green-700 bg-green-50';
-      }
+      const { variant, className } = getStatusColor(status);
 
       return (
-        <Badge variant={variant} className={customClass}>
+        <Badge variant={variant} className={className}>
           {status.replace(/_/g, ' ')}
         </Badge>
       );

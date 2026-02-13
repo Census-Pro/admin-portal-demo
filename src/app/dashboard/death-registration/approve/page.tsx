@@ -39,6 +39,16 @@ const approvalList = [
     status: 'VERIFIED',
     created_at: '2026-02-02T15:40:00Z',
     verified_at: '2026-02-04T14:20:00Z'
+  },
+  {
+    id: '8',
+    first_name: 'Tashi',
+    last_name: 'Wangdi',
+    deceased_cid: '10903004567',
+    date_of_death: '2026-01-30',
+    status: 'APPROVED',
+    created_at: '2026-01-31T09:00:00Z',
+    verified_at: '2026-02-02T16:30:00Z'
   }
 ];
 

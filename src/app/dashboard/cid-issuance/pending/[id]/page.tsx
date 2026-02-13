@@ -16,6 +16,7 @@ import {
   IconFileText,
   IconUsers
 } from '@tabler/icons-react';
+import { getStatusColor, getTypeColor } from '@/lib/status-utils';
 
 // Dummy detailed data - In real app, fetch from API
 const getApplicationDetails = (id: string) => {
@@ -59,6 +60,8 @@ export default function ApplicationDetailPage() {
   const applicationId = params.id as string;
 
   const application = getApplicationDetails(applicationId);
+  const statusStyle = getStatusColor(application.status);
+  const typeStyle = getTypeColor(application.application_type);
 
   return (
     <PageContainer
@@ -74,12 +77,15 @@ export default function ApplicationDetailPage() {
 
         {/* Status and Type */}
         <div className="flex items-center gap-4">
-          <Badge variant="secondary" className="px-4 py-2 text-base">
+          <Badge
+            variant={typeStyle.variant}
+            className={`px-4 py-2 text-base ${typeStyle.className}`}
+          >
             {application.application_type}
           </Badge>
           <Badge
-            variant={application.status === 'SUBMITTED' ? 'default' : 'outline'}
-            className="px-4 py-2 text-base"
+            variant={statusStyle.variant}
+            className={`px-4 py-2 text-base ${statusStyle.className}`}
           >
             {application.status}
           </Badge>

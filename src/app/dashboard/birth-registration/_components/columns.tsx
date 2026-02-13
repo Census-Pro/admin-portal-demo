@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
+import { getStatusColor } from '@/lib/status-utils';
 
 interface BirthRegistration {
   id: string;
@@ -88,24 +89,11 @@ export const columns: ColumnDef<BirthRegistration>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
-      const statusLower = status?.toLowerCase() || '';
-
-      let variant: 'default' | 'secondary' | 'destructive' | 'outline' =
-        'default';
-      let customClass = '';
-
-      if (statusLower === 'approved' || statusLower === 'verified') {
-        variant = 'outline';
-        customClass = 'border-green-500 text-green-700 bg-green-50';
-      } else if (statusLower === 'rejected' || statusLower === 'cancelled') {
-        variant = 'destructive';
-      } else if (statusLower === 'pending' || statusLower === 'submitted') {
-        variant = 'secondary';
-      }
+      const { variant, className } = getStatusColor(status);
 
       return (
-        <Badge variant={variant} className={`capitalize ${customClass}`}>
-          {status}
+        <Badge variant={variant} className={className}>
+          {status.replace(/_/g, ' ')}
         </Badge>
       );
     }
