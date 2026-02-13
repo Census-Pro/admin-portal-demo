@@ -31,9 +31,7 @@ function ActionsCell({ application }: { application: CIDApplication }) {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() =>
-          router.push(`/dashboard/cid-issuance/pending/${application.id}`)
-        }
+        onClick={() => router.push(`/dashboard/cid-issuance/${application.id}`)}
       >
         <IconEye className="h-4 w-4" />
         <span className="sr-only">View Details</span>
