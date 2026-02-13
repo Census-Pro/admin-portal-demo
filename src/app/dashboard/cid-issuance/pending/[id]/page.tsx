@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import PageContainer from '@/components/layout/page-container';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +15,9 @@ import {
   IconMapPin,
   IconPhone,
   IconFileText,
-  IconUsers
+  IconUsers,
+  IconChevronLeft,
+  IconChevronRight
 } from '@tabler/icons-react';
 import { getStatusColor, getTypeColor } from '@/lib/status-utils';
 
@@ -46,10 +49,30 @@ const getApplicationDetails = (id: string) => {
     permanent_address: 'Kabesa, Chang Gewog, Thimphu',
     remarks: 'First time CID application. All documents verified.',
     supporting_documents: [
-      { name: 'Birth Certificate', status: 'Uploaded' },
-      { name: 'Census Certificate', status: 'Uploaded' },
-      { name: 'Passport Photo', status: 'Uploaded' },
-      { name: 'Parent CID Copies', status: 'Uploaded' }
+      {
+        name: 'Birth Certificate',
+        status: 'Uploaded',
+        url: '/samepleCeritificate.pdf',
+        type: 'pdf'
+      },
+      {
+        name: 'Census Certificate',
+        status: 'Uploaded',
+        url: '/sample_census_certificate.pdf',
+        type: 'pdf'
+      },
+      {
+        name: 'Passport Photo',
+        status: 'Uploaded',
+        url: '/sampleCid.png',
+        type: 'image'
+      },
+      {
+        name: 'Parent CID Copies',
+        status: 'Uploaded',
+        url: '/sample_parent_cid_copies.pdf',
+        type: 'pdf'
+      }
     ]
   };
 };
@@ -63,6 +86,20 @@ export default function ApplicationDetailPage() {
   const statusStyle = getStatusColor(application.status);
   const typeStyle = getTypeColor(application.application_type);
 
+  const [currentDocIndex, setCurrentDocIndex] = useState(0);
+
+  const documents = application.supporting_documents;
+
+  const handleNextDoc = () => {
+    setCurrentDocIndex((prev) => (prev + 1) % documents.length);
+  };
+
+  const handlePrevDoc = () => {
+    setCurrentDocIndex(
+      (prev) => (prev - 1 + documents.length) % documents.length
+    );
+  };
+
   return (
     <PageContainer
       pageTitle="CID Application Details"
@@ -74,22 +111,6 @@ export default function ApplicationDetailPage() {
           <IconArrowLeft className="mr-2 h-4 w-4" />
           Back to List
         </Button>
-
-        {/* Status and Type */}
-        <div className="flex items-center gap-4">
-          <Badge
-            variant={typeStyle.variant}
-            className={`px-4 py-2 text-base ${typeStyle.className}`}
-          >
-            {application.application_type}
-          </Badge>
-          <Badge
-            variant={statusStyle.variant}
-            className={`px-4 py-2 text-base ${statusStyle.className}`}
-          >
-            {application.status}
-          </Badge>
-        </div>
 
         {/* 40/60 Split Layout */}
         <div className="grid gap-6 lg:grid-cols-5">
@@ -328,6 +349,28 @@ export default function ApplicationDetailPage() {
                       </Label>
                       <p className="flex-1 text-sm">{application.remarks}</p>
                     </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        as type :
+                      </Label>
+                      <Badge
+                        variant={typeStyle.variant}
+                        className={`uppercase ${typeStyle.className}`}
+                      >
+                        {application.application_type}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        status :
+                      </Label>
+                      <Badge
+                        variant={statusStyle.variant}
+                        className={`uppercase ${statusStyle.className}`}
+                      >
+                        {application.status}
+                      </Badge>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -339,29 +382,79 @@ export default function ApplicationDetailPage() {
             {/* Supporting Documents */}
             <Card className="h-full">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <IconFileText className="h-5 w-5" />
-                  Supporting Documents
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <IconFileText className="h-5 w-5" />
+                    Supporting Documents
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handlePrevDoc}
+                      disabled={documents.length <= 1}
+                    >
+                      <IconChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <span className="text-muted-foreground text-sm">
+                      {currentDocIndex + 1} / {documents.length}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleNextDoc}
+                      disabled={documents.length <= 1}
+                    >
+                      <IconChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {application.supporting_documents.map((doc, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between rounded-lg border p-4"
-                    >
-                      <div>
-                        <p className="text-sm font-medium">{doc.name}</p>
-                        <p className="text-muted-foreground text-xs">
-                          {doc.status}
-                        </p>
-                      </div>
-                      <Badge variant="outline" className="ml-2">
-                        ✓
+                <div className="space-y-4">
+                  {/* Document Selector Badges */}
+                  <div className="flex flex-wrap gap-2">
+                    {documents.map((doc, index) => (
+                      <Badge
+                        key={index}
+                        variant={
+                          currentDocIndex === index ? 'default' : 'outline'
+                        }
+                        className="cursor-pointer"
+                        onClick={() => setCurrentDocIndex(index)}
+                      >
+                        {doc.name}
                       </Badge>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+
+                  {/* Document Name */}
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">
+                      {documents[currentDocIndex].name}
+                    </p>
+                    <Badge variant="secondary">
+                      {documents[currentDocIndex].type.toUpperCase()}
+                    </Badge>
+                  </div>
+
+                  {/* Document Viewer */}
+                  <div className="border-muted overflow-hidden rounded-lg border">
+                    {documents[currentDocIndex].type === 'image' ? (
+                      <img
+                        src={documents[currentDocIndex].url}
+                        alt={documents[currentDocIndex].name}
+                        className="h-auto w-full object-contain"
+                        style={{ maxHeight: '600px' }}
+                      />
+                    ) : (
+                      <iframe
+                        src={documents[currentDocIndex].url}
+                        className="h-[600px] w-full"
+                        title={documents[currentDocIndex].name}
+                      />
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
