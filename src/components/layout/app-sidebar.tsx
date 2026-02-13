@@ -36,6 +36,29 @@ export default function AppSidebar() {
   const { isOpen } = useMediaQuery();
   const { data: session } = useSession();
   const filteredItems = useFilteredNavItems(navItems);
+  const [openStates, setOpenStates] = React.useState<Record<string, boolean>>(
+    {}
+  );
+
+  // Sync with localStorage and handle initial state
+  React.useEffect(() => {
+    const saved = localStorage.getItem('sidebar-collapsible-states');
+    if (saved) {
+      try {
+        setOpenStates(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to parse sidebar state', e);
+      }
+    }
+  }, []);
+
+  const handleOpenChange = (title: string, open: boolean) => {
+    setOpenStates((prev) => {
+      const next = { ...prev, [title]: open };
+      localStorage.setItem('sidebar-collapsible-states', JSON.stringify(next));
+      return next;
+    });
+  };
 
   React.useEffect(() => {
     // Side effects based on sidebar state changes
@@ -57,18 +80,24 @@ export default function AppSidebar() {
           <SidebarMenu>
             {filteredItems.map((item) => {
               const Icon = item.icon ? Icons[item.icon] : Icons.logo;
+              const isChildActive = item.items?.some(
+                (subItem) => subItem.url === pathname
+              );
+              const isOpen = openStates[item.title] ?? isChildActive;
+
               return item?.items && item?.items?.length > 0 ? (
                 <Collapsible
                   key={item.title}
                   asChild
-                  defaultOpen={false}
+                  open={isOpen}
+                  onOpenChange={(open) => handleOpenChange(item.title, open)}
                   className="group/collapsible"
                 >
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
                       <SidebarMenuButton
                         tooltip={item.title}
-                        isActive={pathname === item.url}
+                        isActive={pathname === item.url || isChildActive}
                       >
                         {item.icon && <Icon />}
                         <span>{item.title}</span>
