@@ -223,6 +223,18 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: [
       {
+        title: 'Pending Applications',
+        url: '/dashboard/birth-registration/pending',
+        subject: 'Birth Registration Pending',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_BIRTH_REGISTRATION_PENDING,
+            PERMS.MANAGE_BIRTH_REGISTRATION
+          ]
+        }
+      },
+      {
         title: 'Endorse',
         url: '/dashboard/birth-registration/endorse',
         subject: 'Birth Registration Endorse',
@@ -264,6 +276,7 @@ export const navItems: NavItem[] = [
       permissions: [
         PERMS.MANAGE_ALL,
         PERMS.MANAGE_BIRTH_REGISTRATION,
+        PERMS.MANAGE_BIRTH_REGISTRATION_PENDING,
         PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
         PERMS.MANAGE_BIRTH_REGISTRATION_VERIFY,
         PERMS.MANAGE_BIRTH_REGISTRATION_APPROVE
@@ -276,6 +289,18 @@ export const navItems: NavItem[] = [
     icon: 'grave',
     isActive: false,
     items: [
+      {
+        title: 'Pending Applications',
+        url: '/dashboard/death-registration/pending',
+        subject: 'Death Registration Pending',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_DEATH_REGISTRATION_PENDING,
+            PERMS.MANAGE_DEATH_REGISTRATION
+          ]
+        }
+      },
       {
         title: 'Endorse',
         url: '/dashboard/death-registration/endorse',
@@ -318,6 +343,7 @@ export const navItems: NavItem[] = [
       permissions: [
         PERMS.MANAGE_ALL,
         PERMS.MANAGE_DEATH_REGISTRATION,
+        PERMS.MANAGE_DEATH_REGISTRATION_PENDING,
         PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
         PERMS.MANAGE_DEATH_REGISTRATION_VERIFY,
         PERMS.MANAGE_DEATH_REGISTRATION_APPROVE

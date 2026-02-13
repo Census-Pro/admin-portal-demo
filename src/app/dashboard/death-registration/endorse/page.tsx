@@ -6,7 +6,7 @@ export const metadata = {
   title: 'Death Registration - Endorse'
 };
 
-// Dummy data - only showing registrations that need endorsement (SUBMITTED status)
+// Dummy data - only showing registrations that need endorsement (ENDORSED status)
 const endorsementList = [
   {
     id: '1',
@@ -15,7 +15,7 @@ const endorsementList = [
     last_name: 'Tshering',
     deceased_cid: '10203004567',
     date_of_death: '2026-01-15',
-    status: 'SUBMITTED',
+    status: 'ENDORSED',
     created_at: '2026-01-16T09:20:00Z'
   },
   {
@@ -25,7 +25,7 @@ const endorsementList = [
     last_name: 'Wangdi',
     deceased_cid: '10405007890',
     date_of_death: '2026-01-20',
-    status: 'SUBMITTED',
+    status: 'ENDORSED',
     created_at: '2026-01-21T14:30:00Z'
   },
   {
@@ -34,7 +34,7 @@ const endorsementList = [
     last_name: 'Namgyal',
     deceased_cid: '11206005432',
     date_of_death: '2026-02-05',
-    status: 'SUBMITTED',
+    status: 'ENDORSED',
     created_at: '2026-02-06T11:45:00Z'
   }
 ];

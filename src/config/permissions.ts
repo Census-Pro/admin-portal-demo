@@ -45,6 +45,8 @@ export const MANAGE_PERMISSIONS = 'manage:permissions' as const;
 // ============================================================================
 
 // Workflow-specific permissions (match subject names in nav-config)
+export const MANAGE_BIRTH_REGISTRATION_PENDING =
+  'manage:birth-registration-pending' as const;
 export const MANAGE_BIRTH_REGISTRATION_ENDORSE =
   'manage:birth-registration-endorse' as const;
 export const MANAGE_BIRTH_REGISTRATION_VERIFY =
@@ -150,6 +152,8 @@ export const MANAGE_RELATIONSHIPS = 'manage:relationships' as const;
 // ============================================================================
 
 // Workflow-specific permissions (match subject names in nav-config)
+export const MANAGE_DEATH_REGISTRATION_PENDING =
+  'manage:death-registration-pending' as const;
 export const MANAGE_DEATH_REGISTRATION_ENDORSE =
   'manage:death-registration-endorse' as const;
 export const MANAGE_DEATH_REGISTRATION_VERIFY =
@@ -437,6 +441,7 @@ export type Permission =
   | typeof APPROVE_DEATH_REGISTRATION
   | typeof ENDORSE_DEATH_REGISTRATION
   | typeof MANAGE_DEATH_REGISTRATION
+  | typeof MANAGE_DEATH_REGISTRATION_PENDING
   | typeof MANAGE_DEATH_REGISTRATION_ENDORSE
   | typeof MANAGE_DEATH_REGISTRATION_VERIFY
   | typeof MANAGE_DEATH_REGISTRATION_APPROVE

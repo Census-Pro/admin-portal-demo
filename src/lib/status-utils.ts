@@ -12,7 +12,8 @@ export type StatusType =
   | 'cancelled'
   | 'ready_to_print'
   | 'printed'
-  | 'collected';
+  | 'collected'
+  | 'endorsed';
 
 export const getStatusColor = (status: string) => {
   const s = status?.toLowerCase().replace(/ /g, '_') || '';
@@ -49,10 +50,16 @@ export const getStatusColor = (status: string) => {
     };
   }
 
-  // Verified / Endorsed / Successful -> Green
-  if (
-    ['verified', 'endorsed', 'successful', 'collected', 'printed'].includes(s)
-  ) {
+  // Endorsed -> Cyan (distinct from verified)
+  if (s === 'endorsed') {
+    return {
+      variant: 'outline' as const,
+      className: 'border-cyan-200 text-cyan-700 bg-cyan-50/50'
+    };
+  }
+
+  // Verified / Successful -> Green
+  if (['verified', 'successful', 'collected', 'printed'].includes(s)) {
     return {
       variant: 'outline' as const,
       className: 'border-green-200 text-green-700 bg-green-50/50'

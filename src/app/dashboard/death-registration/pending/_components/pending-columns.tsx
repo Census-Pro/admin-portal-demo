@@ -1,0 +1,115 @@
+'use client';
+
+import { ColumnDef } from '@tanstack/react-table';
+import { IconEye } from '@tabler/icons-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
+import { getStatusColor } from '@/lib/status-utils';
+
+interface DeathRegistration {
+  id: string;
+  first_name: string;
+  middle_name?: string;
+  last_name: string;
+  deceased_cid: string;
+  date_of_death: string;
+  status: string;
+  created_at?: string;
+}
+
+function ActionsCell({ registration }: { registration: DeathRegistration }) {
+  const router = useRouter();
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() =>
+          router.push(
+            `/dashboard/death-registration/endorse/${registration.id}`
+          )
+        }
+      >
+        <IconEye className="h-4 w-4" />
+        <span className="sr-only">View Details</span>
+      </Button>
+    </div>
+  );
+}
+
+export const columns: ColumnDef<DeathRegistration>[] = [
+  {
+    accessorKey: 'deceased_cid',
+    header: 'Deceased CID',
+    cell: ({ row }) => {
+      return <div className="font-medium">{row.getValue('deceased_cid')}</div>;
+    }
+  },
+  {
+    accessorKey: 'first_name',
+    header: 'First Name'
+  },
+  {
+    accessorKey: 'middle_name',
+    header: 'Middle Name',
+    cell: ({ row }) => {
+      const middleName = row.getValue('middle_name') as string;
+      return middleName || '-';
+    }
+  },
+  {
+    accessorKey: 'last_name',
+    header: 'Last Name'
+  },
+  {
+    accessorKey: 'date_of_death',
+    header: 'Date of Death',
+    cell: ({ row }) => {
+      const date = row.getValue('date_of_death') as string;
+      try {
+        return format(new Date(date), 'MMM dd, yyyy');
+      } catch {
+        return date;
+      }
+    }
+  },
+  {
+    accessorKey: 'created_at',
+    header: 'Submitted Date',
+    cell: ({ row }) => {
+      const date = row.getValue('created_at') as string;
+      if (!date) return '-';
+      try {
+        return format(new Date(date), 'MMM dd, yyyy');
+      } catch {
+        return date;
+      }
+    }
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      const status = row.getValue('status') as string;
+      const { variant, className } = getStatusColor(status);
+
+      return (
+        <Badge variant={variant} className={`uppercase ${className}`}>
+          {status}
+        </Badge>
+      );
+    }
+  },
+
+  {
+    id: 'actions',
+    header: 'Actions',
+    cell: ({ row }) => {
+      const registration = row.original;
+      return <ActionsCell registration={registration} />;
+    }
+  }
+];
