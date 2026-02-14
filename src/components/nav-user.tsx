@@ -24,6 +24,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SIDEBAR_COOKIE_NAME,
   useSidebar
 } from '@/components/ui/sidebar';
 import { signOut } from 'next-auth/react';
@@ -43,6 +44,8 @@ export function NavUser({
   const { isMobile } = useSidebar();
 
   const handleSignOut = async () => {
+    localStorage.removeItem('sidebar-collapsible-states');
+    document.cookie = `${SIDEBAR_COOKIE_NAME}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     await signOut({ callbackUrl: '/' });
   };
 
