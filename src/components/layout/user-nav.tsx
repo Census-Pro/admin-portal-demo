@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
+import { SIDEBAR_COOKIE_NAME } from '@/components/ui/sidebar';
 import { UserAvatarProfile } from '@/components/user-avatar-profile';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -18,6 +19,9 @@ export function UserNav() {
   const router = useRouter();
 
   const handleSignOut = async () => {
+    // Clear sidebar state
+    localStorage.removeItem('sidebar-collapsible-states');
+    document.cookie = `${SIDEBAR_COOKIE_NAME}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     await signOut({ callbackUrl: '/' });
   };
 
