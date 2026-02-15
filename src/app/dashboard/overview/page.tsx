@@ -30,19 +30,16 @@ export default async function OverviewPage() {
       label: 'Total Users',
       value: statsData?.totalUsers.toString() || '0',
       iconName: 'users' as const,
-      trend: '+12% from last month',
+      trend: 'Total registered users',
       trendUp: true,
       color: 'text-blue-600',
       href: '/dashboard/user'
     },
     {
-      label: 'Active Roles',
-      value: statsData?.activeRoles.toString() || '0',
+      label: 'Roles',
+      value: statsData?.totalRoles.toString() || '0',
       iconName: 'shield' as const,
-      trend:
-        statsData?.pendingRoles && statsData.pendingRoles > 0
-          ? `${statsData.pendingRoles} pending approval`
-          : 'All active',
+      trend: 'Total available roles',
       trendUp: false,
       color: 'text-emerald-600',
       href: '/dashboard/roles'
@@ -51,7 +48,7 @@ export default async function OverviewPage() {
       label: 'Permissions',
       value: statsData?.totalPermissions.toString() || '0',
       iconName: 'lock' as const,
-      trend: 'All configured',
+      trend: 'Total available permissions',
       trendUp: true,
       color: 'text-indigo-600',
       href: '/dashboard/permissions'
