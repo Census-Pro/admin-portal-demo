@@ -209,6 +209,8 @@ const authConfig = {
               refreshToken: data.refreshToken,
               sessionId: data.user.id, // Use user ID as session ID for activity tracking
               tokenExpiry: Math.floor(Date.now() / 1000) + sessionDuration,
+              accessTokenExpiry:
+                Math.floor(Date.now() / 1000) + (data.expiresIn || 3600), // Access token expiry from backend
               rememberMe
             };
           }
@@ -236,12 +238,14 @@ const authConfig = {
         token.refreshToken = user.refreshToken;
         token.sessionId = user.sessionId; // Redis session ID for activity tracking
         token.tokenExpiry = user.tokenExpiry;
+        token.accessTokenExpiry = user.accessTokenExpiry;
         token.rememberMe = user.rememberMe;
         console.log('✅ JWT Callback - User data stored:', {
           hasUser: !!token.user,
           hasAccessToken: !!token.accessToken,
           hasRefreshToken: !!token.refreshToken,
-          tokenExpiry: token.tokenExpiry
+          tokenExpiry: token.tokenExpiry,
+          accessTokenExpiry: token.accessTokenExpiry
         });
       }
 
@@ -276,12 +280,17 @@ const authConfig = {
       }
 
       // Check if access token needs refresh (refresh 5 minutes before expiry)
-      // Only refresh if we have more than 5 minutes left on session
-      const shouldRefresh = timeUntilExpiry < 300 && timeUntilExpiry > 0;
+      // We use accessTokenExpiry to decide when to refresh the backend token
+      const accessTokenExpiry = (token.accessTokenExpiry as number) || 0;
+      const timeUntilAccessTokenExpiry = accessTokenExpiry - now;
+
+      // Refresh if less than 5 minutes left, OR if it's already expired (and we have a refresh token)
+      const shouldRefresh = timeUntilAccessTokenExpiry < 300;
 
       if (shouldRefresh && token.refreshToken) {
         try {
-          const response = await fetch(`${API_URL}auth/refresh`, {
+          console.log('🔄 Refreshing access token...');
+          const response = await fetch(`${API_URL}/auth/refresh`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken: token.refreshToken })
@@ -290,26 +299,44 @@ const authConfig = {
           if (response.ok) {
             const data = await response.json();
             // Keep original session expiry based on rememberMe, just refresh access token
-            token.accessToken = data.token.accessToken;
-            token.refreshToken = data.token.refreshToken;
-            // Extend expiry based on rememberMe preference
+            token.accessToken = data.accessToken || data.token.accessToken;
+            token.refreshToken = data.refreshToken || data.token.refreshToken;
+
+            // Update access token expiry
+            token.accessTokenExpiry =
+              Math.floor(Date.now() / 1000) + (data.expiresIn || 3600);
+
+            // Extend session expiry based on rememberMe preference (optional: keep session alive as long as specific activity occurs)
             const sessionDuration = token.rememberMe
               ? SESSION_MAX_AGE_REMEMBER
               : SESSION_MAX_AGE_DEFAULT;
             token.tokenExpiry = Math.floor(Date.now() / 1000) + sessionDuration;
+
+            console.log(
+              '✅ Token refresh successful. New expiry:',
+              token.accessTokenExpiry
+            );
           } else {
-            // console.log(
-            //   'Token refresh failed - HTTP status:',
-            //   response.status
-            // );
-            return null;
+            console.error(
+              'Token refresh failed - HTTP status:',
+              response.status
+            );
+            // If refresh failed and token is already expired, we must return null
+            if (timeUntilAccessTokenExpiry <= 0) {
+              return null;
+            }
           }
         } catch (error) {
-          // console.error('Token refresh error:', error);
-          return null;
+          console.error('Token refresh error:', error);
+          if (timeUntilAccessTokenExpiry <= 0) {
+            return null;
+          }
         }
       } else if (shouldRefresh && !token.refreshToken) {
-        return null;
+        // If we should refresh but have no refresh token, and token is expired, die.
+        if (timeUntilAccessTokenExpiry <= 0) {
+          return null;
+        }
       }
 
       return token;

@@ -11,7 +11,7 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { useState } from 'react';
 
 interface SessionExpiredDialogProps {
@@ -43,8 +43,16 @@ export function SessionExpiredDialog({
     }
   };
 
-  const handleStay = () => {
-    onOpenChange(false);
+  const { update } = useSession();
+
+  const handleStay = async () => {
+    const newSession = await update();
+    if (!newSession) {
+      // If session update failed, force logout
+      await handleLogin();
+    } else {
+      onOpenChange(false);
+    }
   };
 
   return (

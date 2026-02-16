@@ -9,6 +9,7 @@ declare module 'next-auth' {
     refreshToken?: string;
     sessionId?: string; // Redis session ID for activity tracking
     tokenExpiry?: number;
+    accessTokenExpiry?: number;
     rememberMe?: boolean;
     organizationId?: string;
     dzongkhagId?: string;
@@ -56,6 +57,7 @@ declare module 'next-auth' {
     refreshToken?: string;
     sessionId?: string; // Redis session ID for activity tracking
     tokenExpiry?: number;
+    accessTokenExpiry?: number;
     rememberMe?: boolean;
   }
 
@@ -65,6 +67,7 @@ declare module 'next-auth' {
     refreshToken?: string;
     sessionId?: string; // Redis session ID for activity tracking
     tokenExpiry?: number;
+    accessTokenExpiry?: number;
     rememberMe?: boolean;
   }
 }
