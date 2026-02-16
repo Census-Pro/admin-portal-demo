@@ -18,9 +18,9 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { MultiSelect } from '@/components/ui/multi-select';
+
 import { createUser } from '@/actions/common/user-actions';
-import { getRoles, assignRoleToAdmin } from '@/actions/common/role-actions';
+
 import { toast } from 'sonner';
 
 interface AddUserModalProps {
@@ -74,17 +74,11 @@ export function AddUserModal({
   const [officeLocations, setOfficeLocations] = useState<OfficeLocation[]>([]);
   const [loadingOfficeLocations, setLoadingOfficeLocations] = useState(false);
 
-  // State for roles
-  const [roles, setRoles] = useState<{ id: string; name: string }[]>([]);
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
-  const [loadingRoles, setLoadingRoles] = useState(false);
-
   // Fetch agencies, office locations, and roles when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchAgencies();
       fetchOfficeLocations();
-      fetchRoles();
     }
   }, [isOpen]);
   const fetchAgencies = async () => {
@@ -144,23 +138,6 @@ export function AddUserModal({
     }
   };
 
-  const fetchRoles = async () => {
-    setLoadingRoles(true);
-    try {
-      const result = await getRoles();
-      if (result.success) {
-        setRoles(result.data || []);
-      } else {
-        toast.error(result.error || 'Failed to fetch roles');
-      }
-    } catch (error) {
-      console.error('Fetch roles error:', error);
-      toast.error('Unable to load roles');
-    } finally {
-      setLoadingRoles(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -189,22 +166,7 @@ export function AddUserModal({
         return;
       }
 
-      // Assign roles to the admin
-      if (selectedRoles.length > 0) {
-        for (const roleId of selectedRoles) {
-          const roleResult = await assignRoleToAdmin({
-            adminId: createdUserId,
-            roleId
-          });
-
-          if (!roleResult.success) {
-            console.error('Failed to assign role:', roleResult.error);
-            // Don't fail the entire process, just log the error
-          }
-        }
-      }
-
-      toast.success('User created successfully with roles assigned');
+      toast.success('User created successfully');
 
       // Dispatch custom event to trigger table refresh
       window.dispatchEvent(new CustomEvent('userCreated'));
@@ -222,7 +184,6 @@ export function AddUserModal({
         officeLocationId: '',
         agencyId: ''
       });
-      setSelectedRoles([]);
     } catch (error) {
       toast.error('An unexpected error occurred');
       console.error('Create user error:', error);
@@ -284,8 +245,7 @@ export function AddUserModal({
               </SelectContent>
             </Select>
             <p className="text-muted-foreground text-xs">
-              SUPER_ADMIN has full system access. ADMIN requires custom role
-              assignment below.
+              SUPER_ADMIN has full system access.
             </p>
           </div>
 
@@ -405,27 +365,6 @@ export function AddUserModal({
                 </SelectContent>
               </Select>
             </div>
-          </div>
-
-          <div className="grid gap-2">
-            <Label htmlFor="roles">Assign Roles</Label>
-            <MultiSelect
-              options={roles.map((role) => ({
-                label: role.name,
-                value: role.id
-              }))}
-              selected={selectedRoles}
-              onChange={setSelectedRoles}
-              placeholder={
-                loadingRoles ? 'Loading roles...' : 'Select roles...'
-              }
-              emptyMessage="No roles available"
-              className="w-full"
-            />
-            <p className="text-muted-foreground text-sm">
-              Select one or more roles to assign to this user. Users will
-              inherit all permissions from their assigned roles.
-            </p>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

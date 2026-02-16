@@ -130,6 +130,24 @@ export function AddPermissionModal({
     }));
   };
 
+  const handleActionBlur = () => {
+    const cleanedInput = actionInput
+      .split(/[,\n]/)
+      .map((action) => action.trim())
+      .filter((action) => action.length > 0)
+      .join(', ');
+    setActionInput(cleanedInput);
+  };
+
+  const handleSubjectBlur = () => {
+    const cleanedInput = subjectInput
+      .split(/[,\n]/)
+      .map((subject) => subject.trim())
+      .filter((subject) => subject.length > 0)
+      .join(', ');
+    setSubjectInput(cleanedInput);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
@@ -173,6 +191,7 @@ export function AddPermissionModal({
               placeholder="Type action names separated by commas or new lines (e.g., manage)"
               value={actionInput}
               onChange={handleActionInputChange}
+              onBlur={handleActionBlur}
               disabled={isLoading}
               rows={4}
               className="resize-none font-mono text-sm"
@@ -188,6 +207,7 @@ export function AddPermissionModal({
               placeholder="Type subject names separated by commas or new lines (e.g., Dashboard, User, Master)"
               value={subjectInput}
               onChange={handleSubjectInputChange}
+              onBlur={handleSubjectBlur}
               disabled={isLoading}
               rows={4}
               className="resize-none font-mono text-sm"
