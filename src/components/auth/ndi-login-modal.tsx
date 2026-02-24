@@ -15,6 +15,7 @@ interface NDILoginModalProps {
   threadId?: string;
   deepLinkUrl?: string;
   isLoading?: boolean;
+  rememberMe?: boolean;
   onRefreshQRCode?: () => void;
   onLoginSuccess?: (data: any) => void;
   onLoginError?: (error: string) => void;
@@ -27,6 +28,7 @@ export function NDILoginModal({
   threadId,
   deepLinkUrl,
   isLoading = false,
+  rememberMe = false,
   onRefreshQRCode,
   onLoginSuccess,
   onLoginError
@@ -48,6 +50,7 @@ export function NDILoginModal({
   const onLoginErrorRef = useRef(onLoginError);
   const onCloseRef = useRef(onClose);
   const statusRef = useRef(verificationStatus);
+  const rememberMeRef = useRef(rememberMe);
 
   // Keep refs in sync
   useEffect(() => {
@@ -65,6 +68,10 @@ export function NDILoginModal({
   useEffect(() => {
     statusRef.current = verificationStatus;
   }, [verificationStatus]);
+
+  useEffect(() => {
+    rememberMeRef.current = rememberMe;
+  }, [rememberMe]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -176,7 +183,8 @@ export function NDILoginModal({
             redirect: false,
             accessToken,
             refreshToken,
-            user: JSON.stringify(user)
+            user: JSON.stringify(user),
+            rememberMe: rememberMeRef.current ? 'true' : 'false'
           });
 
           if (result?.ok) {

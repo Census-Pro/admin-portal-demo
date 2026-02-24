@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -28,6 +29,7 @@ export function LoginPage() {
       const result = await signIn('credentials', {
         cidNo,
         password,
+        rememberMe: rememberMe ? 'true' : 'false',
         redirect: false
       });
 
@@ -137,11 +139,29 @@ export function LoginPage() {
             </div>
           </div>
 
+          <div className="ml-1 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="text-primary accent-primary focus:ring-primary h-4 w-4 rounded border-gray-300"
+              />
+              <label
+                htmlFor="rememberMe"
+                className="text-muted-foreground cursor-pointer text-sm font-medium"
+              >
+                Stay logged in
+              </label>
+            </div>
+          </div>
+
           <button
             type="submit"
             disabled={isLoading}
             className={cn(
-              'bg-primary text-primary-foreground shadow-primary/25 mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3 font-semibold shadow-lg transition-all hover:opacity-90',
+              'bg-primary text-primary-foreground shadow-primary/25 mt-2 flex w-full items-center justify-center gap-2 rounded-xl py-3 font-semibold shadow-lg transition-all hover:opacity-90',
               isLoading && 'cursor-not-allowed opacity-70'
             )}
           >
@@ -166,6 +186,7 @@ export function LoginPage() {
         <NDILoginButton
           size="md"
           className="w-full"
+          rememberMe={rememberMe}
           onLoginSuccess={async (data) => {
             console.log('🔐 NDI login successful:', data);
 
