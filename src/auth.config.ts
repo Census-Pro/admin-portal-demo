@@ -227,8 +227,22 @@ const authConfig = {
     signIn: '/login'
   },
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, trigger, session }) {
       const now = Math.floor(Date.now() / 1000);
+
+      // Handle manual session update
+      if (trigger === 'update' && session?.rememberMe !== undefined) {
+        console.log('🔄 JWT Callback - Manual update triggered:', session);
+        token.rememberMe = session.rememberMe;
+        const sessionDuration = token.rememberMe
+          ? SESSION_MAX_AGE_REMEMBER
+          : SESSION_MAX_AGE_DEFAULT;
+        token.tokenExpiry = now + sessionDuration;
+        console.log('✅ JWT Callback - Session updated. New expiry:', {
+          rememberMe: token.rememberMe,
+          tokenExpiry: token.tokenExpiry
+        });
+      }
 
       // Initial sign in - store tokens
       if (user) {

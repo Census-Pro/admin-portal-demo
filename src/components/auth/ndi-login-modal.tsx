@@ -616,7 +616,6 @@ export function NDILoginModal({
               </div>
             </div>
           </div>
-          w{' '}
         </div>
       </div>
     </>

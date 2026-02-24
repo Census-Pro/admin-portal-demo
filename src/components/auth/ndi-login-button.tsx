@@ -8,7 +8,6 @@ interface NDILoginButtonProps {
   className?: string;
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
-  rememberMe?: boolean;
   onLoginSuccess?: (data: any) => void;
   onLoginError?: (error: string) => void;
 }
@@ -17,7 +16,6 @@ export function NDILoginButton({
   className = '',
   variant = 'default',
   size = 'md',
-  rememberMe = false,
   onLoginSuccess,
   onLoginError
 }: NDILoginButtonProps) {
@@ -158,7 +156,7 @@ export function NDILoginButton({
         threadId={threadId}
         deepLinkUrl={deepLinkUrl}
         isLoading={isLoading}
-        rememberMe={rememberMe}
+        rememberMe={false}
         onRefreshQRCode={handleRefreshQRCode}
         onLoginSuccess={onLoginSuccess}
         onLoginError={onLoginError}
