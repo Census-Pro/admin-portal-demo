@@ -21,23 +21,37 @@ export const getColumns = ({
     cell: ({ row }) => <div className="font-medium">{row.original.label}</div>
   },
   {
-    accessorKey: 'url',
-    header: 'URL/Path',
+    accessorKey: 'message',
+    header: 'Message',
     cell: ({ row }) => (
-      <div className="text-muted-foreground text-sm">{row.original.url}</div>
+      <div className="text-muted-foreground max-w-[300px] truncate text-sm">
+        {row.original.message || '-'}
+      </div>
     )
   },
   {
     accessorKey: 'order',
-    header: 'Order'
+    header: 'Order',
+    cell: ({ row }) => (
+      <div className="text-center">{row.original.order || '-'}</div>
+    )
   },
   {
-    accessorKey: 'isActive',
+    accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => (
-      <Badge variant={row.original.isActive ? 'default' : 'secondary'}>
-        {row.original.isActive ? 'Active' : 'Hidden'}
+      <Badge
+        variant={row.original.status === 'active' ? 'default' : 'secondary'}
+      >
+        {row.original.status}
       </Badge>
+    )
+  },
+  {
+    accessorKey: 'created_by_name',
+    header: 'Created By',
+    cell: ({ row }) => (
+      <div className="text-sm">{row.original.created_by_name || '-'}</div>
     )
   },
   {

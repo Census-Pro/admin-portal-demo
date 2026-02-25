@@ -11,7 +11,14 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { NavigationItem } from '@/actions/common/cms-actions';
 
 interface NavigationDialogProps {
@@ -29,9 +36,10 @@ export function NavigationDialog({
 }: NavigationDialogProps) {
   const [formData, setFormData] = useState<Partial<NavigationItem>>({
     label: '',
-    url: '',
+    message: '',
+    status: 'active',
     order: 1,
-    isActive: true
+    created_by_name: 'Admin User'
   });
   const [loading, setLoading] = useState(false);
 
@@ -39,16 +47,18 @@ export function NavigationDialog({
     if (item) {
       setFormData({
         label: item.label,
-        url: item.url,
-        order: item.order,
-        isActive: item.isActive
+        message: item.message || '',
+        status: item.status,
+        order: item.order || 1,
+        created_by_name: item.created_by_name || 'Admin User'
       });
     } else {
       setFormData({
         label: '',
-        url: '',
+        message: '',
+        status: 'active',
         order: 1,
-        isActive: true
+        created_by_name: 'Admin User'
       });
     }
   }, [item, open]);
@@ -71,7 +81,7 @@ export function NavigationDialog({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Menu Label</Label>
+            <Label>Menu Label *</Label>
             <Input
               required
               value={formData.label}
@@ -81,51 +91,61 @@ export function NavigationDialog({
               placeholder="e.g. Home"
             />
           </div>
+
           <div className="space-y-2">
-            <Label>URL/Path</Label>
-            <Input
-              required
-              value={formData.url}
+            <Label>Message</Label>
+            <Textarea
+              value={formData.message}
               onChange={(e) =>
-                setFormData({ ...formData, url: e.target.value })
+                setFormData({ ...formData, message: e.target.value })
               }
-              placeholder="e.g. /home"
+              placeholder="Optional description or tooltip text"
+              rows={3}
             />
           </div>
-          <div className="space-y-2">
-            <Label>Display Order</Label>
-            <Input
-              required
-              type="number"
-              min="1"
-              value={formData.order}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  order: parseInt(e.target.value, 10)
-                })
-              }
-            />
-          </div>
-          <div className="flex flex-row items-center justify-between rounded-lg border p-3">
-            <div className="space-y-0.5">
-              <Label>Visibility Status</Label>
-              <div className="text-muted-foreground text-sm">
-                Set if this item appears on the user portal
-              </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Display Order</Label>
+              <Input
+                required
+                type="number"
+                min="1"
+                value={formData.order}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    order: parseInt(e.target.value, 10)
+                  })
+                }
+              />
             </div>
-            <Switch
-              checked={formData.isActive}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, isActive: checked })
-              }
-            />
+
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(val: any) =>
+                  setFormData({ ...formData, status: val })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={loading}
             >
               Cancel
             </Button>

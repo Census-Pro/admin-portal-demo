@@ -1,146 +1,206 @@
 'use server';
 
+import { instance } from '../instance';
+import { revalidatePath } from 'next/cache';
+
+const COMMON_SERVICE_URL =
+  process.env.COMMON_SERVICE_URL || 'http://localhost:5003';
+
 // ============================================================================
-// DUMMY DATA FOR CMS
+// TYPE DEFINITIONS
 // ============================================================================
 
 export interface Announcement {
   id: string;
-  title: string;
-  status: 'Published' | 'Draft' | 'Archived';
-  publishedDate: string;
-  mediaId?: string;
-  imageUrl?: string;
+  headline: string;
+  message?: string;
+  status: 'active' | 'inactive';
+  created_by_id?: string;
+  created_by_name?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-let announcements: Announcement[] = [
-  {
-    id: '1',
-    title: 'New Portal Launch',
-    status: 'Published',
-    publishedDate: '2026-02-01',
-    imageUrl:
-      'https://images.unsplash.com/photo-1454165833767-0275084967a5?q=80&w=200&h=200&auto=format&fit=crop'
-  },
-  {
-    id: '2',
-    title: 'Maintenance Scheduled',
-    status: 'Draft',
-    publishedDate: '2026-03-01'
-  }
-];
+export interface Announcement {
+  id: string;
+  headline: string;
+  message?: string;
+  status: 'active' | 'inactive';
+  created_by_id?: string;
+  created_by_name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 export interface CmsPage {
   id: string;
-  title: string;
+  cms_navigation_id?: string;
   slug: string;
-  status: 'Published' | 'Draft';
-  updatedAt: string;
-  imageUrl?: string;
+  title: string;
+  body?: string;
+  status: 'draft' | 'published';
+  updated_by_id?: string;
+  updated_by_name?: string;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  navigation?: {
+    id: string;
+    label: string;
+  };
 }
-
-let cmsPages: CmsPage[] = [
-  {
-    id: '1',
-    title: 'About Us',
-    slug: '/about',
-    status: 'Published',
-    updatedAt: '2026-01-15',
-    imageUrl:
-      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=200&h=200&auto=format&fit=crop'
-  },
-  {
-    id: '2',
-    title: 'Contact',
-    slug: '/contact',
-    status: 'Draft',
-    updatedAt: '2026-02-20'
-  }
-];
 
 export interface MediaItem {
   id: string;
-  fileName: string;
-  fileType: string;
-  size: string;
-  uploadDate: string;
-  url: string;
+  file_name: string;
+  file_path: string;
+  category: 'forms' | 'banners';
+  createdAt?: string;
+  updatedAt?: string;
 }
-
-let mediaItems: MediaItem[] = [
-  {
-    id: '1',
-    fileName: 'logo.png',
-    fileType: 'image/png',
-    size: '24 KB',
-    uploadDate: '2026-01-10',
-    url: 'https://images.unsplash.com/photo-1633409361618-c73427e4e206?q=80&w=200&h=200&auto=format&fit=crop'
-  },
-  {
-    id: '2',
-    fileName: 'guidelines.pdf',
-    fileType: 'application/pdf',
-    size: '1.2 MB',
-    uploadDate: '2026-02-18',
-    url: '#'
-  }
-];
 
 export interface NavigationItem {
   id: string;
   label: string;
-  url: string;
-  order: number;
-  isActive: boolean;
+  message?: string;
+  status: 'active' | 'inactive';
+  created_by_id?: string;
+  created_by_name?: string;
+  order?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
-
-let navigationItems: NavigationItem[] = [
-  { id: '1', label: 'Home', url: '/', order: 1, isActive: true },
-  { id: '2', label: 'Services', url: '/services', order: 2, isActive: true }
-];
-
-// Helper to simulate network delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // ============================================================================
 // ANNOUNCEMENTS ACTIONS
 // ============================================================================
 
 export async function getAnnouncements() {
-  await delay(300);
-  return { success: true, data: [...announcements] };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/announcement-and-news/all`;
+
+    console.log('[getAnnouncements] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    console.log('[getAnnouncements] Response status:', response.status);
+
+    if (!response.ok) {
+      console.error('[getAnnouncements] API Error:', response.statusText);
+      return {
+        success: false,
+        error: 'Failed to fetch announcements',
+        data: []
+      };
+    }
+
+    const data = await response.json();
+    console.log('[getAnnouncements] Data received:', data);
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getAnnouncements] Error:', error);
+    return { success: false, error: 'Failed to fetch announcements', data: [] };
+  }
 }
 
 export async function createAnnouncement(data: Omit<Announcement, 'id'>) {
-  await delay(300);
-  const newAnnouncement = { ...data, id: String(Date.now()) };
-  announcements.unshift(newAnnouncement);
-  return {
-    success: true,
-    message: 'Announcement created successfully',
-    data: newAnnouncement
-  };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/announcement-and-news`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create announcement'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/announcements');
+    return {
+      success: true,
+      message: 'Announcement created successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createAnnouncement] Error:', error);
+    return { success: false, error: 'Failed to create announcement' };
+  }
 }
 
 export async function updateAnnouncement(
   id: string,
   data: Partial<Announcement>
 ) {
-  await delay(300);
-  const index = announcements.findIndex((a) => a.id === id);
-  if (index === -1) return { success: false, error: 'Not found' };
-  announcements[index] = { ...announcements[index], ...data };
-  return {
-    success: true,
-    message: 'Announcement updated successfully',
-    data: announcements[index]
-  };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/announcement-and-news/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update announcement'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/announcements');
+    return {
+      success: true,
+      message: 'Announcement updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateAnnouncement] Error:', error);
+    return { success: false, error: 'Failed to update announcement' };
+  }
 }
 
 export async function deleteAnnouncement(id: string) {
-  await delay(300);
-  announcements = announcements.filter((a) => a.id !== id);
-  return { success: true, message: 'Announcement deleted successfully' };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/announcement-and-news/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to delete announcement' };
+    }
+
+    revalidatePath('/dashboard/content/announcements');
+    return { success: true, message: 'Announcement deleted successfully' };
+  } catch (error) {
+    console.error('[deleteAnnouncement] Error:', error);
+    return { success: false, error: 'Failed to delete announcement' };
+  }
 }
 
 // ============================================================================
@@ -148,33 +208,123 @@ export async function deleteAnnouncement(id: string) {
 // ============================================================================
 
 export async function getCmsPages() {
-  await delay(300);
-  return { success: true, data: [...cmsPages] };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-content/all`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error('[getCmsPages] API Error:', response.statusText);
+      return {
+        success: false,
+        error: 'Failed to fetch content pages',
+        data: []
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getCmsPages] Error:', error);
+    return { success: false, error: 'Failed to fetch content pages', data: [] };
+  }
 }
 
 export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
-  await delay(300);
-  const newPage = { ...data, id: String(Date.now()) };
-  cmsPages.unshift(newPage);
-  return { success: true, message: 'Page created successfully', data: newPage };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-content`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create page'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/pages');
+    return {
+      success: true,
+      message: 'Page created successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createCmsPage] Error:', error);
+    return { success: false, error: 'Failed to create page' };
+  }
 }
 
 export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
-  await delay(300);
-  const index = cmsPages.findIndex((p) => p.id === id);
-  if (index === -1) return { success: false, error: 'Not found' };
-  cmsPages[index] = { ...cmsPages[index], ...data };
-  return {
-    success: true,
-    message: 'Page updated successfully',
-    data: cmsPages[index]
-  };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-content/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update page'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/pages');
+    return {
+      success: true,
+      message: 'Page updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateCmsPage] Error:', error);
+    return { success: false, error: 'Failed to update page' };
+  }
 }
 
 export async function deleteCmsPage(id: string) {
-  await delay(300);
-  cmsPages = cmsPages.filter((p) => p.id !== id);
-  return { success: true, message: 'Page deleted successfully' };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-content/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to delete page' };
+    }
+
+    revalidatePath('/dashboard/content/pages');
+    return { success: true, message: 'Page deleted successfully' };
+  } catch (error) {
+    console.error('[deleteCmsPage] Error:', error);
+    return { success: false, error: 'Failed to delete page' };
+  }
 }
 
 // ============================================================================
@@ -182,43 +332,121 @@ export async function deleteCmsPage(id: string) {
 // ============================================================================
 
 export async function getMediaItems() {
-  await delay(300);
-  return { success: true, data: [...mediaItems] };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-media-library/all`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error('[getMediaItems] API Error:', response.statusText);
+      return { success: false, error: 'Failed to fetch media items', data: [] };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getMediaItems] Error:', error);
+    return { success: false, error: 'Failed to fetch media items', data: [] };
+  }
 }
 
 export async function createMediaItem(
-  data: Omit<MediaItem, 'id' | 'uploadDate'>
+  data: Omit<MediaItem, 'id' | 'createdAt' | 'updatedAt'>
 ) {
-  await delay(300);
-  const newItem: MediaItem = {
-    ...data,
-    uploadDate: new Date().toISOString().split('T')[0],
-    id: String(Date.now())
-  };
-  mediaItems.unshift(newItem);
-  return {
-    success: true,
-    message: 'Media uploaded successfully',
-    data: newItem
-  };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-media-library`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create media item'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/media');
+    return {
+      success: true,
+      message: 'Media uploaded successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createMediaItem] Error:', error);
+    return { success: false, error: 'Failed to create media item' };
+  }
 }
 
 export async function updateMediaItem(id: string, data: Partial<MediaItem>) {
-  await delay(300);
-  const index = mediaItems.findIndex((m) => m.id === id);
-  if (index === -1) return { success: false, error: 'Not found' };
-  mediaItems[index] = { ...mediaItems[index], ...data };
-  return {
-    success: true,
-    message: 'Media updated successfully',
-    data: mediaItems[index]
-  };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-media-library/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update media item'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/media');
+    return {
+      success: true,
+      message: 'Media updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateMediaItem] Error:', error);
+    return { success: false, error: 'Failed to update media item' };
+  }
 }
 
 export async function deleteMediaItem(id: string) {
-  await delay(300);
-  mediaItems = mediaItems.filter((m) => m.id !== id);
-  return { success: true, message: 'Media deleted successfully' };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-media-library/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to delete media item' };
+    }
+
+    revalidatePath('/dashboard/content/media');
+    return { success: true, message: 'Media deleted successfully' };
+  } catch (error) {
+    console.error('[deleteMediaItem] Error:', error);
+    return { success: false, error: 'Failed to delete media item' };
+  }
 }
 
 // ============================================================================
@@ -226,40 +454,132 @@ export async function deleteMediaItem(id: string) {
 // ============================================================================
 
 export async function getNavigationItems() {
-  await delay(300);
-  // Sort by order
-  const sorted = [...navigationItems].sort((a, b) => a.order - b.order);
-  return { success: true, data: sorted };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-navigation/all`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error('[getNavigationItems] API Error:', response.statusText);
+      return {
+        success: false,
+        error: 'Failed to fetch navigation items',
+        data: []
+      };
+    }
+
+    const data = await response.json();
+    // Sort by order if available
+    const sorted = data.sort(
+      (a: NavigationItem, b: NavigationItem) => (a.order || 0) - (b.order || 0)
+    );
+    return { success: true, data: sorted };
+  } catch (error) {
+    console.error('[getNavigationItems] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch navigation items',
+      data: []
+    };
+  }
 }
 
 export async function createNavigationItem(data: Omit<NavigationItem, 'id'>) {
-  await delay(300);
-  const newItem = { ...data, id: String(Date.now()) };
-  navigationItems.push(newItem);
-  return {
-    success: true,
-    message: 'Navigation item created successfully',
-    data: newItem
-  };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-navigation`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create navigation item'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/navigation');
+    return {
+      success: true,
+      message: 'Navigation item created successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createNavigationItem] Error:', error);
+    return { success: false, error: 'Failed to create navigation item' };
+  }
 }
 
 export async function updateNavigationItem(
   id: string,
   data: Partial<NavigationItem>
 ) {
-  await delay(300);
-  const index = navigationItems.findIndex((n) => n.id === id);
-  if (index === -1) return { success: false, error: 'Not found' };
-  navigationItems[index] = { ...navigationItems[index], ...data };
-  return {
-    success: true,
-    message: 'Navigation item updated successfully',
-    data: navigationItems[index]
-  };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-navigation/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update navigation item'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/navigation');
+    return {
+      success: true,
+      message: 'Navigation item updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateNavigationItem] Error:', error);
+    return { success: false, error: 'Failed to update navigation item' };
+  }
 }
 
 export async function deleteNavigationItem(id: string) {
-  await delay(300);
-  navigationItems = navigationItems.filter((n) => n.id !== id);
-  return { success: true, message: 'Navigation item deleted successfully' };
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-navigation/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to delete navigation item' };
+    }
+
+    revalidatePath('/dashboard/content/navigation');
+    return { success: true, message: 'Navigation item deleted successfully' };
+  } catch (error) {
+    console.error('[deleteNavigationItem] Error:', error);
+    return { success: false, error: 'Failed to delete navigation item' };
+  }
 }

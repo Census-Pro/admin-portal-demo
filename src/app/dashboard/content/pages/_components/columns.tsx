@@ -16,29 +16,29 @@ export const getColumns = ({
   onDelete
 }: ColumnProps): ColumnDef<CmsPage>[] => [
   {
-    accessorKey: 'imageUrl',
-    header: 'Image',
-    cell: ({ row }) => {
-      const url = row.original.imageUrl;
-      return (
-        <div className="bg-muted flex h-12 w-12 items-center justify-center overflow-hidden rounded border">
-          {url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={url} alt="" className="h-full w-full object-cover" />
-          ) : (
-            <div className="text-muted-foreground text-[10px]">No Image</div>
-          )}
-        </div>
-      );
-    }
-  },
-  {
     accessorKey: 'title',
-    header: 'Title'
+    header: 'Title',
+    cell: ({ row }) => (
+      <div className="max-w-[300px] truncate font-medium">
+        {row.original.title}
+      </div>
+    )
   },
   {
     accessorKey: 'slug',
-    header: 'Slug'
+    header: 'Slug',
+    cell: ({ row }) => (
+      <code className="text-muted-foreground bg-muted rounded px-2 py-1 text-xs">
+        {row.original.slug}
+      </code>
+    )
+  },
+  {
+    accessorKey: 'navigation',
+    header: 'Navigation',
+    cell: ({ row }) => (
+      <div className="text-sm">{row.original.navigation?.label || '-'}</div>
+    )
   },
   {
     accessorKey: 'status',
@@ -46,15 +46,26 @@ export const getColumns = ({
     cell: ({ row }) => {
       const status = row.original.status;
       return (
-        <Badge variant={status === 'Published' ? 'default' : 'secondary'}>
+        <Badge variant={status === 'published' ? 'default' : 'secondary'}>
           {status}
         </Badge>
       );
     }
   },
   {
+    accessorKey: 'updated_by_name',
+    header: 'Updated By',
+    cell: ({ row }) => (
+      <div className="text-sm">{row.original.updated_by_name || '-'}</div>
+    )
+  },
+  {
     accessorKey: 'updatedAt',
-    header: 'Last Updated'
+    header: 'Last Updated',
+    cell: ({ row }) => {
+      const date = row.original.updatedAt;
+      return date ? new Date(date).toLocaleDateString() : '-';
+    }
   },
   {
     id: 'actions',

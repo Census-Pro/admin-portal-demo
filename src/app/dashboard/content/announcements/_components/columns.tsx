@@ -16,25 +16,22 @@ export const getColumns = ({
   onDelete
 }: ColumnProps): ColumnDef<Announcement>[] => [
   {
-    accessorKey: 'imageUrl',
-    header: 'Image',
-    cell: ({ row }) => {
-      const url = row.original.imageUrl;
-      return (
-        <div className="bg-muted flex h-12 w-12 items-center justify-center overflow-hidden rounded border">
-          {url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={url} alt="" className="h-full w-full object-cover" />
-          ) : (
-            <div className="text-muted-foreground text-[10px]">No Image</div>
-          )}
-        </div>
-      );
-    }
+    accessorKey: 'headline',
+    header: 'Headline',
+    cell: ({ row }) => (
+      <div className="max-w-[400px] truncate font-medium">
+        {row.original.headline}
+      </div>
+    )
   },
   {
-    accessorKey: 'title',
-    header: 'Title'
+    accessorKey: 'message',
+    header: 'Message',
+    cell: ({ row }) => (
+      <div className="text-muted-foreground max-w-[300px] truncate text-sm">
+        {row.original.message || '-'}
+      </div>
+    )
   },
   {
     accessorKey: 'status',
@@ -42,23 +39,26 @@ export const getColumns = ({
     cell: ({ row }) => {
       const status = row.original.status;
       return (
-        <Badge
-          variant={
-            status === 'Published'
-              ? 'default'
-              : status === 'Draft'
-                ? 'secondary'
-                : 'outline'
-          }
-        >
+        <Badge variant={status === 'active' ? 'default' : 'secondary'}>
           {status}
         </Badge>
       );
     }
   },
   {
-    accessorKey: 'publishedDate',
-    header: 'Published Date'
+    accessorKey: 'created_by_name',
+    header: 'Created By',
+    cell: ({ row }) => (
+      <div className="text-sm">{row.original.created_by_name || '-'}</div>
+    )
+  },
+  {
+    accessorKey: 'createdAt',
+    header: 'Created Date',
+    cell: ({ row }) => {
+      const date = row.original.createdAt;
+      return date ? new Date(date).toLocaleDateString() : '-';
+    }
   },
   {
     id: 'actions',

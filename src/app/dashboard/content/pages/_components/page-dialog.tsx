@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -20,8 +21,8 @@ import {
 } from '@/components/ui/select';
 import {
   CmsPage,
-  MediaItem,
-  getMediaItems
+  NavigationItem,
+  getNavigationItems
 } from '@/actions/common/cms-actions';
 
 interface PageDialogProps {
@@ -40,20 +41,21 @@ export function PageDialog({
   const [formData, setFormData] = useState<Partial<CmsPage>>({
     title: '',
     slug: '',
-    status: 'Draft',
-    updatedAt: new Date().toISOString().split('T')[0],
-    imageUrl: ''
+    body: '',
+    status: 'draft',
+    cms_navigation_id: '',
+    order: 1,
+    updated_by_name: 'Admin User'
   });
   const [loading, setLoading] = useState(false);
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [navigationItems, setNavigationItems] = useState<NavigationItem[]>([]);
 
   useEffect(() => {
-    const fetchMedia = async () => {
-      const res = await getMediaItems();
-      if (res.success)
-        setMediaItems(res.data.filter((m) => m.fileType.startsWith('image/')));
+    const fetchNavigation = async () => {
+      const res = await getNavigationItems();
+      if (res.success) setNavigationItems(res.data);
     };
-    if (open) fetchMedia();
+    if (open) fetchNavigation();
   }, [open]);
 
   useEffect(() => {
@@ -61,17 +63,21 @@ export function PageDialog({
       setFormData({
         title: page.title,
         slug: page.slug,
+        body: page.body || '',
         status: page.status,
-        updatedAt: page.updatedAt,
-        imageUrl: page.imageUrl || ''
+        cms_navigation_id: page.cms_navigation_id || '',
+        order: page.order || 1,
+        updated_by_name: page.updated_by_name || 'Admin User'
       });
     } else {
       setFormData({
         title: '',
         slug: '',
-        status: 'Draft',
-        updatedAt: new Date().toISOString().split('T')[0],
-        imageUrl: ''
+        body: '',
+        status: 'draft',
+        cms_navigation_id: '',
+        order: 1,
+        updated_by_name: 'Admin User'
       });
     }
   }, [page, open]);
@@ -81,7 +87,7 @@ export function PageDialog({
     setLoading(true);
     await onSave({
       ...formData,
-      updatedAt: new Date().toISOString().split('T')[0]
+      order: Number(formData.order)
     });
     setLoading(false);
     onOpenChange(false);
@@ -89,14 +95,14 @@ export function PageDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>{page ? 'Edit Page' : 'Add Page'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Title</Label>
+              <Label>Title *</Label>
               <Input
                 required
                 value={formData.title}
@@ -107,87 +113,97 @@ export function PageDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Slug</Label>
+              <Label>Slug *</Label>
               <Input
                 required
                 value={formData.slug}
                 onChange={(e) =>
                   setFormData({ ...formData, slug: e.target.value })
                 }
-                placeholder="e.g. /about"
+                placeholder="e.g. about-us"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Cover Image</Label>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-muted/50 flex aspect-video items-center justify-center overflow-hidden rounded-lg border p-2">
-                {formData.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={formData.imageUrl}
-                    alt="Preview"
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <span className="text-muted-foreground px-4 text-center text-xs">
-                    No image selected
-                  </span>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label className="text-muted-foreground text-xs">
-                  Select from Library
-                </Label>
-                <Select
-                  value={formData.imageUrl}
-                  onValueChange={(val) =>
-                    setFormData({ ...formData, imageUrl: val })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pick an image" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mediaItems.map((item) => (
-                      <SelectItem key={item.id} value={item.url}>
-                        {item.fileName}
-                      </SelectItem>
-                    ))}
-                    {mediaItems.length === 0 && (
-                      <SelectItem value="none" disabled>
-                        No images in library
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
+            <Label>Body Content</Label>
+            <Textarea
+              value={formData.body}
+              onChange={(e) =>
+                setFormData({ ...formData, body: e.target.value })
+              }
+              placeholder="Enter page content (supports HTML)"
+              rows={8}
+              className="font-mono text-sm"
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>Navigation Menu</Label>
+              <Select
+                value={formData.cms_navigation_id || undefined}
+                onValueChange={(val) =>
+                  setFormData({
+                    ...formData,
+                    cms_navigation_id: val === 'none' ? undefined : val
+                  })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select menu" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {navigationItems.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Order</Label>
+              <Input
+                type="number"
+                min="1"
+                value={formData.order}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    order: parseInt(e.target.value, 10)
+                  })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(val: any) =>
+                  setFormData({ ...formData, status: val })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="published">Published</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(val: any) =>
-                setFormData({ ...formData, status: val })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Draft">Draft</SelectItem>
-                <SelectItem value="Published">Published</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={loading}
             >
               Cancel
             </Button>
