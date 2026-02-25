@@ -37,8 +37,7 @@ export function AnnouncementDialog({
   const [formData, setFormData] = useState<Partial<Announcement>>({
     headline: '',
     message: '',
-    status: 'active',
-    created_by_name: 'Admin User'
+    status: 'active'
   });
   const [loading, setLoading] = useState(false);
 
@@ -47,15 +46,13 @@ export function AnnouncementDialog({
       setFormData({
         headline: announcement.headline,
         message: announcement.message || '',
-        status: announcement.status,
-        created_by_name: announcement.created_by_name || 'Admin User'
+        status: announcement.status
       });
     } else {
       setFormData({
         headline: '',
         message: '',
-        status: 'active',
-        created_by_name: 'Admin User'
+        status: 'active'
       });
     }
   }, [announcement, open]);
@@ -113,8 +110,8 @@ export function AnnouncementDialog({
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="active">ACTIVE</SelectItem>
+                <SelectItem value="inactive">INACTIVE</SelectItem>
               </SelectContent>
             </Select>
           </div>

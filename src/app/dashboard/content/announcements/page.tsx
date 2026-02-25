@@ -67,14 +67,25 @@ export default function AnnouncementsPage() {
           selectedAnnouncement.id,
           formData
         );
-        if (result.success) toast.success(result.message);
+        if (result.success) {
+          toast.success(result.message);
+          setDialogOpen(false);
+        } else {
+          toast.error(result.error || 'Failed to update announcement');
+        }
       } else {
         const result = await createAnnouncement(formData as any);
-        if (result.success) toast.success(result.message);
+        if (result.success) {
+          toast.success(result.message);
+          setDialogOpen(false);
+        } else {
+          toast.error(result.error || 'Failed to create announcement');
+        }
       }
       fetchData();
-    } catch {
-      toast.error('An error occurred');
+    } catch (error) {
+      console.error('Error saving announcement:', error);
+      toast.error('An error occurred while saving');
     }
   };
 

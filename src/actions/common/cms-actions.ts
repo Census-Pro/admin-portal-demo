@@ -21,17 +21,6 @@ export interface Announcement {
   updatedAt?: string;
 }
 
-export interface Announcement {
-  id: string;
-  headline: string;
-  message?: string;
-  status: 'active' | 'inactive';
-  created_by_id?: string;
-  created_by_name?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 export interface CmsPage {
   id: string;
   cms_navigation_id?: string;
@@ -108,10 +97,33 @@ export async function getAnnouncements() {
   }
 }
 
-export async function createAnnouncement(data: Omit<Announcement, 'id'>) {
+export async function createAnnouncement(
+  data: Omit<Announcement, 'id' | 'created_by_id' | 'created_by_name'>
+) {
   try {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/announcement-and-news`;
+
+    // Get user info from session
+    const session = await import('@/auth').then((mod) => mod.auth());
+    const currentUser = (await session)?.user;
+
+    if (!currentUser) {
+      return {
+        success: false,
+        error: 'User not authenticated'
+      };
+    }
+
+    // Prepare payload with user information
+    const payload = {
+      ...data,
+      created_by_id: currentUser.id,
+      created_by_name:
+        currentUser.fullName || currentUser.cidNo || 'Unknown User'
+    };
+
+    console.log('[createAnnouncement] Payload:', payload);
 
     const response = await fetch(url, {
       method: 'POST',
@@ -119,7 +131,7 @@ export async function createAnnouncement(data: Omit<Announcement, 'id'>) {
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
