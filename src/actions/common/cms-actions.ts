@@ -9,6 +9,8 @@ export interface Announcement {
   title: string;
   status: 'Published' | 'Draft' | 'Archived';
   publishedDate: string;
+  mediaId?: string;
+  imageUrl?: string;
 }
 
 let announcements: Announcement[] = [
@@ -16,7 +18,9 @@ let announcements: Announcement[] = [
     id: '1',
     title: 'New Portal Launch',
     status: 'Published',
-    publishedDate: '2026-02-01'
+    publishedDate: '2026-02-01',
+    imageUrl:
+      'https://images.unsplash.com/photo-1454165833767-0275084967a5?q=80&w=200&h=200&auto=format&fit=crop'
   },
   {
     id: '2',
@@ -32,6 +36,7 @@ export interface CmsPage {
   slug: string;
   status: 'Published' | 'Draft';
   updatedAt: string;
+  imageUrl?: string;
 }
 
 let cmsPages: CmsPage[] = [
@@ -40,7 +45,9 @@ let cmsPages: CmsPage[] = [
     title: 'About Us',
     slug: '/about',
     status: 'Published',
-    updatedAt: '2026-01-15'
+    updatedAt: '2026-01-15',
+    imageUrl:
+      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=200&h=200&auto=format&fit=crop'
   },
   {
     id: '2',
@@ -57,6 +64,7 @@ export interface MediaItem {
   fileType: string;
   size: string;
   uploadDate: string;
+  url: string;
 }
 
 let mediaItems: MediaItem[] = [
@@ -65,14 +73,16 @@ let mediaItems: MediaItem[] = [
     fileName: 'logo.png',
     fileType: 'image/png',
     size: '24 KB',
-    uploadDate: '2026-01-10'
+    uploadDate: '2026-01-10',
+    url: 'https://images.unsplash.com/photo-1633409361618-c73427e4e206?q=80&w=200&h=200&auto=format&fit=crop'
   },
   {
     id: '2',
     fileName: 'guidelines.pdf',
     fileType: 'application/pdf',
     size: '1.2 MB',
-    uploadDate: '2026-02-18'
+    uploadDate: '2026-02-18',
+    url: '#'
   }
 ];
 
@@ -180,7 +190,7 @@ export async function createMediaItem(
   data: Omit<MediaItem, 'id' | 'uploadDate'>
 ) {
   await delay(300);
-  const newItem = {
+  const newItem: MediaItem = {
     ...data,
     uploadDate: new Date().toISOString().split('T')[0],
     id: String(Date.now())

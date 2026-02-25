@@ -16,16 +16,29 @@ export const getColumns = ({
   onDelete
 }: ColumnProps): ColumnDef<CmsPage>[] => [
   {
+    accessorKey: 'imageUrl',
+    header: 'Image',
+    cell: ({ row }) => {
+      const url = row.original.imageUrl;
+      return (
+        <div className="bg-muted flex h-12 w-12 items-center justify-center overflow-hidden rounded border">
+          {url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={url} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <div className="text-muted-foreground text-[10px]">No Image</div>
+          )}
+        </div>
+      );
+    }
+  },
+  {
     accessorKey: 'title',
-    header: 'Title',
-    cell: ({ row }) => <div className="font-medium">{row.original.title}</div>
+    header: 'Title'
   },
   {
     accessorKey: 'slug',
-    header: 'Slug',
-    cell: ({ row }) => (
-      <div className="text-muted-foreground text-sm">{row.original.slug}</div>
-    )
+    header: 'Slug'
   },
   {
     accessorKey: 'status',

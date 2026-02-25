@@ -16,11 +16,31 @@ export const getColumns = ({
   onDelete
 }: ColumnProps): ColumnDef<MediaItem>[] => [
   {
+    accessorKey: 'preview',
+    header: 'Preview',
+    cell: ({ row }) => {
+      const item = row.original;
+      return (
+        <div className="bg-muted flex h-12 w-12 items-center justify-center overflow-hidden rounded border">
+          {item.fileType.startsWith('image/') ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={item.url}
+              alt={item.fileName}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="text-muted-foreground text-[10px] font-bold">
+              {item.fileType.split('/')[1]?.toUpperCase() || 'FILE'}
+            </div>
+          )}
+        </div>
+      );
+    }
+  },
+  {
     accessorKey: 'fileName',
-    header: 'File Name',
-    cell: ({ row }) => (
-      <div className="font-medium">{row.original.fileName}</div>
-    )
+    header: 'File Name'
   },
   {
     accessorKey: 'fileType',
@@ -33,7 +53,7 @@ export const getColumns = ({
   },
   {
     accessorKey: 'uploadDate',
-    header: 'Upload Date'
+    header: 'Uploaded'
   },
   {
     id: 'actions',
