@@ -11,14 +11,42 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { MediaItem } from '@/actions/common/cms-actions';
+import { FileText, Upload, Loader2 } from 'lucide-react';
 
 interface MediaDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   media?: MediaItem | null;
-  onSave: (data: Partial<MediaItem>) => Promise<void>;
+  onSave: (data: FormData | Partial<MediaItem>, file?: File) => Promise<void>;
 }
+
+// File size limits
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+const MAX_FILE_SIZE_MB = 10;
+
+// Allowed file types
+const ALLOWED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/gif',
+  'image/svg+xml',
+  'image/webp'
+];
+const ALLOWED_DOCUMENT_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+];
+const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_DOCUMENT_TYPES];
 
 export function MediaDialog({
   open,
@@ -26,59 +54,136 @@ export function MediaDialog({
   media,
   onSave
 }: MediaDialogProps) {
-  const [formData, setFormData] = useState<Partial<MediaItem>>({
-    fileName: '',
-    fileType: '',
-    size: '',
-    url: ''
-  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [category, setCategory] = useState<'forms' | 'banners' | 'media'>(
+    'media'
+  );
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (media) {
-      setFormData({
-        fileName: media.fileName,
-        fileType: media.fileType,
-        size: media.size,
-        url: media.url
-      });
-      setPreview(media.url);
+      setCategory(media.category);
+      setPreview(media.url || null);
     } else {
-      setFormData({
-        fileName: '',
-        fileType: '',
-        size: '',
-        url: ''
-      });
+      setSelectedFile(null);
+      setCategory('media');
       setPreview(null);
     }
   }, [media, open]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      alert(
+        `❌ File Size Exceeds Limit\n\n` +
+          `File: ${file.name}\n` +
+          `Size: ${(file.size / (1024 * 1024)).toFixed(2)} MB\n` +
+          `Maximum allowed: ${MAX_FILE_SIZE_MB} MB\n\n` +
+          `Please choose a smaller file.`
+      );
+      e.target.value = ''; // Reset file input
+      return;
+    }
+
+    // Validate file type
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+      alert(
+        `❌ Invalid File Type\n\n` +
+          `File: ${file.name}\n` +
+          `Type: ${file.type || 'Unknown'}\n\n` +
+          `Allowed types:\n` +
+          `• Images: JPG, PNG, GIF, SVG, WebP\n` +
+          `• Documents: PDF, DOC, DOCX`
+      );
+      e.target.value = ''; // Reset file input
+      return;
+    }
+
+    setSelectedFile(file);
+
+    // Generate preview for images
+    if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const result = reader.result as string;
-        setPreview(result);
-        setFormData({
-          fileName: file.name,
-          fileType: file.type,
-          size: `${(file.size / 1024).toFixed(1)} KB`,
-          url: result // In a real app, you'd upload and get back a URL
-        });
+        setPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    } else {
+      setPreview(null);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!media && !selectedFile) {
+      alert('⚠️ Please select a file to upload');
+      return;
+    }
+
+    // Double-check file size before submission
+    if (selectedFile && selectedFile.size > MAX_FILE_SIZE) {
+      alert(
+        `❌ File Size Exceeds Limit\n\n` +
+          `File: ${selectedFile.name}\n` +
+          `Size: ${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB\n` +
+          `Maximum allowed: ${MAX_FILE_SIZE_MB} MB\n\n` +
+          `Please choose a smaller file.`
+      );
+      return;
+    }
+
     setLoading(true);
-    await onSave(formData);
-    setLoading(false);
-    onOpenChange(false);
+
+    try {
+      if (selectedFile) {
+        // Creating new or updating with new file
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('category', category);
+        await onSave(formData, selectedFile);
+      } else if (media) {
+        // Updating metadata only
+        await onSave({ category });
+      }
+
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Upload error:', error);
+
+      // Show user-friendly error message
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+
+      if (
+        errorMessage.includes('Body exceeded') ||
+        errorMessage.includes('1 MB limit')
+      ) {
+        alert(
+          `❌ Upload Failed: File Too Large\n\n` +
+            `The file size exceeds the server limit.\n\n` +
+            `File: ${selectedFile?.name || 'Unknown'}\n` +
+            `Size: ${selectedFile ? (selectedFile.size / (1024 * 1024)).toFixed(2) : 'Unknown'} MB\n` +
+            `Maximum allowed: ${MAX_FILE_SIZE_MB} MB\n\n` +
+            `Please:\n` +
+            `1. Compress the image/file\n` +
+            `2. Use a smaller file\n` +
+            `3. Convert to a more efficient format`
+        );
+      } else {
+        alert(
+          `❌ Upload Failed\n\n` +
+            `Error: ${errorMessage}\n\n` +
+            `Please try again or contact support if the issue persists.`
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -90,24 +195,46 @@ export function MediaDialog({
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
           {!media && (
             <div className="space-y-2">
-              <Label htmlFor="file-upload">Choose File</Label>
-              <div className="border-muted-foreground/25 hover:bg-muted/50 relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors">
+              <Label htmlFor="file-upload">Choose File *</Label>
+              <label
+                htmlFor="file-upload"
+                className="border-muted-foreground/25 hover:bg-muted/50 relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 transition-colors"
+              >
                 <Input
                   id="file-upload"
                   type="file"
-                  className="absolute inset-0 cursor-pointer opacity-0"
+                  required
+                  className="sr-only"
                   onChange={handleFileChange}
-                  accept="image/*,application/pdf"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp,.pdf,.doc,.docx"
                 />
-                <div className="text-center">
-                  <p className="text-muted-foreground text-sm">
-                    Click to upload or drag and drop
-                  </p>
-                  <p className="text-muted-foreground mt-1 text-xs">
-                    Images or PDF (max 10MB)
-                  </p>
+                <div className="pointer-events-none text-center">
+                  {selectedFile ? (
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      <span className="text-sm font-medium">
+                        {selectedFile.name}
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload className="text-muted-foreground mx-auto h-8 w-8" />
+                      <p className="text-muted-foreground mt-2 text-sm">
+                        Click to upload or drag and drop
+                      </p>
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        Images, PDF, DOC, DOCX (max {MAX_FILE_SIZE_MB}MB)
+                      </p>
+                    </>
+                  )}
                 </div>
-              </div>
+              </label>
+              {selectedFile && (
+                <p className="text-muted-foreground mt-2 text-xs">
+                  Selected: {selectedFile.name} (
+                  {(selectedFile.size / 1024).toFixed(1)} KB)
+                </p>
+              )}
             </div>
           )}
 
@@ -115,20 +242,41 @@ export function MediaDialog({
             <div className="space-y-2">
               <Label>Preview</Label>
               <div className="bg-muted relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg border">
-                {formData.fileType?.startsWith('image/') ? (
+                {selectedFile?.type.startsWith('image/') ||
+                media?.file_name?.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i) ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={preview}
                     alt="Preview"
                     className="h-full w-full object-contain"
+                    onError={(e) => {
+                      // Hide the broken image and show file icon instead
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'flex flex-col items-center gap-3';
+                        fallback.innerHTML = `
+                          <div class="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-lg">
+                            <svg class="text-primary h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
+                          <span class="text-muted-foreground text-sm">Image preview unavailable</span>
+                          <span class="text-muted-foreground text-xs">${selectedFile?.name || media?.file_name || ''}</span>
+                        `;
+                        parent.appendChild(fallback);
+                      }
+                    }}
                   />
                 ) : (
                   <div className="flex flex-col items-center gap-2">
                     <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded">
-                      <span className="text-primary font-bold">PDF</span>
+                      <FileText className="text-primary h-6 w-6" />
                     </div>
                     <span className="text-muted-foreground text-xs">
-                      {formData.fileName}
+                      {selectedFile?.name || media?.file_name}
                     </span>
                   </div>
                 )}
@@ -136,37 +284,70 @@ export function MediaDialog({
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>File Name</Label>
-              <Input
-                required
-                value={formData.fileName}
-                onChange={(e) =>
-                  setFormData({ ...formData, fileName: e.target.value })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>File Type</Label>
-              <Input
-                disabled
-                value={formData.fileType}
-                placeholder="Auto-detected"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">Category *</Label>
+            <Select
+              value={category}
+              onValueChange={(val: any) => setCategory(val)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="media">Media</SelectItem>
+                <SelectItem value="banners">Banners</SelectItem>
+                <SelectItem value="forms">Forms</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+
+          {selectedFile && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>File Name</Label>
+                <Input disabled value={selectedFile.name} />
+              </div>
+              <div className="space-y-2">
+                <Label>File Size</Label>
+                <Input
+                  disabled
+                  value={`${(selectedFile.size / 1024).toFixed(1)} KB`}
+                />
+              </div>
+            </div>
+          )}
+
+          {media && (
+            <div className="space-y-2">
+              <Label>Current File</Label>
+              <div className="flex items-center gap-2 rounded-md border p-3">
+                <FileText className="text-muted-foreground h-4 w-4" />
+                <span className="text-sm">{media.file_name}</span>
+              </div>
+            </div>
+          )}
 
           <DialogFooter>
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={loading}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !formData.url}>
-              {loading ? 'Saving...' : media ? 'Save Changes' : 'Upload'}
+            <Button
+              type="submit"
+              disabled={loading || (!media && !selectedFile)}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {media ? 'Updating...' : 'Uploading...'}
+                </>
+              ) : (
+                <>{media ? 'Save Changes' : 'Upload'}</>
+              )}
             </Button>
           </DialogFooter>
         </form>

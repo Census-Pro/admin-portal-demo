@@ -43,7 +43,8 @@ export interface MediaItem {
   id: string;
   file_name: string;
   file_path: string;
-  category: 'forms' | 'banners';
+  category: 'forms' | 'banners' | 'media';
+  url?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -404,6 +405,42 @@ export async function createMediaItem(
   }
 }
 
+export async function uploadMediaFile(formData: FormData) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-media-library`;
+
+    // Remove Content-Type header to let browser set it with boundary
+    const headersWithoutContentType = { ...headers };
+    delete headersWithoutContentType['Content-Type'];
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: headersWithoutContentType,
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to upload file'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/media');
+    return {
+      success: true,
+      message: 'File uploaded successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[uploadMediaFile] Error:', error);
+    return { success: false, error: 'Failed to upload file' };
+  }
+}
+
 export async function updateMediaItem(id: string, data: Partial<MediaItem>) {
   try {
     const headers = await instance();
@@ -436,6 +473,45 @@ export async function updateMediaItem(id: string, data: Partial<MediaItem>) {
   } catch (error) {
     console.error('[updateMediaItem] Error:', error);
     return { success: false, error: 'Failed to update media item' };
+  }
+}
+
+export async function updateMediaFileWithUpload(
+  id: string,
+  formData: FormData
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-media-library/${id}`;
+
+    // Remove Content-Type header to let browser set it with boundary
+    const headersWithoutContentType = { ...headers };
+    delete headersWithoutContentType['Content-Type'];
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: headersWithoutContentType,
+      body: formData
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update file'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/media');
+    return {
+      success: true,
+      message: 'File updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateMediaFileWithUpload] Error:', error);
+    return { success: false, error: 'Failed to update file' };
   }
 }
 

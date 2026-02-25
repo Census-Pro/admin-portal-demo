@@ -2,6 +2,12 @@ import type { NextConfig } from 'next';
 
 // Define the base Next.js configuration
 const baseConfig: NextConfig = {
+  // Server Actions configuration
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb' // Increase limit for file uploads
+    }
+  },
   images: {
     remotePatterns: [
       {
@@ -41,6 +47,12 @@ const baseConfig: NextConfig = {
         protocol: 'https',
         hostname: 'bhutanndi.com',
         port: '',
+        pathname: '/**'
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '9000',
         pathname: '/**'
       }
     ],

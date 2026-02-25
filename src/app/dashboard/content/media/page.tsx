@@ -11,7 +11,8 @@ import { MediaDialog } from './_components/media-dialog';
 import {
   MediaItem,
   getMediaItems,
-  createMediaItem,
+  uploadMediaFile,
+  updateMediaFileWithUpload,
   updateMediaItem,
   deleteMediaItem
 } from '@/actions/common/cms-actions';
@@ -59,18 +60,37 @@ export default function MediaLibraryPage() {
     setDeleteOpen(true);
   };
 
-  const handleSave = async (formData: Partial<MediaItem>) => {
+  const handleSave = async (
+    formData: FormData | Partial<MediaItem>,
+    file?: File
+  ) => {
     try {
       if (selectedMedia) {
-        const result = await updateMediaItem(selectedMedia.id, formData);
-        if (result.success) toast.success(result.message);
+        // Updating existing media
+        if (file && formData instanceof FormData) {
+          const result = await updateMediaFileWithUpload(
+            selectedMedia.id,
+            formData
+          );
+          if (result.success) toast.success(result.message);
+          else toast.error(result.error);
+        } else if (formData && !(formData instanceof FormData)) {
+          const result = await updateMediaItem(selectedMedia.id, formData);
+          if (result.success) toast.success(result.message);
+          else toast.error(result.error);
+        }
       } else {
-        const result = await createMediaItem(formData as any);
-        if (result.success) toast.success(result.message);
+        // Creating new media
+        if (formData instanceof FormData) {
+          const result = await uploadMediaFile(formData);
+          if (result.success) toast.success(result.message);
+          else toast.error(result.error);
+        }
       }
       fetchData();
-    } catch {
+    } catch (error) {
       toast.error('An error occurred');
+      console.error('Save error:', error);
     }
   };
 
