@@ -351,6 +351,61 @@ export const navItems: NavItem[] = [
     }
   },
   {
+    title: 'Content',
+    url: '#',
+    icon: 'page',
+    isActive: false,
+    subject: 'Content',
+    items: [
+      {
+        title: 'Announcements & News',
+        url: '/dashboard/content/announcements',
+        shortcut: ['a', 'n'],
+        subject: 'Announcements',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ANNOUNCEMENTS]
+        }
+      },
+      {
+        title: 'Content',
+        url: '/dashboard/content/pages',
+        shortcut: ['c', 'o'],
+        subject: 'Content',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
+        }
+      },
+      {
+        title: 'Media Library',
+        url: '/dashboard/content/media',
+        shortcut: ['m', 'l'],
+        subject: 'Media Library',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MEDIA_LIBRARY]
+        }
+      },
+      {
+        title: 'Navigation',
+        url: '/dashboard/content/navigation',
+        shortcut: ['n', 'v'],
+        subject: 'Navigation',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_NAVIGATION]
+        }
+      }
+    ],
+    access: {
+      permissions: [
+        PERMS.MANAGE_ALL,
+        PERMS.MANAGE_CMS,
+        PERMS.MANAGE_ANNOUNCEMENTS,
+        PERMS.MANAGE_CONTENT,
+        PERMS.MANAGE_MEDIA_LIBRARY,
+        PERMS.MANAGE_NAVIGATION
+      ]
+    }
+  },
+  {
     title: 'CID Issuance',
     url: '#',
     icon: 'idCard',

@@ -295,6 +295,36 @@ export const MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES =
   'manage:relationship-certificate-purposes' as const;
 
 // ============================================================================
+// CMS PERMISSIONS
+// ============================================================================
+
+export const VIEW_ANNOUNCEMENTS = 'read:announcements' as const;
+export const CREATE_ANNOUNCEMENTS = 'create:announcements' as const;
+export const EDIT_ANNOUNCEMENTS = 'update:announcements' as const;
+export const DELETE_ANNOUNCEMENTS = 'delete:announcements' as const;
+export const MANAGE_ANNOUNCEMENTS = 'manage:announcements' as const;
+
+export const VIEW_CONTENT = 'read:content' as const;
+export const CREATE_CONTENT = 'create:content' as const;
+export const EDIT_CONTENT = 'update:content' as const;
+export const DELETE_CONTENT = 'delete:content' as const;
+export const MANAGE_CONTENT = 'manage:content' as const;
+
+export const VIEW_MEDIA_LIBRARY = 'read:media-library' as const;
+export const CREATE_MEDIA_LIBRARY = 'create:media-library' as const;
+export const EDIT_MEDIA_LIBRARY = 'update:media-library' as const;
+export const DELETE_MEDIA_LIBRARY = 'delete:media-library' as const;
+export const MANAGE_MEDIA_LIBRARY = 'manage:media-library' as const;
+
+export const VIEW_NAVIGATION = 'read:navigation' as const;
+export const CREATE_NAVIGATION = 'create:navigation' as const;
+export const EDIT_NAVIGATION = 'update:navigation' as const;
+export const DELETE_NAVIGATION = 'delete:navigation' as const;
+export const MANAGE_NAVIGATION = 'manage:navigation' as const;
+
+export const MANAGE_CMS = 'manage:cms' as const;
+
+// ============================================================================
 // DASHBOARD PERMISSIONS
 // ============================================================================
 
@@ -499,7 +529,29 @@ export type Permission =
   | typeof CREATE_RELATIONSHIP_CERTIFICATE_PURPOSES
   | typeof EDIT_RELATIONSHIP_CERTIFICATE_PURPOSES
   | typeof DELETE_RELATIONSHIP_CERTIFICATE_PURPOSES
+  | typeof DELETE_RELATIONSHIP_CERTIFICATE_PURPOSES
   | typeof MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES
+  | typeof VIEW_ANNOUNCEMENTS
+  | typeof CREATE_ANNOUNCEMENTS
+  | typeof EDIT_ANNOUNCEMENTS
+  | typeof DELETE_ANNOUNCEMENTS
+  | typeof MANAGE_ANNOUNCEMENTS
+  | typeof VIEW_CONTENT
+  | typeof CREATE_CONTENT
+  | typeof EDIT_CONTENT
+  | typeof DELETE_CONTENT
+  | typeof MANAGE_CONTENT
+  | typeof VIEW_MEDIA_LIBRARY
+  | typeof CREATE_MEDIA_LIBRARY
+  | typeof EDIT_MEDIA_LIBRARY
+  | typeof DELETE_MEDIA_LIBRARY
+  | typeof MANAGE_MEDIA_LIBRARY
+  | typeof VIEW_NAVIGATION
+  | typeof CREATE_NAVIGATION
+  | typeof EDIT_NAVIGATION
+  | typeof DELETE_NAVIGATION
+  | typeof MANAGE_NAVIGATION
+  | typeof MANAGE_CMS
   | typeof VIEW_DASHBOARD;
 
 // ============================================================================
