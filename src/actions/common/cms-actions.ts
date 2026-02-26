@@ -52,13 +52,16 @@ export interface MediaItem {
 export interface NavigationItem {
   id: string;
   label: string;
+  url?: string;
+  icon?: string;
+  order?: number;
   message?: string;
   status: 'active' | 'inactive';
   created_by_id?: string;
   created_by_name?: string;
-  order?: number;
   createdAt?: string;
   updatedAt?: string;
+  contentPages?: CmsPage[];
 }
 
 // ============================================================================

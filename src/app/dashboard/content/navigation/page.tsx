@@ -95,11 +95,11 @@ export default function NavigationPage() {
 
   return (
     <PageContainer
-      pageTitle="Navigation Menus"
-      pageDescription="Manage site navigation menus and links."
+      pageTitle="Navigation Links (NavLinks)"
+      pageDescription="Manage main navigation menu items. Each nav item can have sub-links (content pages) as dropdowns."
       pageHeaderAction={
         <Button onClick={handleAdd}>
-          <Icons.add className="mr-2 h-4 w-4" /> Add Menu Item
+          <Icons.add className="mr-2 h-4 w-4" /> Add Nav Link
         </Button>
       }
     >
