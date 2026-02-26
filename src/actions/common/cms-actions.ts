@@ -67,6 +67,21 @@ export interface NavigationItem {
   contentPages?: CmsPage[];
 }
 
+export interface QuickLink {
+  id: string;
+  title: string;
+  description?: string;
+  url: string;
+  category: string;
+  type: string;
+  order: number;
+  is_active: boolean;
+  opens_in_new_tab: boolean;
+  icon?: string;
+  created_at: string;
+  created_by_name?: string;
+}
+
 // ============================================================================
 // ANNOUNCEMENTS ACTIONS
 // ============================================================================
@@ -726,5 +741,148 @@ export async function deleteNavigationItem(id: string) {
   } catch (error) {
     console.error('[deleteNavigationItem] Error:', error);
     return { success: false, error: 'Failed to delete navigation item' };
+  }
+}
+
+// ============================================================================
+// QUICK LINKS ACTIONS
+// ============================================================================
+
+export async function getQuickLinks() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-links`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to fetch quick links', data: [] };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getQuickLinks] Error:', error);
+    return { success: false, error: 'Failed to fetch quick links', data: [] };
+  }
+}
+
+export async function createQuickLink(
+  data: Omit<QuickLink, 'id' | 'created_at'>
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-links`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create quick link'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/quick-links');
+    return {
+      success: true,
+      message: 'Quick link created successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createQuickLink] Error:', error);
+    return { success: false, error: 'Failed to create quick link' };
+  }
+}
+
+export async function updateQuickLink(id: string, data: Partial<QuickLink>) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-links/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update quick link'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/quick-links');
+    return {
+      success: true,
+      message: 'Quick link updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateQuickLink] Error:', error);
+    return { success: false, error: 'Failed to update quick link' };
+  }
+}
+
+export async function toggleQuickLinkStatus(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-links/${id}/toggle-active`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to update status' };
+    }
+
+    revalidatePath('/dashboard/content/quick-links');
+    return { success: true, message: 'Status updated successfully' };
+  } catch (error) {
+    console.error('[toggleQuickLinkStatus] Error:', error);
+    return { success: false, error: 'Failed to update status' };
+  }
+}
+
+export async function deleteQuickLink(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-links/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to delete quick link' };
+    }
+
+    revalidatePath('/dashboard/content/quick-links');
+    return { success: true, message: 'Quick link deleted successfully' };
+  } catch (error) {
+    console.error('[deleteQuickLink] Error:', error);
+    return { success: false, error: 'Failed to delete quick link' };
   }
 }

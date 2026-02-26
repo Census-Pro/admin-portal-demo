@@ -392,6 +392,15 @@ export const navItems: NavItem[] = [
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_NAVIGATION]
         }
+      },
+      {
+        title: 'Quick Links',
+        url: '/dashboard/content/quick-links',
+        shortcut: ['q', 'l'],
+        subject: 'Quick Links',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
+        }
       }
     ],
     access: {
