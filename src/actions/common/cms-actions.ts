@@ -776,7 +776,22 @@ export async function createQuickLink(
 ) {
   try {
     const headers = await instance();
+    const session = await auth();
     const url = `${COMMON_SERVICE_URL}/quick-links`;
+
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    const payload = {
+      ...data,
+      created_by_id: currentUser.id || currentUser.sessionId,
+      created_by_name: currentUser.fullName || currentUser.name || 'Admin User'
+    };
+
+    console.log('[createQuickLink] Payload:', payload);
 
     const response = await fetch(url, {
       method: 'POST',
@@ -784,7 +799,7 @@ export async function createQuickLink(
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {

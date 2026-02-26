@@ -47,7 +47,7 @@ export const getColumns = ({
       const status = row.original.status;
       return (
         <Badge variant={status === 'published' ? 'default' : 'secondary'}>
-          {status}
+          {status.toUpperCase()}
         </Badge>
       );
     }

@@ -133,7 +133,7 @@ export const createColumns = (
       const isActive = row.getValue('is_active') as boolean;
       return (
         <Badge variant={isActive ? 'default' : 'secondary'}>
-          {isActive ? 'Active' : 'Inactive'}
+          {isActive ? 'ACTIVE' : 'INACTIVE'}
         </Badge>
       );
     },

@@ -83,7 +83,7 @@ export const getColumns = ({
       <Badge
         variant={row.original.status === 'active' ? 'default' : 'secondary'}
       >
-        {row.original.status}
+        {row.original.status.toUpperCase()}
       </Badge>
     ),
     size: 100
