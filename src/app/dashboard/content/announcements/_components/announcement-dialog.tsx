@@ -11,7 +11,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import '@/components/ui/rich-text-editor.css';
 import {
   Select,
   SelectContent,
@@ -104,13 +105,12 @@ export function AnnouncementDialog({
 
           <div className="space-y-2">
             <Label>Message</Label>
-            <Textarea
-              value={formData.message}
-              onChange={(e) =>
-                setFormData({ ...formData, message: e.target.value })
+            <RichTextEditor
+              content={formData.message || ''}
+              onChange={(content: string) =>
+                setFormData({ ...formData, message: content })
               }
               placeholder="Enter announcement message..."
-              rows={4}
             />
           </div>
 

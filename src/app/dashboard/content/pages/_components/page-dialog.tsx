@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -19,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
+import '@/components/ui/rich-text-editor.css';
 import {
   CmsPage,
   NavigationItem,
@@ -143,15 +144,17 @@ export function PageDialog({
 
           <div className="space-y-2">
             <Label>Body Content</Label>
-            <Textarea
-              value={formData.body}
-              onChange={(e) =>
-                setFormData({ ...formData, body: e.target.value })
+            <RichTextEditor
+              content={formData.body || ''}
+              onChange={(content) =>
+                setFormData({ ...formData, body: content })
               }
-              placeholder="Enter page content (supports HTML)"
-              rows={8}
-              className="font-mono text-sm"
+              placeholder="Start typing your page content..."
             />
+            <p className="text-muted-foreground text-xs">
+              Use the toolbar to format your content with headings, bold,
+              colors, lists, and more
+            </p>
           </div>
 
           <div className="space-y-2">
