@@ -5,6 +5,7 @@ import { IconTrash, IconEdit, IconList } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { NavigationItem } from '@/actions/common/cms-actions';
+import { ICON_LIST, IconName } from '@/components/ui/icon-picker';
 
 interface ColumnProps {
   onEdit: (data: NavigationItem) => void;
@@ -28,16 +29,17 @@ export const getColumns = ({
   {
     accessorKey: 'label',
     header: 'Label',
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        {row.original.icon && (
-          <span className="text-muted-foreground text-xs">
-            [{row.original.icon}]
-          </span>
-        )}
-        <span className="font-medium">{row.original.label}</span>
-      </div>
-    )
+    cell: ({ row }) => {
+      const iconName = row.original.icon as IconName;
+      const Icon = iconName ? ICON_LIST[iconName] : null;
+
+      return (
+        <div className="flex items-center gap-2">
+          {Icon && <Icon className="text-muted-foreground h-4 w-4" />}
+          <span className="font-medium">{row.original.label}</span>
+        </div>
+      );
+    }
   },
   {
     accessorKey: 'url',

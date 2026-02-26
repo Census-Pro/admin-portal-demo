@@ -35,7 +35,7 @@ export const getColumns = ({
   },
   {
     accessorKey: 'navigation',
-    header: 'Navigation',
+    header: 'Nav Link',
     cell: ({ row }) => (
       <div className="text-sm">{row.original.navigation?.label || '-'}</div>
     )

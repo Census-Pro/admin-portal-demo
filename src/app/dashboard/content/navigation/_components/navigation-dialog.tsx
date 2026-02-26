@@ -20,6 +20,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { NavigationItem } from '@/actions/common/cms-actions';
+import { IconPicker } from '@/components/ui/icon-picker';
 
 interface NavigationDialogProps {
   open: boolean;
@@ -119,16 +120,12 @@ export function NavigationDialog({
 
           <div className="space-y-2">
             <Label htmlFor="icon">Icon (Optional)</Label>
-            <Input
-              id="icon"
-              value={formData.icon}
-              onChange={(e) =>
-                setFormData({ ...formData, icon: e.target.value })
-              }
-              placeholder="e.g. building, users, info"
+            <IconPicker
+              value={formData.icon || ''}
+              onChange={(val) => setFormData({ ...formData, icon: val })}
             />
             <p className="text-muted-foreground text-xs">
-              Icon identifier for the menu item
+              Select an icon for the menu item
             </p>
           </div>
 

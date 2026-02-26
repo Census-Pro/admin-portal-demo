@@ -22,7 +22,9 @@ import {
 import {
   CmsPage,
   NavigationItem,
-  getNavigationItems
+  getNavigationItems,
+  MediaItem,
+  getMediaItems
 } from '@/actions/common/cms-actions';
 
 interface PageDialogProps {
@@ -46,19 +48,30 @@ export function PageDialog({
     body: '',
     status: 'draft',
     cms_navigation_id: '',
+    featured_image_id: '',
     order: 1,
     updated_by_name: 'Admin User'
   });
   const [loading, setLoading] = useState(false);
   const [navigationItems, setNavigationItems] = useState<NavigationItem[]>([]);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
 
   useEffect(() => {
     const fetchNavigation = async () => {
       const res = await getNavigationItems();
       if (res.success) setNavigationItems(res.data);
     };
-    if (open) fetchNavigation();
+    const fetchMedia = async () => {
+      const res = await getMediaItems();
+      if (res.success) setMediaItems(res.data);
+    };
+
+    if (open) {
+      fetchNavigation();
+      fetchMedia();
+    }
   }, [open]);
+
   useEffect(() => {
     if (page) {
       setFormData({
@@ -67,6 +80,7 @@ export function PageDialog({
         body: page.body || '',
         status: page.status,
         cms_navigation_id: page.cms_navigation_id || '',
+        featured_image_id: page.featured_image_id || '',
         order: page.order || 1,
         updated_by_name: page.updated_by_name || 'Admin User'
       });
@@ -77,6 +91,7 @@ export function PageDialog({
         body: '',
         status: 'draft',
         cms_navigation_id: preSelectedNavigationId || '',
+        featured_image_id: '',
         order: 1,
         updated_by_name: 'Admin User'
       });
@@ -139,9 +154,54 @@ export function PageDialog({
             />
           </div>
 
+          <div className="space-y-2">
+            <Label>Featured Image (Optional)</Label>
+            <Select
+              value={formData.featured_image_id || undefined}
+              onValueChange={(val) =>
+                setFormData({
+                  ...formData,
+                  featured_image_id: val === 'none' ? undefined : val
+                })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select featured image" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">None</SelectItem>
+                {mediaItems.map((item) => (
+                  <SelectItem key={item.id} value={item.id}>
+                    {item.file_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {formData.featured_image_id &&
+              formData.featured_image_id !== 'none' && (
+                <div className="mt-2">
+                  <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
+                    <img
+                      src={
+                        mediaItems.find(
+                          (m) => m.id === formData.featured_image_id
+                        )?.url || ''
+                      }
+                      alt="Featured image preview"
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                </div>
+              )}
+            <p className="text-muted-foreground text-xs">
+              Select an image from the media library to use as the featured
+              image
+            </p>
+          </div>
+
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>Navigation Menu</Label>
+              <Label>Nav Link</Label>
               <Select
                 value={formData.cms_navigation_id || undefined}
                 onValueChange={(val) =>
@@ -152,7 +212,7 @@ export function PageDialog({
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select menu" />
+                  <SelectValue placeholder="Select nav link" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">None</SelectItem>
@@ -163,6 +223,9 @@ export function PageDialog({
                   ))}
                 </SelectContent>
               </Select>
+              <p className="text-muted-foreground text-xs">
+                This page will appear as a sub-link under the selected nav link
+              </p>
             </div>
 
             <div className="space-y-2">

@@ -31,6 +31,10 @@ import {
   IconCloud,
   IconCheck,
   IconX,
+  IconBuilding,
+  IconInfoCircle,
+  IconNews,
+  IconLayoutDashboard,
   IconChevronDown
 } from '@tabler/icons-react';
 import {
@@ -72,7 +76,11 @@ export const ICON_LIST = {
   music: IconMusic,
   cloud: IconCloud,
   check: IconCheck,
-  x: IconX
+  x: IconX,
+  building: IconBuilding,
+  info: IconInfoCircle,
+  news: IconNews,
+  dashboard: IconLayoutDashboard
 } as const;
 
 export type IconName = keyof typeof ICON_LIST;

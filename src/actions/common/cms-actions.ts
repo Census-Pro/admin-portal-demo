@@ -30,6 +30,7 @@ export interface CmsPage {
   slug: string;
   title: string;
   body?: string;
+  featured_image_id?: string;
   status: 'draft' | 'published';
   updated_by_id?: string;
   updated_by_name?: string;
@@ -40,6 +41,7 @@ export interface CmsPage {
     id: string;
     label: string;
   };
+  featuredImage?: MediaItem;
 }
 
 export interface MediaItem {
