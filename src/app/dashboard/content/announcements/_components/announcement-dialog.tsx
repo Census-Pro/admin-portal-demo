@@ -25,7 +25,7 @@ interface AnnouncementDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   announcement?: Announcement | null;
-  onSave: (data: Partial<Announcement>) => Promise<void>;
+  onSave: (data: Partial<Announcement>, file?: File) => Promise<void>;
 }
 
 export function AnnouncementDialog({
@@ -39,6 +39,8 @@ export function AnnouncementDialog({
     message: '',
     status: 'active'
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -48,19 +50,33 @@ export function AnnouncementDialog({
         message: announcement.message || '',
         status: announcement.status
       });
+      setPreviewUrl(announcement.image_url || null);
+      setSelectedFile(null);
     } else {
       setFormData({
         headline: '',
         message: '',
         status: 'active'
       });
+      setPreviewUrl(null);
+      setSelectedFile(null);
     }
   }, [announcement, open]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      // Create preview URL
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await onSave(formData);
+    await onSave(formData, selectedFile || undefined);
     setLoading(false);
     onOpenChange(false);
   };
@@ -99,6 +115,32 @@ export function AnnouncementDialog({
           </div>
 
           <div className="space-y-2">
+            <Label>Image (Optional)</Label>
+            <Input
+              id="image"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            <p className="text-muted-foreground text-xs">
+              Upload an image for this announcement
+            </p>
+          </div>
+
+          {previewUrl && (
+            <div className="space-y-2">
+              <Label>Image Preview</Label>
+              <div className="relative h-48 w-full overflow-hidden rounded-lg border">
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2">
             <Label>Status</Label>
             <Select
               value={formData.status}
@@ -110,8 +152,8 @@ export function AnnouncementDialog({
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">ACTIVE</SelectItem>
-                <SelectItem value="inactive">INACTIVE</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
               </SelectContent>
             </Select>
           </div>

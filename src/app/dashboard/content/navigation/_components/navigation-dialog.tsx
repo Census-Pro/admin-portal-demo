@@ -72,7 +72,7 @@ export function NavigationDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await onSave({ ...formData, order: Number(formData.order) });
+    await onSave({ ...formData, order: Number(formData.order ?? 0) });
     setLoading(false);
     onOpenChange(false);
   };
@@ -153,13 +153,17 @@ export function NavigationDialog({
                 required
                 type="number"
                 min="0"
-                value={formData.order}
-                onChange={(e) =>
+                value={formData.order ?? ''}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const parsed = parseInt(val, 10);
                   setFormData({
                     ...formData,
-                    order: parseInt(e.target.value, 10)
-                  })
-                }
+                    // keep undefined when input is empty or invalid to avoid NaN
+                    order:
+                      val === '' || Number.isNaN(parsed) ? undefined : parsed
+                  });
+                }}
               />
               <p className="text-muted-foreground text-xs">
                 0 = first, higher = later

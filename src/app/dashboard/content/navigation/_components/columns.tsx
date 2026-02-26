@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit, IconList } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { NavigationItem } from '@/actions/common/cms-actions';
@@ -9,11 +9,13 @@ import { NavigationItem } from '@/actions/common/cms-actions';
 interface ColumnProps {
   onEdit: (data: NavigationItem) => void;
   onDelete: (id: string) => void;
+  onManageSubLinks: (data: NavigationItem) => void;
 }
 
 export const getColumns = ({
   onEdit,
-  onDelete
+  onDelete,
+  onManageSubLinks
 }: ColumnProps): ColumnDef<NavigationItem>[] => [
   {
     accessorKey: 'order',
@@ -52,17 +54,27 @@ export const getColumns = ({
     cell: ({ row }) => {
       const count = row.original.contentPages?.length || 0;
       return (
-        <div className="text-center">
+        <div className="flex items-center justify-center gap-2">
           {count > 0 ? (
             <Badge variant="outline" className="text-xs">
               {count} {count === 1 ? 'page' : 'pages'}
             </Badge>
           ) : (
-            <span className="text-muted-foreground text-xs">-</span>
+            <span className="text-muted-foreground text-xs">None</span>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onManageSubLinks(row.original)}
+            className="h-7 px-2 text-xs"
+          >
+            <IconList className="mr-1 h-3 w-3" />
+            Manage
+          </Button>
         </div>
       );
-    }
+    },
+    size: 150
   },
   {
     accessorKey: 'status',

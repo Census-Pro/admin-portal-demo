@@ -60,12 +60,13 @@ export default function AnnouncementsPage() {
     setDeleteOpen(true);
   };
 
-  const handleSave = async (formData: Partial<Announcement>) => {
+  const handleSave = async (formData: Partial<Announcement>, file?: File) => {
     try {
       if (selectedAnnouncement) {
         const result = await updateAnnouncement(
           selectedAnnouncement.id,
-          formData
+          formData,
+          file
         );
         if (result.success) {
           toast.success(result.message);
@@ -74,7 +75,7 @@ export default function AnnouncementsPage() {
           toast.error(result.error || 'Failed to update announcement');
         }
       } else {
-        const result = await createAnnouncement(formData as any);
+        const result = await createAnnouncement(formData as any, file);
         if (result.success) {
           toast.success(result.message);
           setDialogOpen(false);

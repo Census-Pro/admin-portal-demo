@@ -30,13 +30,15 @@ interface PageDialogProps {
   onOpenChange: (open: boolean) => void;
   page?: CmsPage | null;
   onSave: (data: Partial<CmsPage>) => Promise<void>;
+  preSelectedNavigationId?: string | null;
 }
 
 export function PageDialog({
   open,
   onOpenChange,
   page,
-  onSave
+  onSave,
+  preSelectedNavigationId
 }: PageDialogProps) {
   const [formData, setFormData] = useState<Partial<CmsPage>>({
     title: '',
@@ -57,7 +59,6 @@ export function PageDialog({
     };
     if (open) fetchNavigation();
   }, [open]);
-
   useEffect(() => {
     if (page) {
       setFormData({
@@ -75,12 +76,12 @@ export function PageDialog({
         slug: '',
         body: '',
         status: 'draft',
-        cms_navigation_id: '',
+        cms_navigation_id: preSelectedNavigationId || '',
         order: 1,
         updated_by_name: 'Admin User'
       });
     }
-  }, [page, open]);
+  }, [page, open, preSelectedNavigationId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

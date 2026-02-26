@@ -16,6 +16,26 @@ export const getColumns = ({
   onDelete
 }: ColumnProps): ColumnDef<Announcement>[] => [
   {
+    accessorKey: 'image_url',
+    header: 'Image',
+    cell: ({ row }) => (
+      <div className="flex items-center justify-center">
+        {row.original.image_url ? (
+          <img
+            src={row.original.image_url}
+            alt={row.original.headline}
+            className="h-12 w-12 rounded object-cover"
+          />
+        ) : (
+          <div className="bg-muted flex h-12 w-12 items-center justify-center rounded text-xs">
+            No Image
+          </div>
+        )}
+      </div>
+    ),
+    size: 80
+  },
+  {
     accessorKey: 'headline',
     header: 'Headline',
     cell: ({ row }) => (

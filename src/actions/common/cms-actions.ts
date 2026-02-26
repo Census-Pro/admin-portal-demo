@@ -2,6 +2,7 @@
 
 import { instance } from '../instance';
 import { revalidatePath } from 'next/cache';
+import { auth } from '@/auth';
 
 const COMMON_SERVICE_URL =
   process.env.COMMON_SERVICE_URL || 'http://localhost:5003';
@@ -14,6 +15,8 @@ export interface Announcement {
   id: string;
   headline: string;
   message?: string;
+  image_url?: string;
+  image_name?: string;
   status: 'active' | 'inactive';
   created_by_id?: string;
   created_by_name?: string;
@@ -102,15 +105,15 @@ export async function getAnnouncements() {
 }
 
 export async function createAnnouncement(
-  data: Omit<Announcement, 'id' | 'created_by_id' | 'created_by_name'>
+  data: Omit<Announcement, 'id' | 'created_by_id' | 'created_by_name'>,
+  file?: File
 ) {
   try {
     const headers = await instance();
+    const session = await auth();
     const url = `${COMMON_SERVICE_URL}/announcement-and-news`;
 
-    // Get user info from session
-    const session = await import('@/auth').then((mod) => mod.auth());
-    const currentUser = (await session)?.user;
+    const currentUser = session?.user;
 
     if (!currentUser) {
       return {
@@ -119,23 +122,33 @@ export async function createAnnouncement(
       };
     }
 
-    // Prepare payload with user information
-    const payload = {
-      ...data,
-      created_by_id: currentUser.id,
-      created_by_name:
-        currentUser.fullName || currentUser.cidNo || 'Unknown User'
-    };
+    const formData = new FormData();
 
-    console.log('[createAnnouncement] Payload:', payload);
+    // Add text fields
+    formData.append('headline', data.headline);
+    if (data.message) formData.append('message', data.message);
+    formData.append('status', data.status);
+    formData.append('created_by_id', currentUser.id);
+    formData.append(
+      'created_by_name',
+      currentUser.fullName || currentUser.cidNo || 'Unknown User'
+    );
+
+    // Add file if provided
+    if (file) {
+      formData.append('file', file);
+    }
+
+    console.log('[createAnnouncement] FormData prepared with file:', !!file);
+
+    // Remove Content-Type header to let browser set it with boundary
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { 'Content-Type': _, ...headersWithoutContentType } = headers;
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
+      headers: headersWithoutContentType,
+      body: formData
     });
 
     if (!response.ok) {
@@ -161,19 +174,35 @@ export async function createAnnouncement(
 
 export async function updateAnnouncement(
   id: string,
-  data: Partial<Announcement>
+  data: Partial<Announcement>,
+  file?: File
 ) {
   try {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/announcement-and-news/${id}`;
 
+    const formData = new FormData();
+
+    // Add text fields if provided
+    if (data.headline) formData.append('headline', data.headline);
+    if (data.message) formData.append('message', data.message);
+    if (data.status) formData.append('status', data.status);
+
+    // Add file if provided
+    if (file) {
+      formData.append('file', file);
+    }
+
+    console.log('[updateAnnouncement] FormData prepared with file:', !!file);
+
+    // Remove Content-Type header to let browser set it with boundary
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { 'Content-Type': _, ...headersWithoutContentType } = headers;
+
     const response = await fetch(url, {
       method: 'PATCH',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
+      headers: headersWithoutContentType,
+      body: formData
     });
 
     if (!response.ok) {
@@ -254,7 +283,16 @@ export async function getCmsPages() {
 export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
   try {
     const headers = await instance();
+    const session = await auth();
     const url = `${COMMON_SERVICE_URL}/cm-content`;
+
+    // Add updated_by_id and updated_by_name from session
+    const payload = {
+      ...data,
+      updated_by_id: session?.user?.id || session?.user?.sessionId,
+      updated_by_name:
+        session?.user?.fullName || session?.user?.name || 'Admin User'
+    };
 
     const response = await fetch(url, {
       method: 'POST',
@@ -262,7 +300,7 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
@@ -583,7 +621,19 @@ export async function getNavigationItems() {
 export async function createNavigationItem(data: Omit<NavigationItem, 'id'>) {
   try {
     const headers = await instance();
+    const session = await auth();
     const url = `${COMMON_SERVICE_URL}/cm-navigation`;
+
+    // Add created_by_id and created_by_name from session
+    const payload = {
+      ...data,
+      created_by_id: session?.user?.id || session?.user?.sessionId,
+      created_by_name:
+        session?.user?.fullName || session?.user?.name || 'Admin User'
+    };
+
+    console.log('[createNavigationItem] URL:', url);
+    console.log('[createNavigationItem] Payload:', payload);
 
     const response = await fetch(url, {
       method: 'POST',
@@ -591,11 +641,14 @@ export async function createNavigationItem(data: Omit<NavigationItem, 'id'>) {
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(payload)
     });
+
+    console.log('[createNavigationItem] Response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('[createNavigationItem] Error response:', errorData);
       return {
         success: false,
         error: errorData.message || 'Failed to create navigation item'
@@ -603,6 +656,7 @@ export async function createNavigationItem(data: Omit<NavigationItem, 'id'>) {
     }
 
     const result = await response.json();
+    console.log('[createNavigationItem] Success:', result);
     revalidatePath('/dashboard/content/navigation');
     return {
       success: true,
