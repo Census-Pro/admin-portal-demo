@@ -107,114 +107,119 @@ export function AnnouncementDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {announcement ? 'Edit Notice' : 'Add Notice'}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label>Headline *</Label>
-            <Input
-              required
-              value={formData.headline}
-              onChange={(e) =>
-                setFormData({ ...formData, headline: e.target.value })
-              }
-              placeholder="e.g. Census 2026 Registration Open"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Message</Label>
-            <RichTextEditor
-              content={formData.message || ''}
-              onChange={(content: string) =>
-                setFormData({ ...formData, message: content })
-              }
-              placeholder="Enter notice message..."
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Image (Optional)</Label>
-            <Input
-              id="image"
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
-            <p className="text-muted-foreground text-xs">
-              Upload an image for this notice
-            </p>
-          </div>
-
-          {previewUrl && (
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-1 flex-col overflow-hidden"
+        >
+          <div className="flex-1 space-y-4 overflow-y-auto py-4">
             <div className="space-y-2">
-              <Label>Image Preview</Label>
-              <div className="relative h-48 w-full overflow-hidden rounded-lg border">
-                <img
-                  src={previewUrl}
-                  alt="Preview"
-                  className="h-full w-full object-cover"
-                />
-              </div>
+              <Label>Headline *</Label>
+              <Input
+                required
+                value={formData.headline}
+                onChange={(e) =>
+                  setFormData({ ...formData, headline: e.target.value })
+                }
+                placeholder="e.g. Census 2026 Registration Open"
+              />
             </div>
-          )}
 
-          <div className="space-y-2">
-            <Label>Category *</Label>
-            <Select
-              value={formData.category_id}
-              onValueChange={(val: string) =>
-                setFormData({ ...formData, category_id: val })
-              }
-              disabled={loadingCategories}
-            >
-              <SelectTrigger>
-                <SelectValue
-                  placeholder={
-                    loadingCategories
-                      ? 'Loading categories...'
-                      : 'Select category'
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {!loadingCategories && categories.length === 0 && (
-              <p className="text-muted-foreground text-destructive text-xs">
-                No categories available. Please create categories first.
+            <div className="space-y-2">
+              <Label>Message</Label>
+              <RichTextEditor
+                content={formData.message || ''}
+                onChange={(content: string) =>
+                  setFormData({ ...formData, message: content })
+                }
+                placeholder="Enter notice message..."
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Image (Optional)</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+              />
+              <p className="text-muted-foreground text-xs">
+                Upload an image for this notice
               </p>
+            </div>
+
+            {previewUrl && (
+              <div className="space-y-2">
+                <Label>Image Preview</Label>
+                <div className="relative h-48 w-full overflow-hidden rounded-lg border">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
             )}
+
+            <div className="space-y-2">
+              <Label>Category *</Label>
+              <Select
+                value={formData.category_id}
+                onValueChange={(val: string) =>
+                  setFormData({ ...formData, category_id: val })
+                }
+                disabled={loadingCategories}
+              >
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      loadingCategories
+                        ? 'Loading categories...'
+                        : 'Select category'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {!loadingCategories && categories.length === 0 && (
+                <p className="text-muted-foreground text-destructive text-xs">
+                  No categories available. Please create categories first.
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(val: any) =>
+                  setFormData({ ...formData, status: val })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Status</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(val: any) =>
-                setFormData({ ...formData, status: val })
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <DialogFooter>
+          <DialogFooter className="shrink-0">
             <Button
               type="button"
               variant="outline"

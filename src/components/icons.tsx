@@ -42,7 +42,8 @@ import {
   IconHome,
   IconUsersGroup,
   IconCertificate,
-  IconGrave2
+  IconGrave2,
+  IconEdit
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -92,5 +93,6 @@ export const Icons = {
   home: IconHome,
   family: IconUsersGroup,
   certificate: IconCertificate,
-  grave: IconGrave2
+  grave: IconGrave2,
+  edit: IconEdit
 };

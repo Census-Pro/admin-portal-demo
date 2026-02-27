@@ -341,16 +341,36 @@ export async function createAnnouncementCategory(
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/announcement-categories`;
 
-    console.log('[createAnnouncementCategory] Creating category:', data);
+    // Clean up the data - remove empty strings and convert to undefined
+    const cleanedData = {
+      name: data.name,
+      name_dzo: data.name_dzo || undefined,
+      description: data.description || undefined,
+      slug: data.slug || undefined,
+      is_active: data.is_active,
+      order: data.order || 0
+    };
+
+    console.log('[createAnnouncementCategory] URL:', url);
+    console.log('[createAnnouncementCategory] Creating category:', cleanedData);
+    console.log('[createAnnouncementCategory] Headers:', headers);
 
     const response = await fetch(url, {
       method: 'POST',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(cleanedData)
     });
 
+    console.log(
+      '[createAnnouncementCategory] Response status:',
+      response.status
+    );
+
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Unknown error' }));
+      console.error('[createAnnouncementCategory] Error response:', errorData);
       return {
         success: false,
         error: errorData.message || 'Failed to create announcement category'
@@ -358,6 +378,7 @@ export async function createAnnouncementCategory(
     }
 
     const result = await response.json();
+    console.log('[createAnnouncementCategory] Success:', result);
     revalidatePath('/dashboard/content/categories');
     return {
       success: true,
@@ -365,8 +386,14 @@ export async function createAnnouncementCategory(
       data: result
     };
   } catch (error) {
-    console.error('[createAnnouncementCategory] Error:', error);
-    return { success: false, error: 'Failed to create announcement category' };
+    console.error('[createAnnouncementCategory] Exception:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : 'Failed to create announcement category'
+    };
   }
 }
 
@@ -378,16 +405,34 @@ export async function updateAnnouncementCategory(
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/announcement-categories/${id}`;
 
-    console.log('[updateAnnouncementCategory] Updating category:', id, data);
+    // Clean up the data - remove empty strings and convert to undefined
+    const cleanedData: Partial<AnnouncementCategory> = {};
+    if (data.name !== undefined) cleanedData.name = data.name;
+    if (data.name_dzo !== undefined)
+      cleanedData.name_dzo = data.name_dzo || undefined;
+    if (data.description !== undefined)
+      cleanedData.description = data.description || undefined;
+    if (data.slug !== undefined) cleanedData.slug = data.slug;
+    if (data.is_active !== undefined) cleanedData.is_active = data.is_active;
+    if (data.order !== undefined) cleanedData.order = data.order;
+
+    console.log(
+      '[updateAnnouncementCategory] Updating category:',
+      id,
+      cleanedData
+    );
 
     const response = await fetch(url, {
       method: 'PATCH',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(cleanedData)
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Unknown error' }));
+      console.error('[updateAnnouncementCategory] Error response:', errorData);
       return {
         success: false,
         error: errorData.message || 'Failed to update announcement category'
