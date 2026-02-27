@@ -111,6 +111,18 @@ export default function AppSidebar() {
                         {item.items?.map((subItem, index) => {
                           const isSubItemActive = pathname === subItem.url;
                           const isLast = index === item.items!.length - 1;
+
+                          if (subItem.isHeader) {
+                            return (
+                              <div
+                                key={subItem.title}
+                                className="text-muted-foreground/50 mt-3 mb-1 ml-4 text-[10px] font-bold tracking-wider uppercase"
+                              >
+                                {subItem.title}
+                              </div>
+                            );
+                          }
+
                           return (
                             <SidebarMenuSubItem
                               key={subItem.title}

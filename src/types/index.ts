@@ -23,6 +23,7 @@ export interface NavItem {
   access?: PermissionCheck;
   subject?: string; // Backend ability subject for dynamic filtering
   superAdminOnly?: boolean; // Only visible to SUPER_ADMIN roleType
+  isHeader?: boolean; // For grouping items in submenus
 }
 
 export interface NavItemWithChildren extends NavItem {

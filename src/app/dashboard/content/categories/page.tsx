@@ -7,25 +7,25 @@ import { Icons } from '@/components/icons';
 import { DataTable } from '@/components/ui/table/data-table';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { getColumns } from './_components/columns';
-import { AnnouncementDialog } from './_components/announcement-dialog';
+import { CategoryDialog } from './_components/category-dialog';
 import {
-  Announcement,
-  getAnnouncements,
-  createAnnouncement,
-  updateAnnouncement,
-  deleteAnnouncement
+  AnnouncementCategory,
+  getAnnouncementCategories,
+  createAnnouncementCategory,
+  updateAnnouncementCategory,
+  deleteAnnouncementCategory
 } from '@/actions/common/cms-actions';
 import { toast } from 'sonner';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 
-export default function AnnouncementsPage() {
-  const [data, setData] = useState<Announcement[]>([]);
+export default function CategoriesPage() {
+  const [data, setData] = useState<AnnouncementCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Dialog states
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedAnnouncement, setSelectedAnnouncement] =
-    useState<Announcement | null>(null);
+  const [selectedCategory, setSelectedCategory] =
+    useState<AnnouncementCategory | null>(null);
 
   // Delete states
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -34,7 +34,7 @@ export default function AnnouncementsPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const result = await getAnnouncements();
+    const result = await getAnnouncementCategories();
     if (result.success && result.data) {
       setData(result.data);
     }
@@ -46,12 +46,12 @@ export default function AnnouncementsPage() {
   }, []);
 
   const handleAdd = () => {
-    setSelectedAnnouncement(null);
+    setSelectedCategory(null);
     setDialogOpen(true);
   };
 
-  const handleEdit = (ann: Announcement) => {
-    setSelectedAnnouncement(ann);
+  const handleEdit = (category: AnnouncementCategory) => {
+    setSelectedCategory(category);
     setDialogOpen(true);
   };
 
@@ -60,32 +60,31 @@ export default function AnnouncementsPage() {
     setDeleteOpen(true);
   };
 
-  const handleSave = async (formData: Partial<Announcement>, file?: File) => {
+  const handleSave = async (formData: Partial<AnnouncementCategory>) => {
     try {
-      if (selectedAnnouncement) {
-        const result = await updateAnnouncement(
-          selectedAnnouncement.id,
-          formData,
-          file
+      if (selectedCategory) {
+        const result = await updateAnnouncementCategory(
+          selectedCategory.id,
+          formData
         );
         if (result.success) {
           toast.success(result.message);
           setDialogOpen(false);
         } else {
-          toast.error(result.error || 'Failed to update announcement');
+          toast.error(result.error || 'Failed to update category');
         }
       } else {
-        const result = await createAnnouncement(formData as any, file);
+        const result = await createAnnouncementCategory(formData as any);
         if (result.success) {
           toast.success(result.message);
           setDialogOpen(false);
         } else {
-          toast.error(result.error || 'Failed to create announcement');
+          toast.error(result.error || 'Failed to create category');
         }
       }
       fetchData();
     } catch (error) {
-      console.error('Error saving announcement:', error);
+      console.error('Error saving category:', error);
       toast.error('An error occurred while saving');
     }
   };
@@ -94,8 +93,9 @@ export default function AnnouncementsPage() {
     if (!deleteId) return;
     setDeleting(true);
     try {
-      const result = await deleteAnnouncement(deleteId);
+      const result = await deleteAnnouncementCategory(deleteId);
       if (result.success) toast.success(result.message);
+      else toast.error(result.error || 'Failed to delete category');
       fetchData();
     } catch {
       toast.error('Failed to delete');
@@ -111,26 +111,26 @@ export default function AnnouncementsPage() {
 
   return (
     <PageContainer
-      pageTitle="Public Notices"
-      pageDescription="Manage public notices and official updates for the portal."
+      pageTitle="Notice Categories"
+      pageDescription="Manage categories for organizing public notices and official updates."
       pageHeaderAction={
         <Button onClick={handleAdd}>
-          <Icons.add className="mr-2 h-4 w-4" /> Add Notice
+          <Icons.add className="mr-2 h-4 w-4" /> Add Category
         </Button>
       }
     >
       <div className="space-y-4">
         {loading ? (
-          <DataTableSkeleton columnCount={4} rowCount={5} />
+          <DataTableSkeleton columnCount={5} rowCount={5} />
         ) : (
           <DataTable columns={columns} data={data} totalItems={data.length} />
         )}
       </div>
 
-      <AnnouncementDialog
+      <CategoryDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        announcement={selectedAnnouncement}
+        category={selectedCategory}
         onSave={handleSave}
       />
 
@@ -139,8 +139,8 @@ export default function AnnouncementsPage() {
         onOpenChange={setDeleteOpen}
         onConfirm={handleConfirmDelete}
         isLoading={deleting}
-        title="Delete Notice"
-        description="Are you sure you want to delete this notice? This action cannot be undone."
+        title="Delete Category"
+        description="Are you sure you want to delete this category? This action cannot be undone. Note: You cannot delete categories that have associated announcements."
       />
     </PageContainer>
   );

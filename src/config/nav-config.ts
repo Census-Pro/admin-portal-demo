@@ -358,7 +358,15 @@ export const navItems: NavItem[] = [
     subject: 'Content',
     items: [
       {
-        title: 'Announcements & News',
+        title: 'PUBLICATION',
+        url: '#',
+        isHeader: true,
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ANNOUNCEMENTS]
+        }
+      },
+      {
+        title: 'Public Notices',
         url: '/dashboard/content/announcements',
         shortcut: ['a', 'n'],
         subject: 'Announcements',
@@ -367,7 +375,24 @@ export const navItems: NavItem[] = [
         }
       },
       {
-        title: 'Content',
+        title: 'Notice Categories',
+        url: '/dashboard/content/categories',
+        shortcut: ['a', 'c'],
+        subject: 'Announcement Categories',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ANNOUNCEMENTS]
+        }
+      },
+      {
+        title: 'CMS ASSETS',
+        url: '#',
+        isHeader: true,
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CMS]
+        }
+      },
+      {
+        title: 'Content Pages',
         url: '/dashboard/content/pages',
         shortcut: ['c', 'o'],
         subject: 'Content',

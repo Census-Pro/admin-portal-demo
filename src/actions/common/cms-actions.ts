@@ -17,10 +17,27 @@ export interface Announcement {
   message?: string;
   image_url?: string;
   image_name?: string;
-  category?: 'dzongkhag_crc_office' | 'news_and_announcement' | 'notification';
+  category_id?: string;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  };
   status: 'active' | 'inactive';
   created_by_id?: string;
   created_by_name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AnnouncementCategory {
+  id: string;
+  name: string;
+  name_dzo?: string;
+  description?: string;
+  slug: string;
+  is_active: boolean;
+  order: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -145,6 +162,7 @@ export async function createAnnouncement(
     // Add text fields
     formData.append('headline', data.headline);
     if (data.message) formData.append('message', data.message);
+    if (data.category_id) formData.append('category_id', data.category_id);
     formData.append('status', data.status);
     formData.append('created_by_id', currentUser.id);
     formData.append(
@@ -204,6 +222,7 @@ export async function updateAnnouncement(
     // Add text fields if provided
     if (data.headline) formData.append('headline', data.headline);
     if (data.message) formData.append('message', data.message);
+    if (data.category_id) formData.append('category_id', data.category_id);
     if (data.status) formData.append('status', data.status);
 
     // Add file if provided
@@ -263,6 +282,157 @@ export async function deleteAnnouncement(id: string) {
   } catch (error) {
     console.error('[deleteAnnouncement] Error:', error);
     return { success: false, error: 'Failed to delete announcement' };
+  }
+}
+
+// ============================================================================
+// ANNOUNCEMENT CATEGORIES ACTIONS
+// ============================================================================
+
+export async function getAnnouncementCategories() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/announcement-categories/all`;
+
+    console.log('[getAnnouncementCategories] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error(
+        '[getAnnouncementCategories] API Error:',
+        response.statusText
+      );
+      return {
+        success: false,
+        error: 'Failed to fetch announcement categories',
+        data: []
+      };
+    }
+
+    const result = await response.json();
+    console.log(
+      '[getAnnouncementCategories] Success, count:',
+      result?.length || 0
+    );
+
+    return {
+      success: true,
+      data: result || []
+    };
+  } catch (error) {
+    console.error('[getAnnouncementCategories] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch announcement categories',
+      data: []
+    };
+  }
+}
+
+export async function createAnnouncementCategory(
+  data: Omit<AnnouncementCategory, 'id' | 'createdAt' | 'updatedAt'>
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/announcement-categories`;
+
+    console.log('[createAnnouncementCategory] Creating category:', data);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create announcement category'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/categories');
+    return {
+      success: true,
+      message: 'Announcement category created successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createAnnouncementCategory] Error:', error);
+    return { success: false, error: 'Failed to create announcement category' };
+  }
+}
+
+export async function updateAnnouncementCategory(
+  id: string,
+  data: Partial<AnnouncementCategory>
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/announcement-categories/${id}`;
+
+    console.log('[updateAnnouncementCategory] Updating category:', id, data);
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update announcement category'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/categories');
+    return {
+      success: true,
+      message: 'Announcement category updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateAnnouncementCategory] Error:', error);
+    return { success: false, error: 'Failed to update announcement category' };
+  }
+}
+
+export async function deleteAnnouncementCategory(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/announcement-categories/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to delete announcement category'
+      };
+    }
+
+    revalidatePath('/dashboard/content/categories');
+    return {
+      success: true,
+      message: 'Announcement category deleted successfully'
+    };
+  } catch (error) {
+    console.error('[deleteAnnouncementCategory] Error:', error);
+    return { success: false, error: 'Failed to delete announcement category' };
   }
 }
 

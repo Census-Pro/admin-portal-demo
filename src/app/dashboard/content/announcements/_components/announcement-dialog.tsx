@@ -20,7 +20,11 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
-import { Announcement } from '@/actions/common/cms-actions';
+import {
+  Announcement,
+  AnnouncementCategory,
+  getAnnouncementCategories
+} from '@/actions/common/cms-actions';
 
 interface AnnouncementDialogProps {
   open: boolean;
@@ -38,19 +42,35 @@ export function AnnouncementDialog({
   const [formData, setFormData] = useState<Partial<Announcement>>({
     headline: '',
     message: '',
-    category: 'news_and_announcement',
+    category_id: '',
     status: 'active'
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<AnnouncementCategory[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setLoadingCategories(true);
+      const result = await getAnnouncementCategories();
+      if (result.success && result.data) {
+        setCategories(result.data);
+      }
+      setLoadingCategories(false);
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (announcement) {
       setFormData({
         headline: announcement.headline,
         message: announcement.message || '',
-        category: announcement.category || 'news_and_announcement',
+        category_id:
+          announcement.category_id || announcement.category?.id || '',
         status: announcement.status
       });
       setPreviewUrl(announcement.image_url || null);
@@ -59,7 +79,7 @@ export function AnnouncementDialog({
       setFormData({
         headline: '',
         message: '',
-        category: 'news_and_announcement',
+        category_id: '',
         status: 'active'
       });
       setPreviewUrl(null);
@@ -90,7 +110,7 @@ export function AnnouncementDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
-            {announcement ? 'Edit Announcement' : 'Add Announcement'}
+            {announcement ? 'Edit Notice' : 'Add Notice'}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -113,7 +133,7 @@ export function AnnouncementDialog({
               onChange={(content: string) =>
                 setFormData({ ...formData, message: content })
               }
-              placeholder="Enter announcement message..."
+              placeholder="Enter notice message..."
             />
           </div>
 
@@ -126,7 +146,7 @@ export function AnnouncementDialog({
               onChange={handleFileChange}
             />
             <p className="text-muted-foreground text-xs">
-              Upload an image for this announcement
+              Upload an image for this notice
             </p>
           </div>
 
@@ -146,24 +166,34 @@ export function AnnouncementDialog({
           <div className="space-y-2">
             <Label>Category *</Label>
             <Select
-              value={formData.category}
-              onValueChange={(val: any) =>
-                setFormData({ ...formData, category: val })
+              value={formData.category_id}
+              onValueChange={(val: string) =>
+                setFormData({ ...formData, category_id: val })
               }
+              disabled={loadingCategories}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select category" />
+                <SelectValue
+                  placeholder={
+                    loadingCategories
+                      ? 'Loading categories...'
+                      : 'Select category'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="dzongkhag_crc_office">
-                  Dzongkhag CRC Office Announcement
-                </SelectItem>
-                <SelectItem value="news_and_announcement">
-                  News and Announcement
-                </SelectItem>
-                <SelectItem value="notification">Notification</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+            {!loadingCategories && categories.length === 0 && (
+              <p className="text-muted-foreground text-destructive text-xs">
+                No categories available. Please create categories first.
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
