@@ -17,6 +17,7 @@ export interface Announcement {
   message?: string;
   image_url?: string;
   image_name?: string;
+  category?: 'dzongkhag_crc_office' | 'news_and_announcement' | 'notification';
   status: 'active' | 'inactive';
   created_by_id?: string;
   created_by_name?: string;

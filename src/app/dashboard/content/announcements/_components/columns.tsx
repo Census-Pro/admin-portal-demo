@@ -54,6 +54,23 @@ export const getColumns = ({
     )
   },
   {
+    accessorKey: 'category',
+    header: 'Category',
+    cell: ({ row }) => {
+      const category = row.original.category || 'news_and_announcement';
+      const categoryLabels = {
+        dzongkhag_crc_office: 'Dzongkhag CRC Office',
+        news_and_announcement: 'News & Announcement',
+        notification: 'Notification'
+      };
+      return (
+        <Badge variant="outline">
+          {categoryLabels[category as keyof typeof categoryLabels]}
+        </Badge>
+      );
+    }
+  },
+  {
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {

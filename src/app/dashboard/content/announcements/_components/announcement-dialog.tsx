@@ -38,6 +38,7 @@ export function AnnouncementDialog({
   const [formData, setFormData] = useState<Partial<Announcement>>({
     headline: '',
     message: '',
+    category: 'news_and_announcement',
     status: 'active'
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -49,6 +50,7 @@ export function AnnouncementDialog({
       setFormData({
         headline: announcement.headline,
         message: announcement.message || '',
+        category: announcement.category || 'news_and_announcement',
         status: announcement.status
       });
       setPreviewUrl(announcement.image_url || null);
@@ -57,6 +59,7 @@ export function AnnouncementDialog({
       setFormData({
         headline: '',
         message: '',
+        category: 'news_and_announcement',
         status: 'active'
       });
       setPreviewUrl(null);
@@ -139,6 +142,29 @@ export function AnnouncementDialog({
               </div>
             </div>
           )}
+
+          <div className="space-y-2">
+            <Label>Category *</Label>
+            <Select
+              value={formData.category}
+              onValueChange={(val: any) =>
+                setFormData({ ...formData, category: val })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="dzongkhag_crc_office">
+                  Dzongkhag CRC Office Announcement
+                </SelectItem>
+                <SelectItem value="news_and_announcement">
+                  News and Announcement
+                </SelectItem>
+                <SelectItem value="notification">Notification</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           <div className="space-y-2">
             <Label>Status</Label>
