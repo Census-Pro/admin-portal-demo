@@ -17,18 +17,6 @@ import { QuickLink } from '@/actions/common/cms-actions';
 import { toast } from 'sonner';
 import { ICON_LIST, IconName } from '@/components/ui/icon-picker';
 
-const getCategoryLabel = (category: string) => {
-  const labels: Record<string, string> = {
-    weblinks: 'Weblinks',
-    forms: 'Google Forms',
-    downloads: 'Downloads',
-    staff_links: 'Staff Links',
-    publications: 'Publications',
-    guidelines: 'Guidelines & TOR'
-  };
-  return labels[category] || category;
-};
-
 const getTypeIcon = (type: string) => {
   switch (type) {
     case 'external':
@@ -118,10 +106,10 @@ export const createColumns = (
     accessorKey: 'category',
     header: 'Category',
     cell: ({ row }) => {
-      const category = row.getValue('category') as string;
+      const category = row.original.category;
       return (
         <Badge variant="outline" className="capitalize">
-          {getCategoryLabel(category)}
+          {category?.name || 'Uncategorized'}
         </Badge>
       );
     }

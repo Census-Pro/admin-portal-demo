@@ -87,12 +87,25 @@ export interface NavigationItem {
   contentPages?: CmsPage[];
 }
 
+export interface QuickLinkCategory {
+  id: string;
+  name: string;
+  name_dzo?: string;
+  description?: string;
+  slug: string;
+  is_active: boolean;
+  order: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface QuickLink {
   id: string;
   title: string;
   description?: string;
   url: string;
-  category: string;
+  category_id?: string;
+  category?: QuickLinkCategory;
   type: string;
   order: number;
   is_active: boolean;
@@ -1117,5 +1130,178 @@ export async function deleteQuickLink(id: string) {
   } catch (error) {
     console.error('[deleteQuickLink] Error:', error);
     return { success: false, error: 'Failed to delete quick link' };
+  }
+}
+
+// ============================================================================
+// QUICK LINK CATEGORIES ACTIONS
+// ============================================================================
+
+export async function getQuickLinkCategories() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-link-categories`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to fetch categories', data: [] };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getQuickLinkCategories] Error:', error);
+    return { success: false, error: 'Failed to fetch categories', data: [] };
+  }
+}
+
+export async function getActiveQuickLinkCategories() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-link-categories/active`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to fetch categories', data: [] };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getActiveQuickLinkCategories] Error:', error);
+    return { success: false, error: 'Failed to fetch categories', data: [] };
+  }
+}
+
+export async function createQuickLinkCategory(
+  data: Omit<QuickLinkCategory, 'id' | 'created_at' | 'updated_at'>
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-link-categories`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create category'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/quick-link-categories');
+    return {
+      success: true,
+      message: 'Category created successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createQuickLinkCategory] Error:', error);
+    return { success: false, error: 'Failed to create category' };
+  }
+}
+
+export async function updateQuickLinkCategory(
+  id: string,
+  data: Partial<QuickLinkCategory>
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-link-categories/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update category'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/quick-link-categories');
+    return {
+      success: true,
+      message: 'Category updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateQuickLinkCategory] Error:', error);
+    return { success: false, error: 'Failed to update category' };
+  }
+}
+
+export async function toggleQuickLinkCategoryStatus(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-link-categories/${id}/toggle-active`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to update status' };
+    }
+
+    revalidatePath('/dashboard/content/quick-link-categories');
+    return { success: true, message: 'Status updated successfully' };
+  } catch (error) {
+    console.error('[toggleQuickLinkCategoryStatus] Error:', error);
+    return { success: false, error: 'Failed to update status' };
+  }
+}
+
+export async function deleteQuickLinkCategory(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/quick-link-categories/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to delete category'
+      };
+    }
+
+    revalidatePath('/dashboard/content/quick-link-categories');
+    return { success: true, message: 'Category deleted successfully' };
+  } catch (error) {
+    console.error('[deleteQuickLinkCategory] Error:', error);
+    return { success: false, error: 'Failed to delete category' };
   }
 }

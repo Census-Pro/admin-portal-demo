@@ -23,8 +23,10 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import {
   QuickLink,
+  QuickLinkCategory,
   createQuickLink,
-  updateQuickLink
+  updateQuickLink,
+  getActiveQuickLinkCategories
 } from '@/actions/common/cms-actions';
 import { IconPicker } from '@/components/ui/icon-picker';
 
@@ -46,7 +48,7 @@ export function QuickLinkDialog({
     description: '',
     url: '',
     type: 'external',
-    category: 'weblinks',
+    category_id: '',
     order: 0,
     is_active: true,
     opens_in_new_tab: true,
@@ -54,6 +56,30 @@ export function QuickLinkDialog({
   });
 
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<QuickLinkCategory[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+
+  // Fetch categories on mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setLoadingCategories(true);
+      try {
+        const result = await getActiveQuickLinkCategories();
+        if (result.success && result.data) {
+          setCategories(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        toast.error('Failed to load categories');
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    if (open) {
+      fetchCategories();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (quickLink) {
@@ -62,7 +88,7 @@ export function QuickLinkDialog({
         description: quickLink.description || '',
         url: quickLink.url || '',
         type: quickLink.type || 'external',
-        category: quickLink.category || 'weblinks',
+        category_id: quickLink.category_id || '',
         order: quickLink.order || 0,
         is_active: quickLink.is_active ?? true,
         opens_in_new_tab: quickLink.opens_in_new_tab ?? true,
@@ -74,7 +100,7 @@ export function QuickLinkDialog({
         description: '',
         url: '',
         type: 'external',
-        category: 'weblinks',
+        category_id: '',
         order: 0,
         is_active: true,
         opens_in_new_tab: true,
@@ -193,25 +219,32 @@ export function QuickLinkDialog({
             </div>
 
             <div>
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">
+                Category <span className="text-red-500">*</span>
+              </Label>
               <Select
-                value={formData.category}
+                value={formData.category_id}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, category: value })
+                  setFormData({ ...formData, category_id: value })
                 }
+                disabled={loadingCategories}
               >
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="weblinks">Weblinks</SelectItem>
-                  <SelectItem value="forms">Google Forms</SelectItem>
-                  <SelectItem value="downloads">Downloads</SelectItem>
-                  <SelectItem value="staff_links">Staff Links</SelectItem>
-                  <SelectItem value="publications">Publications</SelectItem>
-                  <SelectItem value="guidelines">Guidelines & TOR</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              {loadingCategories && (
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Loading categories...
+                </p>
+              )}
             </div>
           </div>
 
