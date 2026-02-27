@@ -104,8 +104,29 @@ export default function AnnouncementsPage() {
     setDeleteOpen(false);
   };
 
+  const handleToggleStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    try {
+      const result = await updateAnnouncement(id, { status: newStatus });
+      if (result.success) {
+        toast.success(`Status updated to ${newStatus}`);
+        fetchData();
+      } else {
+        toast.error(result.error || 'Failed to update status');
+      }
+    } catch (error) {
+      console.error('Error toggling status:', error);
+      toast.error('An error occurred while toggling status');
+    }
+  };
+
   const columns = useMemo(
-    () => getColumns({ onEdit: handleEdit, onDelete: handleDeleteClick }),
+    () =>
+      getColumns({
+        onEdit: handleEdit,
+        onDelete: handleDeleteClick,
+        onToggleStatus: handleToggleStatus
+      }),
     []
   );
 

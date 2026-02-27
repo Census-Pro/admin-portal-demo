@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconTrash, IconEdit, IconList } from '@tabler/icons-react';
+import { IconTrash, IconEdit, IconList, IconPower } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { NavigationItem } from '@/actions/common/cms-actions';
@@ -11,12 +11,14 @@ interface ColumnProps {
   onEdit: (data: NavigationItem) => void;
   onDelete: (id: string) => void;
   onManageSubLinks: (data: NavigationItem) => void;
+  onToggleStatus: (data: NavigationItem) => void;
 }
 
 export const getColumns = ({
   onEdit,
   onDelete,
-  onManageSubLinks
+  onManageSubLinks,
+  onToggleStatus
 }: ColumnProps): ColumnDef<NavigationItem>[] => [
   {
     accessorKey: 'order',
@@ -98,6 +100,20 @@ export const getColumns = ({
         <Button
           variant="ghost"
           size="icon"
+          onClick={() => onToggleStatus(row.original)}
+          title={row.original.status === 'active' ? 'Deactivate' : 'Activate'}
+        >
+          <IconPower
+            className={`h-4 w-4 ${
+              row.original.status === 'active'
+                ? 'text-green-600'
+                : 'text-muted-foreground'
+            }`}
+          />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
           onClick={() => onEdit(row.original)}
         >
           <IconEdit className="h-4 w-4" />
@@ -112,6 +128,6 @@ export const getColumns = ({
         </Button>
       </div>
     ),
-    size: 100
+    size: 120
   }
 ];

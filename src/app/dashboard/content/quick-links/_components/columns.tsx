@@ -148,13 +148,12 @@ export const createColumns = (
             size="icon"
             onClick={() => onToggleActive(link)}
             title={link.is_active ? 'Deactivate' : 'Activate'}
-            className={
-              link.is_active
-                ? 'text-amber-600 hover:text-amber-700'
-                : 'text-green-600 hover:text-green-700'
-            }
           >
-            <IconPower className="h-4 w-4" />
+            <IconPower
+              className={`h-4 w-4 ${
+                link.is_active ? 'text-green-600' : 'text-muted-foreground'
+              }`}
+            />
           </Button>
           <Button
             variant="ghost"

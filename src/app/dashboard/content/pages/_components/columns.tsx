@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconTrash, IconEdit } from '@tabler/icons-react';
+import { IconTrash, IconEdit, IconPower } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CmsPage } from '@/actions/common/cms-actions';
@@ -9,11 +9,13 @@ import { CmsPage } from '@/actions/common/cms-actions';
 interface ColumnProps {
   onEdit: (data: CmsPage) => void;
   onDelete: (id: string) => void;
+  onToggleStatus: (data: CmsPage) => void;
 }
 
 export const getColumns = ({
   onEdit,
-  onDelete
+  onDelete,
+  onToggleStatus
 }: ColumnProps): ColumnDef<CmsPage>[] => [
   {
     accessorKey: 'title',
@@ -72,6 +74,20 @@ export const getColumns = ({
     header: 'Actions',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onToggleStatus(row.original)}
+          title={row.original.status === 'published' ? 'Unpublish' : 'Publish'}
+        >
+          <IconPower
+            className={`h-4 w-4 ${
+              row.original.status === 'published'
+                ? 'text-green-600'
+                : 'text-muted-foreground'
+            }`}
+          />
+        </Button>
         <Button
           variant="ghost"
           size="icon"

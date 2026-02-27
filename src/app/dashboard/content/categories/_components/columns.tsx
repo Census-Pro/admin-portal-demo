@@ -2,6 +2,7 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { AnnouncementCategory } from '@/actions/common/cms-actions';
+import { IconEdit, IconTrash, IconPower } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
@@ -9,11 +10,13 @@ import { Badge } from '@/components/ui/badge';
 interface GetColumnsProps {
   onEdit: (category: AnnouncementCategory) => void;
   onDelete: (id: string) => void;
+  onToggleStatus: (category: AnnouncementCategory) => void;
 }
 
 export const getColumns = ({
   onEdit,
-  onDelete
+  onDelete,
+  onToggleStatus
 }: GetColumnsProps): ColumnDef<AnnouncementCategory>[] => [
   {
     accessorKey: 'order',
@@ -73,6 +76,19 @@ export const getColumns = ({
 
       return (
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => onToggleStatus(category)}
+            title={category.is_active ? 'Deactivate' : 'Activate'}
+          >
+            <IconPower
+              className={`h-4 w-4 ${
+                category.is_active ? 'text-green-600' : 'text-muted-foreground'
+              }`}
+            />
+          </Button>
           <Button
             variant="ghost"
             size="icon"

@@ -216,12 +216,31 @@ export default function NavigationPage() {
     setDeletePageOpen(false);
   };
 
+  const handleToggleStatus = async (item: NavigationItem) => {
+    try {
+      const newStatus = item.status === 'active' ? 'inactive' : 'active';
+      const result = await updateNavigationItem(item.id, {
+        status: newStatus
+      });
+      if (result.success) {
+        toast.success(`Menu item status updated to ${newStatus}`);
+        fetchData();
+      } else {
+        toast.error(result.error || 'Failed to update status');
+      }
+    } catch (error) {
+      console.error('[NavigationPage] Error toggling status:', error);
+      toast.error('An error occurred while toggling status');
+    }
+  };
+
   const columns = useMemo(
     () =>
       getColumns({
         onEdit: handleEdit,
         onDelete: handleDeleteClick,
-        onManageSubLinks: handleManageSubLinks
+        onManageSubLinks: handleManageSubLinks,
+        onToggleStatus: handleToggleStatus
       }),
     []
   );

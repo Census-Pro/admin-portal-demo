@@ -104,8 +104,32 @@ export default function CategoriesPage() {
     setDeleteOpen(false);
   };
 
+  const handleToggleStatus = async (category: AnnouncementCategory) => {
+    try {
+      const result = await updateAnnouncementCategory(category.id, {
+        is_active: !category.is_active
+      });
+      if (result.success) {
+        toast.success(
+          `Category ${!category.is_active ? 'activated' : 'deactivated'} successfully`
+        );
+        fetchData();
+      } else {
+        toast.error(result.error || 'Failed to update status');
+      }
+    } catch (error) {
+      console.error('Error toggling status:', error);
+      toast.error('An error occurred while toggling status');
+    }
+  };
+
   const columns = useMemo(
-    () => getColumns({ onEdit: handleEdit, onDelete: handleDeleteClick }),
+    () =>
+      getColumns({
+        onEdit: handleEdit,
+        onDelete: handleDeleteClick,
+        onToggleStatus: handleToggleStatus
+      }),
     []
   );
 
