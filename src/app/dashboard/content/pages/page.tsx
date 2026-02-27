@@ -13,7 +13,8 @@ import {
   getCmsPages,
   createCmsPage,
   updateCmsPage,
-  deleteCmsPage
+  deleteCmsPage,
+  toggleCmsPageStatus
 } from '@/actions/common/cms-actions';
 import { toast } from 'sonner';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
@@ -88,8 +89,28 @@ export default function ContentPage() {
     setDeleteOpen(false);
   };
 
+  const handleToggleStatus = async (pageData: CmsPage) => {
+    try {
+      const result = await toggleCmsPageStatus(pageData.id);
+      if (result.success) {
+        toast.success(result.message);
+        fetchData();
+      } else {
+        toast.error(result.error || 'Failed to update status');
+      }
+    } catch (error) {
+      console.error('Error toggling status:', error);
+      toast.error('Error updating status');
+    }
+  };
+
   const columns = useMemo(
-    () => getColumns({ onEdit: handleEdit, onDelete: handleDeleteClick }),
+    () =>
+      getColumns({
+        onEdit: handleEdit,
+        onDelete: handleDeleteClick,
+        onToggleStatus: handleToggleStatus
+      }),
     []
   );
 

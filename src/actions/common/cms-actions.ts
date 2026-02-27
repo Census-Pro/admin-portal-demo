@@ -629,6 +629,28 @@ export async function deleteCmsPage(id: string) {
   }
 }
 
+export async function toggleCmsPageStatus(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-content/${id}/toggle-status`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to update status' };
+    }
+
+    revalidatePath('/dashboard/content/pages');
+    return { success: true, message: 'Status updated successfully' };
+  } catch (error) {
+    console.error('[toggleCmsPageStatus] Error:', error);
+    return { success: false, error: 'Failed to update status' };
+  }
+}
+
 // ============================================================================
 // MEDIA LIBRARY ACTIONS
 // ============================================================================
