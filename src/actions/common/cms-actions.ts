@@ -103,7 +103,9 @@ export interface QuickLink {
   id: string;
   title: string;
   description?: string;
-  url: string;
+  url?: string;
+  content_page_id?: string;
+  contentPage?: CmsPage;
   category_id?: string;
   category?: QuickLinkCategory;
   type: string;

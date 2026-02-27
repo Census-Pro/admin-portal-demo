@@ -24,11 +24,14 @@ import { toast } from 'sonner';
 import {
   QuickLink,
   QuickLinkCategory,
+  CmsPage,
   createQuickLink,
   updateQuickLink,
-  getActiveQuickLinkCategories
+  getActiveQuickLinkCategories,
+  getCmsPages
 } from '@/actions/common/cms-actions';
 import { IconPicker } from '@/components/ui/icon-picker';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface QuickLinkDialogProps {
   open: boolean;
@@ -47,6 +50,7 @@ export function QuickLinkDialog({
     title: '',
     description: '',
     url: '',
+    content_page_id: '',
     type: 'external',
     category_id: '',
     order: 0,
@@ -58,35 +62,52 @@ export function QuickLinkDialog({
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<QuickLinkCategory[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
+  const [contentPages, setContentPages] = useState<CmsPage[]>([]);
+  const [loadingPages, setLoadingPages] = useState(false);
+  const [linkType, setLinkType] = useState<'url' | 'content_page'>('url');
 
-  // Fetch categories on mount
+  // Fetch categories and pages on mount
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
       setLoadingCategories(true);
+      setLoadingPages(true);
       try {
-        const result = await getActiveQuickLinkCategories();
-        if (result.success && result.data) {
-          setCategories(result.data);
+        const [categoriesResult, pagesResult] = await Promise.all([
+          getActiveQuickLinkCategories(),
+          getCmsPages()
+        ]);
+
+        if (categoriesResult.success && categoriesResult.data) {
+          setCategories(categoriesResult.data);
+        }
+
+        if (pagesResult.success && pagesResult.data) {
+          setContentPages(pagesResult.data);
         }
       } catch (error) {
-        console.error('Error fetching categories:', error);
-        toast.error('Failed to load categories');
+        console.error('Error fetching data:', error);
+        toast.error('Failed to load data');
       } finally {
         setLoadingCategories(false);
+        setLoadingPages(false);
       }
     };
 
     if (open) {
-      fetchCategories();
+      fetchData();
     }
   }, [open]);
 
   useEffect(() => {
     if (quickLink) {
+      const hasContentPage = !!quickLink.content_page_id;
+      setLinkType(hasContentPage ? 'content_page' : 'url');
+
       setFormData({
         title: quickLink.title || '',
         description: quickLink.description || '',
         url: quickLink.url || '',
+        content_page_id: quickLink.content_page_id || '',
         type: quickLink.type || 'external',
         category_id: quickLink.category_id || '',
         order: quickLink.order || 0,
@@ -95,10 +116,12 @@ export function QuickLinkDialog({
         icon: quickLink.icon || ''
       });
     } else {
+      setLinkType('url');
       setFormData({
         title: '',
         description: '',
         url: '',
+        content_page_id: '',
         type: 'external',
         category_id: '',
         order: 0,
@@ -165,24 +188,101 @@ export function QuickLinkDialog({
             />
           </div>
 
-          <div>
-            <Label htmlFor="url">
-              URL <span className="text-red-500">*</span>
+          {/* Link Type Selection */}
+          <div className="space-y-3">
+            <Label>
+              Link Target <span className="text-red-500">*</span>
             </Label>
-            <Input
-              id="url"
-              type="text"
-              value={formData.url}
-              onChange={(e) =>
-                setFormData({ ...formData, url: e.target.value })
-              }
-              required
-              placeholder="https://example.com or /internal-page"
-            />
-            <p className="text-muted-foreground mt-1 text-xs">
-              Full URL for external links, relative path for internal pages
-            </p>
+            <RadioGroup
+              value={linkType}
+              onValueChange={(value: 'url' | 'content_page') => {
+                setLinkType(value);
+                // Clear the opposite field
+                if (value === 'url') {
+                  setFormData({ ...formData, content_page_id: '' });
+                } else {
+                  setFormData({ ...formData, url: '' });
+                }
+              }}
+              className="flex gap-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="url" id="url_type" />
+                <Label
+                  htmlFor="url_type"
+                  className="cursor-pointer font-normal"
+                >
+                  External/Internal URL
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="content_page" id="content_page_type" />
+                <Label
+                  htmlFor="content_page_type"
+                  className="cursor-pointer font-normal"
+                >
+                  Content Page
+                </Label>
+              </div>
+            </RadioGroup>
           </div>
+
+          {/* URL Input - shown when linkType is 'url' */}
+          {linkType === 'url' && (
+            <div>
+              <Label htmlFor="url">
+                URL <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="url"
+                type="text"
+                value={formData.url}
+                onChange={(e) =>
+                  setFormData({ ...formData, url: e.target.value })
+                }
+                required={linkType === 'url'}
+                placeholder="https://example.com or /internal-page"
+              />
+              <p className="text-muted-foreground mt-1 text-xs">
+                Full URL for external links, relative path for internal pages
+              </p>
+            </div>
+          )}
+
+          {/* Content Page Selector - shown when linkType is 'content_page' */}
+          {linkType === 'content_page' && (
+            <div>
+              <Label htmlFor="content_page">
+                Content Page <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={formData.content_page_id}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, content_page_id: value })
+                }
+                disabled={loadingPages}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a content page" />
+                </SelectTrigger>
+                <SelectContent>
+                  {contentPages.map((page) => (
+                    <SelectItem key={page.id} value={page.id}>
+                      {page.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {loadingPages && (
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Loading content pages...
+                </p>
+              )}
+              <p className="text-muted-foreground mt-1 text-xs">
+                Link to an existing content page from your CMS
+              </p>
+            </div>
+          )}
 
           <div>
             <Label htmlFor="description">Description</Label>

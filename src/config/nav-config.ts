@@ -426,6 +426,15 @@ export const navItems: NavItem[] = [
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
         }
+      },
+      {
+        title: 'Quick Link Categories',
+        url: '/dashboard/content/quick-link-categories',
+        shortcut: ['q', 'c'],
+        subject: 'Quick Link Categories',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
+        }
       }
     ],
     access: {
