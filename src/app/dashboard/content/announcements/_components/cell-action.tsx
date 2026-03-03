@@ -92,6 +92,11 @@ export function ActionCell({ data }: ActionCellProps) {
           variant="ghost"
           size="icon"
           onClick={handleToggleStatus}
+          aria-label={
+            data.status === 'active'
+              ? 'Deactivate announcement'
+              : 'Activate announcement'
+          }
           title={data.status === 'active' ? 'Deactivate' : 'Activate'}
         >
           <IconPower
@@ -100,24 +105,27 @@ export function ActionCell({ data }: ActionCellProps) {
                 ? 'text-green-600'
                 : 'text-muted-foreground'
             }`}
+            aria-hidden="true"
           />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setOpen(true)}
+          aria-label="Edit announcement"
           title="Edit"
         >
-          <IconEdit className="h-4 w-4" />
+          <IconEdit className="h-4 w-4" aria-hidden="true" />
         </Button>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setDeleteOpen(true)}
           className="text-destructive hover:text-destructive"
+          aria-label="Delete announcement"
           title="Delete"
         >
-          <IconTrash className="h-4 w-4" />
+          <IconTrash className="h-4 w-4" aria-hidden="true" />
         </Button>
       </div>
     </>
