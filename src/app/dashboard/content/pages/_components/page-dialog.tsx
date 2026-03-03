@@ -11,6 +11,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -220,7 +222,7 @@ export function PageDialog({
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Nav Link</Label>
               <Select
@@ -262,24 +264,42 @@ export function PageDialog({
                   })
                 }
               />
+              <p className="text-muted-foreground text-xs">
+                Display order (lower numbers first)
+              </p>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(val: any) =>
-                  setFormData({ ...formData, status: val })
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label htmlFor="status" className="text-sm font-medium">
+                Publishing Status
+              </Label>
+              <p className="text-muted-foreground text-xs">
+                {formData.status === 'published'
+                  ? 'Page will be visible to everyone'
+                  : 'Page will be saved as a draft'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge
+                variant={
+                  formData.status === 'published' ? 'default' : 'secondary'
                 }
+                className="px-2 py-0 text-[10px]"
               >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                </SelectContent>
-              </Select>
+                {formData.status?.toUpperCase()}
+              </Badge>
+              <Switch
+                id="status"
+                checked={formData.status === 'published'}
+                onCheckedChange={(checked) =>
+                  setFormData({
+                    ...formData,
+                    status: checked ? 'published' : 'draft'
+                  })
+                }
+              />
             </div>
           </div>
 

@@ -20,6 +20,7 @@ import {
   SelectValue
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
   QuickLink,
@@ -137,11 +138,42 @@ export function QuickLinkDialog({
     setLoading(true);
 
     try {
+      // Clean up the data based on link type
+      const dataToSave = { ...formData };
+
+      if (linkType === 'url') {
+        // If using URL, remove content_page_id (don't send empty string)
+        delete dataToSave.content_page_id;
+        // Ensure URL is not empty
+        if (!dataToSave.url || dataToSave.url.trim() === '') {
+          toast.error('Please enter a URL', { duration: 5000 });
+          setLoading(false);
+          return;
+        }
+      } else {
+        // If using content page, set url to empty string (database has NOT NULL constraint)
+        dataToSave.url = '';
+        // Ensure content_page_id is selected
+        if (!dataToSave.content_page_id || dataToSave.content_page_id === '') {
+          toast.error('Please select a content page', { duration: 5000 });
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Remove empty content_page_id if it exists
+      if (dataToSave.content_page_id === '') {
+        delete dataToSave.content_page_id;
+      }
+
+      console.log('[QuickLinkDialog] Link type:', linkType);
+      console.log('[QuickLinkDialog] Data to save:', dataToSave);
+
       let result;
       if (quickLink) {
-        result = await updateQuickLink(quickLink.id, formData);
+        result = await updateQuickLink(quickLink.id, dataToSave);
       } else {
-        result = await createQuickLink(formData as any);
+        result = await createQuickLink(dataToSave as any);
       }
 
       if (result.success) {
@@ -379,27 +411,61 @@ export function QuickLinkDialog({
             </div>
           </div>
 
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="is_active"
-                checked={formData.is_active}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, is_active: checked })
-                }
-              />
-              <Label htmlFor="is_active">Active</Label>
+          <div className="grid gap-3">
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="is_active" className="text-sm font-medium">
+                  Active Status
+                </Label>
+                <p className="text-muted-foreground text-xs">
+                  {formData.is_active
+                    ? 'Quick link will be visible and active'
+                    : 'Quick link will be hidden and disabled'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={formData.is_active ? 'default' : 'secondary'}
+                  className="px-2 py-0 text-[10px]"
+                >
+                  {formData.is_active ? 'ACTIVE' : 'INACTIVE'}
+                </Badge>
+                <Switch
+                  id="is_active"
+                  checked={formData.is_active}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, is_active: checked })
+                  }
+                />
+              </div>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="opens_in_new_tab"
-                checked={formData.opens_in_new_tab}
-                onCheckedChange={(checked) =>
-                  setFormData({ ...formData, opens_in_new_tab: checked })
-                }
-              />
-              <Label htmlFor="opens_in_new_tab">Open in New Tab</Label>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label
+                  htmlFor="opens_in_new_tab"
+                  className="text-sm font-medium"
+                >
+                  Tab Behavior
+                </Label>
+                <p className="text-muted-foreground text-xs">
+                  {formData.opens_in_new_tab
+                    ? 'Link will open in a new window'
+                    : 'Link will open in the same window'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="px-2 py-0 text-[10px]">
+                  {formData.opens_in_new_tab ? 'NEW TAB' : 'SAME TAB'}
+                </Badge>
+                <Switch
+                  id="opens_in_new_tab"
+                  checked={formData.opens_in_new_tab}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, opens_in_new_tab: checked })
+                  }
+                />
+              </div>
             </div>
           </div>
 

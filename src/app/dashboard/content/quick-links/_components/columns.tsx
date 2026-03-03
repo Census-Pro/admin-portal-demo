@@ -2,13 +2,10 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import {
-  IconEdit,
-  IconTrash,
   IconExternalLink,
   IconDownload,
   IconFileText,
   IconLink,
-  IconPower,
   IconCopy
 } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { QuickLink } from '@/actions/common/cms-actions';
 import { toast } from 'sonner';
 import { ICON_LIST, IconName } from '@/components/ui/icon-picker';
+import { ActionCell } from './cell-action';
 
 const getTypeIcon = (type: string) => {
   switch (type) {
@@ -32,11 +30,7 @@ const getTypeIcon = (type: string) => {
   }
 };
 
-export const createColumns = (
-  onEdit: (link: QuickLink) => void,
-  onDelete: (link: QuickLink) => void,
-  onToggleActive: (link: QuickLink) => void
-): ColumnDef<QuickLink>[] => [
+export const columns: ColumnDef<QuickLink>[] = [
   {
     accessorKey: 'order',
     header: 'Order',
@@ -75,29 +69,37 @@ export const createColumns = (
     accessorKey: 'url',
     header: 'URL',
     cell: ({ row }) => {
-      const url = row.getValue('url') as string;
+      const url = (row.getValue('url') as string) || '';
       const truncated = url.length > 40 ? url.substring(0, 40) + '...' : url;
       return (
         <div className="flex items-center gap-2">
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="max-w-[200px] truncate text-xs text-blue-600 hover:underline"
-          >
-            {truncated}
-          </a>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={() => {
-              navigator.clipboard.writeText(url);
-              toast.success('URL copied to clipboard');
-            }}
-          >
-            <IconCopy className="h-3 w-3" />
-          </Button>
+          {url ? (
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="max-w-[200px] truncate text-xs text-blue-600 hover:underline"
+            >
+              {truncated}
+            </a>
+          ) : (
+            <span className="text-muted-foreground text-xs italic">
+              Linked to Content Page
+            </span>
+          )}
+          {url && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => {
+                navigator.clipboard.writeText(url);
+                toast.success('URL copied to clipboard');
+              }}
+            >
+              <IconCopy className="h-3 w-3" />
+            </Button>
+          )}
         </div>
       );
     }
@@ -130,43 +132,7 @@ export const createColumns = (
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => {
-      const link = row.original;
-
-      return (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEdit(link)}
-            title="Edit"
-          >
-            <IconEdit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onToggleActive(link)}
-            title={link.is_active ? 'Deactivate' : 'Activate'}
-          >
-            <IconPower
-              className={`h-4 w-4 ${
-                link.is_active ? 'text-green-600' : 'text-muted-foreground'
-              }`}
-            />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(link)}
-            className="text-destructive hover:text-destructive"
-            title="Delete"
-          >
-            <IconTrash className="h-4 w-4" />
-          </Button>
-        </div>
-      );
-    },
+    cell: ({ row }) => <ActionCell data={row.original} />,
     size: 120
   }
 ];

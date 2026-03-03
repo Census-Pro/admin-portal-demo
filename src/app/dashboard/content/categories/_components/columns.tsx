@@ -7,17 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Icons } from '@/components/icons';
 import { Badge } from '@/components/ui/badge';
 
-interface GetColumnsProps {
-  onEdit: (category: AnnouncementCategory) => void;
-  onDelete: (id: string) => void;
-  onToggleStatus: (category: AnnouncementCategory) => void;
-}
+import { ActionCell } from './cell-action';
 
-export const getColumns = ({
-  onEdit,
-  onDelete,
-  onToggleStatus
-}: GetColumnsProps): ColumnDef<AnnouncementCategory>[] => [
+export const columns: ColumnDef<AnnouncementCategory>[] = [
   {
     accessorKey: 'order',
     header: 'Order',
@@ -53,11 +45,21 @@ export const getColumns = ({
   {
     accessorKey: 'description',
     header: 'Description',
-    cell: ({ row }) => (
-      <div className="text-muted-foreground max-w-md truncate text-sm">
-        {row.original.description || '-'}
-      </div>
-    )
+    cell: ({ row }) => {
+      const description = row.original.description || '-';
+      const plainText =
+        typeof description === 'string'
+          ? description
+              .replace(/<[^>]*>/g, '')
+              .replace(/\s+/g, ' ')
+              .trim()
+          : description;
+      return (
+        <div className="text-muted-foreground max-w-md truncate text-sm">
+          {plainText || '-'}
+        </div>
+      );
+    }
   },
   {
     accessorKey: 'is_active',
@@ -71,44 +73,6 @@ export const getColumns = ({
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => {
-      const category = row.original;
-
-      return (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => onToggleStatus(category)}
-            title={category.is_active ? 'Deactivate' : 'Activate'}
-          >
-            <IconPower
-              className={`h-4 w-4 ${
-                category.is_active ? 'text-green-600' : 'text-muted-foreground'
-              }`}
-            />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => onEdit(category)}
-            title="Edit"
-          >
-            <Icons.edit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8"
-            onClick={() => onDelete(category.id)}
-            title="Delete"
-          >
-            <Icons.trash className="h-4 w-4" />
-          </Button>
-        </div>
-      );
-    }
+    cell: ({ row }) => <ActionCell data={row.original} />
   }
 ];

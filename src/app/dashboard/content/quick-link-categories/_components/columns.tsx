@@ -1,16 +1,11 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconEdit, IconTrash, IconPower } from '@tabler/icons-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { QuickLinkCategory } from '@/actions/common/cms-actions';
+import { ActionCell } from './cell-action';
 
-export const createColumns = (
-  onEdit: (category: QuickLinkCategory) => void,
-  onDelete: (category: QuickLinkCategory) => void,
-  onToggleActive: (category: QuickLinkCategory) => void
-): ColumnDef<QuickLinkCategory>[] => [
+export const columns: ColumnDef<QuickLinkCategory>[] = [
   {
     accessorKey: 'order',
     header: 'Order',
@@ -76,39 +71,7 @@ export const createColumns = (
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => {
-      const category = row.original;
-      return (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onToggleActive(category)}
-            title={category.is_active ? 'Deactivate' : 'Activate'}
-          >
-            <IconPower
-              className={`h-4 w-4 ${category.is_active ? 'text-green-600' : 'text-gray-400'}`}
-            />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onEdit(category)}
-            title="Edit"
-          >
-            <IconEdit className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(category)}
-            title="Delete"
-          >
-            <IconTrash className="h-4 w-4 text-red-600" />
-          </Button>
-        </div>
-      );
-    },
+    cell: ({ row }) => <ActionCell data={row.original} />,
     size: 120
   }
 ];

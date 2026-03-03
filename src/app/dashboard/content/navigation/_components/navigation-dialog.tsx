@@ -12,13 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { NavigationItem } from '@/actions/common/cms-actions';
 import { IconPicker } from '@/components/ui/icon-picker';
 
@@ -142,47 +137,57 @@ export function NavigationDialog({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="order">Display Order</Label>
-              <Input
-                id="order"
-                required
-                type="number"
-                min="0"
-                value={formData.order ?? ''}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  const parsed = parseInt(val, 10);
-                  setFormData({
-                    ...formData,
-                    // keep undefined when input is empty or invalid to avoid NaN
-                    order:
-                      val === '' || Number.isNaN(parsed) ? undefined : parsed
-                  });
-                }}
-              />
+          <div className="space-y-2">
+            <Label htmlFor="order">Display Order</Label>
+            <Input
+              id="order"
+              required
+              type="number"
+              min="0"
+              value={formData.order ?? ''}
+              onChange={(e) => {
+                const val = e.target.value;
+                const parsed = parseInt(val, 10);
+                setFormData({
+                  ...formData,
+                  // keep undefined when input is empty or invalid to avoid NaN
+                  order: val === '' || Number.isNaN(parsed) ? undefined : parsed
+                });
+              }}
+            />
+            <p className="text-muted-foreground text-xs">
+              0 = first, higher = later
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between rounded-lg border p-4">
+            <div className="space-y-0.5">
+              <Label htmlFor="status" className="text-sm font-medium">
+                Active Status
+              </Label>
               <p className="text-muted-foreground text-xs">
-                0 = first, higher = later
+                {formData.status === 'active'
+                  ? 'Nav link will be visible in the menu'
+                  : 'Nav link will be hidden from the menu'}
               </p>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(val: any) =>
-                  setFormData({ ...formData, status: val })
-                }
+            <div className="flex items-center gap-2">
+              <Badge
+                variant={formData.status === 'active' ? 'default' : 'secondary'}
+                className="px-2 py-0 text-[10px]"
               >
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+                {formData.status?.toUpperCase()}
+              </Badge>
+              <Switch
+                id="status"
+                checked={formData.status === 'active'}
+                onCheckedChange={(checked) =>
+                  setFormData({
+                    ...formData,
+                    status: checked ? 'active' : 'inactive'
+                  })
+                }
+              />
             </div>
           </div>
 

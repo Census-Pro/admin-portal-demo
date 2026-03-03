@@ -349,6 +349,46 @@ export async function getAnnouncementCategories() {
   }
 }
 
+export async function getActiveAnnouncementCategories() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/announcement-categories/active`;
+
+    console.log('[getActiveAnnouncementCategories] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error(
+        '[getActiveAnnouncementCategories] API Error:',
+        response.statusText
+      );
+      return {
+        success: false,
+        error: 'Failed to fetch active announcement categories',
+        data: []
+      };
+    }
+
+    const result = await response.json();
+    return {
+      success: true,
+      data: result || []
+    };
+  } catch (error) {
+    console.error('[getActiveAnnouncementCategories] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch active announcement categories',
+      data: []
+    };
+  }
+}
+
 export async function createAnnouncementCategory(
   data: Omit<AnnouncementCategory, 'id' | 'createdAt' | 'updatedAt'>
 ) {

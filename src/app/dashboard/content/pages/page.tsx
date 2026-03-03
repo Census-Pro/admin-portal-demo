@@ -1,162 +1,44 @@
-'use client';
-
-import { useEffect, useState, useMemo } from 'react';
+import { Suspense } from 'react';
 import PageContainer from '@/components/layout/page-container';
-import { Button } from '@/components/ui/button';
-import { Icons } from '@/components/icons';
-import { DataTable } from '@/components/ui/table/data-table';
-import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
-import { getColumns } from './_components/columns';
-import { PageDialog } from './_components/page-dialog';
-import {
-  CmsPage,
-  getCmsPages,
-  createCmsPage,
-  updateCmsPage,
-  deleteCmsPage,
-  toggleCmsPageStatus
-} from '@/actions/common/cms-actions';
-import { toast } from 'sonner';
+import { getCmsPages } from '@/actions/common/cms-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
+import { AddPageButton } from './_components/add-page-button';
+import { PagesTable } from './_components/pages-table';
 
-export default function ContentPage() {
-  const [data, setData] = useState<CmsPage[]>([]);
-  const [loading, setLoading] = useState(true);
+export const metadata = {
+  title: 'Dashboard: Content Pages'
+};
 
-  // Dialog states
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedPage, setSelectedPage] = useState<CmsPage | null>(null);
-
-  // Delete states
-  const [deleteOpen, setDeleteOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
-
-  const fetchData = async () => {
-    setLoading(true);
-    const result = await getCmsPages();
-    if (result.success && result.data) {
-      setData(result.data);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const handleAdd = () => {
-    setSelectedPage(null);
-    setDialogOpen(true);
-  };
-
-  const handleEdit = (pageData: CmsPage) => {
-    setSelectedPage(pageData);
-    setDialogOpen(true);
-  };
-
-  const handleDeleteClick = (id: string) => {
-    setDeleteId(id);
-    setDeleteOpen(true);
-  };
-
-  const handleSave = async (formData: Partial<CmsPage>) => {
-    try {
-      if (selectedPage) {
-        const result = await updateCmsPage(selectedPage.id, formData);
-        if (result.success) {
-          toast.success(result.message);
-          fetchData();
-        } else {
-          toast.error(result.error || 'Failed to update page');
-        }
-      } else {
-        const result = await createCmsPage(formData as any);
-        if (result.success) {
-          toast.success(result.message);
-          fetchData();
-        } else {
-          toast.error(result.error || 'Failed to create page');
-        }
-      }
-    } catch (error) {
-      console.error('Error saving page:', error);
-      toast.error('An unexpected error occurred');
-    }
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!deleteId) return;
-    setDeleting(true);
-    try {
-      const result = await deleteCmsPage(deleteId);
-      if (result.success) toast.success(result.message);
-      fetchData();
-    } catch {
-      toast.error('Failed to delete');
-    }
-    setDeleting(false);
-    setDeleteOpen(false);
-  };
-
-  const handleToggleStatus = async (pageData: CmsPage) => {
-    try {
-      const result = await toggleCmsPageStatus(pageData.id);
-      if (result.success) {
-        toast.success(result.message);
-        fetchData();
-      } else {
-        toast.error(result.error || 'Failed to update status');
-      }
-    } catch (error) {
-      console.error('Error toggling status:', error);
-      toast.error('Error updating status');
-    }
-  };
-
-  const columns = useMemo(
-    () =>
-      getColumns({
-        onEdit: handleEdit,
-        onDelete: handleDeleteClick,
-        onToggleStatus: handleToggleStatus
-      }),
-    []
-  );
-
+export default async function ContentPage() {
   return (
     <PageContainer
       pageTitle="Content Pages"
       pageDescription="Manage content pages for the portal."
-      pageHeaderAction={
-        <Button onClick={handleAdd}>
-          <Icons.add className="mr-2 h-4 w-4" /> Add Page
-        </Button>
-      }
+      pageHeaderAction={<AddPageButton />}
     >
       <div className="space-y-4">
-        {loading ? (
-          <DataTableSkeleton columnCount={4} rowCount={5} />
-        ) : (
-          <DataTable columns={columns} data={data} totalItems={data.length} />
-        )}
+        <Suspense
+          fallback={<DataTableSkeleton columnCount={4} rowCount={10} />}
+        >
+          <PagesDataWrapper />
+        </Suspense>
       </div>
-
-      <PageDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        page={selectedPage}
-        onSave={handleSave}
-      />
-
-      <DeleteConfirmationDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        onConfirm={handleConfirmDelete}
-        isLoading={deleting}
-        title="Delete Page"
-        description="Are you sure you want to delete this page? This action cannot be undone."
-      />
     </PageContainer>
   );
+}
+
+async function PagesDataWrapper() {
+  const result = await getCmsPages();
+
+  if (!result.success) {
+    return (
+      <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-6 text-center">
+        <p className="text-destructive">{result.error}</p>
+      </div>
+    );
+  }
+
+  const pages = result.data || [];
+
+  return <PagesTable data={pages} />;
 }

@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { AnnouncementCategory } from '@/actions/common/cms-actions';
 
 interface CategoryDialogProps {
@@ -171,18 +172,30 @@ export function CategoryDialog({
 
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div className="space-y-0.5">
-              <Label htmlFor="is_active">Active Status</Label>
-              <p className="text-muted-foreground text-sm">
-                Only active categories are shown in dropdowns
+              <Label htmlFor="is_active" className="text-sm font-medium">
+                Active Status
+              </Label>
+              <p className="text-muted-foreground text-xs">
+                {formData.is_active
+                  ? 'Category will be visible and usable'
+                  : 'Category will be hidden and disabled'}
               </p>
             </div>
-            <Switch
-              id="is_active"
-              checked={formData.is_active}
-              onCheckedChange={(checked) =>
-                setFormData({ ...formData, is_active: checked })
-              }
-            />
+            <div className="flex items-center gap-2">
+              <Badge
+                variant={formData.is_active ? 'default' : 'secondary'}
+                className="px-2 py-0 text-[10px]"
+              >
+                {formData.is_active ? 'ACTIVE' : 'INACTIVE'}
+              </Badge>
+              <Switch
+                id="is_active"
+                checked={formData.is_active}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, is_active: checked })
+                }
+              />
+            </div>
           </div>
 
           <DialogFooter>

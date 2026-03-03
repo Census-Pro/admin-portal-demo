@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import '@/components/ui/rich-text-editor.css';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
@@ -23,7 +25,7 @@ import {
 import {
   Announcement,
   AnnouncementCategory,
-  getAnnouncementCategories
+  getActiveAnnouncementCategories
 } from '@/actions/common/cms-actions';
 
 interface AnnouncementDialogProps {
@@ -55,14 +57,34 @@ export function AnnouncementDialog({
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true);
-      const result = await getAnnouncementCategories();
+      const result = await getActiveAnnouncementCategories();
       if (result.success && result.data) {
         setCategories(result.data);
       }
       setLoadingCategories(false);
     };
-    fetchCategories();
-  }, []);
+    if (open) {
+      fetchCategories();
+    }
+  }, [open]);
+
+  // Transform MinIO URLs to proxy URLs
+  const transformImageUrl = (url: string | undefined | null): string | null => {
+    if (!url) return null;
+
+    // If it's a direct MinIO URL, convert to proxy URL
+    if (url.includes('localhost:9000') || url.includes('census-media')) {
+      const parts = url.split('/');
+      const categoryIndex = parts.findIndex((p) => p === 'announcements');
+      if (categoryIndex !== -1) {
+        const category = parts[categoryIndex];
+        const filename = parts.slice(categoryIndex + 1).join('/');
+        return `http://localhost:5003/media/${category}/${filename}`;
+      }
+    }
+
+    return url;
+  };
 
   useEffect(() => {
     if (announcement) {
@@ -73,7 +95,7 @@ export function AnnouncementDialog({
           announcement.category_id || announcement.category?.id || '',
         status: announcement.status
       });
-      setPreviewUrl(announcement.image_url || null);
+      setPreviewUrl(transformImageUrl(announcement.image_url));
       setSelectedFile(null);
     } else {
       setFormData({
@@ -200,22 +222,37 @@ export function AnnouncementDialog({
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label>Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(val: any) =>
-                  setFormData({ ...formData, status: val })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="status" className="text-sm font-medium">
+                  Status
+                </Label>
+                <p className="text-muted-foreground text-xs">
+                  {formData.status === 'active'
+                    ? 'Notice will be visible to the public'
+                    : 'Notice will be hidden from the public'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={
+                    formData.status === 'active' ? 'default' : 'secondary'
+                  }
+                  className="px-2 py-0 text-[10px]"
+                >
+                  {formData.status?.toUpperCase()}
+                </Badge>
+                <Switch
+                  id="status"
+                  checked={formData.status === 'active'}
+                  onCheckedChange={(checked) =>
+                    setFormData({
+                      ...formData,
+                      status: checked ? 'active' : 'inactive'
+                    })
+                  }
+                />
+              </div>
             </div>
           </div>
 
