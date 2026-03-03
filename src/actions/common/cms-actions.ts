@@ -534,13 +534,27 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
     const session = await auth();
     const url = `${COMMON_SERVICE_URL}/cm-content`;
 
-    // Add updated_by_id and updated_by_name from session
-    const payload = {
-      ...data,
+    // Clean up optional fields - convert empty strings or 'none' to null
+    const cleanedData: any = {
+      title: data.title,
+      slug: data.slug,
+      body: data.body || '',
+      status: data.status || 'draft',
+      order: data.order || 1,
+      cms_navigation_id:
+        data.cms_navigation_id && data.cms_navigation_id !== 'none'
+          ? data.cms_navigation_id
+          : null,
+      featured_image_id:
+        data.featured_image_id && data.featured_image_id !== 'none'
+          ? data.featured_image_id
+          : null,
       updated_by_id: session?.user?.id || session?.user?.sessionId,
       updated_by_name:
         session?.user?.fullName || session?.user?.name || 'Admin User'
     };
+
+    console.log('[createCmsPage] Payload:', cleanedData);
 
     const response = await fetch(url, {
       method: 'POST',
@@ -548,14 +562,35 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(cleanedData)
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[createCmsPage] Error response:', errorData);
+
+      // Handle specific foreign key constraint errors
+      let errorMessage = errorData.message || 'Failed to create page';
+
+      if (
+        errorMessage.includes('foreign key constraint') ||
+        errorMessage.includes('violates foreign key')
+      ) {
+        if (errorMessage.includes('cms_navigation_id')) {
+          errorMessage =
+            'The selected navigation item does not exist. Please refresh and try again.';
+        } else if (errorMessage.includes('featured_image_id')) {
+          errorMessage =
+            'The selected featured image does not exist. Please refresh and try again.';
+        } else {
+          errorMessage =
+            'Invalid reference data. Please check your selections and try again.';
+        }
+      }
+
       return {
         success: false,
-        error: errorData.message || 'Failed to create page'
+        error: errorMessage
       };
     }
 
@@ -568,7 +603,10 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
     };
   } catch (error) {
     console.error('[createCmsPage] Error:', error);
-    return { success: false, error: 'Failed to create page' };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to create page'
+    };
   }
 }
 
@@ -577,20 +615,67 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/cm-content/${id}`;
 
+    // Clean up optional fields - convert empty strings or 'none' to null
+    const cleanedData: any = {};
+
+    if (data.title !== undefined) cleanedData.title = data.title;
+    if (data.slug !== undefined) cleanedData.slug = data.slug;
+    if (data.body !== undefined) cleanedData.body = data.body;
+    if (data.status !== undefined) cleanedData.status = data.status;
+    if (data.order !== undefined) cleanedData.order = data.order;
+
+    // Handle optional foreign keys properly
+    if (data.cms_navigation_id !== undefined) {
+      cleanedData.cms_navigation_id =
+        data.cms_navigation_id && data.cms_navigation_id !== 'none'
+          ? data.cms_navigation_id
+          : null;
+    }
+
+    if (data.featured_image_id !== undefined) {
+      cleanedData.featured_image_id =
+        data.featured_image_id && data.featured_image_id !== 'none'
+          ? data.featured_image_id
+          : null;
+    }
+
+    console.log('[updateCmsPage] Payload:', cleanedData);
+
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(cleanedData)
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[updateCmsPage] Error response:', errorData);
+
+      // Handle specific foreign key constraint errors
+      let errorMessage = errorData.message || 'Failed to update page';
+
+      if (
+        errorMessage.includes('foreign key constraint') ||
+        errorMessage.includes('violates foreign key')
+      ) {
+        if (errorMessage.includes('cms_navigation_id')) {
+          errorMessage =
+            'The selected navigation item does not exist. Please refresh and try again.';
+        } else if (errorMessage.includes('featured_image_id')) {
+          errorMessage =
+            'The selected featured image does not exist. Please refresh and try again.';
+        } else {
+          errorMessage =
+            'Invalid reference data. Please check your selections and try again.';
+        }
+      }
+
       return {
         success: false,
-        error: errorData.message || 'Failed to update page'
+        error: errorMessage
       };
     }
 
@@ -603,7 +688,10 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
     };
   } catch (error) {
     console.error('[updateCmsPage] Error:', error);
-    return { success: false, error: 'Failed to update page' };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update page'
+    };
   }
 }
 

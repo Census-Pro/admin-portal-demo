@@ -48,8 +48,8 @@ export function PageDialog({
     slug: '',
     body: '',
     status: 'draft',
-    cms_navigation_id: '',
-    featured_image_id: '',
+    cms_navigation_id: undefined,
+    featured_image_id: undefined,
     order: 1,
     updated_by_name: 'Admin User'
   });
@@ -80,8 +80,8 @@ export function PageDialog({
         slug: page.slug,
         body: page.body || '',
         status: page.status,
-        cms_navigation_id: page.cms_navigation_id || '',
-        featured_image_id: page.featured_image_id || '',
+        cms_navigation_id: page.cms_navigation_id || undefined,
+        featured_image_id: page.featured_image_id || undefined,
         order: page.order || 1,
         updated_by_name: page.updated_by_name || 'Admin User'
       });
@@ -91,8 +91,8 @@ export function PageDialog({
         slug: '',
         body: '',
         status: 'draft',
-        cms_navigation_id: preSelectedNavigationId || '',
-        featured_image_id: '',
+        cms_navigation_id: preSelectedNavigationId || undefined,
+        featured_image_id: undefined,
         order: 1,
         updated_by_name: 'Admin User'
       });

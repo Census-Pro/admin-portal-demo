@@ -64,14 +64,24 @@ export default function ContentPage() {
     try {
       if (selectedPage) {
         const result = await updateCmsPage(selectedPage.id, formData);
-        if (result.success) toast.success(result.message);
+        if (result.success) {
+          toast.success(result.message);
+          fetchData();
+        } else {
+          toast.error(result.error || 'Failed to update page');
+        }
       } else {
         const result = await createCmsPage(formData as any);
-        if (result.success) toast.success(result.message);
+        if (result.success) {
+          toast.success(result.message);
+          fetchData();
+        } else {
+          toast.error(result.error || 'Failed to create page');
+        }
       }
-      fetchData();
-    } catch {
-      toast.error('An error occurred');
+    } catch (error) {
+      console.error('Error saving page:', error);
+      toast.error('An unexpected error occurred');
     }
   };
 
