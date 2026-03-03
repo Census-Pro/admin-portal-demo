@@ -150,10 +150,25 @@ export default function NavigationPage() {
         ? { ...formData, cms_navigation_id: preSelectedNavId }
         : formData;
 
+      console.log('═══════════════════════════════════════════════');
+      console.log('[handleSavePage] 🚀 Starting save process...');
+      console.log('[handleSavePage] Form data received:', formData);
+      console.log('[handleSavePage] preSelectedNavId:', preSelectedNavId);
+      console.log('[handleSavePage] Final data to save:', dataToSave);
+      console.log('[handleSavePage] Is editing?', !!selectedPage);
+      console.log('═══════════════════════════════════════════════');
+
       if (selectedPage) {
+        console.log(
+          '[handleSavePage] 📝 Updating existing page:',
+          selectedPage.id
+        );
         const result = await updateCmsPage(selectedPage.id, dataToSave);
+        console.log('[handleSavePage] ✅ Update result:', result);
+
         if (result.success) {
-          toast.success(result.message);
+          toast.success(result.message, { duration: 5000 });
+          console.log('[handleSavePage] ✅ SUCCESS: Page updated successfully');
           setPageDialogOpen(false);
           fetchData();
           // Refresh the sub-links dialog if open
@@ -166,11 +181,23 @@ export default function NavigationPage() {
               if (refreshed) setSelectedNavForSubLinks(refreshed);
             }
           }
+        } else {
+          const errorMsg = result.error || 'Failed to update page';
+          toast.error(errorMsg, { duration: 10000 });
+          console.error('[handleSavePage] ❌ ERROR:', errorMsg);
+          console.error('[handleSavePage] Full error result:', result);
         }
       } else {
+        console.log('[handleSavePage] ➕ Creating new page...');
         const result = await createCmsPage(dataToSave as any);
+        console.log('[handleSavePage] ✅ Create result:', result);
+
         if (result.success) {
-          toast.success(result.message);
+          toast.success(result.message || 'Page created successfully', {
+            duration: 5000
+          });
+          console.log('[handleSavePage] ✅ SUCCESS: Page created successfully');
+          console.log('[handleSavePage] Created page data:', result.data);
           setPageDialogOpen(false);
           fetchData();
           // Refresh the sub-links dialog if open
@@ -183,10 +210,26 @@ export default function NavigationPage() {
               if (refreshed) setSelectedNavForSubLinks(refreshed);
             }
           }
+        } else {
+          const errorMsg = result.error || 'Failed to create page';
+          toast.error(errorMsg, { duration: 10000 });
+          console.error('[handleSavePage] ❌ ERROR:', errorMsg);
+          console.error('[handleSavePage] Full error result:', result);
         }
       }
-    } catch {
-      toast.error('An error occurred');
+    } catch (error) {
+      console.error('[handleSavePage] ❌ EXCEPTION:', error);
+      console.error(
+        '[handleSavePage] Exception stack:',
+        error instanceof Error ? error.stack : 'No stack trace'
+      );
+      toast.error(
+        'An error occurred: ' +
+          (error instanceof Error ? error.message : 'Unknown error'),
+        {
+          duration: 10000
+        }
+      );
     }
   };
 

@@ -102,12 +102,28 @@ export function PageDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await onSave({
-      ...formData,
-      order: Number(formData.order)
-    });
-    setLoading(false);
-    onOpenChange(false);
+
+    console.log('═══════════════════════════════════════════════');
+    console.log('[PageDialog] 📝 Form submitted');
+    console.log('[PageDialog] Current form data:', formData);
+    console.log(
+      '[PageDialog] preSelectedNavigationId:',
+      preSelectedNavigationId
+    );
+    console.log('═══════════════════════════════════════════════');
+
+    try {
+      await onSave({
+        ...formData,
+        order: Number(formData.order)
+      });
+      console.log('[PageDialog] ✅ onSave completed successfully');
+    } catch (error) {
+      console.error('[PageDialog] ❌ Error in onSave:', error);
+    } finally {
+      setLoading(false);
+      // Don't close immediately - let the parent component handle it after showing toast
+    }
   };
 
   return (
@@ -181,14 +197,16 @@ export function PageDialog({
               </SelectContent>
             </Select>
             {formData.featured_image_id &&
-              formData.featured_image_id !== 'none' && (
+              formData.featured_image_id !== 'none' &&
+              mediaItems.find((m) => m.id === formData.featured_image_id)
+                ?.url && (
                 <div className="mt-2">
                   <div className="bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
                     <img
                       src={
                         mediaItems.find(
                           (m) => m.id === formData.featured_image_id
-                        )?.url || ''
+                        )!.url
                       }
                       alt="Featured image preview"
                       className="h-full w-full object-contain"

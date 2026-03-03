@@ -535,6 +535,8 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
     const url = `${COMMON_SERVICE_URL}/cm-content`;
 
     // Clean up optional fields - convert empty strings or 'none' to null
+    // Note: updated_by_id and updated_by_name are NOT included for CREATE
+    // The backend will auto-populate these from the session/context
     const cleanedData: any = {
       title: data.title,
       slug: data.slug,
@@ -548,10 +550,8 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
       featured_image_id:
         data.featured_image_id && data.featured_image_id !== 'none'
           ? data.featured_image_id
-          : null,
-      updated_by_id: session?.user?.id || session?.user?.sessionId,
-      updated_by_name:
-        session?.user?.fullName || session?.user?.name || 'Admin User'
+          : null
+      // updated_by_id and updated_by_name removed - not allowed in CreateDto
     };
 
     console.log('[createCmsPage] Payload:', cleanedData);
