@@ -23,7 +23,7 @@ export async function createDzongkhags(formData: any) {
       return { error: true, message: errorMessage };
     }
 
-    revalidatePath('/dashboard/dzongkhag');
+    revalidatePath('/dashboard/dzongkhags');
     return data;
   } catch (error) {
     console.error('Error creating dzongkhag:', error);
@@ -117,7 +117,7 @@ export async function deleteDzongkhag(id?: string) {
       };
     }
 
-    revalidatePath('/dashboard/dzongkhag');
+    revalidatePath('/dashboard/dzongkhags');
     return { error: false, message: 'Dzongkhag deleted successfully' };
   } catch (error) {
     console.error('Error deleting dzongkhag:', error);
@@ -140,6 +140,6 @@ export async function updateDzongkhag(id: string, data: any) {
     return { error: true, message: errorMessage };
   }
 
-  revalidatePath('/dashboard/dzongkhag');
+  revalidatePath('/dashboard/dzongkhags');
   return res;
 }

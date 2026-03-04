@@ -11,14 +11,33 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
 import { createGewogs, updateGewog } from '@/actions/common/gewog-actions';
+import { getAllDzongkhags } from '@/actions/common/dzongkhag-actions';
 import { toast } from 'sonner';
+
+interface Dzongkhag {
+  id: string;
+  name: string;
+  dzongkha_name?: string;
+}
 
 interface AddGewogModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  initialData?: { id: string; name: string } | null;
+  initialData?: {
+    id: string;
+    name: string;
+    dzongkha_name?: string;
+    dzongkhag_id?: string;
+  } | null;
 }
 
 export function AddGewogModal({
@@ -29,12 +48,45 @@ export function AddGewogModal({
 }: AddGewogModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
+  const [dzongkhaName, setDzongkhaName] = useState(
+    initialData?.dzongkha_name || ''
+  );
+  const [dzongkhagId, setDzongkhagId] = useState(
+    initialData?.dzongkhag_id || ''
+  );
+  const [dzongkhags, setDzongkhags] = useState<Dzongkhag[]>([]);
+  const [loadingDzongkhags, setLoadingDzongkhags] = useState(false);
+
+  useEffect(() => {
+    const fetchDzongkhags = async () => {
+      setLoadingDzongkhags(true);
+      try {
+        const result = await getAllDzongkhags();
+        if (result && !result.error) {
+          setDzongkhags(result.data || result || []);
+        }
+      } catch (error) {
+        console.error('Error fetching dzongkhags:', error);
+        toast.error('Failed to load dzongkhags');
+      } finally {
+        setLoadingDzongkhags(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchDzongkhags();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
+      setDzongkhaName(initialData.dzongkha_name || '');
+      setDzongkhagId(initialData.dzongkhag_id || '');
     } else {
       setName('');
+      setDzongkhaName('');
+      setDzongkhagId('');
     }
   }, [initialData, isOpen]);
 
@@ -45,9 +97,17 @@ export function AddGewogModal({
     try {
       let result;
       if (initialData) {
-        result = await updateGewog(initialData.id, { name });
+        result = await updateGewog(initialData.id, {
+          name,
+          dzongkha_name: dzongkhaName,
+          dzongkhag_id: dzongkhagId
+        });
       } else {
-        result = await createGewogs({ name });
+        result = await createGewogs({
+          name,
+          dzongkha_name: dzongkhaName,
+          dzongkhag_id: dzongkhagId
+        });
       }
 
       if (result && !result.error) {
@@ -57,6 +117,8 @@ export function AddGewogModal({
         onSuccess?.();
         onClose();
         setName('');
+        setDzongkhaName('');
+        setDzongkhagId('');
       } else {
         toast.error(
           result?.message ||
@@ -94,11 +156,52 @@ export function AddGewogModal({
             />
           </div>
 
+          <div className="grid gap-2">
+            <Label htmlFor="dzongkha_name">Dzongkha Name</Label>
+            <Input
+              id="dzongkha_name"
+              value={dzongkhaName}
+              onChange={(e) => setDzongkhaName(e.target.value)}
+              placeholder="Enter dzongkha name (e.g., ཀ་ཝང)"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="dzongkhag">Dzongkhag *</Label>
+            <Select
+              value={dzongkhagId}
+              onValueChange={setDzongkhagId}
+              disabled={loadingDzongkhags}
+              required
+            >
+              <SelectTrigger id="dzongkhag">
+                <SelectValue
+                  placeholder={
+                    loadingDzongkhags
+                      ? 'Loading dzongkhags...'
+                      : 'Select a dzongkhag'
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {dzongkhags.map((dzongkhag) => (
+                  <SelectItem key={dzongkhag.id} value={dzongkhag.id}>
+                    {dzongkhag.name}
+                    {dzongkhag.dzongkha_name && ` (${dzongkhag.dzongkha_name})`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-muted-foreground text-xs">
+              Select the dzongkhag this gewog belongs to
+            </p>
+          </div>
+
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || !dzongkhagId}>
               {isLoading
                 ? 'Saving...'
                 : initialData

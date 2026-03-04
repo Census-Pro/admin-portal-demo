@@ -21,7 +21,11 @@ interface AddDzongkhagModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (result?: any) => void;
-  initialData?: { id: string; name: string } | null;
+  initialData?: {
+    id: string;
+    name: string;
+    dzongkha_name?: string;
+  } | null;
 }
 
 export function AddDzongkhagModal({
@@ -32,13 +36,18 @@ export function AddDzongkhagModal({
 }: AddDzongkhagModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState(initialData?.name || '');
+  const [dzongkhaName, setDzongkhaName] = useState(
+    initialData?.dzongkha_name || ''
+  );
 
-  // Update name when initialData changes
+  // Update fields when initialData changes
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
+      setDzongkhaName(initialData.dzongkha_name || '');
     } else {
       setName('');
+      setDzongkhaName('');
     }
   }, [initialData, isOpen]);
 
@@ -49,9 +58,15 @@ export function AddDzongkhagModal({
     try {
       let result;
       if (initialData) {
-        result = await updateDzongkhag(initialData.id, { name });
+        result = await updateDzongkhag(initialData.id, {
+          name,
+          dzongkha_name: dzongkhaName
+        });
       } else {
-        result = await createDzongkhags({ name });
+        result = await createDzongkhags({
+          name,
+          dzongkha_name: dzongkhaName
+        });
       }
 
       if (result && !result.error) {
@@ -61,6 +76,7 @@ export function AddDzongkhagModal({
         onSuccess(result);
         onClose();
         setName('');
+        setDzongkhaName('');
       } else {
         toast.error(
           result?.message ||
@@ -98,6 +114,19 @@ export function AddDzongkhagModal({
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter dzongkhag name (e.g., Thimphu, Paro, Punakha)"
             />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="dzongkha_name">Dzongkha Name</Label>
+            <Input
+              id="dzongkha_name"
+              value={dzongkhaName}
+              onChange={(e) => setDzongkhaName(e.target.value)}
+              placeholder="Enter dzongkha name (e.g., ཐིམ་ཕུག, སྤ་རོ, སྤུ་ན་ཁ)"
+            />
+            <p className="text-muted-foreground text-xs">
+              Optional: Enter the Dzongkha name for the dzongkhag
+            </p>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
