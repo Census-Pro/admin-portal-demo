@@ -1,8 +1,8 @@
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import PageContainer from '@/components/layout/page-container';
-import { Heading } from '@/components/ui/heading';
 import VillagesListingPage from './_components/villages-listing';
 import { SearchParams } from 'nuqs/server';
+
+import AddVillageButton from './_components/add-village-button';
 
 type PageProps = {
   searchParams: Promise<SearchParams>;
@@ -10,16 +10,12 @@ type PageProps = {
 
 export default async function page({ searchParams }: PageProps) {
   return (
-    <PageContainer>
+    <PageContainer
+      pageTitle="Villages"
+      pageDescription="Manage villages for the census system"
+      pageHeaderAction={<AddVillageButton />}
+    >
       <div className="space-y-4">
-        <Breadcrumbs />
-
-        <div className="flex items-start justify-between">
-          <Heading
-            title="Villages"
-            description="Manage villages for the census system"
-          />
-        </div>
         <VillagesListingPage searchParams={await searchParams} />
       </div>
     </PageContainer>

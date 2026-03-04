@@ -6,6 +6,7 @@ import { columns } from './columns';
 interface Gewog {
   id: string;
   name: string;
+  dzongkha_name?: string;
   description?: string;
   isActive: boolean;
   createdAt: string;

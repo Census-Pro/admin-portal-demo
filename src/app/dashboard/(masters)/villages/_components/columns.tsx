@@ -37,6 +37,14 @@ export const columns: ColumnDef<Village>[] = [
     }
   },
   {
+    accessorKey: 'dzongkha_name',
+    header: 'Dzongkha Name',
+    cell: ({ row }) => {
+      const village = row.original;
+      return <div className="font-medium">{village.dzongkha_name || '-'}</div>;
+    }
+  },
+  {
     accessorKey: 'gewog.name',
     header: 'Gewog',
     cell: ({ row }) => {

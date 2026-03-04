@@ -10,6 +10,7 @@ import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 interface Dzongkhag {
   id: string;
   name: string;
+  dzongkha_name?: string;
   description?: string;
   isActive: boolean;
   createdAt: string;

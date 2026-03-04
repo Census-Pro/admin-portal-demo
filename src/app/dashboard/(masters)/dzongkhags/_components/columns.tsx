@@ -12,6 +12,7 @@ import { AddDzongkhagModal } from './add-dzongkhag-modal';
 interface Dzongkhag {
   id: string;
   name: string;
+  dzongkha_name?: string;
   description?: string;
   isActive: boolean;
   createdAt: string;
@@ -34,6 +35,16 @@ export const createColumns = (
           </div>
           <div className="font-medium">{dzongkhag.name}</div>
         </div>
+      );
+    }
+  },
+  {
+    accessorKey: 'dzongkha_name',
+    header: 'Dzongkha Name',
+    cell: ({ row }) => {
+      const dzongkhag = row.original;
+      return (
+        <div className="font-medium">{dzongkhag.dzongkha_name || '-'}</div>
       );
     }
   },

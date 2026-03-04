@@ -12,6 +12,7 @@ import { AddGewogModal } from './add-gewog-modal';
 interface Gewog {
   id: string;
   name: string;
+  dzongkha_name?: string;
 }
 
 export const columns: ColumnDef<Gewog>[] = [
@@ -28,6 +29,14 @@ export const columns: ColumnDef<Gewog>[] = [
           <div className="font-medium">{gewog.name}</div>
         </div>
       );
+    }
+  },
+  {
+    accessorKey: 'dzongkha_name',
+    header: 'Dzongkha Name',
+    cell: ({ row }) => {
+      const gewog = row.original;
+      return <div className="font-medium">{gewog.dzongkha_name || '-'}</div>;
     }
   },
   {
