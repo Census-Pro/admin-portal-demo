@@ -5,6 +5,8 @@ import { IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { AddCountryModal } from './add-country-modal';
 
+import { BulkUploadButton } from '@/components/common/bulk-upload-button';
+
 export function AddCountryButton() {
   const [open, setOpen] = useState(false);
 
@@ -18,10 +20,13 @@ export function AddCountryButton() {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} className="gap-2">
-        <IconPlus className="h-4 w-4" />
-        Add Country
-      </Button>
+      <div className="flex items-center gap-2">
+        <BulkUploadButton itemName="countries" />
+        <Button onClick={() => setOpen(true)} className="gap-2">
+          <IconPlus className="h-4 w-4" />
+          Add Country
+        </Button>
+      </div>
       <AddCountryModal
         open={open}
         onOpenChange={setOpen}

@@ -5,6 +5,8 @@ import { IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import { AddDzongkhagModal } from './add-dzongkhag-modal';
 
+import { BulkUploadButton } from '@/components/common/bulk-upload-button';
+
 export function AddDzongkhagButton() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -19,10 +21,13 @@ export function AddDzongkhagButton() {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>
-        <IconPlus className="mr-2 h-4 w-4" />
-        Add Dzongkhag
-      </Button>
+      <div className="flex items-center gap-2">
+        <BulkUploadButton itemName="dzongkhags" />
+        <Button onClick={() => setIsOpen(true)}>
+          <IconPlus className="mr-2 h-4 w-4" />
+          Add Dzongkhag
+        </Button>
+      </div>
 
       <AddDzongkhagModal
         isOpen={isOpen}
