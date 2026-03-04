@@ -102,6 +102,30 @@ export async function getAllGewogs() {
   }
 }
 
+export async function getGewogById(id: string) {
+  try {
+    const response = await fetch(`${API_URL}/gewogs/${id}`, {
+      headers: await instance(),
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      return {
+        error: true,
+        message: `Failed to fetch gewog: ${response.statusText}`
+      };
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching gewog:', error);
+    return {
+      error: true,
+      message: 'Failed to fetch gewog'
+    };
+  }
+}
+
 export async function deleteGewog(id?: string) {
   try {
     const response = await fetch(`${API_URL}/gewogs/${id}`, {

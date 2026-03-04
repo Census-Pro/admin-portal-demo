@@ -8,6 +8,8 @@ const API_URL = process.env.COMMON_SERVICE;
 
 export async function createVillages(formData: any) {
   try {
+    console.log('Creating village with data:', formData);
+
     const response = await fetch(`${API_URL}/villages`, {
       method: 'POST',
       body: JSON.stringify(formData),
@@ -16,9 +18,14 @@ export async function createVillages(formData: any) {
 
     const data = await response.json();
 
+    console.log('API Response:', { status: response.status, data });
+
     if (!response.ok || data.error) {
       const errorMessage =
-        (data?.error as ApiErrorResponse)?.message || 'Failed to add villages';
+        (data?.error as ApiErrorResponse)?.message ||
+        data?.message ||
+        `Failed to add village (Status: ${response.status})`;
+      console.error('API Error:', errorMessage, data);
       return { error: true, message: errorMessage };
     }
 
@@ -26,7 +33,10 @@ export async function createVillages(formData: any) {
     return data;
   } catch (error) {
     console.error('Error creating village:', error);
-    return { error: true, message: 'Failed to add villages' };
+    return {
+      error: true,
+      message: 'Failed to add villages. Please check the console for details.'
+    };
   }
 }
 
@@ -39,7 +49,7 @@ export async function getVillages({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/villages?page=${page}&take=${limit}`;
+  let url = `${API_URL}/villages?page=${page}&take=${limit}&relations=gewog,dzongkhag`;
   try {
     // Search
     if (search) {
@@ -84,21 +94,118 @@ export async function getVillages({
 
 export async function getAllVillages() {
   try {
-    const response = await fetch(`${API_URL}/villages/all`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
+    // First, try with relations parameter
+    let response = await fetch(
+      `${API_URL}/villages/all?relations=gewog,dzongkhag`,
+      {
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      console.error('Failed to fetch villages:', response.statusText);
+      return {
+        error: true,
+        message: `Failed to fetch villages: ${response.statusText}`,
+        data: []
+      };
+    }
+
+    let data = await response.json();
+    console.log('Villages API Response (raw):', data);
+
+    // Handle different response structures
+    let villagesData = Array.isArray(data) ? data : data.data || data;
+
+    // If no villages or if villages don't have gewog/dzongkhag objects, fetch them separately
+    if (Array.isArray(villagesData) && villagesData.length > 0) {
+      const firstVillage = villagesData[0];
+
+      // Check if relations are missing
+      if (!firstVillage.gewog || !firstVillage.dzongkhag) {
+        console.log(
+          'Relations not included in response, fetching separately...'
+        );
+
+        // Fetch all gewogs and dzongkhags
+        const [gewogsResponse, dzongkhagsResponse] = await Promise.all([
+          fetch(`${API_URL}/gewogs/all`, {
+            headers: await instance(),
+            cache: 'no-store'
+          }),
+          fetch(`${API_URL}/dzongkhags/all`, {
+            headers: await instance(),
+            cache: 'no-store'
+          })
+        ]);
+
+        const gewogs = await gewogsResponse.json();
+        const dzongkhags = await dzongkhagsResponse.json();
+
+        const gewogsData = Array.isArray(gewogs) ? gewogs : gewogs.data || [];
+        const dzongkhagsData = Array.isArray(dzongkhags)
+          ? dzongkhags
+          : dzongkhags.data || [];
+
+        console.log('Fetched gewogs:', gewogsData.length);
+        console.log('Fetched dzongkhags:', dzongkhagsData.length);
+
+        // Map villages with their relations
+        villagesData = villagesData.map((village: any) => {
+          const gewog = gewogsData.find((g: any) => g.id === village.gewog_id);
+          const dzongkhag = dzongkhagsData.find(
+            (d: any) => d.id === village.dzongkhag_id
+          );
+
+          return {
+            ...village,
+            gewog: gewog || null,
+            dzongkhag: dzongkhag || null
+          };
+        });
+
+        console.log('Villages with relations mapped:', villagesData.length);
+      }
+    }
+
+    console.log('Final processed villages data:', villagesData);
+
+    return { data: villagesData, error: false };
+  } catch (error) {
+    console.error('Error fetching villages:', error);
+    return {
+      error: true,
+      message: 'Failed to fetch villages',
+      data: []
+    };
+  }
+}
+
+export async function getVillageById(id: string) {
+  try {
+    const response = await fetch(
+      `${API_URL}/villages/${id}?relations=gewog,dzongkhag`,
+      {
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
 
     if (!response.ok) {
       return {
         error: true,
-        message: `Failed to fetch villages: ${response.statusText}`
+        message: `Failed to fetch village: ${response.statusText}`
       };
     }
 
     return response.json();
   } catch (error) {
-    console.error('Error fetching villages:', error);
+    console.error('Error fetching village:', error);
+    return {
+      error: true,
+      message: 'Failed to fetch village'
+    };
   }
 }
 
@@ -125,20 +232,35 @@ export async function deleteVillage(id?: string) {
 }
 
 export async function updateVillage(id: string, data: any) {
-  const response = await fetch(`${API_URL}/villages/${id}`, {
-    method: 'PATCH',
-    headers: await instance(),
-    body: JSON.stringify(data)
-  });
+  try {
+    console.log('Updating village:', id, 'with data:', data);
 
-  const res = await response.json();
+    const response = await fetch(`${API_URL}/villages/${id}`, {
+      method: 'PATCH',
+      headers: await instance(),
+      body: JSON.stringify(data)
+    });
 
-  if (!response.ok || res?.error) {
-    const errorMessage =
-      (res?.error as ApiErrorResponse)?.message || 'Failed to update village';
-    return { error: true, message: errorMessage };
+    const res = await response.json();
+
+    console.log('Update Response:', { status: response.status, data: res });
+
+    if (!response.ok || res?.error) {
+      const errorMessage =
+        (res?.error as ApiErrorResponse)?.message ||
+        res?.message ||
+        `Failed to update village (Status: ${response.status})`;
+      console.error('Update API Error:', errorMessage, res);
+      return { error: true, message: errorMessage };
+    }
+
+    revalidatePath('/dashboard/villages');
+    return res;
+  } catch (error) {
+    console.error('Error updating village:', error);
+    return {
+      error: true,
+      message: 'Failed to update village. Please check the console for details.'
+    };
   }
-
-  revalidatePath('/dashboard/villages');
-  return res;
 }

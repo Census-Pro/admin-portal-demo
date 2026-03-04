@@ -103,6 +103,30 @@ export async function getAllDzongkhags() {
   }
 }
 
+export async function getDzongkhagById(id: string) {
+  try {
+    const response = await fetch(`${API_URL}/dzongkhags/${id}`, {
+      headers: await instance(),
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      return {
+        error: true,
+        message: `Failed to fetch dzongkhag: ${response.statusText}`
+      };
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching dzongkhag:', error);
+    return {
+      error: true,
+      message: 'Failed to fetch dzongkhag'
+    };
+  }
+}
+
 export async function deleteDzongkhag(id?: string) {
   try {
     const response = await fetch(`${API_URL}/dzongkhags/${id}`, {

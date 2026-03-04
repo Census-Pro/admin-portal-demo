@@ -4,11 +4,16 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { IconPlus } from '@tabler/icons-react';
 import { AddVillageModal } from './add-village-modal';
-
+import { useRouter } from 'next/navigation';
 import { BulkUploadButton } from '@/components/common/bulk-upload-button';
 
 export default function AddVillageButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSuccess = () => {
+    router.refresh();
+  };
 
   return (
     <>
@@ -19,7 +24,11 @@ export default function AddVillageButton() {
           Add New Village
         </Button>
       </div>
-      <AddVillageModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <AddVillageModal
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        onSuccess={handleSuccess}
+      />
     </>
   );
 }

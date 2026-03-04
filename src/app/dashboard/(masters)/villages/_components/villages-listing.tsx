@@ -1,7 +1,6 @@
 import { SearchParams } from 'nuqs/server';
-import { getVillages } from '@/actions/common/village-actions';
+import { getAllVillages } from '@/actions/common/village-actions';
 import VillagesTable from './villages-table';
-import { searchParamsCache } from '@/lib/searchparams';
 
 type VillagesListingPageProps = {
   searchParams: SearchParams;
@@ -10,13 +9,10 @@ type VillagesListingPageProps = {
 export default async function VillagesListingPage({
   searchParams
 }: VillagesListingPageProps) {
-  const { page, limit, q } = searchParamsCache.parse(searchParams);
+  const result = await getAllVillages();
 
-  const { villages, totalVillages } = await getVillages({
-    page,
-    limit,
-    search: q || undefined
-  });
+  const villages = result?.error ? [] : result?.data || [];
+  const totalVillages = villages.length;
 
   return <VillagesTable data={villages} totalData={totalVillages} />;
 }
