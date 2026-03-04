@@ -87,6 +87,15 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Villages',
+        url: '/dashboard/villages',
+        shortcut: ['v', 'l'],
+        subject: 'Villages',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_VILLAGES]
+        }
+      },
+      {
         title: 'Cities',
         url: '/dashboard/cities',
         shortcut: ['c', 't'],
@@ -171,6 +180,7 @@ export const navItems: NavItem[] = [
         PERMS.MANAGE_COUNTRIES,
         PERMS.MANAGE_DZONGKHAGS,
         PERMS.MANAGE_GEWOGS,
+        PERMS.MANAGE_VILLAGES,
         PERMS.MANAGE_CITIES,
         PERMS.MANAGE_GENDERS,
         PERMS.MANAGE_MARITAL_STATUS,

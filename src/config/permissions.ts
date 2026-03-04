@@ -204,6 +204,16 @@ export const DELETE_GEWOGS = 'delete:gewogs' as const;
 export const MANAGE_GEWOGS = 'manage:gewogs' as const;
 
 // ============================================================================
+// VILLAGE PERMISSIONS
+// ============================================================================
+
+export const VIEW_VILLAGES = 'read:villages' as const;
+export const CREATE_VILLAGES = 'create:villages' as const;
+export const EDIT_VILLAGES = 'update:villages' as const;
+export const DELETE_VILLAGES = 'delete:villages' as const;
+export const MANAGE_VILLAGES = 'manage:villages' as const;
+
+// ============================================================================
 // CITY PERMISSIONS
 // ============================================================================
 
@@ -490,6 +500,11 @@ export type Permission =
   | typeof EDIT_GEWOGS
   | typeof DELETE_GEWOGS
   | typeof MANAGE_GEWOGS
+  | typeof VIEW_VILLAGES
+  | typeof CREATE_VILLAGES
+  | typeof EDIT_VILLAGES
+  | typeof DELETE_VILLAGES
+  | typeof MANAGE_VILLAGES
   | typeof VIEW_CITIES
   | typeof CREATE_CITIES
   | typeof EDIT_CITIES
