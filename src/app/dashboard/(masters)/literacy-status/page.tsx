@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
+import { LiteracyStatusSearchBar } from './_components/search-bar';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddLiteracyStatusButton } from './_components/add-literacy-status-button';
 import { LiteracyStatusesTable } from './_components/literacy-statuses-table';
@@ -16,6 +17,7 @@ export default function LiteracyStatusManagementPage() {
       pageHeaderAction={<AddLiteracyStatusButton />}
     >
       <div className="space-y-4">
+        <LiteracyStatusSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >

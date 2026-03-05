@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
+import { CitiesSearchBar } from './_components/search-bar';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddCityButton } from './_components/add-city-button';
 import { CitiesListing } from './_components/cities-listing';
@@ -25,6 +26,7 @@ export default async function CityManagementPage(props: PageProps) {
       pageHeaderAction={<AddCityButton />}
     >
       <div className="space-y-4">
+        <CitiesSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >

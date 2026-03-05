@@ -1,6 +1,7 @@
 'use client';
 
 import PageContainer from '@/components/layout/page-container';
+import { RelationshipTypesSearchBar } from './_components/search-bar';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddRelationshipButton } from './_components/add-relationship-button';
 import { RelationshipsTable } from './_components/relationships-table';
@@ -20,6 +21,7 @@ export default function RelationshipManagementPage() {
       pageHeaderAction={<AddRelationshipButton onSuccess={handleDataChange} />}
     >
       <div className="space-y-4">
+        <RelationshipTypesSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={4} rowCount={10} />}
         >

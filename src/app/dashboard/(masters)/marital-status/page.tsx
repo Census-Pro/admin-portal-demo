@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
+import { MaritalStatusSearchBar } from './_components/search-bar';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddMaritalStatusButton } from './_components/add-marital-status-button';
 import { MaritalStatusesTable } from './_components/marital-statuses-table';
@@ -16,6 +17,7 @@ export default function MaritalStatusManagementPage() {
       pageHeaderAction={<AddMaritalStatusButton />}
     >
       <div className="space-y-4">
+        <MaritalStatusSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >

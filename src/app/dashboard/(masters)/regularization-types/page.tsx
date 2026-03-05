@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
+import { RegularizationTypesSearchBar } from './_components/search-bar';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddRegularizationTypeButton } from './_components/add-regularization-type-button';
 import { RegularizationTypesTable } from './_components/regularization-types-table';
@@ -16,6 +17,7 @@ export default function RegularizationTypeManagementPage() {
       pageHeaderAction={<AddRegularizationTypeButton />}
     >
       <div className="space-y-4">
+        <RegularizationTypesSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >

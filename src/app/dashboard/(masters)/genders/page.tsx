@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
+import { GendersSearchBar } from './_components/search-bar';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddGenderButton } from './_components/add-gender-button';
 import { GendersTable } from './_components/genders-table';
@@ -16,6 +17,7 @@ export default function GenderManagementPage() {
       pageHeaderAction={<AddGenderButton />}
     >
       <div className="space-y-4">
+        <GendersSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >

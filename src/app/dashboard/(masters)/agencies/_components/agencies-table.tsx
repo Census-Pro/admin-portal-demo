@@ -40,7 +40,8 @@ export function AgenciesTable({
   const [searchParams, setSearchParams] = useQueryStates(
     {
       page: parseAsInteger.withDefault(1),
-      limit: parseAsInteger.withDefault(10)
+      limit: parseAsInteger.withDefault(10),
+      q: parseAsString.withDefault('')
     },
     {
       shallow: false,
@@ -53,7 +54,8 @@ export function AgenciesTable({
       try {
         const result = await getAgencies({
           page: searchParams.page,
-          limit: searchParams.limit
+          limit: searchParams.limit,
+          search: searchParams.q
         });
 
         if (result.success) {
@@ -80,7 +82,7 @@ export function AgenciesTable({
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit, refreshTrigger]);
+  }, [searchParams.page, searchParams.limit, searchParams.q, refreshTrigger]);
 
   if (error) {
     return (

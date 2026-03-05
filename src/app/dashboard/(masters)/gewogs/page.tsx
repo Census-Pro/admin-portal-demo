@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
+import { GewogsSearchBar } from './_components/search-bar';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddGewogButton } from './_components/add-gewog-button';
 import { GewogsListing } from './_components/gewogs-listing';
@@ -25,6 +26,7 @@ export default async function GewogManagementPage(props: PageProps) {
       pageHeaderAction={<AddGewogButton />}
     >
       <div className="space-y-4">
+        <GewogsSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={2} rowCount={10} />}
         >

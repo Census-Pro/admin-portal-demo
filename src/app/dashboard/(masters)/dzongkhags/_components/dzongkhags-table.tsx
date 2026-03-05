@@ -1,6 +1,6 @@
 'use client';
 
-import { useQueryStates, parseAsInteger } from 'nuqs';
+import { useQueryStates, parseAsInteger, parseAsString } from 'nuqs';
 import { useEffect, useState, useTransition, useCallback } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { createColumns } from './columns';
@@ -34,7 +34,8 @@ export function DzongkhagsTable({
   const [searchParams] = useQueryStates(
     {
       page: parseAsInteger.withDefault(1),
-      limit: parseAsInteger.withDefault(10)
+      limit: parseAsInteger.withDefault(10),
+      q: parseAsString.withDefault('')
     },
     {
       shallow: false,
@@ -47,7 +48,8 @@ export function DzongkhagsTable({
       try {
         const result = await getDzongkhags({
           page: searchParams.page,
-          limit: searchParams.limit
+          limit: searchParams.limit,
+          search: searchParams.q
         });
 
         if (result.dzongkhags) {
@@ -65,7 +67,7 @@ export function DzongkhagsTable({
         setTotalItems(0);
       }
     });
-  }, [searchParams.page, searchParams.limit]);
+  }, [searchParams.page, searchParams.limit, searchParams.q]);
 
   useEffect(() => {
     fetchData();

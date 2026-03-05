@@ -1,4 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
+import { CountriesSearchBar } from './_components/search-bar';
 import { AddCountryButton } from './_components/add-country-button';
 import { Suspense } from 'react';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
@@ -16,6 +17,7 @@ export default async function CountryManagementPage() {
       pageHeaderAction={<AddCountryButton />}
     >
       <div className="space-y-4">
+        <CountriesSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={3} rowCount={10} />}
         >

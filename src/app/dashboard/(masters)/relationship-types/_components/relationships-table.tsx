@@ -37,7 +37,8 @@ export function RelationshipsTable({
   const [searchParams, setSearchParams] = useQueryStates(
     {
       page: parseAsInteger.withDefault(1),
-      limit: parseAsInteger.withDefault(10)
+      limit: parseAsInteger.withDefault(10),
+      q: parseAsString.withDefault('')
     },
     {
       shallow: false,
@@ -50,7 +51,8 @@ export function RelationshipsTable({
       try {
         const result = await getRelationships({
           page: searchParams.page,
-          limit: searchParams.limit
+          limit: searchParams.limit,
+          search: searchParams.q
         });
 
         if (result.success) {
@@ -68,11 +70,11 @@ export function RelationshipsTable({
         setTotalItems(0);
       }
     });
-  }, [searchParams.page, searchParams.limit]);
+  }, [searchParams.page, searchParams.limit, searchParams.q]);
 
   useEffect(() => {
     fetchData();
-  }, [searchParams.page, searchParams.limit, fetchData]);
+  }, [searchParams.page, searchParams.limit, searchParams.q, fetchData]);
 
   useEffect(() => {
     if (refreshTrigger > 0) {

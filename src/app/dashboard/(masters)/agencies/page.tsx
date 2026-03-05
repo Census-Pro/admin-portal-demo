@@ -1,6 +1,7 @@
 'use client';
 
 import PageContainer from '@/components/layout/page-container';
+import { AgenciesSearchBar } from './_components/search-bar';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddAgencyButton } from './_components/add-agency-button';
 import { AgenciesTable } from './_components/agencies-table';
@@ -20,6 +21,7 @@ export default function AgencyManagementPage() {
       }
     >
       <div className="space-y-4">
+        <AgenciesSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={3} rowCount={10} />}
         >
