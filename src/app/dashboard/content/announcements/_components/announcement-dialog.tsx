@@ -25,7 +25,7 @@ import {
 import {
   Announcement,
   AnnouncementCategory,
-  getActiveAnnouncementCategories
+  getAnnouncementCategories
 } from '@/actions/common/cms-actions';
 
 interface AnnouncementDialogProps {
@@ -57,7 +57,7 @@ export function AnnouncementDialog({
   useEffect(() => {
     const fetchCategories = async () => {
       setLoadingCategories(true);
-      const result = await getActiveAnnouncementCategories();
+      const result = await getAnnouncementCategories();
       if (result.success && result.data) {
         setCategories(result.data);
       }
