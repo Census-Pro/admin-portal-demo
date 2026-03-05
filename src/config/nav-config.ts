@@ -10,6 +10,7 @@ export const navItems: NavItem[] = [
     shortcut: ['d', 'd'],
     items: [],
     subject: 'Dashboard',
+    superAdminOnly: true, // Only super admins can see the Dashboard
     access: {
       permissions: [PERMS.MANAGE_ALL, PERMS.VIEW_DASHBOARD]
     }

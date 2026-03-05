@@ -227,10 +227,15 @@ export async function updateRole(data: {
 }) {
   try {
     const headers = await instance();
-    const response = await fetch(`${API_URL}/roles/${data.id}`, {
-      method: 'PUT',
+    const { id, ...updateData } = data;
+
+    console.log('[updateRole] Updating role:', id, updateData);
+    console.log('[updateRole] URL:', `${API_URL}/roles/${id}`);
+
+    const response = await fetch(`${API_URL}/roles/${id}`, {
+      method: 'PATCH',
       headers,
-      body: JSON.stringify(data)
+      body: JSON.stringify(updateData)
     });
 
     if (!response.ok) {
@@ -238,9 +243,20 @@ export async function updateRole(data: {
 
       try {
         const error = await response.json();
+        console.error('[updateRole] API Error:', error);
         errorMessage = error.message || error.error || errorMessage;
       } catch {
+        console.error(
+          '[updateRole] HTTP Error:',
+          response.status,
+          response.statusText
+        );
         errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      if (response.status === 403) {
+        errorMessage =
+          "You don't have permission to update roles. Please contact your administrator.";
       }
 
       return {
@@ -250,14 +266,16 @@ export async function updateRole(data: {
     }
 
     const result = await response.json();
+    console.log('[updateRole] Role updated successfully:', result);
     revalidatePath('/dashboard/roles');
 
     return {
       success: true,
-      message: result.message || 'Role updated successfully'
+      message: result.message || 'Role updated successfully',
+      data: result.data
     };
   } catch (error) {
-    console.error('Error in updateRole:', error);
+    console.error('[updateRole] Unexpected error:', error);
     return {
       success: false,
       error:

@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconTrash, IconEye } from '@tabler/icons-react';
+import { IconTrash, IconEye, IconArrowsSort } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User } from '@/types/user';
@@ -15,7 +15,18 @@ import { useRouter } from 'next/navigation';
 export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
   {
     accessorKey: 'name',
-    header: 'User',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="-ml-4 hover:bg-transparent"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          User
+          <IconArrowsSort className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const user = row.original;
       const displayName = user.name || user.cidNo || 'N/A';
@@ -46,7 +57,18 @@ export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
   },
   {
     accessorKey: 'role',
-    header: 'Role',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className="-ml-4 hover:bg-transparent"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Role
+          <IconArrowsSort className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       return <Badge variant="outline">{row.getValue('role')}</Badge>;
     }

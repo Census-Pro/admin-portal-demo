@@ -8,14 +8,8 @@ import { checkPermission } from '@/lib/permission-check';
 export default async function OverviewPage() {
   const session = await auth();
 
-  // Check if user has permission to view dashboard
-  const permissionCheck = checkPermission(session, [
-    'read:dashboard',
-    'manage:all'
-  ]);
-
-  // If user doesn't have permission, redirect to unauthorized page
-  if (!permissionCheck.hasAccess) {
+  // Dashboard is restricted to SUPER_ADMIN only
+  if (session?.user?.roleType !== 'SUPER_ADMIN') {
     redirect('/dashboard/unauthorized');
   }
 

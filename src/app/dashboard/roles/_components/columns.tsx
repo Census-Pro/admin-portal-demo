@@ -1,14 +1,14 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconTrash, IconEye } from '@tabler/icons-react';
+import { IconTrash, IconEye, IconEdit } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteRole } from '@/actions/common/role-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { EditRoleModal } from './edit-role-modal';
 
 interface Role {
   id: string;
@@ -61,10 +61,15 @@ export const columns: ColumnDef<Role>[] = [
 function ActionsCell({ role }: { role: Role }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
+  };
+
+  const handleEditClick = () => {
+    setEditModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
@@ -87,6 +92,10 @@ function ActionsCell({ role }: { role: Role }) {
     }
   };
 
+  const handleEditSuccess = () => {
+    router.refresh();
+  };
+
   return (
     <>
       {/* Debug: Verify role object */}
@@ -104,6 +113,13 @@ function ActionsCell({ role }: { role: Role }) {
         confirmText="Delete Role"
       />
 
+      <EditRoleModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSuccess={handleEditSuccess}
+        role={role}
+      />
+
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"
@@ -113,6 +129,15 @@ function ActionsCell({ role }: { role: Role }) {
         >
           <IconEye className="h-4 w-4" />
           <span className="sr-only">View Permissions</span>
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleEditClick}
+          disabled={isDeleting}
+        >
+          <IconEdit className="h-4 w-4" />
+          <span className="sr-only">Edit Role</span>
         </Button>
         <Button
           variant="ghost"

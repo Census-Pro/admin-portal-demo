@@ -235,11 +235,16 @@ export function useFilteredNavItems(items: NavItem[]) {
             return true;
           }
 
-          // If subject check fails, deny access
+          // If subject check fails, fall back to permission-based check
+          // This allows users with correct permissions to access even without subject abilities
           console.log(
-            `Item "${item.title}": No access to subject "${item.subject}"`
+            `Item "${item.title}": No subject access, falling back to permission check`
           );
-          return false;
+          const hasAccess = checkItemAccess(item.access);
+          console.log(
+            `Item "${item.title}": Permission-based access = ${hasAccess}`
+          );
+          return hasAccess;
         }
 
         // No subject defined, fall back to traditional permission-based access
