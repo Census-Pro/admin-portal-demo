@@ -5,6 +5,7 @@ import { columns } from './_components/columns';
 import { Suspense } from 'react';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddRoleButton } from './_components/add-role-button';
+import { RolesSearchBar } from './_components/search-bar';
 
 export const metadata = {
   title: 'Dashboard: Role Management'
@@ -18,6 +19,7 @@ export default async function RoleManagementPage() {
       pageHeaderAction={<AddRoleButton />}
     >
       <div className="space-y-4">
+        <RolesSearchBar />
         <Suspense
           fallback={<DataTableSkeleton columnCount={4} rowCount={10} />}
         >

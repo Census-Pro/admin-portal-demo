@@ -1,6 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
 import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './_components/pending-columns';
+import { PendingSearchBar } from './_components/search-bar';
 
 export const metadata = {
   title: 'Death Registration - Pending Applications'
@@ -36,7 +37,6 @@ const pendingList = [
     created_at: '2026-01-16T11:20:00Z'
   }
 ];
-
 export default function DeathRegistrationPendingPage() {
   return (
     <PageContainer
@@ -44,6 +44,7 @@ export default function DeathRegistrationPendingPage() {
       pageDescription="View all pending death registration applications"
     >
       <div className="space-y-4">
+        <PendingSearchBar />
         <DataTable
           columns={columns}
           data={pendingList}

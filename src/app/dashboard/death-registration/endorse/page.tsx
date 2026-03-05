@@ -1,6 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
 import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './_components/endorse-columns';
+import { EndorseSearchBar } from './_components/search-bar';
 
 export const metadata = {
   title: 'Death Registration - Endorse'
@@ -46,6 +47,7 @@ export default function DeathRegistrationEndorsePage() {
       pageDescription="Review and endorse death registration applications pending endorsement"
     >
       <div className="space-y-4">
+        <EndorseSearchBar />
         <DataTable
           columns={columns}
           data={endorsementList}

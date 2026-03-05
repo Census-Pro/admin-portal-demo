@@ -1,6 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
 import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './_components/verify-columns';
+import { VerifySearchBar } from './_components/search-bar';
 
 export const metadata = {
   title: 'Death Registration - Verify'
@@ -46,6 +47,7 @@ export default function DeathRegistrationVerifyPage() {
       pageDescription="Review and verify death registration applications pending verification"
     >
       <div className="space-y-4">
+        <VerifySearchBar />
         <DataTable
           columns={columns}
           data={verificationList}

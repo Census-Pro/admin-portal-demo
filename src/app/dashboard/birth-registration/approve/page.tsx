@@ -1,6 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
 import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './_components/approve-columns';
+import { ApproveSearchBar } from './_components/search-bar';
 
 export const metadata = {
   title: 'Birth Registration - Approve'
@@ -55,6 +56,7 @@ export default function BirthRegistrationApprovePage() {
       pageDescription="Review and approve verified birth registration applications"
     >
       <div className="space-y-4">
+        <ApproveSearchBar />
         <DataTable
           columns={columns}
           data={approvalList}
