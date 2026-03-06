@@ -1075,13 +1075,23 @@ export async function updateNavigationItem(
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/cm-navigation/${id}`;
 
+    // Remove fields that should not be updated
+    const {
+      created_by_id,
+      created_by_name,
+      createdAt,
+      updatedAt,
+      contentPages,
+      ...updateData
+    } = data;
+
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(updateData)
     });
 
     if (!response.ok) {
