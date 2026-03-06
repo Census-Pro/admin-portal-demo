@@ -3,13 +3,13 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { NavigationItem } from '@/actions/common/cms-actions';
+import { SubLink } from '@/actions/common/cms-actions';
 import { ICON_LIST, IconName } from '@/components/ui/icon-picker';
 import { ActionCell } from './action-cell';
-import { IconList, IconPlus } from '@tabler/icons-react';
+import { IconFiles } from '@tabler/icons-react';
 import Link from 'next/link';
 
-export const columns: ColumnDef<NavigationItem>[] = [
+export const columns: ColumnDef<SubLink>[] = [
   {
     accessorKey: 'order',
     header: 'Order',
@@ -28,49 +28,39 @@ export const columns: ColumnDef<NavigationItem>[] = [
       return (
         <div className="flex items-center gap-2">
           {Icon && <Icon className="text-muted-foreground h-4 w-4" />}
-          <span className="font-medium">{row.original.label}</span>
+          <div>
+            <div className="font-medium">{row.original.label}</div>
+            {row.original.description && (
+              <div className="text-muted-foreground text-xs">
+                {row.original.description}
+              </div>
+            )}
+          </div>
         </div>
       );
     }
   },
   {
-    accessorKey: 'url',
-    header: 'URL',
-    cell: ({ row }) => (
-      <div className="text-muted-foreground max-w-[200px] truncate text-sm">
-        {row.original.url || '-'}
-      </div>
-    )
-  },
-  {
-    accessorKey: 'subLinks',
-    header: 'Sub-Links',
+    accessorKey: 'contentPages',
+    header: 'Content Pages',
     cell: ({ row }) => {
-      const subLinksCount = row.original.subLinks?.length || 0;
+      const contentCount = row.original.contentPages?.length || 0;
+      const navId = row.original.cms_navigation_id;
+      const subLinkId = row.original.id;
+
       return (
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="font-mono">
-            {subLinksCount}
+            {contentCount}
           </Badge>
-          {subLinksCount > 0 ? (
-            <Link
-              href={`/dashboard/content/navigation/${row.original.id}/sub-links`}
-            >
-              <Button variant="secondary" size="sm" className="h-7 gap-1">
-                <IconList className="h-3.5 w-3.5" />
-                Manage
-              </Button>
-            </Link>
-          ) : (
-            <Link
-              href={`/dashboard/content/navigation/${row.original.id}/sub-links`}
-            >
-              <Button variant="secondary" size="sm" className="h-7 gap-1">
-                <IconPlus className="h-3.5 w-3.5" />
-                Add
-              </Button>
-            </Link>
-          )}
+          <Link
+            href={`/dashboard/content/navigation/${navId}/sub-links/${subLinkId}/content`}
+          >
+            <Button variant="ghost" size="sm" className="h-7 gap-1">
+              <IconFiles className="h-3.5 w-3.5" />
+              {contentCount > 0 ? 'View Pages' : 'Add Page'}
+            </Button>
+          </Link>
         </div>
       );
     },

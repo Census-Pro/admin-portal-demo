@@ -44,7 +44,8 @@ export interface AnnouncementCategory {
 
 export interface CmsPage {
   id: string;
-  cms_navigation_id?: string;
+  cms_navigation_id?: string; // Legacy - for backward compatibility
+  cm_sub_link_id?: string; // New - for 3-tier structure
   slug: string;
   title: string;
   body?: string;
@@ -56,6 +57,10 @@ export interface CmsPage {
   createdAt?: string;
   updatedAt?: string;
   navigation?: {
+    id: string;
+    label: string;
+  };
+  subLink?: {
     id: string;
     label: string;
   };
@@ -79,6 +84,22 @@ export interface NavigationItem {
   icon?: string;
   order?: number;
   message?: string;
+  status: 'active' | 'inactive';
+  created_by_id?: string;
+  created_by_name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  subLinks?: SubLink[]; // New - for 3-tier structure
+  contentPages?: CmsPage[]; // Legacy - for backward compatibility
+}
+
+export interface SubLink {
+  id: string;
+  cms_navigation_id: string;
+  label: string;
+  description?: string;
+  icon?: string;
+  order?: number;
   status: 'active' | 'inactive';
   created_by_id?: string;
   created_by_name?: string;
@@ -571,7 +592,6 @@ export async function getCmsPages() {
 export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
   try {
     const headers = await instance();
-    const session = await auth();
     const url = `${COMMON_SERVICE_URL}/cm-content`;
 
     // Clean up optional fields - convert empty strings or 'none' to null
@@ -586,6 +606,10 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
       cms_navigation_id:
         data.cms_navigation_id && data.cms_navigation_id !== 'none'
           ? data.cms_navigation_id
+          : null,
+      cm_sub_link_id:
+        data.cm_sub_link_id && data.cm_sub_link_id !== 'none'
+          ? data.cm_sub_link_id
           : null,
       featured_image_id:
         data.featured_image_id && data.featured_image_id !== 'none'
@@ -669,6 +693,13 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
       cleanedData.cms_navigation_id =
         data.cms_navigation_id && data.cms_navigation_id !== 'none'
           ? data.cms_navigation_id
+          : null;
+    }
+
+    if (data.cm_sub_link_id !== undefined) {
+      cleanedData.cm_sub_link_id =
+        data.cm_sub_link_id && data.cm_sub_link_id !== 'none'
+          ? data.cm_sub_link_id
           : null;
     }
 
@@ -1077,11 +1108,12 @@ export async function updateNavigationItem(
 
     // Remove fields that should not be updated
     const {
-      created_by_id,
-      created_by_name,
-      createdAt,
-      updatedAt,
-      contentPages,
+      created_by_id: _created_by_id,
+      created_by_name: _created_by_name,
+      createdAt: _createdAt,
+      updatedAt: _updatedAt,
+      contentPages: _contentPages,
+      subLinks: _subLinks,
       ...updateData
     } = data;
 
@@ -1134,6 +1166,197 @@ export async function deleteNavigationItem(id: string) {
   } catch (error) {
     console.error('[deleteNavigationItem] Error:', error);
     return { success: false, error: 'Failed to delete navigation item' };
+  }
+}
+
+// ============================================================================
+// SUB-LINKS ACTIONS (3-Tier Structure)
+// ============================================================================
+
+export async function getSubLinks() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-sub-links/all`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error('[getSubLinks] API Error:', response.statusText);
+      return {
+        success: false,
+        error: 'Failed to fetch sub-links',
+        data: []
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getSubLinks] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch sub-links',
+      data: []
+    };
+  }
+}
+
+export async function getSubLinksByNavigation(navigationId: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-sub-links/navigation/${navigationId}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error(
+        '[getSubLinksByNavigation] API Error:',
+        response.statusText
+      );
+      return {
+        success: false,
+        error: 'Failed to fetch sub-links for navigation',
+        data: []
+      };
+    }
+
+    const data = await response.json();
+    // Sort by order
+    const sorted = data.sort(
+      (a: SubLink, b: SubLink) => (a.order || 0) - (b.order || 0)
+    );
+    return { success: true, data: sorted };
+  } catch (error) {
+    console.error('[getSubLinksByNavigation] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch sub-links for navigation',
+      data: []
+    };
+  }
+}
+
+export async function createSubLink(data: Omit<SubLink, 'id'>) {
+  try {
+    const headers = await instance();
+    const session = await auth();
+    const url = `${COMMON_SERVICE_URL}/cm-sub-links`;
+
+    const payload = {
+      ...data,
+      created_by_id: session?.user?.id || session?.user?.sessionId,
+      created_by_name:
+        session?.user?.fullName || session?.user?.name || 'Admin User'
+    };
+
+    console.log('[createSubLink] URL:', url);
+    console.log('[createSubLink] Payload:', payload);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('[createSubLink] Error response:', errorData);
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create sub-link'
+      };
+    }
+
+    const result = await response.json();
+    console.log('[createSubLink] Success:', result);
+    revalidatePath('/dashboard/content/navigation');
+    return {
+      success: true,
+      message: 'Sub-link created successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createSubLink] Error:', error);
+    return { success: false, error: 'Failed to create sub-link' };
+  }
+}
+
+export async function updateSubLink(id: string, data: Partial<SubLink>) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-sub-links/${id}`;
+
+    // Remove fields that should not be updated
+    const {
+      created_by_id: _created_by_id,
+      created_by_name: _created_by_name,
+      cms_navigation_id: _cms_navigation_id,
+      createdAt: _createdAt,
+      updatedAt: _updatedAt,
+      contentPages: _contentPages,
+      ...updateData
+    } = data;
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updateData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update sub-link'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/navigation');
+    return {
+      success: true,
+      message: 'Sub-link updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateSubLink] Error:', error);
+    return { success: false, error: 'Failed to update sub-link' };
+  }
+}
+
+export async function deleteSubLink(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/cm-sub-links/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to delete sub-link' };
+    }
+
+    revalidatePath('/dashboard/content/navigation');
+    return { success: true, message: 'Sub-link deleted successfully' };
+  } catch (error) {
+    console.error('[deleteSubLink] Error:', error);
+    return { success: false, error: 'Failed to delete sub-link' };
   }
 }
 

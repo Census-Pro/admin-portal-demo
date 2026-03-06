@@ -43,6 +43,8 @@ interface PageDialogProps {
   page?: CmsPage | null;
   onSave: (data: Partial<CmsPage>) => Promise<void>;
   preSelectedNavigationId?: string | null;
+  navigationId?: string;
+  subLinkId?: string;
 }
 
 export function PageDialog({
@@ -50,14 +52,17 @@ export function PageDialog({
   onOpenChange,
   page,
   onSave,
-  preSelectedNavigationId
+  preSelectedNavigationId,
+  navigationId,
+  subLinkId
 }: PageDialogProps) {
   const [formData, setFormData] = useState<Partial<CmsPage>>({
     title: '',
     slug: '',
     body: '',
     status: 'draft',
-    cms_navigation_id: undefined,
+    cms_navigation_id: navigationId || preSelectedNavigationId || undefined,
+    cm_sub_link_id: subLinkId || undefined,
     featured_image_id: undefined,
     order: 1,
     updated_by_name: 'Admin User'
@@ -90,6 +95,7 @@ export function PageDialog({
         body: page.body || '',
         status: page.status,
         cms_navigation_id: page.cms_navigation_id || undefined,
+        cm_sub_link_id: page.cm_sub_link_id || undefined,
         featured_image_id: page.featured_image_id || undefined,
         order: page.order || 1,
         updated_by_name: page.updated_by_name || 'Admin User'
@@ -100,13 +106,14 @@ export function PageDialog({
         slug: '',
         body: '',
         status: 'draft',
-        cms_navigation_id: preSelectedNavigationId || undefined,
+        cms_navigation_id: navigationId || preSelectedNavigationId || undefined,
+        cm_sub_link_id: subLinkId || undefined,
         featured_image_id: undefined,
         order: 1,
         updated_by_name: 'Admin User'
       });
     }
-  }, [page, open, preSelectedNavigationId]);
+  }, [page, open, preSelectedNavigationId, navigationId, subLinkId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
