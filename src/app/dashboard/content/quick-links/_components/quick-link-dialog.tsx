@@ -205,7 +205,7 @@ export function QuickLinkDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="title">
               Title <span className="text-red-500">*</span>
             </Label>
@@ -261,7 +261,7 @@ export function QuickLinkDialog({
 
           {/* URL Input - shown when linkType is 'url' */}
           {linkType === 'url' && (
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="url">
                 URL <span className="text-red-500">*</span>
               </Label>
@@ -283,7 +283,7 @@ export function QuickLinkDialog({
 
           {/* Content Page Selector - shown when linkType is 'content_page' */}
           {linkType === 'content_page' && (
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="content_page">
                 Content Page <span className="text-red-500">*</span>
               </Label>
@@ -316,7 +316,7 @@ export function QuickLinkDialog({
             </div>
           )}
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
@@ -330,7 +330,7 @@ export function QuickLinkDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="type">Type</Label>
               <Select
                 value={formData.type}
@@ -350,7 +350,7 @@ export function QuickLinkDialog({
               </Select>
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="category">
                 Category <span className="text-red-500">*</span>
               </Label>
@@ -381,7 +381,7 @@ export function QuickLinkDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="icon">Icon Selection</Label>
               <IconPicker
                 value={formData.icon || ''}
@@ -392,7 +392,7 @@ export function QuickLinkDialog({
               </p>
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="order">Order</Label>
               <Input
                 id="order"

@@ -120,7 +120,7 @@ export function QuickLinkCategoryDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="name">
                 Name (English) <span className="text-red-500">*</span>
               </Label>
@@ -133,7 +133,7 @@ export function QuickLinkCategoryDialog({
               />
             </div>
 
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="name_dzo">Name (Dzongkha)</Label>
               <Input
                 id="name_dzo"
@@ -146,7 +146,7 @@ export function QuickLinkCategoryDialog({
             </div>
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="slug">
               Slug <span className="text-red-500">*</span>
             </Label>
@@ -165,7 +165,7 @@ export function QuickLinkCategoryDialog({
             </p>
           </div>
 
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
@@ -179,7 +179,7 @@ export function QuickLinkCategoryDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="order">Display Order</Label>
               <Input
                 id="order"

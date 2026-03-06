@@ -30,6 +30,13 @@ import {
   getMediaItems
 } from '@/actions/common/cms-actions';
 
+const generateSlug = (text: string) => {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+};
+
 interface PageDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -141,9 +148,15 @@ export function PageDialog({
               <Input
                 required
                 value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                onChange={(e) => {
+                  const title = e.target.value;
+                  setFormData((prev) => ({
+                    ...prev,
+                    title,
+                    // Auto-generate slug only when creating a new page
+                    ...(!page ? { slug: generateSlug(title) } : {})
+                  }));
+                }}
                 placeholder="e.g. About Us"
               />
             </div>
