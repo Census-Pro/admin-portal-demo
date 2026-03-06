@@ -171,27 +171,8 @@ export const navItems: NavItem[] = [
           ]
         }
       }
-    ],
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.MANAGE_AGENCIES,
-        PERMS.MANAGE_OFFICE_LOCATIONS,
-        PERMS.MANAGE_RELATIONSHIP_TYPES,
-        PERMS.MANAGE_COUNTRIES,
-        PERMS.MANAGE_DZONGKHAGS,
-        PERMS.MANAGE_GEWOGS,
-        PERMS.MANAGE_VILLAGES,
-        PERMS.MANAGE_CITIES,
-        PERMS.MANAGE_GENDERS,
-        PERMS.MANAGE_MARITAL_STATUS,
-        PERMS.MANAGE_LITERACY_STATUS,
-        PERMS.MANAGE_CENSUS_STATUS,
-        PERMS.MANAGE_NATURALIZATION_TYPES,
-        PERMS.MANAGE_REGULARIZATION_TYPES,
-        PERMS.MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES
-      ]
-    }
+    ]
+    // Parent access is automatic - shows if user has access to ANY child item
   },
   {
     title: 'Roles & Permission',
@@ -218,14 +199,8 @@ export const navItems: NavItem[] = [
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_PERMISSIONS]
         }
       }
-    ],
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.MANAGE_ROLES,
-        PERMS.MANAGE_PERMISSIONS
-      ]
-    }
+    ]
+    // Parent access is automatic - shows if user has access to ANY child item
   },
   {
     title: 'Birth Registration',
@@ -281,18 +256,8 @@ export const navItems: NavItem[] = [
           ]
         }
       }
-    ],
-    // Parent menu shows if user has ANY workflow permission
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.MANAGE_BIRTH_REGISTRATION,
-        PERMS.MANAGE_BIRTH_REGISTRATION_PENDING,
-        PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
-        PERMS.MANAGE_BIRTH_REGISTRATION_VERIFY,
-        PERMS.MANAGE_BIRTH_REGISTRATION_APPROVE
-      ]
-    }
+    ]
+    // Parent access is automatic - shows if user has access to ANY workflow permission
   },
   {
     title: 'Death Registration',
@@ -348,18 +313,8 @@ export const navItems: NavItem[] = [
           ]
         }
       }
-    ],
-    // Parent menu shows if user has ANY workflow permission
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.MANAGE_DEATH_REGISTRATION,
-        PERMS.MANAGE_DEATH_REGISTRATION_PENDING,
-        PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
-        PERMS.MANAGE_DEATH_REGISTRATION_VERIFY,
-        PERMS.MANAGE_DEATH_REGISTRATION_APPROVE
-      ]
-    }
+    ]
+    // Parent access is automatic - shows if user has access to ANY workflow permission
   },
   {
     title: 'Content',
@@ -455,17 +410,8 @@ export const navItems: NavItem[] = [
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
         }
       }
-    ],
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.MANAGE_CMS,
-        PERMS.MANAGE_ANNOUNCEMENTS,
-        PERMS.MANAGE_CONTENT,
-        PERMS.MANAGE_MEDIA_LIBRARY,
-        PERMS.MANAGE_NAVIGATION
-      ]
-    }
+    ]
+    // Parent access is automatic - shows if user has access to ANY child item
   },
   {
     title: 'CID Issuance',
@@ -497,15 +443,7 @@ export const navItems: NavItem[] = [
           ]
         }
       }
-    ],
-    // Parent menu shows if user has ANY workflow permission
-    access: {
-      permissions: [
-        PERMS.MANAGE_ALL,
-        PERMS.MANAGE_CID_ISSUANCE,
-        PERMS.MANAGE_CID_ISSUANCE_APPROVE,
-        PERMS.MANAGE_CID_ISSUANCE_PRINT
-      ]
-    }
+    ]
+    // Parent access is automatic - shows if user has access to ANY workflow permission
   }
 ];

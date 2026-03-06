@@ -210,6 +210,30 @@ export function useFilteredNavItems(items: NavItem[]) {
     };
 
     const filtered = items
+      .map((item) => {
+        // First, filter child items if they exist
+        let filteredChildren: NavItem[] = [];
+        if (item.items && item.items.length > 0) {
+          filteredChildren = item.items.filter((childItem) => {
+            // Skip header items (they're just labels)
+            if (childItem.isHeader) {
+              return true;
+            }
+
+            const childHasAccess = checkItemAccess(childItem.access);
+            console.log(`Child "${childItem.title}" of "${item.title}":`, {
+              access: childItem.access,
+              hasAccess: childHasAccess
+            });
+            return childHasAccess;
+          });
+        }
+
+        return {
+          ...item,
+          items: filteredChildren
+        };
+      })
       .filter((item) => {
         // Check if item is super admin only
         if (item.superAdminOnly && user?.roleType !== 'SUPER_ADMIN') {
@@ -247,7 +271,16 @@ export function useFilteredNavItems(items: NavItem[]) {
           return hasAccess;
         }
 
-        // No subject defined, fall back to traditional permission-based access
+        // For parent items with children: show if user has access to ANY child
+        if (item.items && item.items.length > 0) {
+          const hasAccessibleChildren = item.items.length > 0;
+          console.log(
+            `Parent "${item.title}": Has ${item.items.length} accessible children`
+          );
+          return hasAccessibleChildren;
+        }
+
+        // No subject and no children, fall back to traditional permission-based access
         const hasAccess = checkItemAccess(item.access);
         console.log(`Item "${item.title}":`, {
           access: item.access,
@@ -257,26 +290,6 @@ export function useFilteredNavItems(items: NavItem[]) {
           roleType: user?.roleType
         });
         return hasAccess;
-      })
-      .map((item) => {
-        // Recursively filter child items
-        if (item.items && item.items.length > 0) {
-          const filteredChildren = item.items.filter((childItem) => {
-            const childHasAccess = checkItemAccess(childItem.access);
-            console.log(`Child "${childItem.title}" of "${item.title}":`, {
-              access: childItem.access,
-              hasAccess: childHasAccess
-            });
-            return childHasAccess;
-          });
-
-          return {
-            ...item,
-            items: filteredChildren
-          };
-        }
-
-        return item;
       });
 
     console.log('Navigation Filter Debug: Final filtered items', {
