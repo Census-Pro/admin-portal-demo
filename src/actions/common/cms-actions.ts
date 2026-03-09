@@ -3,6 +3,13 @@
 import { instance } from '../instance';
 import { revalidatePath } from 'next/cache';
 import { auth } from '@/auth';
+import {
+  revalidateAnnouncements,
+  revalidateNavigation,
+  revalidateContentPages,
+  revalidateQuickLinks,
+  revalidateMediaLibrary
+} from '@/lib/revalidate-client';
 
 const COMMON_SERVICE_URL =
   process.env.COMMON_SERVICE_URL || 'http://localhost:5003';
@@ -233,6 +240,10 @@ export async function createAnnouncement(
 
     const result = await response.json();
     revalidatePath('/dashboard/content/announcements');
+
+    // Trigger Client Portal revalidation
+    await revalidateAnnouncements();
+
     return {
       success: true,
       message: 'Announcement created successfully',
@@ -288,6 +299,10 @@ export async function updateAnnouncement(
 
     const result = await response.json();
     revalidatePath('/dashboard/content/announcements');
+
+    // Trigger Client Portal revalidation
+    await revalidateAnnouncements();
+
     return {
       success: true,
       message: 'Announcement updated successfully',
@@ -314,6 +329,10 @@ export async function deleteAnnouncement(id: string) {
     }
 
     revalidatePath('/dashboard/content/announcements');
+
+    // Trigger Client Portal revalidation
+    await revalidateAnnouncements();
+
     return { success: true, message: 'Announcement deleted successfully' };
   } catch (error) {
     console.error('[deleteAnnouncement] Error:', error);
@@ -660,6 +679,10 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
 
     const result = await response.json();
     revalidatePath('/dashboard/content/pages');
+
+    // Trigger Client Portal revalidation
+    await revalidateContentPages(result.slug);
+
     return {
       success: true,
       message: 'Page created successfully',
@@ -758,6 +781,10 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
     const result = await response.json();
     revalidatePath('/dashboard/content/pages');
     revalidatePath('/dashboard/content/navigation', 'layout');
+
+    // Trigger Client Portal revalidation
+    await revalidateContentPages(result.slug);
+
     return {
       success: true,
       message: 'Page updated successfully',
@@ -787,6 +814,10 @@ export async function deleteCmsPage(id: string) {
     }
 
     revalidatePath('/dashboard/content/pages');
+
+    // Trigger Client Portal revalidation (revalidate all content pages)
+    await revalidateContentPages();
+
     return { success: true, message: 'Page deleted successfully' };
   } catch (error) {
     console.error('[deleteCmsPage] Error:', error);
@@ -885,6 +916,10 @@ export async function createMediaItem(
 
     const result = await response.json();
     revalidatePath('/dashboard/content/media');
+
+    // Trigger Client Portal revalidation
+    await revalidateMediaLibrary();
+
     return {
       success: true,
       message: 'Media uploaded successfully',
@@ -921,6 +956,10 @@ export async function uploadMediaFile(formData: FormData) {
 
     const result = await response.json();
     revalidatePath('/dashboard/content/media');
+
+    // Trigger Client Portal revalidation
+    await revalidateMediaLibrary();
+
     return {
       success: true,
       message: 'File uploaded successfully',
@@ -995,6 +1034,10 @@ export async function updateMediaFileWithUpload(
 
     const result = await response.json();
     revalidatePath('/dashboard/content/media');
+
+    // Trigger Client Portal revalidation
+    await revalidateMediaLibrary();
+
     return {
       success: true,
       message: 'File updated successfully',
@@ -1021,6 +1064,10 @@ export async function deleteMediaItem(id: string) {
     }
 
     revalidatePath('/dashboard/content/media');
+
+    // Trigger Client Portal revalidation
+    await revalidateMediaLibrary();
+
     return { success: true, message: 'Media deleted successfully' };
   } catch (error) {
     console.error('[deleteMediaItem] Error:', error);
@@ -1108,6 +1155,10 @@ export async function createNavigationItem(data: Omit<NavigationItem, 'id'>) {
     const result = await response.json();
     console.log('[createNavigationItem] Success:', result);
     revalidatePath('/dashboard/content/navigation');
+
+    // Trigger Client Portal revalidation
+    await revalidateNavigation();
+
     return {
       success: true,
       message: 'Navigation item created successfully',
@@ -1157,6 +1208,10 @@ export async function updateNavigationItem(
 
     const result = await response.json();
     revalidatePath('/dashboard/content/navigation');
+
+    // Trigger Client Portal revalidation
+    await revalidateNavigation();
+
     return {
       success: true,
       message: 'Navigation item updated successfully',
@@ -1183,6 +1238,10 @@ export async function deleteNavigationItem(id: string) {
     }
 
     revalidatePath('/dashboard/content/navigation');
+
+    // Trigger Client Portal revalidation
+    await revalidateNavigation();
+
     return { success: true, message: 'Navigation item deleted successfully' };
   } catch (error) {
     console.error('[deleteNavigationItem] Error:', error);
@@ -1449,6 +1508,10 @@ export async function createQuickLink(
 
     const result = await response.json();
     revalidatePath('/dashboard/content/quick-links');
+
+    // Trigger Client Portal revalidation
+    await revalidateQuickLinks();
+
     return {
       success: true,
       message: 'Quick link created successfully',
@@ -1484,6 +1547,10 @@ export async function updateQuickLink(id: string, data: Partial<QuickLink>) {
 
     const result = await response.json();
     revalidatePath('/dashboard/content/quick-links');
+
+    // Trigger Client Portal revalidation
+    await revalidateQuickLinks();
+
     return {
       success: true,
       message: 'Quick link updated successfully',
@@ -1510,6 +1577,10 @@ export async function toggleQuickLinkStatus(id: string) {
     }
 
     revalidatePath('/dashboard/content/quick-links');
+
+    // Trigger Client Portal revalidation
+    await revalidateQuickLinks();
+
     return { success: true, message: 'Status updated successfully' };
   } catch (error) {
     console.error('[toggleQuickLinkStatus] Error:', error);
@@ -1532,6 +1603,10 @@ export async function deleteQuickLink(id: string) {
     }
 
     revalidatePath('/dashboard/content/quick-links');
+
+    // Trigger Client Portal revalidation
+    await revalidateQuickLinks();
+
     return { success: true, message: 'Quick link deleted successfully' };
   } catch (error) {
     console.error('[deleteQuickLink] Error:', error);
