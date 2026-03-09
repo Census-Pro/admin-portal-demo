@@ -102,7 +102,17 @@ function SortableRow({ row, ...props }: any) {
         />
       </TableCell>
       {row.getVisibleCells().map((cell: any) => (
-        <TableCell key={cell.id}>
+        <TableCell
+          key={cell.id}
+          style={{
+            width: cell.column.columnDef.size
+              ? `${cell.column.columnDef.size}px`
+              : undefined,
+            minWidth: cell.column.columnDef.size
+              ? `${cell.column.columnDef.size}px`
+              : undefined
+          }}
+        >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
       ))}
@@ -120,7 +130,17 @@ function OverlayRow({ row }: { row: Row<any> }) {
         </div>
       </TableCell>
       {row.getVisibleCells().map((cell: any) => (
-        <TableCell key={cell.id}>
+        <TableCell
+          key={cell.id}
+          style={{
+            width: cell.column.columnDef.size
+              ? `${cell.column.columnDef.size}px`
+              : undefined,
+            minWidth: cell.column.columnDef.size
+              ? `${cell.column.columnDef.size}px`
+              : undefined
+          }}
+        >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </TableCell>
       ))}
@@ -221,7 +241,17 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
                   </span>
                 </TableHead>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    style={{
+                      width: header.column.columnDef.size
+                        ? `${header.column.columnDef.size}px`
+                        : undefined,
+                      minWidth: header.column.columnDef.size
+                        ? `${header.column.columnDef.size}px`
+                        : undefined
+                    }}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(

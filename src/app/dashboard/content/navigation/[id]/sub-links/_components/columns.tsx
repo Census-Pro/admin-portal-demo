@@ -67,6 +67,7 @@ export function createColumns(
       cell: ({ row }) => (
         <Badge
           variant={row.original.status === 'active' ? 'default' : 'secondary'}
+          className="min-w-[70px] justify-center transition-colors duration-200"
         >
           {row.original.status.toUpperCase()}
         </Badge>
