@@ -145,15 +145,25 @@ export function PageDialog({
         className="flex w-full max-w-none flex-col p-0 sm:max-w-none md:w-[92vw] lg:w-[88vw] xl:w-[84vw]"
       >
         {/* ── Header ── */}
-        <SheetHeader className="flex-row items-center justify-between space-y-0 border-b px-6 py-4">
+        <SheetHeader className="space-y-0 border-b px-6 py-4">
           <div className="flex items-center gap-3">
             <div className="bg-primary/10 text-primary flex h-9 w-9 items-center justify-center rounded-lg">
               <FileText className="h-4 w-4" />
             </div>
-            <div>
-              <SheetTitle className="text-base font-semibold">
-                {page ? 'Edit Page' : 'Add New Page'}
-              </SheetTitle>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <SheetTitle className="text-base font-semibold">
+                  {page ? 'Edit Page' : 'Add New Page'}
+                </SheetTitle>
+                <Badge
+                  variant={
+                    formData.status === 'published' ? 'default' : 'secondary'
+                  }
+                  className="capitalize"
+                >
+                  {formData.status}
+                </Badge>
+              </div>
               <p className="text-muted-foreground text-xs">
                 {page
                   ? 'Update the content and settings of this page'
@@ -161,12 +171,6 @@ export function PageDialog({
               </p>
             </div>
           </div>
-          <Badge
-            variant={formData.status === 'published' ? 'default' : 'secondary'}
-            className="capitalize"
-          >
-            {formData.status}
-          </Badge>
         </SheetHeader>
 
         {/* ── Body ── */}

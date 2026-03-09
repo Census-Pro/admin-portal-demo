@@ -42,7 +42,13 @@ import {
   Subscript as SubscriptIcon,
   Superscript as SuperscriptIcon,
   RemoveFormatting,
-  ChevronDown
+  ChevronDown,
+  ArrowLeftToLine,
+  ArrowRightToLine,
+  ArrowUpToLine,
+  ArrowDownToLine,
+  Trash2,
+  Columns2
 } from 'lucide-react';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
@@ -112,7 +118,7 @@ function Divider() {
 export function RichTextEditor({
   content,
   onChange,
-  placeholder = 'Start typing your content...',
+  placeholder = '',
   minHeight = '400px'
 }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState('');
@@ -152,7 +158,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class: cn(
-          'prose prose-sm sm:prose-base dark:prose-invert max-w-none',
+          'rte-content max-w-none',
           'px-6 py-4 focus:outline-none',
           'overflow-y-auto'
         ),
@@ -570,6 +576,147 @@ export function RichTextEditor({
       )}
 
       {/* ── Editor area ── */}
+      {/* ── Table toolbar (visible when cursor is inside a table) ── */}
+      {(editor.isActive('table') ||
+        editor.isActive('tableCell') ||
+        editor.isActive('tableHeader')) && (
+        <div className="table-toolbar border-b px-2 py-1">
+          <TooltipProvider delayDuration={200}>
+            {/* Column actions */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  onClick={() => editor.chain().focus().addColumnBefore().run()}
+                >
+                  <ArrowLeftToLine className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs">
+                Add column before
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  onClick={() => editor.chain().focus().addColumnAfter().run()}
+                >
+                  <ArrowRightToLine className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs">
+                Add column after
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-red-500 hover:text-red-600"
+                  onClick={() => editor.chain().focus().deleteColumn().run()}
+                >
+                  <Columns2 className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs">Delete column</TooltipContent>
+            </Tooltip>
+
+            <div className="bg-border mx-0.5 h-5 w-px self-center" />
+
+            {/* Row actions */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  onClick={() => editor.chain().focus().addRowBefore().run()}
+                >
+                  <ArrowUpToLine className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs">Add row above</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                  onClick={() => editor.chain().focus().addRowAfter().run()}
+                >
+                  <ArrowDownToLine className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs">Add row below</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-red-500 hover:text-red-600"
+                  onClick={() => editor.chain().focus().deleteRow().run()}
+                >
+                  <Minus className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs">Delete row</TooltipContent>
+            </Tooltip>
+
+            <div className="bg-border mx-0.5 h-5 w-px self-center" />
+
+            {/* Toggle header row */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-xs font-semibold"
+                  onClick={() => editor.chain().focus().toggleHeaderRow().run()}
+                >
+                  H±
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs">
+                Toggle header row
+              </TooltipContent>
+            </Tooltip>
+
+            <div className="bg-border mx-0.5 h-5 w-px self-center" />
+
+            {/* Delete table */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-red-500 hover:text-red-600"
+                  onClick={() => editor.chain().focus().deleteTable().run()}
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent className="text-xs">Delete table</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      )}
+
       <EditorContent editor={editor} className="flex-1" />
 
       {/* ── Status bar ── */}
