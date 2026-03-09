@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { columns } from './columns';
+import { useState, useEffect, useMemo } from 'react';
+import { createColumns } from './columns';
 import { CmsPage, SubLink, updateCmsPage } from '@/actions/common/cms-actions';
 import { SortableDataTable } from '@/components/ui/table/sortable-data-table';
 import { toast } from 'sonner';
@@ -20,6 +20,17 @@ export function ContentPagesTable({ data, subLink }: ContentPagesTableProps) {
   useEffect(() => {
     setItems(data);
   }, [data]);
+
+  // Optimistic status update — mutates only the changed row, no re-sort
+  const handleStatusChange = (id: string, newStatus: 'published' | 'draft') => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, status: newStatus } : item
+      )
+    );
+  };
+
+  const columns = useMemo(() => createColumns(handleStatusChange), []);
 
   const handleReorder = async (newOrder: CmsPage[]) => {
     const oldItems = [...items];

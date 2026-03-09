@@ -15,9 +15,10 @@ import { useRouter } from 'next/navigation';
 
 interface ActionCellProps {
   data: SubLink;
+  onStatusChange?: (id: string, newStatus: 'active' | 'inactive') => void;
 }
 
-export function ActionCell({ data }: ActionCellProps) {
+export function ActionCell({ data, onStatusChange }: ActionCellProps) {
   const router = useRouter();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -25,16 +26,20 @@ export function ActionCell({ data }: ActionCellProps) {
   const [loading, setLoading] = useState(false);
 
   const handleToggleStatus = async () => {
+    const newStatus = data.status === 'active' ? 'inactive' : 'active';
+    // Optimistically update local state immediately (no row jump)
+    onStatusChange?.(data.id, newStatus);
     try {
-      const newStatus = data.status === 'active' ? 'inactive' : 'active';
       const result = await updateSubLink(data.id, { status: newStatus });
       if (result.success) {
         toast.success(`Sub-link status updated to ${newStatus}`);
-        router.refresh();
       } else {
+        // Revert on failure
+        onStatusChange?.(data.id, data.status);
         toast.error(result.error);
       }
     } catch (error) {
+      onStatusChange?.(data.id, data.status);
       toast.error('Error updating status');
     }
   };

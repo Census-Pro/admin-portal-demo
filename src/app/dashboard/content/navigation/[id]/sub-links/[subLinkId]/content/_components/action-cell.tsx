@@ -15,9 +15,10 @@ import { useRouter } from 'next/navigation';
 
 interface ActionCellProps {
   data: CmsPage;
+  onStatusChange?: (id: string, newStatus: 'published' | 'draft') => void;
 }
 
-export function ActionCell({ data }: ActionCellProps) {
+export function ActionCell({ data, onStatusChange }: ActionCellProps) {
   const router = useRouter();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -58,17 +59,21 @@ export function ActionCell({ data }: ActionCellProps) {
 
   const onToggleStatus = async () => {
     const newStatus = data.status === 'published' ? 'draft' : 'published';
+    // Optimistically update local state immediately (no row jump)
+    onStatusChange?.(data.id, newStatus);
     try {
       const result = await updateCmsPage(data.id, { status: newStatus });
       if (result.success) {
         toast.success(
           `Content page ${newStatus === 'published' ? 'published' : 'unpublished'}`
         );
-        router.refresh();
       } else {
+        // Revert on failure
+        onStatusChange?.(data.id, data.status as 'published' | 'draft');
         toast.error(result.error);
       }
     } catch (error) {
+      onStatusChange?.(data.id, data.status as 'published' | 'draft');
       toast.error('Error updating status');
     }
   };

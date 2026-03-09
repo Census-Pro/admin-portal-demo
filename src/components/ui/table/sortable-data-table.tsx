@@ -8,7 +8,10 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent
+  DragEndEvent,
+  DragStartEvent,
+  DragOverlay,
+  defaultDropAnimationSideEffects
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -22,7 +25,8 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
-  useReactTable
+  useReactTable,
+  Row
 } from '@tanstack/react-table';
 import {
   Table,
@@ -33,12 +37,32 @@ import {
   TableRow
 } from '@/components/ui/table';
 import { IconGripVertical } from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
 
 interface SortableDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   totalItems: number;
   onReorder?: (newData: TData[]) => void;
+}
+
+function DragHandle({ attributes, listeners, isDragging }: any) {
+  return (
+    <div
+      {...attributes}
+      {...listeners}
+      className={cn(
+        'flex h-8 w-8 items-center justify-center rounded-md transition-colors',
+        'hover:bg-accent hover:text-accent-foreground',
+        isDragging
+          ? 'text-primary cursor-grabbing'
+          : 'text-muted-foreground cursor-grab'
+      )}
+      title="Drag to reorder"
+    >
+      <IconGripVertical className="h-4 w-4" />
+    </div>
+  );
 }
 
 function SortableRow({ row, ...props }: any) {
@@ -48,13 +72,13 @@ function SortableRow({ row, ...props }: any) {
     setNodeRef,
     transform,
     transition,
-    isDragging
+    isDragging,
+    isOver
   } = useSortable({ id: (row.original as { id: string }).id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1
+    transition
   };
 
   return (
@@ -62,15 +86,37 @@ function SortableRow({ row, ...props }: any) {
       ref={setNodeRef}
       style={style}
       data-state={row.getIsSelected() && 'selected'}
+      className={cn(
+        'group relative transition-colors',
+        isDragging && 'ring-primary/30 bg-muted/60 opacity-40 ring-2',
+        isOver && !isDragging && 'bg-accent/40',
+        !isDragging && 'hover:bg-muted/50'
+      )}
       {...props}
     >
-      <TableCell className="w-[50px]">
-        <div
-          {...attributes}
-          {...listeners}
-          className="cursor-grab active:cursor-grabbing"
-        >
-          <IconGripVertical className="text-muted-foreground h-5 w-5" />
+      <TableCell className="w-[50px] py-2">
+        <DragHandle
+          attributes={attributes}
+          listeners={listeners}
+          isDragging={isDragging}
+        />
+      </TableCell>
+      {row.getVisibleCells().map((cell: any) => (
+        <TableCell key={cell.id}>
+          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        </TableCell>
+      ))}
+    </TableRow>
+  );
+}
+
+/** Snapshot row rendered inside the DragOverlay (the "floating card") */
+function OverlayRow({ row }: { row: Row<any> }) {
+  return (
+    <TableRow className="bg-background ring-primary/40 scale-[1.02] rounded-md opacity-95 shadow-2xl ring-2">
+      <TableCell className="w-[50px] py-2">
+        <div className="text-primary flex h-8 w-8 items-center justify-center rounded-md">
+          <IconGripVertical className="h-4 w-4" />
         </div>
       </TableCell>
       {row.getVisibleCells().map((cell: any) => (
@@ -82,6 +128,14 @@ function SortableRow({ row, ...props }: any) {
   );
 }
 
+const dropAnimationConfig = {
+  sideEffects: defaultDropAnimationSideEffects({
+    styles: {
+      active: { opacity: '0.4' }
+    }
+  })
+};
+
 export function SortableDataTable<TData extends { id: string }, TValue>({
   columns,
   data,
@@ -89,13 +143,16 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
   onReorder
 }: SortableDataTableProps<TData, TValue>) {
   const [items, setItems] = React.useState(data);
+  const [activeId, setActiveId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setItems(data);
   }, [data]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 4 }
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates
     })
@@ -107,8 +164,13 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
     getCoreRowModel: getCoreRowModel()
   });
 
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
+    setActiveId(null);
 
     if (over && active.id !== over.id) {
       const oldIndex = items.findIndex((item) => item.id === active.id);
@@ -120,6 +182,22 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
     }
   };
 
+  const handleDragCancel = () => {
+    setActiveId(null);
+  };
+
+  const activeRow = React.useMemo(
+    () =>
+      activeId
+        ? (table
+            .getRowModel()
+            .rows.find(
+              (row) => (row.original as { id: string }).id === activeId
+            ) ?? null)
+        : null,
+    [activeId, table]
+  );
+
   if (items.length === 0) {
     return null;
   }
@@ -129,13 +207,19 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
       >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                <TableHead className="w-[50px]"></TableHead>
+                <TableHead className="w-[50px]">
+                  <span className="text-muted-foreground/60 text-[10px] font-medium tracking-widest uppercase select-none">
+                    Order
+                  </span>
+                </TableHead>
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
                     {header.isPlaceholder
@@ -171,6 +255,16 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
             </SortableContext>
           </TableBody>
         </Table>
+
+        <DragOverlay dropAnimation={dropAnimationConfig}>
+          {activeRow ? (
+            <Table>
+              <TableBody>
+                <OverlayRow row={activeRow} />
+              </TableBody>
+            </Table>
+          ) : null}
+        </DragOverlay>
       </DndContext>
     </div>
   );

@@ -15,9 +15,10 @@ import { useRouter } from 'next/navigation';
 
 interface ActionCellProps {
   data: NavigationItem;
+  onStatusChange?: (id: string, newStatus: 'active' | 'inactive') => void;
 }
 
-export function ActionCell({ data }: ActionCellProps) {
+export function ActionCell({ data, onStatusChange }: ActionCellProps) {
   const router = useRouter();
 
   // Navigation internal dialog states
@@ -29,16 +30,20 @@ export function ActionCell({ data }: ActionCellProps) {
   // --- Navigation Mutation Handlers ---
 
   const handleToggleStatus = async () => {
+    const newStatus = data.status === 'active' ? 'inactive' : 'active';
+    // Optimistically update local state immediately (no row jump)
+    onStatusChange?.(data.id, newStatus);
     try {
-      const newStatus = data.status === 'active' ? 'inactive' : 'active';
       const result = await updateNavigationItem(data.id, { status: newStatus });
       if (result.success) {
         toast.success(`Menu item status updated to ${newStatus}`);
-        router.refresh();
       } else {
+        // Revert on failure
+        onStatusChange?.(data.id, data.status);
         toast.error(result.error);
       }
     } catch (error) {
+      onStatusChange?.(data.id, data.status);
       toast.error('Error updating status');
     }
   };
