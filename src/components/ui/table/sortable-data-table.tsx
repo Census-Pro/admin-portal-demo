@@ -49,7 +49,7 @@ function SortableRow({ row, ...props }: any) {
     transform,
     transition,
     isDragging
-  } = useSortable({ id: row.id });
+  } = useSortable({ id: (row.original as { id: string }).id });
 
   const style = {
     transform: CSS.Transform.toString(transform),

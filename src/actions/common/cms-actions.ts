@@ -679,6 +679,8 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/cm-content/${id}`;
 
+    console.log('[updateCmsPage] Input data:', { id, data });
+
     // Clean up optional fields - convert empty strings or 'none' to null
     const cleanedData: any = {};
 
@@ -711,6 +713,7 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
     }
 
     console.log('[updateCmsPage] Payload:', cleanedData);
+    console.log('[updateCmsPage] URL:', url);
 
     const response = await fetch(url, {
       method: 'PATCH',
@@ -720,6 +723,8 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
       },
       body: JSON.stringify(cleanedData)
     });
+
+    console.log('[updateCmsPage] Response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -752,6 +757,7 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
 
     const result = await response.json();
     revalidatePath('/dashboard/content/pages');
+    revalidatePath('/dashboard/content/navigation', 'layout');
     return {
       success: true,
       message: 'Page updated successfully',

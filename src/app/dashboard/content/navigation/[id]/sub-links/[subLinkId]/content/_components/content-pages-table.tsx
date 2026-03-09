@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { columns } from './columns';
 import { CmsPage, SubLink, updateCmsPage } from '@/actions/common/cms-actions';
 import { SortableDataTable } from '@/components/ui/table/sortable-data-table';
@@ -16,12 +16,16 @@ export function ContentPagesTable({ data, subLink }: ContentPagesTableProps) {
   const router = useRouter();
   const [items, setItems] = useState(data);
 
+  // Sync items when server-side data changes (after router.refresh())
+  useEffect(() => {
+    setItems(data);
+  }, [data]);
+
   const handleReorder = async (newOrder: CmsPage[]) => {
     const oldItems = [...items];
     setItems(newOrder);
 
     try {
-      // Update order for each item
       const updates = newOrder.map((item, index) =>
         updateCmsPage(item.id, { order: index + 1 })
       );
@@ -30,6 +34,8 @@ export function ContentPagesTable({ data, subLink }: ContentPagesTableProps) {
       const hasError = results.some((r) => !r.success);
 
       if (hasError) {
+        const errors = results.filter((r) => !r.success);
+        console.error('[handleReorder] Errors:', errors);
         toast.error('Failed to update some page orders');
         setItems(oldItems);
       } else {
@@ -37,6 +43,7 @@ export function ContentPagesTable({ data, subLink }: ContentPagesTableProps) {
         router.refresh();
       }
     } catch (error) {
+      console.error('[handleReorder] Exception:', error);
       toast.error('Error updating page order');
       setItems(oldItems);
     }

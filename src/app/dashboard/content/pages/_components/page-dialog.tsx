@@ -97,7 +97,7 @@ export function PageDialog({
         cms_navigation_id: page.cms_navigation_id || undefined,
         cm_sub_link_id: page.cm_sub_link_id || undefined,
         featured_image_id: page.featured_image_id || undefined,
-        order: page.order || 1,
+        order: page.order !== undefined && page.order !== null ? page.order : 1,
         updated_by_name: page.updated_by_name || 'Admin User'
       });
     } else {
@@ -119,26 +119,18 @@ export function PageDialog({
     e.preventDefault();
     setLoading(true);
 
-    console.log('═══════════════════════════════════════════════');
-    console.log('[PageDialog] 📝 Form submitted');
-    console.log('[PageDialog] Current form data:', formData);
-    console.log(
-      '[PageDialog] preSelectedNavigationId:',
-      preSelectedNavigationId
-    );
-    console.log('═══════════════════════════════════════════════');
-
     try {
       await onSave({
         ...formData,
-        order: Number(formData.order)
+        order:
+          formData.order !== undefined && !isNaN(Number(formData.order))
+            ? Number(formData.order)
+            : 1
       });
-      console.log('[PageDialog] ✅ onSave completed successfully');
     } catch (error) {
-      console.error('[PageDialog] ❌ Error in onSave:', error);
+      console.error('[PageDialog] Error in onSave:', error);
     } finally {
       setLoading(false);
-      // Don't close immediately - let the parent component handle it after showing toast
     }
   };
 
@@ -276,13 +268,14 @@ export function PageDialog({
               <Input
                 type="number"
                 min="1"
-                value={formData.order}
-                onChange={(e) =>
+                value={formData.order ?? ''}
+                onChange={(e) => {
+                  const value = e.target.value;
                   setFormData({
                     ...formData,
-                    order: parseInt(e.target.value, 10)
-                  })
-                }
+                    order: value === '' ? 1 : parseInt(value, 10)
+                  });
+                }}
               />
               <p className="text-muted-foreground text-xs">
                 Display order (lower numbers first)

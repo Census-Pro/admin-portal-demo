@@ -33,7 +33,9 @@ async function ContentPagesContent({
   // Fetch content pages for this sub-link
   const pagesResult = await getCmsPages();
   const contentPages = pagesResult.success
-    ? pagesResult.data.filter((page: any) => page.cm_sub_link_id === subLinkId)
+    ? pagesResult.data
+        .filter((page: any) => page.cm_sub_link_id === subLinkId)
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
     : [];
 
   return (
