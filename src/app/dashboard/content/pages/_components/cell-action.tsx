@@ -59,7 +59,10 @@ export function ActionCell({ data }: ActionCellProps) {
 
   const handleToggleStatus = async () => {
     try {
-      const result = await toggleCmsPageStatus(data.id);
+      const result = await toggleCmsPageStatus(
+        data.id,
+        data.status as 'draft' | 'published'
+      );
       if (result.success) {
         toast.success(result.message);
         router.refresh();

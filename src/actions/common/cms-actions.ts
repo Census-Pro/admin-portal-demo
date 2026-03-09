@@ -794,22 +794,37 @@ export async function deleteCmsPage(id: string) {
   }
 }
 
-export async function toggleCmsPageStatus(id: string) {
+export async function toggleCmsPageStatus(
+  id: string,
+  currentStatus: 'draft' | 'published'
+) {
   try {
     const headers = await instance();
-    const url = `${COMMON_SERVICE_URL}/cm-content/${id}/toggle-status`;
+    const url = `${COMMON_SERVICE_URL}/cm-content/${id}`;
+    const newStatus = currentStatus === 'published' ? 'draft' : 'published';
 
     const response = await fetch(url, {
-      method: 'PUT',
-      headers
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status: newStatus })
     });
 
     if (!response.ok) {
-      return { success: false, error: 'Failed to update status' };
+      const errorData = await response.json().catch(() => ({}));
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update status'
+      };
     }
 
     revalidatePath('/dashboard/content/pages');
-    return { success: true, message: 'Status updated successfully' };
+    return {
+      success: true,
+      message: `Page ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`
+    };
   } catch (error) {
     console.error('[toggleCmsPageStatus] Error:', error);
     return { success: false, error: 'Failed to update status' };
