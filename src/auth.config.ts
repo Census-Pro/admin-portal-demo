@@ -30,10 +30,12 @@ const authConfig = {
   },
   cookies: {
     sessionToken: {
+      // Use a unique cookie name so the admin portal session doesn't collide
+      // with the client portal session when both run simultaneously in development.
       name:
         process.env.NODE_ENV === 'production'
-          ? '__Secure-next-auth.session-token'
-          : 'next-auth.session-token',
+          ? '__Secure-admin-portal.session-token'
+          : 'admin-portal.session-token',
       options: {
         httpOnly: true,
         sameSite: 'lax',
