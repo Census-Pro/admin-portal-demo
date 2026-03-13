@@ -14,6 +14,7 @@ import { QuickLink } from '@/actions/common/cms-actions';
 import { toast } from 'sonner';
 import { ICON_LIST, IconName } from '@/components/ui/icon-picker';
 import { ActionCell } from './cell-action';
+import Link from 'next/link';
 
 const getTypeIcon = (type: string) => {
   switch (type) {
@@ -71,6 +72,15 @@ export const columns: ColumnDef<QuickLink>[] = [
     cell: ({ row }) => {
       const url = (row.getValue('url') as string) || '';
       const truncated = url.length > 40 ? url.substring(0, 40) + '...' : url;
+      const contentPage = row.original.contentPage;
+
+      // Build admin link to the content page
+      const contentPageAdminHref = contentPage
+        ? contentPage.cm_sub_link_id && contentPage.cms_navigation_id
+          ? `/dashboard/content/navigation/${contentPage.cms_navigation_id}/sub-links/${contentPage.cm_sub_link_id}/content`
+          : `/dashboard/content/pages`
+        : null;
+
       return (
         <div className="flex items-center gap-2">
           {url ? (
@@ -82,6 +92,14 @@ export const columns: ColumnDef<QuickLink>[] = [
             >
               {truncated}
             </a>
+          ) : contentPageAdminHref ? (
+            <Link
+              href={contentPageAdminHref}
+              className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
+            >
+              <IconFileText className="h-3 w-3" />
+              {contentPage?.title || 'Linked to Content Page'}
+            </Link>
           ) : (
             <span className="text-muted-foreground text-xs italic">
               Linked to Content Page
