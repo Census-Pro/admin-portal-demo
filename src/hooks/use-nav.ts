@@ -211,76 +211,85 @@ export function useFilteredNavItems(items: NavItem[]) {
 
     const filtered = items
       .map((item) => {
+        // Track whether this item was originally a parent (had non-empty children)
+        const wasParent = Array.isArray(item.items) && item.items.length > 0;
+
         // First, filter child items if they exist
         let filteredChildren: NavItem[] = [];
         if (item.items && item.items.length > 0) {
-          filteredChildren = item.items.filter((childItem) => {
-            // Skip header items (they're just labels)
-            if (childItem.isHeader) {
-              return true;
-            }
-
-            const childHasAccess = checkItemAccess(childItem.access);
-            console.log(`Child "${childItem.title}" of "${item.title}":`, {
-              access: childItem.access,
-              hasAccess: childHasAccess
-            });
-            return childHasAccess;
+          // Determine accessible non-header children first
+          const accessibleNonHeaderChildren = item.items.filter((childItem) => {
+            if (childItem.isHeader) return false;
+            return checkItemAccess(childItem.access);
           });
+
+          // Only keep children (including headers) if there are accessible non-header children
+          if (accessibleNonHeaderChildren.length > 0) {
+            filteredChildren = item.items.filter((childItem) => {
+              if (childItem.isHeader) {
+                // Only keep header if there's at least one accessible sibling below it
+                return true;
+              }
+              const childHasAccess = checkItemAccess(childItem.access);
+              console.log(`Child "${childItem.title}" of "${item.title}":`, {
+                access: childItem.access,
+                hasAccess: childHasAccess
+              });
+              return childHasAccess;
+            });
+          }
         }
 
         return {
           ...item,
-          items: filteredChildren
+          items: filteredChildren,
+          _wasParent: wasParent
         };
       })
       .filter((item) => {
+        const wasParent = (item as any)._wasParent;
+
         // Check if item is super admin only
         if (item.superAdminOnly && user?.roleType !== 'SUPER_ADMIN') {
           console.log(`Item "${item.title}": Restricted to SUPER_ADMIN only`);
           return false;
         }
 
-        // Check subject-based access (from backend abilities)
-        // If item has a subject and user has access to it, grant access
-        if (item.subject) {
-          if (user?.roleType === 'SUPER_ADMIN') {
-            console.log(`Item "${item.title}": SUPER_ADMIN has access`);
-            return true;
-          }
+        // SUPER_ADMIN bypass — sees everything (that isn't already filtered above)
+        if (user?.roleType === 'SUPER_ADMIN') {
+          console.log(`Item "${item.title}": SUPER_ADMIN has access`);
+          return true;
+        }
 
+        // For parent items (originally had children): show only if there are accessible non-header children
+        if (wasParent) {
+          // item.items here is already the filtered children array
+          const hasAccessibleChildren = item.items
+            ? item.items.some((child) => !child.isHeader)
+            : false;
+          console.log(
+            `Parent "${item.title}": Has ${item.items?.length ?? 0} accessible children (has non-header: ${hasAccessibleChildren})`
+          );
+          return hasAccessibleChildren;
+        }
+
+        // Leaf item: check subject-based access first, then fall back to permission check
+        if (item.subject) {
           const subjectAccess = hasSubjectAccess(item.subject);
           console.log(
             `Item "${item.title}": Subject "${item.subject}" access = ${subjectAccess}`
           );
 
-          // If subject check passes, grant access (skip permission check)
           if (subjectAccess) {
             return true;
           }
 
-          // If subject check fails, fall back to permission-based check
-          // This allows users with correct permissions to access even without subject abilities
+          // Subject check failed — fall back to explicit permission check
           console.log(
             `Item "${item.title}": No subject access, falling back to permission check`
           );
-          const hasAccess = checkItemAccess(item.access);
-          console.log(
-            `Item "${item.title}": Permission-based access = ${hasAccess}`
-          );
-          return hasAccess;
         }
 
-        // For parent items with children: show if user has access to ANY child
-        if (item.items && item.items.length > 0) {
-          const hasAccessibleChildren = item.items.length > 0;
-          console.log(
-            `Parent "${item.title}": Has ${item.items.length} accessible children`
-          );
-          return hasAccessibleChildren;
-        }
-
-        // No subject and no children, fall back to traditional permission-based access
         const hasAccess = checkItemAccess(item.access);
         console.log(`Item "${item.title}":`, {
           access: item.access,
@@ -290,6 +299,12 @@ export function useFilteredNavItems(items: NavItem[]) {
           roleType: user?.roleType
         });
         return hasAccess;
+      })
+      .map((item) => {
+        // Clean up the internal _wasParent flag before returning
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _wasParent: _removed, ...cleanItem } = item as any;
+        return cleanItem as NavItem;
       });
 
     console.log('Navigation Filter Debug: Final filtered items', {
