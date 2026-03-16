@@ -10,26 +10,30 @@ import { toast } from 'sonner';
 
 export function AddMediaButton() {
   const [showAddModal, setShowAddModal] = useState(false);
+  const [uploadedSuccessfully, setUploadedSuccessfully] = useState(false);
   const router = useRouter();
 
   const handleSave = async (
     formData: FormData | Partial<MediaItem>,
     file?: File
   ) => {
-    try {
-      if (formData instanceof FormData) {
-        const result = await uploadMediaFile(formData);
-        if (result.success) {
-          toast.success(result.message);
-          setShowAddModal(false);
-          router.refresh();
-        } else {
-          toast.error(result.error || 'Failed to upload media');
-        }
+    if (formData instanceof FormData) {
+      const result = await uploadMediaFile(formData);
+      if (result.success) {
+        toast.success(result.message || 'File uploaded successfully');
+        setUploadedSuccessfully(true);
+      } else {
+        toast.error(result.error || 'Failed to upload media');
+        throw new Error(result.error || 'Failed to upload media');
       }
-    } catch (error) {
-      console.error('Error uploading media:', error);
-      toast.error('An error occurred while uploading');
+    }
+  };
+
+  const handleOpenChange = (open: boolean) => {
+    setShowAddModal(open);
+    if (!open && uploadedSuccessfully) {
+      setUploadedSuccessfully(false);
+      router.refresh();
     }
   };
 
@@ -40,7 +44,7 @@ export function AddMediaButton() {
       </Button>
       <MediaDialog
         open={showAddModal}
-        onOpenChange={setShowAddModal}
+        onOpenChange={handleOpenChange}
         media={null}
         onSave={handleSave}
       />

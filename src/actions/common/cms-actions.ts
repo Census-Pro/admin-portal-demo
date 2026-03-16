@@ -936,21 +936,44 @@ export async function uploadMediaFile(formData: FormData) {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/cm-media-library`;
 
-    // Remove Content-Type header to let browser set it with boundary
-    const headersWithoutContentType = { ...headers };
+    // Remove Content-Type header to let fetch set it with the correct multipart boundary
+    const headersWithoutContentType = { ...headers } as Record<string, string>;
     delete headersWithoutContentType['Content-Type'];
+
+    // Reconstruct FormData server-side (Next.js deserializes it across the action boundary)
+    const file = formData.get('file') as File | null;
+    const category = formData.get('category') as string | null;
+
+    if (!file) {
+      return { success: false, error: 'No file provided' };
+    }
+
+    const serverFormData = new FormData();
+    serverFormData.append('file', file);
+    serverFormData.append('category', category || 'media');
+
+    console.log(
+      '[uploadMediaFile] Uploading:',
+      file.name,
+      'size:',
+      file.size,
+      'category:',
+      category
+    );
 
     const response = await fetch(url, {
       method: 'POST',
       headers: headersWithoutContentType,
-      body: formData
+      body: serverFormData
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[uploadMediaFile] API error:', response.status, errorData);
       return {
         success: false,
-        error: errorData.message || 'Failed to upload file'
+        error:
+          errorData.message || `Upload failed with status ${response.status}`
       };
     }
 
@@ -967,7 +990,10 @@ export async function uploadMediaFile(formData: FormData) {
     };
   } catch (error) {
     console.error('[uploadMediaFile] Error:', error);
-    return { success: false, error: 'Failed to upload file' };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to upload file'
+    };
   }
 }
 

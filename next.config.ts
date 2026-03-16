@@ -54,6 +54,12 @@ const baseConfig: NextConfig = {
         hostname: 'localhost',
         port: '9000',
         pathname: '/**'
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '5003',
+        pathname: '/**'
       }
     ],
     unoptimized: false
