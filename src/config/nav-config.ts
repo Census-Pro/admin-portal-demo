@@ -88,6 +88,15 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Chiwogs',
+        url: '/dashboard/chiwogs',
+        shortcut: ['c', 'w'],
+        subject: 'Chiwogs',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CHIWOGS]
+        }
+      },
+      {
         title: 'Villages',
         url: '/dashboard/villages',
         shortcut: ['v', 'l'],

@@ -204,6 +204,16 @@ export const DELETE_GEWOGS = 'delete:gewogs' as const;
 export const MANAGE_GEWOGS = 'manage:gewogs' as const;
 
 // ============================================================================
+// CHIWOG PERMISSIONS
+// ============================================================================
+
+export const VIEW_CHIWOGS = 'read:chiwogs' as const;
+export const CREATE_CHIWOGS = 'create:chiwogs' as const;
+export const EDIT_CHIWOGS = 'update:chiwogs' as const;
+export const DELETE_CHIWOGS = 'delete:chiwogs' as const;
+export const MANAGE_CHIWOGS = 'manage:chiwogs' as const;
+
+// ============================================================================
 // VILLAGE PERMISSIONS
 // ============================================================================
 
@@ -500,6 +510,11 @@ export type Permission =
   | typeof EDIT_GEWOGS
   | typeof DELETE_GEWOGS
   | typeof MANAGE_GEWOGS
+  | typeof VIEW_CHIWOGS
+  | typeof CREATE_CHIWOGS
+  | typeof EDIT_CHIWOGS
+  | typeof DELETE_CHIWOGS
+  | typeof MANAGE_CHIWOGS
   | typeof VIEW_VILLAGES
   | typeof CREATE_VILLAGES
   | typeof EDIT_VILLAGES
