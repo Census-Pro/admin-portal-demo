@@ -147,15 +147,11 @@ export async function getAnnouncements() {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/announcement-and-news/all`;
 
-    console.log('[getAnnouncements] Fetching from:', url);
-
     const response = await fetch(url, {
       method: 'GET',
       headers,
       cache: 'no-store'
     });
-
-    console.log('[getAnnouncements] Response status:', response.status);
 
     if (!response.ok) {
       console.error('[getAnnouncements] API Error:', response.statusText);
@@ -167,7 +163,6 @@ export async function getAnnouncements() {
     }
 
     const data = await response.json();
-    console.log('[getAnnouncements] Data received:', data);
     return { success: true, data };
   } catch (error) {
     console.error('[getAnnouncements] Error:', error);
@@ -210,8 +205,6 @@ export async function createAnnouncement(
     if (file) {
       formData.append('file', file);
     }
-
-    console.log('[createAnnouncement] FormData prepared with file:', !!file);
 
     // Remove Content-Type header to let browser set it with boundary
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -265,8 +258,6 @@ export async function updateAnnouncement(
     if (file) {
       formData.append('file', file);
     }
-
-    console.log('[updateAnnouncement] FormData prepared with file:', !!file);
 
     // Remove Content-Type header to let browser set it with boundary
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -330,8 +321,6 @@ export async function getAnnouncementCategories() {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/announcement-categories/all`;
 
-    console.log('[getAnnouncementCategories] Fetching from:', url);
-
     const response = await fetch(url, {
       method: 'GET',
       headers,
@@ -351,10 +340,6 @@ export async function getAnnouncementCategories() {
     }
 
     const result = await response.json();
-    console.log(
-      '[getAnnouncementCategories] Success, count:',
-      result?.length || 0
-    );
 
     return {
       success: true,
@@ -374,8 +359,6 @@ export async function getActiveAnnouncementCategories() {
   try {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/announcement-categories/active`;
-
-    console.log('[getActiveAnnouncementCategories] Fetching from:', url);
 
     const response = await fetch(url, {
       method: 'GET',
@@ -427,20 +410,11 @@ export async function createAnnouncementCategory(
       order: data.order || 0
     };
 
-    console.log('[createAnnouncementCategory] URL:', url);
-    console.log('[createAnnouncementCategory] Creating category:', cleanedData);
-    console.log('[createAnnouncementCategory] Headers:', headers);
-
     const response = await fetch(url, {
       method: 'POST',
       headers,
       body: JSON.stringify(cleanedData)
     });
-
-    console.log(
-      '[createAnnouncementCategory] Response status:',
-      response.status
-    );
 
     if (!response.ok) {
       const errorData = await response
@@ -454,7 +428,6 @@ export async function createAnnouncementCategory(
     }
 
     const result = await response.json();
-    console.log('[createAnnouncementCategory] Success:', result);
     revalidatePath('/dashboard/content/categories');
     return {
       success: true,
@@ -491,12 +464,6 @@ export async function updateAnnouncementCategory(
     if (data.slug !== undefined) cleanedData.slug = data.slug;
     if (data.is_active !== undefined) cleanedData.is_active = data.is_active;
     if (data.order !== undefined) cleanedData.order = data.order;
-
-    console.log(
-      '[updateAnnouncementCategory] Updating category:',
-      id,
-      cleanedData
-    );
 
     const response = await fetch(url, {
       method: 'PATCH',
@@ -618,8 +585,6 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
       // updated_by_id and updated_by_name removed - not allowed in CreateDto
     };
 
-    console.log('[createCmsPage] Payload:', cleanedData);
-
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -679,8 +644,6 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/cm-content/${id}`;
 
-    console.log('[updateCmsPage] Input data:', { id, data });
-
     // Get current session to populate updated_by fields
     const session = await auth();
 
@@ -721,9 +684,6 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
           : null;
     }
 
-    console.log('[updateCmsPage] Payload:', cleanedData);
-    console.log('[updateCmsPage] URL:', url);
-
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
@@ -732,8 +692,6 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
       },
       body: JSON.stringify(cleanedData)
     });
-
-    console.log('[updateCmsPage] Response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -1091,9 +1049,6 @@ export async function createNavigationItem(data: Omit<NavigationItem, 'id'>) {
         session?.user?.fullName || session?.user?.name || 'Admin User'
     };
 
-    console.log('[createNavigationItem] URL:', url);
-    console.log('[createNavigationItem] Payload:', payload);
-
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -1102,8 +1057,6 @@ export async function createNavigationItem(data: Omit<NavigationItem, 'id'>) {
       },
       body: JSON.stringify(payload)
     });
-
-    console.log('[createNavigationItem] Response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -1115,7 +1068,6 @@ export async function createNavigationItem(data: Omit<NavigationItem, 'id'>) {
     }
 
     const result = await response.json();
-    console.log('[createNavigationItem] Success:', result);
     revalidatePath('/dashboard/content/navigation');
     return {
       success: true,
@@ -1287,9 +1239,6 @@ export async function createSubLink(data: Omit<SubLink, 'id'>) {
         session?.user?.fullName || session?.user?.name || 'Admin User'
     };
 
-    console.log('[createSubLink] URL:', url);
-    console.log('[createSubLink] Payload:', payload);
-
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -1309,7 +1258,6 @@ export async function createSubLink(data: Omit<SubLink, 'id'>) {
     }
 
     const result = await response.json();
-    console.log('[createSubLink] Success:', result);
     revalidatePath('/dashboard/content/navigation');
     return {
       success: true,
@@ -1436,8 +1384,6 @@ export async function createQuickLink(
       created_by_id: currentUser.id || currentUser.sessionId,
       created_by_name: currentUser.fullName || currentUser.name || 'Admin User'
     };
-
-    console.log('[createQuickLink] Payload:', payload);
 
     const response = await fetch(url, {
       method: 'POST',
