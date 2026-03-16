@@ -681,6 +681,9 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
 
     console.log('[updateCmsPage] Input data:', { id, data });
 
+    // Get current session to populate updated_by fields
+    const session = await auth();
+
     // Clean up optional fields - convert empty strings or 'none' to null
     const cleanedData: any = {};
 
@@ -689,6 +692,12 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
     if (data.body !== undefined) cleanedData.body = data.body;
     if (data.status !== undefined) cleanedData.status = data.status;
     if (data.order !== undefined) cleanedData.order = data.order;
+
+    // Always attach updated_by fields from session on update
+    cleanedData.updated_by_id =
+      session?.user?.id || session?.user?.sessionId || undefined;
+    cleanedData.updated_by_name =
+      session?.user?.fullName || session?.user?.name || 'Admin User';
 
     // Handle optional foreign keys properly
     if (data.cms_navigation_id !== undefined) {

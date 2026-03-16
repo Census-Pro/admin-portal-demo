@@ -217,22 +217,46 @@ export function useFilteredNavItems(items: NavItem[]) {
         // First, filter child items if they exist
         let filteredChildren: NavItem[] = [];
         if (item.items && item.items.length > 0) {
+          // Helper: same subject-first logic used for top-level leaf items
+          const checkChildAccess = (childItem: NavItem): boolean => {
+            if (childItem.subject) {
+              const subjectAccess = hasSubjectAccess(childItem.subject);
+              if (subjectAccess) return true;
+              // Subject check failed — fall back to explicit permission check
+            }
+            return checkItemAccess(childItem.access);
+          };
+
           // Determine accessible non-header children first
           const accessibleNonHeaderChildren = item.items.filter((childItem) => {
             if (childItem.isHeader) return false;
-            return checkItemAccess(childItem.access);
+            return checkChildAccess(childItem);
           });
 
           // Only keep children (including headers) if there are accessible non-header children
           if (accessibleNonHeaderChildren.length > 0) {
-            filteredChildren = item.items.filter((childItem) => {
+            // Pre-compute which non-header children are accessible
+            const accessibleTitles = new Set(
+              accessibleNonHeaderChildren.map((c) => c.title)
+            );
+
+            filteredChildren = item.items.filter((childItem, idx, arr) => {
               if (childItem.isHeader) {
-                // Only keep header if there's at least one accessible sibling below it
-                return true;
+                // Only keep header if there's at least one accessible non-header item
+                // between this header and the next header
+                const nextHeaderIdx = arr.findIndex(
+                  (c, i) => i > idx && c.isHeader
+                );
+                const end = nextHeaderIdx === -1 ? arr.length : nextHeaderIdx;
+                const hasAccessibleFollower = arr
+                  .slice(idx + 1, end)
+                  .some((c) => !c.isHeader && accessibleTitles.has(c.title));
+                return hasAccessibleFollower;
               }
-              const childHasAccess = checkItemAccess(childItem.access);
+              const childHasAccess = checkChildAccess(childItem);
               console.log(`Child "${childItem.title}" of "${item.title}":`, {
                 access: childItem.access,
+                subject: childItem.subject,
                 hasAccess: childHasAccess
               });
               return childHasAccess;
