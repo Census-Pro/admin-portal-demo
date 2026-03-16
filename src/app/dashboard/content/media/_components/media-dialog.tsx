@@ -11,13 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
 import { MediaItem } from '@/actions/common/cms-actions';
 import { FileText, Upload, Loader2 } from 'lucide-react';
 
@@ -41,12 +34,7 @@ const ALLOWED_IMAGE_TYPES = [
   'image/svg+xml',
   'image/webp'
 ];
-const ALLOWED_DOCUMENT_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-];
-const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_DOCUMENT_TYPES];
+const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES];
 
 export function MediaDialog({
   open,
@@ -55,19 +43,14 @@ export function MediaDialog({
   onSave
 }: MediaDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [category, setCategory] = useState<'forms' | 'banners' | 'media'>(
-    'media'
-  );
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (media) {
-      setCategory(media.category);
       setPreview(media.url || null);
     } else {
       setSelectedFile(null);
-      setCategory('media');
       setPreview(null);
     }
   }, [media, open]);
@@ -96,8 +79,7 @@ export function MediaDialog({
           `File: ${file.name}\n` +
           `Type: ${file.type || 'Unknown'}\n\n` +
           `Allowed types:\n` +
-          `• Images: JPG, PNG, GIF, SVG, WebP\n` +
-          `• Documents: PDF, DOC, DOCX`
+          `• Images: JPG, PNG, GIF, SVG, WebP`
       );
       e.target.value = ''; // Reset file input
       return;
@@ -144,11 +126,11 @@ export function MediaDialog({
         // Creating new or updating with new file
         const formData = new FormData();
         formData.append('file', selectedFile);
-        formData.append('category', category);
+        formData.append('category', 'media');
         await onSave(formData, selectedFile);
       } else if (media) {
         // Updating metadata only
-        await onSave({ category });
+        await onSave({ category: 'media' });
       }
 
       onOpenChange(false);
@@ -206,7 +188,7 @@ export function MediaDialog({
                   required
                   className="sr-only"
                   onChange={handleFileChange}
-                  accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp,.pdf,.doc,.docx"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp"
                 />
                 <div className="pointer-events-none text-center">
                   {selectedFile ? (
@@ -223,7 +205,7 @@ export function MediaDialog({
                         Click to upload or drag and drop
                       </p>
                       <p className="text-muted-foreground mt-1 text-xs">
-                        Images, PDF, DOC, DOCX (max {MAX_FILE_SIZE_MB}MB)
+                        JPG, PNG, GIF, SVG, WebP (max {MAX_FILE_SIZE_MB}MB)
                       </p>
                     </>
                   )}
@@ -283,23 +265,6 @@ export function MediaDialog({
               </div>
             </div>
           )}
-
-          <div className="space-y-2">
-            <Label htmlFor="category">Category *</Label>
-            <Select
-              value={category}
-              onValueChange={(val: any) => setCategory(val)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="media">Media</SelectItem>
-                <SelectItem value="banners">Banners</SelectItem>
-                <SelectItem value="forms">Forms</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
           {selectedFile && (
             <div className="grid grid-cols-2 gap-4">

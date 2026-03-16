@@ -30,91 +30,47 @@ export function useFilteredNavItems(items: NavItem[]) {
   const { data: session, status } = useSession();
   const user = session?.user;
 
-  // Helper function to check if user has a specific ability
+  // Helper function to check if user has a specific ability/permission
   const hasAbility = useMemo(() => {
-    // SUPER_ADMIN bypass - they have access to everything
     if (user?.roleType === 'SUPER_ADMIN') {
-      return () => {
-        console.log(
-          'SUPER_ADMIN roleType detected - bypassing permission check, granting access'
-        );
-        return true;
-      };
+      return () => true;
     }
 
-    // Use transformed permissions array (action:subject format)
     const permissions = (user as any)?.permissions || [];
 
     if (permissions.length === 0) {
-      console.log('No permissions found for user');
       return () => false;
     }
 
-    console.log('User permissions:', permissions);
-
     return (permission: string) => {
-      // Check for 'manage:all' - grants access to everything
       const hasManageAll = permissions.includes('manage:all');
-
-      if (hasManageAll) {
-        console.log(
-          `User has 'manage:all' - granting access to "${permission}"`
-        );
-        return true;
-      }
-
-      const result = permissions.includes(permission);
-
-      console.log(`Checking permission "${permission}":`, {
-        result,
-        hasManageAll,
-        userPermissions: permissions
-      });
-
-      return result;
+      if (hasManageAll) return true;
+      return permissions.includes(permission);
     };
   }, [user]);
 
   // Helper function to check if user has a specific role
   const hasRole = useMemo(() => {
-    // SUPER_ADMIN bypass - they have all roles
     if (user?.roleType === 'SUPER_ADMIN') {
-      return () => {
-        console.log(
-          'SUPER_ADMIN roleType detected - bypassing role check, granting access'
-        );
-        return true;
-      };
+      return () => true;
     }
 
     if (!user?.roles) {
-      console.log('No roles found for user');
       return () => false;
     }
 
     return (roleName: string) => {
-      const result = user.roles.some((role) => role.name === roleName);
-      console.log(`Checking role "${roleName}":`, {
-        result,
-        userRoles: user.roles.map((r) => r.name)
-      });
-      return result;
+      return user.roles.some((role) => role.name === roleName);
     };
   }, [user?.roles, user?.roleType]);
 
   // Helper function to check if an item passes all access checks
   const checkItemAccess = useMemo(() => {
     return (access: any) => {
-      if (!access) {
-        console.log('No access restrictions, allowing access');
-        return true;
-      }
-
-      console.log('Checking access:', access);
+      if (!access) return true;
 
       // Check single permission
       if (access.permission && !hasAbility(access.permission)) {
-        console.log(`Access denied: Missing permission "${access.permission}"`);
         return false;
       }
 
@@ -123,183 +79,135 @@ export function useFilteredNavItems(items: NavItem[]) {
         const hasAnyPermission = access.permissions.some((permission: string) =>
           hasAbility(permission)
         );
-        if (!hasAnyPermission) {
-          console.log(
-            `Access denied: Missing any of permissions [${access.permissions.join(', ')}]`
-          );
-          return false;
-        }
+        if (!hasAnyPermission) return false;
       }
 
       // Check single role
       if (access.role && !hasRole(access.role)) {
-        console.log(`Access denied: Missing role "${access.role}"`);
         return false;
       }
 
       // Check multiple roles (OR logic - user needs ANY of these)
       if (access.roles && access.roles.length > 0) {
         const hasAnyRole = access.roles.some((role: string) => hasRole(role));
-        if (!hasAnyRole) {
-          console.log(
-            `Access denied: Missing any of roles [${access.roles.join(', ')}]`
-          );
-          return false;
-        }
+        if (!hasAnyRole) return false;
       }
 
-      console.log('Access granted');
       return true;
     };
   }, [hasAbility, hasRole]);
 
   // Filter items synchronously (all client-side)
   const filteredItems = useMemo(() => {
-    // Return empty array if session is loading or no session
     if (status === 'loading' || !session) {
-      console.log('Navigation Filter Debug: Session loading or no session', {
-        status,
-        hasSession: !!session
-      });
       return [];
     }
 
-    console.log('Navigation Filter Debug: Processing items', {
-      user: session?.user,
-      abilities: user?.ability,
-      roles: user?.roles,
-      roleType: user?.roleType,
-      totalItems: items.length
-    });
-
     // Helper to check subject access from backend abilities
-    const hasSubjectAccess = (subject: string) => {
-      if (!user?.ability) {
-        console.log(`hasSubjectAccess("${subject}"): No abilities found`);
-        return false;
-      }
+    const hasSubjectAccess = (subject: string): boolean => {
+      if (!user?.ability) return false;
 
-      // Normalize subject for comparison (e.g., "Birth Registration" -> "birth registration")
       const normalizedSubject = subject.toLowerCase();
 
-      console.log(`hasSubjectAccess: Checking subject "${subject}"`, {
-        normalizedSubject,
-        abilities: user.ability
-      });
-
-      const result = user.ability.some((ability: any) => {
-        // Handle subject as either string or array
+      return user.ability.some((ability: any) => {
         const subjects = Array.isArray(ability.subject)
           ? ability.subject
           : [ability.subject || ''];
 
-        // Check if any of the ability subjects match the requested subject
-        const matches = subjects.some((abilitySubject: string) => {
-          const normalizedAbilitySubject = abilitySubject.toLowerCase();
-          console.log(
-            `- Comparing "${normalizedAbilitySubject}" with "${normalizedSubject}"`
-          );
-          return normalizedAbilitySubject === normalizedSubject;
+        return subjects.some((abilitySubject: string) => {
+          return abilitySubject.toLowerCase() === normalizedSubject;
         });
-
-        return matches;
       });
-
-      console.log(`hasSubjectAccess("${subject}"): ${result}`);
-      return result;
     };
 
     const filtered = items
       .map((item) => {
+        const wasParent = Array.isArray(item.items) && item.items.length > 0;
+
         // First, filter child items if they exist
         let filteredChildren: NavItem[] = [];
         if (item.items && item.items.length > 0) {
-          filteredChildren = item.items.filter((childItem) => {
-            // Skip header items (they're just labels)
-            if (childItem.isHeader) {
-              return true;
+          // Helper: subject-first logic for child items
+          const checkChildAccess = (childItem: NavItem): boolean => {
+            if (childItem.subject) {
+              const subjectAccess = hasSubjectAccess(childItem.subject);
+              if (subjectAccess) return true;
+              // Subject check failed — fall back to explicit permission check
             }
+            return checkItemAccess(childItem.access);
+          };
 
-            const childHasAccess = checkItemAccess(childItem.access);
-            console.log(`Child "${childItem.title}" of "${item.title}":`, {
-              access: childItem.access,
-              hasAccess: childHasAccess
-            });
-            return childHasAccess;
+          // Determine accessible non-header children first
+          const accessibleNonHeaderChildren = item.items.filter((childItem) => {
+            if (childItem.isHeader) return false;
+            return checkChildAccess(childItem);
           });
+
+          // Only keep children (including headers) if there are accessible non-header children
+          if (accessibleNonHeaderChildren.length > 0) {
+            const accessibleTitles = new Set(
+              accessibleNonHeaderChildren.map((c) => c.title)
+            );
+
+            filteredChildren = item.items.filter((childItem, idx, arr) => {
+              if (childItem.isHeader) {
+                // Only keep header if there's at least one accessible non-header item
+                // between this header and the next header
+                const nextHeaderIdx = arr.findIndex(
+                  (c, i) => i > idx && c.isHeader
+                );
+                const end = nextHeaderIdx === -1 ? arr.length : nextHeaderIdx;
+                return arr
+                  .slice(idx + 1, end)
+                  .some((c) => !c.isHeader && accessibleTitles.has(c.title));
+              }
+              return checkChildAccess(childItem);
+            });
+          }
         }
 
         return {
           ...item,
-          items: filteredChildren
+          items: filteredChildren,
+          _wasParent: wasParent
         };
       })
       .filter((item) => {
+        const wasParent = (item as any)._wasParent;
+
         // Check if item is super admin only
         if (item.superAdminOnly && user?.roleType !== 'SUPER_ADMIN') {
-          console.log(`Item "${item.title}": Restricted to SUPER_ADMIN only`);
           return false;
         }
 
-        // Check subject-based access (from backend abilities)
-        // If item has a subject and user has access to it, grant access
-        if (item.subject) {
-          if (user?.roleType === 'SUPER_ADMIN') {
-            console.log(`Item "${item.title}": SUPER_ADMIN has access`);
-            return true;
-          }
-
-          const subjectAccess = hasSubjectAccess(item.subject);
-          console.log(
-            `Item "${item.title}": Subject "${item.subject}" access = ${subjectAccess}`
-          );
-
-          // If subject check passes, grant access (skip permission check)
-          if (subjectAccess) {
-            return true;
-          }
-
-          // If subject check fails, fall back to permission-based check
-          // This allows users with correct permissions to access even without subject abilities
-          console.log(
-            `Item "${item.title}": No subject access, falling back to permission check`
-          );
-          const hasAccess = checkItemAccess(item.access);
-          console.log(
-            `Item "${item.title}": Permission-based access = ${hasAccess}`
-          );
-          return hasAccess;
+        // SUPER_ADMIN bypass — sees everything
+        if (user?.roleType === 'SUPER_ADMIN') {
+          return true;
         }
 
-        // For parent items with children: show if user has access to ANY child
-        if (item.items && item.items.length > 0) {
-          const hasAccessibleChildren = item.items.length > 0;
-          console.log(
-            `Parent "${item.title}": Has ${item.items.length} accessible children`
-          );
+        // For parent items (originally had children): show only if there are accessible non-header children
+        if (wasParent) {
+          const hasAccessibleChildren = item.items
+            ? item.items.some((child) => !child.isHeader)
+            : false;
           return hasAccessibleChildren;
         }
 
-        // No subject and no children, fall back to traditional permission-based access
-        const hasAccess = checkItemAccess(item.access);
-        console.log(`Item "${item.title}":`, {
-          access: item.access,
-          hasAccess,
-          abilities: user?.ability,
-          roles: user?.roles,
-          roleType: user?.roleType
-        });
-        return hasAccess;
-      });
+        // Leaf item: check subject-based access first, then fall back to permission check
+        if (item.subject) {
+          const subjectAccess = hasSubjectAccess(item.subject);
+          if (subjectAccess) return true;
+          // Subject check failed — fall back to explicit permission check
+        }
 
-    console.log('Navigation Filter Debug: Final filtered items', {
-      filteredCount: filtered.length,
-      filteredItems: filtered.map((item) => ({
-        title: item.title,
-        hasChildren: !!item.items?.length,
-        childrenCount: item.items?.length || 0
-      }))
-    });
+        return checkItemAccess(item.access);
+      })
+      .map((item) => {
+        // Clean up the internal _wasParent flag before returning
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { _wasParent: _removed, ...cleanItem } = item as any;
+        return cleanItem as NavItem;
+      });
 
     return filtered;
   }, [items, checkItemAccess, session, status, user]);
@@ -315,7 +223,6 @@ export function useUserAbilities() {
   const user = session?.user;
 
   return useMemo(() => {
-    // SUPER_ADMIN bypass - they have all abilities
     if (user?.roleType === 'SUPER_ADMIN') {
       return {
         hasAbility: () => true,
@@ -325,7 +232,6 @@ export function useUserAbilities() {
       };
     }
 
-    // Use transformed permissions from auth.config.ts
     const permissions = (user as any)?.permissions || [];
 
     if (permissions.length === 0) {
@@ -337,7 +243,6 @@ export function useUserAbilities() {
       };
     }
 
-    // Check if user has 'manage:all' permission
     const hasManageAll = permissions.includes('manage:all');
 
     return {
@@ -360,7 +265,6 @@ export function useUserRoles() {
   const user = session?.user;
 
   return useMemo(() => {
-    // SUPER_ADMIN bypass - they have all roles
     if (user?.roleType === 'SUPER_ADMIN') {
       return {
         hasRole: () => true,

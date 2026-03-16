@@ -1,7 +1,6 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { Badge } from '@/components/ui/badge';
 import { MediaItem } from '@/actions/common/cms-actions';
 import {
   HoverCard,
@@ -135,15 +134,6 @@ export const columns: ColumnDef<MediaItem>[] = [
       <div className="max-w-xs truncate" title={row.original.file_name}>
         {row.original.file_name}
       </div>
-    )
-  },
-  {
-    accessorKey: 'category',
-    header: 'Category',
-    cell: ({ row }) => (
-      <Badge variant="outline" className="capitalize">
-        {row.original.category}
-      </Badge>
     )
   },
   {
