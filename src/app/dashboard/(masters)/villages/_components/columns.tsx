@@ -26,6 +26,11 @@ interface Village {
     name: string;
     dzongkha_name?: string;
   };
+  chiwog?: {
+    id: string;
+    name: string;
+    dzongkha_name?: string;
+  };
 }
 
 export const columns: ColumnDef<Village>[] = [
@@ -66,6 +71,14 @@ export const columns: ColumnDef<Village>[] = [
     cell: ({ row }) => {
       const village = row.original;
       return <div>{village.gewog?.name || 'N/A'}</div>;
+    }
+  },
+  {
+    accessorKey: 'chiwog.name',
+    header: 'Chiwog',
+    cell: ({ row }) => {
+      const village = row.original;
+      return <div>{village.chiwog?.name || 'N/A'}</div>;
     }
   },
   {
