@@ -49,7 +49,7 @@ export async function getVillages({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/villages?page=${page}&take=${limit}&relations=gewog,dzongkhag`;
+  let url = `${API_URL}/villages?page=${page}&take=${limit}`;
   try {
     // Search
     if (search) {
@@ -94,14 +94,10 @@ export async function getVillages({
 
 export async function getAllVillages() {
   try {
-    // First, try with relations parameter
-    let response = await fetch(
-      `${API_URL}/villages/all?relations=gewog,dzongkhag`,
-      {
-        headers: await instance(),
-        cache: 'no-store'
-      }
-    );
+    const response = await fetch(`${API_URL}/villages/all`, {
+      headers: await instance(),
+      cache: 'no-store'
+    });
 
     if (!response.ok) {
       console.error('Failed to fetch villages:', response.statusText);
@@ -112,64 +108,8 @@ export async function getAllVillages() {
       };
     }
 
-    let data = await response.json();
-    console.log('Villages API Response (raw):', data);
-
-    // Handle different response structures
-    let villagesData = Array.isArray(data) ? data : data.data || data;
-
-    // If no villages or if villages don't have gewog/dzongkhag objects, fetch them separately
-    if (Array.isArray(villagesData) && villagesData.length > 0) {
-      const firstVillage = villagesData[0];
-
-      // Check if relations are missing
-      if (!firstVillage.gewog || !firstVillage.dzongkhag) {
-        console.log(
-          'Relations not included in response, fetching separately...'
-        );
-
-        // Fetch all gewogs and dzongkhags
-        const [gewogsResponse, dzongkhagsResponse] = await Promise.all([
-          fetch(`${API_URL}/gewogs/all`, {
-            headers: await instance(),
-            cache: 'no-store'
-          }),
-          fetch(`${API_URL}/dzongkhags/all`, {
-            headers: await instance(),
-            cache: 'no-store'
-          })
-        ]);
-
-        const gewogs = await gewogsResponse.json();
-        const dzongkhags = await dzongkhagsResponse.json();
-
-        const gewogsData = Array.isArray(gewogs) ? gewogs : gewogs.data || [];
-        const dzongkhagsData = Array.isArray(dzongkhags)
-          ? dzongkhags
-          : dzongkhags.data || [];
-
-        console.log('Fetched gewogs:', gewogsData.length);
-        console.log('Fetched dzongkhags:', dzongkhagsData.length);
-
-        // Map villages with their relations
-        villagesData = villagesData.map((village: any) => {
-          const gewog = gewogsData.find((g: any) => g.id === village.gewog_id);
-          const dzongkhag = dzongkhagsData.find(
-            (d: any) => d.id === village.dzongkhag_id
-          );
-
-          return {
-            ...village,
-            gewog: gewog || null,
-            dzongkhag: dzongkhag || null
-          };
-        });
-
-        console.log('Villages with relations mapped:', villagesData.length);
-      }
-    }
-
-    console.log('Final processed villages data:', villagesData);
+    const data = await response.json();
+    const villagesData = Array.isArray(data) ? data : data.data || data;
 
     return { data: villagesData, error: false };
   } catch (error) {
@@ -184,13 +124,10 @@ export async function getAllVillages() {
 
 export async function getVillageById(id: string) {
   try {
-    const response = await fetch(
-      `${API_URL}/villages/${id}?relations=gewog,dzongkhag`,
-      {
-        headers: await instance(),
-        cache: 'no-store'
-      }
-    );
+    const response = await fetch(`${API_URL}/villages/${id}`, {
+      headers: await instance(),
+      cache: 'no-store'
+    });
 
     if (!response.ok) {
       return {

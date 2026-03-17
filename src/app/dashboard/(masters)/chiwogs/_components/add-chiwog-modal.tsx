@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -69,6 +69,7 @@ export function AddChiwogModal({
   const [filteredGewogs, setFilteredGewogs] = useState<Gewog[]>([]);
   const [loadingDzongkhags, setLoadingDzongkhags] = useState(false);
   const [loadingGewogs, setLoadingGewogs] = useState(false);
+  const isUserChangingDzongkhag = useRef(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -109,15 +110,19 @@ export function AddChiwogModal({
       );
       setFilteredGewogs(filtered);
 
-      // Reset gewog if it no longer belongs to the selected dzongkhag
-      if (gewogId && !filtered.find((g) => g.id === gewogId)) {
+      // Only reset gewog selection when the user actively changes the dzongkhag
+      if (isUserChangingDzongkhag.current) {
         setGewogId('');
+        isUserChangingDzongkhag.current = false;
       }
     } else {
       setFilteredGewogs([]);
-      setGewogId('');
+      if (isUserChangingDzongkhag.current) {
+        setGewogId('');
+        isUserChangingDzongkhag.current = false;
+      }
     }
-  }, [dzongkhagId, gewogs, gewogId]);
+  }, [dzongkhagId, gewogs]);
 
   useEffect(() => {
     if (initialData) {
@@ -213,7 +218,10 @@ export function AddChiwogModal({
             <Label htmlFor="dzongkhag">Dzongkhag *</Label>
             <Select
               value={dzongkhagId}
-              onValueChange={setDzongkhagId}
+              onValueChange={(val) => {
+                isUserChangingDzongkhag.current = true;
+                setDzongkhagId(val);
+              }}
               disabled={loadingDzongkhags}
               required
             >

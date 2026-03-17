@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,7 @@ import {
   updateVillage
 } from '@/actions/common/village-actions';
 import { getAllGewogs } from '@/actions/common/gewog-actions';
+import { getAllChiwogs } from '@/actions/common/chiwog-actions';
 import { getAllDzongkhags } from '@/actions/common/dzongkhag-actions';
 import { toast } from 'sonner';
 
@@ -31,6 +32,13 @@ interface Gewog {
   name: string;
   dzongkha_name?: string;
   dzongkhag_id?: string;
+}
+
+interface Chiwog {
+  id: string;
+  name: string;
+  dzongkha_name?: string;
+  gewog_id?: string;
 }
 
 interface Dzongkhag {
@@ -49,6 +57,7 @@ interface AddVillageModalProps {
     dzongkha_name?: string;
     dzongkhag_id?: string;
     gewog_id?: string;
+    chiwog_id?: string;
   } | null;
 }
 
@@ -67,21 +76,30 @@ export function AddVillageModal({
     initialData?.dzongkhag_id || ''
   );
   const [gewogId, setGewogId] = useState(initialData?.gewog_id || '');
+  const [chiwogId, setChiwogId] = useState(initialData?.chiwog_id || '');
   const [dzongkhags, setDzongkhags] = useState<Dzongkhag[]>([]);
   const [gewogs, setGewogs] = useState<Gewog[]>([]);
+  const [chiwogs, setChiwogs] = useState<Chiwog[]>([]);
   const [filteredGewogs, setFilteredGewogs] = useState<Gewog[]>([]);
+  const [filteredChiwogs, setFilteredChiwogs] = useState<Chiwog[]>([]);
   const [loadingDzongkhags, setLoadingDzongkhags] = useState(false);
   const [loadingGewogs, setLoadingGewogs] = useState(false);
+  const [loadingChiwogs, setLoadingChiwogs] = useState(false);
+  const isUserChangingDzongkhag = useRef(false);
+  const isUserChangingGewog = useRef(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoadingDzongkhags(true);
       setLoadingGewogs(true);
+      setLoadingChiwogs(true);
       try {
-        const [dzongkhagsResult, gewogsResult] = await Promise.all([
-          getAllDzongkhags(),
-          getAllGewogs()
-        ]);
+        const [dzongkhagsResult, gewogsResult, chiwogsResult] =
+          await Promise.all([
+            getAllDzongkhags(),
+            getAllGewogs(),
+            getAllChiwogs()
+          ]);
 
         if (dzongkhagsResult && !dzongkhagsResult.error) {
           setDzongkhags(dzongkhagsResult.data || dzongkhagsResult || []);
@@ -90,12 +108,17 @@ export function AddVillageModal({
         if (gewogsResult && !gewogsResult.error) {
           setGewogs(gewogsResult.data || gewogsResult || []);
         }
+
+        if (chiwogsResult && !chiwogsResult.error) {
+          setChiwogs(chiwogsResult.data || chiwogsResult || []);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
         toast.error('Failed to load form data');
       } finally {
         setLoadingDzongkhags(false);
         setLoadingGewogs(false);
+        setLoadingChiwogs(false);
       }
     };
 
@@ -112,15 +135,41 @@ export function AddVillageModal({
       );
       setFilteredGewogs(filtered);
 
-      // Reset gewog selection if the current selection doesn't belong to the selected dzongkhag
-      if (gewogId && !filtered.find((g) => g.id === gewogId)) {
+      // Only reset gewog selection when the user actively changes the dzongkhag
+      if (isUserChangingDzongkhag.current) {
         setGewogId('');
+        setChiwogId('');
+        isUserChangingDzongkhag.current = false;
       }
     } else {
       setFilteredGewogs([]);
-      setGewogId('');
+      if (isUserChangingDzongkhag.current) {
+        setGewogId('');
+        setChiwogId('');
+        isUserChangingDzongkhag.current = false;
+      }
     }
-  }, [dzongkhagId, gewogs, gewogId]);
+  }, [dzongkhagId, gewogs]);
+
+  // Filter chiwogs based on selected gewog
+  useEffect(() => {
+    if (gewogId) {
+      const filtered = chiwogs.filter((c) => c.gewog_id === gewogId);
+      setFilteredChiwogs(filtered);
+
+      // Only reset chiwog selection when the user actively changes the gewog
+      if (isUserChangingGewog.current) {
+        setChiwogId('');
+        isUserChangingGewog.current = false;
+      }
+    } else {
+      setFilteredChiwogs([]);
+      if (isUserChangingGewog.current) {
+        setChiwogId('');
+        isUserChangingGewog.current = false;
+      }
+    }
+  }, [gewogId, chiwogs]);
 
   useEffect(() => {
     if (initialData) {
@@ -128,11 +177,13 @@ export function AddVillageModal({
       setDzongkhaName(initialData.dzongkha_name || '');
       setDzongkhagId(initialData.dzongkhag_id || '');
       setGewogId(initialData.gewog_id || '');
+      setChiwogId(initialData.chiwog_id || '');
     } else {
       setName('');
       setDzongkhaName('');
       setDzongkhagId('');
       setGewogId('');
+      setChiwogId('');
     }
   }, [initialData, isOpen]);
 
@@ -145,7 +196,8 @@ export function AddVillageModal({
         name,
         dzongkha_name: dzongkhaName,
         dzongkhag_id: dzongkhagId,
-        gewog_id: gewogId
+        gewog_id: gewogId,
+        chiwog_id: chiwogId
       };
 
       console.log('Submitting village data:', payload);
@@ -169,6 +221,7 @@ export function AddVillageModal({
         setDzongkhaName('');
         setDzongkhagId('');
         setGewogId('');
+        setChiwogId('');
       } else {
         const errorMsg =
           result?.message ||
@@ -221,7 +274,10 @@ export function AddVillageModal({
             <Label htmlFor="dzongkhag">Dzongkhag *</Label>
             <Select
               value={dzongkhagId}
-              onValueChange={setDzongkhagId}
+              onValueChange={(val) => {
+                isUserChangingDzongkhag.current = true;
+                setDzongkhagId(val);
+              }}
               disabled={loadingDzongkhags}
               required
             >
@@ -252,7 +308,10 @@ export function AddVillageModal({
             <Label htmlFor="gewog">Gewog *</Label>
             <Select
               value={gewogId}
-              onValueChange={setGewogId}
+              onValueChange={(val) => {
+                isUserChangingGewog.current = true;
+                setGewogId(val);
+              }}
               disabled={loadingGewogs || !dzongkhagId}
               required
             >
@@ -278,6 +337,38 @@ export function AddVillageModal({
             </Select>
             <p className="text-muted-foreground text-xs">
               Select the gewog this village belongs to
+            </p>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="chiwog">Chiwog</Label>
+            <Select
+              value={chiwogId}
+              onValueChange={setChiwogId}
+              disabled={loadingChiwogs || !gewogId}
+            >
+              <SelectTrigger id="chiwog">
+                <SelectValue
+                  placeholder={
+                    !gewogId
+                      ? 'Select a gewog first'
+                      : loadingChiwogs
+                        ? 'Loading chiwogs...'
+                        : 'Select a chiwog'
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {filteredChiwogs.map((chiwog) => (
+                  <SelectItem key={chiwog.id} value={chiwog.id}>
+                    {chiwog.name}
+                    {chiwog.dzongkha_name && ` (${chiwog.dzongkha_name})`}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-muted-foreground text-xs">
+              Select the chiwog this village belongs to
             </p>
           </div>
 

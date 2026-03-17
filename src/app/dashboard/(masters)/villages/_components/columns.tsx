@@ -15,6 +15,7 @@ interface Village {
   dzongkha_name?: string;
   gewog_id?: string;
   dzongkhag_id?: string;
+  chiwog_id?: string;
   gewog?: {
     id: string;
     name: string;
