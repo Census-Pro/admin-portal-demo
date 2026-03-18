@@ -1,7 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconTrash, IconEdit } from '@tabler/icons-react';
+import {
+  IconTrash,
+  IconEdit,
+  IconArrowsSort,
+  IconSortAscending,
+  IconSortDescending
+} from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteRegularizationType } from '@/actions/common/regularization-type-actions';
@@ -24,7 +30,22 @@ export const createColumns = (
 ): ColumnDef<RegularizationType>[] => [
   {
     accessorKey: 'name',
-    header: 'Regularization Type',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        className="-ml-3 h-8 gap-1"
+      >
+        Regularization Type
+        {column.getIsSorted() === 'asc' ? (
+          <IconSortAscending className="h-4 w-4" />
+        ) : column.getIsSorted() === 'desc' ? (
+          <IconSortDescending className="h-4 w-4" />
+        ) : (
+          <IconArrowsSort className="h-4 w-4 opacity-50" />
+        )}
+      </Button>
+    ),
     cell: ({ row }) => {
       const type = row.original;
       return (

@@ -1,7 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconTrash, IconEye, IconArrowsSort } from '@tabler/icons-react';
+import {
+  IconTrash,
+  IconEye,
+  IconArrowsSort,
+  IconSortAscending,
+  IconSortDescending
+} from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User } from '@/types/user';
@@ -19,11 +25,17 @@ export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
       return (
         <Button
           variant="ghost"
-          className="-ml-4 hover:bg-transparent"
+          className="-ml-3 h-8 gap-1"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           User
-          <IconArrowsSort className="ml-2 h-4 w-4" />
+          {column.getIsSorted() === 'asc' ? (
+            <IconSortAscending className="h-4 w-4" />
+          ) : column.getIsSorted() === 'desc' ? (
+            <IconSortDescending className="h-4 w-4" />
+          ) : (
+            <IconArrowsSort className="h-4 w-4 opacity-50" />
+          )}
         </Button>
       );
     },
@@ -61,11 +73,17 @@ export const getColumns = (currentUserCidNo?: string): ColumnDef<User>[] => [
       return (
         <Button
           variant="ghost"
-          className="-ml-4 hover:bg-transparent"
+          className="-ml-3 h-8 gap-1"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Role
-          <IconArrowsSort className="ml-2 h-4 w-4" />
+          {column.getIsSorted() === 'asc' ? (
+            <IconSortAscending className="h-4 w-4" />
+          ) : column.getIsSorted() === 'desc' ? (
+            <IconSortDescending className="h-4 w-4" />
+          ) : (
+            <IconArrowsSort className="h-4 w-4 opacity-50" />
+          )}
         </Button>
       );
     },

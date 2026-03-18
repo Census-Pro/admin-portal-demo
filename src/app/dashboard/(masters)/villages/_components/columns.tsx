@@ -1,7 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconTrash, IconEdit } from '@tabler/icons-react';
+import {
+  IconTrash,
+  IconEdit,
+  IconArrowsSort,
+  IconSortAscending,
+  IconSortDescending
+} from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteVillage } from '@/actions/common/village-actions';
@@ -36,7 +42,22 @@ interface Village {
 export const columns: ColumnDef<Village>[] = [
   {
     accessorKey: 'name',
-    header: 'Village Name',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        className="-ml-3 h-8 gap-1"
+      >
+        Village Name
+        {column.getIsSorted() === 'asc' ? (
+          <IconSortAscending className="h-4 w-4" />
+        ) : column.getIsSorted() === 'desc' ? (
+          <IconSortDescending className="h-4 w-4" />
+        ) : (
+          <IconArrowsSort className="h-4 w-4 opacity-50" />
+        )}
+      </Button>
+    ),
     cell: ({ row }) => {
       const village = row.original;
       return (

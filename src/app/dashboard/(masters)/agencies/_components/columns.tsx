@@ -1,20 +1,18 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconDotsVertical, IconTrash, IconEdit } from '@tabler/icons-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+  IconTrash,
+  IconEdit,
+  IconArrowsSort,
+  IconSortAscending,
+  IconSortDescending
+} from '@tabler/icons-react';
+import { Button } from '@/components/ui/button';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { deleteAgency } from '@/actions/common/agency-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { EditAgencyModal } from './edit-agency-modal';
 
 interface Agency {
@@ -29,7 +27,22 @@ interface Agency {
 export const columns = (onDataChange?: () => void): ColumnDef<Agency>[] => [
   {
     accessorKey: 'name',
-    header: 'Agency Name',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        className="-ml-3 h-8 gap-1"
+      >
+        Agency Name
+        {column.getIsSorted() === 'asc' ? (
+          <IconSortAscending className="h-4 w-4" />
+        ) : column.getIsSorted() === 'desc' ? (
+          <IconSortDescending className="h-4 w-4" />
+        ) : (
+          <IconArrowsSort className="h-4 w-4 opacity-50" />
+        )}
+      </Button>
+    ),
     cell: ({ row }) => {
       const agency = row.original;
       return (
@@ -75,7 +88,6 @@ function ActionsCell({
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);

@@ -232,7 +232,7 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
         onDragCancel={handleDragCancel}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-primary/10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 <TableHead className="w-[50px]">
