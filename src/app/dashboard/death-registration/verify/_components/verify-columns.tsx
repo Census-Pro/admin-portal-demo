@@ -22,15 +22,18 @@ export type DeathRegistrationVerify = {
 export const columns: ColumnDef<DeathRegistrationVerify>[] = [
   {
     accessorKey: 'deceased_cid',
-    header: 'CID'
+    header: 'CID',
+    enableSorting: true
   },
   {
     accessorKey: 'first_name',
-    header: 'First Name'
+    header: 'First Name',
+    enableSorting: true
   },
   {
     accessorKey: 'middle_name',
     header: 'Middle Name',
+    enableSorting: false,
     cell: ({ row }) => {
       const middleName = row.getValue('middle_name') as string;
       return middleName || '-';
@@ -38,11 +41,13 @@ export const columns: ColumnDef<DeathRegistrationVerify>[] = [
   },
   {
     accessorKey: 'last_name',
-    header: 'Last Name'
+    header: 'Last Name',
+    enableSorting: true
   },
   {
     accessorKey: 'date_of_death',
     header: 'Date of Death',
+    enableSorting: true,
     cell: ({ row }) => {
       const date = row.getValue('date_of_death') as string;
       return format(new Date(date), 'MMM dd, yyyy');
@@ -51,6 +56,7 @@ export const columns: ColumnDef<DeathRegistrationVerify>[] = [
   {
     accessorKey: 'created_at',
     header: 'Submitted Date',
+    enableSorting: true,
     cell: ({ row }) => {
       const date = row.getValue('created_at') as string;
       return format(new Date(date), 'MMM dd, yyyy');
@@ -59,6 +65,7 @@ export const columns: ColumnDef<DeathRegistrationVerify>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
+    enableSorting: true,
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       const { variant, className } = getStatusColor(status);

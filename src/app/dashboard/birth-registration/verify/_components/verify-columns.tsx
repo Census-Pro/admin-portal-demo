@@ -42,17 +42,20 @@ export const columns: ColumnDef<BirthRegistration>[] = [
   {
     accessorKey: 'applicant_cid',
     header: 'Applicant CID',
+    enableSorting: true,
     cell: ({ row }) => {
       return <div className="font-medium">{row.getValue('applicant_cid')}</div>;
     }
   },
   {
     accessorKey: 'first_name',
-    header: 'First Name'
+    header: 'First Name',
+    enableSorting: true
   },
   {
     accessorKey: 'middle_name',
     header: 'Middle Name',
+    enableSorting: false,
     cell: ({ row }) => {
       const middleName = row.getValue('middle_name') as string;
       return middleName || '-';
@@ -60,11 +63,13 @@ export const columns: ColumnDef<BirthRegistration>[] = [
   },
   {
     accessorKey: 'last_name',
-    header: 'Last Name'
+    header: 'Last Name',
+    enableSorting: true
   },
   {
     accessorKey: 'date_of_birth',
     header: 'Date of Birth',
+    enableSorting: true,
     cell: ({ row }) => {
       const date = row.getValue('date_of_birth') as string;
       try {
@@ -77,6 +82,7 @@ export const columns: ColumnDef<BirthRegistration>[] = [
   {
     accessorKey: 'created_at',
     header: 'Submitted Date',
+    enableSorting: true,
     cell: ({ row }) => {
       const date = row.getValue('created_at') as string;
       if (!date) return '-';
@@ -90,6 +96,7 @@ export const columns: ColumnDef<BirthRegistration>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
+    enableSorting: true,
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       const { variant, className } = getStatusColor(status);

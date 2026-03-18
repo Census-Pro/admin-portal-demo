@@ -22,11 +22,11 @@ export const getStatusColor = (status: string) => {
   if (['submitted', 'received'].includes(s)) {
     return {
       variant: 'outline' as const,
-      className: 'border-blue-200 text-blue-700 bg-blue-50/50'
+      className: 'border-blue-600 bg-blue-600 text-white'
     };
   }
 
-  // In Review / Processing -> Yellow / Amber
+  // In Review / Processing -> Amber
   if (
     [
       'in_review',
@@ -38,7 +38,7 @@ export const getStatusColor = (status: string) => {
   ) {
     return {
       variant: 'outline' as const,
-      className: 'border-amber-200 text-amber-700 bg-amber-50/50'
+      className: 'border-amber-500 bg-amber-500 text-white'
     };
   }
 
@@ -46,7 +46,7 @@ export const getStatusColor = (status: string) => {
   if (s === 'approved') {
     return {
       variant: 'outline' as const,
-      className: 'border-indigo-200 text-indigo-700 bg-indigo-50/50'
+      className: 'border-indigo-600 bg-indigo-600 text-white'
     };
   }
 
@@ -54,7 +54,7 @@ export const getStatusColor = (status: string) => {
   if (s === 'endorsed') {
     return {
       variant: 'outline' as const,
-      className: 'border-cyan-200 text-cyan-700 bg-cyan-50/50'
+      className: 'border-cyan-600 bg-cyan-600 text-white'
     };
   }
 
@@ -62,7 +62,7 @@ export const getStatusColor = (status: string) => {
   if (['verified', 'successful', 'collected', 'printed'].includes(s)) {
     return {
       variant: 'outline' as const,
-      className: 'border-green-200 text-green-700 bg-green-50/50'
+      className: 'border-green-600 bg-green-600 text-white'
     };
   }
 
@@ -70,7 +70,7 @@ export const getStatusColor = (status: string) => {
   if (['rejected', 'declined', 'cancelled'].includes(s)) {
     return {
       variant: 'outline' as const,
-      className: 'border-red-200 text-red-700 bg-red-50/50'
+      className: 'border-red-600 bg-red-600 text-white'
     };
   }
 

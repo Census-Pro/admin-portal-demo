@@ -33,6 +33,11 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
+import {
+  IconArrowsSort,
+  IconSortAscending,
+  IconSortDescending
+} from '@tabler/icons-react';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import {
   Tooltip,
@@ -114,12 +119,28 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
+                    {header.isPlaceholder ? null : header.column.getCanSort() &&
+                      typeof header.column.columnDef.header === 'string' ? (
+                      <Button
+                        variant="ghost"
+                        onClick={header.column.getToggleSortingHandler()}
+                        className="-ml-3 h-8 gap-1 select-none"
+                      >
+                        {header.column.columnDef.header}
+                        {header.column.getIsSorted() === 'asc' ? (
+                          <IconSortAscending className="h-4 w-4 shrink-0" />
+                        ) : header.column.getIsSorted() === 'desc' ? (
+                          <IconSortDescending className="h-4 w-4 shrink-0" />
+                        ) : (
+                          <IconArrowsSort className="h-4 w-4 shrink-0 opacity-50" />
                         )}
+                      </Button>
+                    ) : (
+                      flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )
+                    )}
                   </TableHead>
                 ))}
               </TableRow>
