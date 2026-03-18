@@ -16,7 +16,7 @@ interface BirthRegistration {
   applicant_cid: string;
   date_of_birth: string;
   status: string;
-  created_at?: string;
+  createdAt?: string;
 }
 
 function ActionsCell({ registration }: { registration: BirthRegistration }) {
@@ -80,11 +80,11 @@ export const columns: ColumnDef<BirthRegistration>[] = [
     }
   },
   {
-    accessorKey: 'created_at',
+    accessorKey: 'createdAt',
     header: 'Submitted Date',
     enableSorting: true,
     cell: ({ row }) => {
-      const date = row.getValue('created_at') as string;
+      const date = row.getValue('createdAt') as string;
       if (!date) return '-';
       try {
         return format(new Date(date), 'MMM dd, yyyy');
