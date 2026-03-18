@@ -245,3 +245,59 @@ export async function getBirthRegistrationById(id: string) {
     };
   }
 }
+
+export async function getBirthApplicationById(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${BIRTH_DEATH_API_URL}/birth-applications/${id}`;
+
+    console.log('[getBirthApplicationById] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch birth application';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[getBirthApplicationById] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage,
+        data: null
+      };
+    }
+
+    const result = await response.json();
+    console.log('[getBirthApplicationById] Fetched successfully');
+
+    return {
+      success: true,
+      data: result
+    };
+  } catch (error) {
+    console.error('[getBirthApplicationById] Unexpected error:', error);
+    const isConnRefused =
+      error instanceof Error &&
+      (error.message.includes('ECONNREFUSED') ||
+        error.message.includes('fetch failed'));
+    return {
+      success: false,
+      error: isConnRefused
+        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
+        : error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred',
+      data: null
+    };
+  }
+}
