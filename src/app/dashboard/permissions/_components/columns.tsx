@@ -66,6 +66,7 @@ export const columns: ColumnDef<Permission>[] = [
   {
     accessorKey: 'actions',
     header: 'Actions',
+    enableSorting: false,
     cell: ({ row }) => {
       const actionsValue = row.getValue('actions') as string | string[];
       // Convert string to array if needed (backend returns comma-separated string)

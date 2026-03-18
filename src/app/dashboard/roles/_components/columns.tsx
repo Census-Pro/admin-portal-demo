@@ -64,6 +64,7 @@ export const columns: ColumnDef<Role>[] = [
   {
     accessorKey: 'description',
     header: 'Description',
+    enableSorting: false,
     cell: ({ row }) => {
       return (
         <span className="text-muted-foreground text-sm">
