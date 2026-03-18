@@ -56,10 +56,12 @@ interface BirthRegistrationData {
 
 interface BirthRegistrationApproveViewProps {
   data: BirthRegistrationData;
+  applicationId: string;
 }
 
 export function BirthRegistrationApproveView({
-  data
+  data,
+  applicationId
 }: BirthRegistrationApproveViewProps) {
   const [activeTab, setActiveTab] = useState('birth_certificate');
 
@@ -448,19 +450,26 @@ export function BirthRegistrationApproveView({
               </TabsList>
 
               <TabsContent value="birth_certificate" className="mt-0">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium">Birth Certificate</p>
-                    <Badge variant="secondary">PDF</Badge>
+                {data.birth_certificate_url ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">Birth Certificate</p>
+                      <Badge variant="secondary">PDF</Badge>
+                    </div>
+                    <div className="border-muted overflow-hidden rounded-lg border">
+                      <iframe
+                        src={`/api/birth-applications/${applicationId}/certificate`}
+                        className="h-[600px] w-full"
+                        title="Birth Certificate"
+                      />
+                    </div>
                   </div>
-                  <div className="border-muted overflow-hidden rounded-lg border">
-                    <iframe
-                      src="/samepleCeritificate.pdf"
-                      className="h-[600px] w-full"
-                      title="Birth Certificate"
-                    />
+                ) : (
+                  <div className="flex h-[200px] flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-sm text-gray-400">
+                    <IconFileText className="h-8 w-8 opacity-40" />
+                    <p>No supporting documents uploaded</p>
                   </div>
-                </div>
+                )}
               </TabsContent>
 
               <TabsContent value="cid_photo" className="mt-0">

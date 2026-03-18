@@ -619,7 +619,7 @@ export function BirthRegistrationEndorseView({
                 </div>
                 <div className="border-muted overflow-hidden rounded-lg border">
                   <iframe
-                    src={data.birth_certificate_url}
+                    src={`/api/birth-applications/${applicationId}/certificate`}
                     className="h-[600px] w-full"
                     title="Birth Certificate"
                   />
