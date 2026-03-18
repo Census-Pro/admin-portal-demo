@@ -22,6 +22,7 @@ import {
   IconX
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { BirthCertificateViewer } from '../../_components/birth-certificate-viewer';
 
 interface BirthRegistrationData {
   applicant_cid: string;
@@ -450,26 +451,10 @@ export function BirthRegistrationVerifyView({
               </TabsList>
 
               <TabsContent value="birth_certificate" className="mt-0">
-                {data.birth_certificate_url ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium">Birth Certificate</p>
-                      <Badge variant="secondary">PDF</Badge>
-                    </div>
-                    <div className="border-muted overflow-hidden rounded-lg border">
-                      <iframe
-                        src={`/api/birth-applications/${applicationId}/certificate`}
-                        className="h-[600px] w-full"
-                        title="Birth Certificate"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex h-[200px] flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-sm text-gray-400">
-                    <IconFileText className="h-8 w-8 opacity-40" />
-                    <p>No supporting documents uploaded</p>
-                  </div>
-                )}
+                <BirthCertificateViewer
+                  applicationId={applicationId}
+                  hasCertificateUrl={!!data.birth_certificate_url}
+                />
               </TabsContent>
 
               <TabsContent value="cid_photo" className="mt-0">
