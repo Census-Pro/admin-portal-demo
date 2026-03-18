@@ -1,17 +1,13 @@
 import PageContainer from '@/components/layout/page-container';
-import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from './_components/approve-columns';
 import { ApproveSearchBar } from './_components/search-bar';
-import { getBirthApplicationsByStatus } from '@/actions/common/birth-registration-actions';
+import { BirthApplicationsTable } from '../_components/birth-applications-table';
 
 export const metadata = {
   title: 'Birth Registration - Approve'
 };
 
-export default async function BirthRegistrationApprovePage() {
-  const result = await getBirthApplicationsByStatus('VERIFIED');
-  const approvalList = result.data ?? [];
-
+export default function BirthRegistrationApprovePage() {
   return (
     <PageContainer
       pageTitle="Birth Registration - Approve"
@@ -19,11 +15,7 @@ export default async function BirthRegistrationApprovePage() {
     >
       <div className="space-y-4">
         <ApproveSearchBar />
-        <DataTable
-          columns={columns}
-          data={approvalList}
-          totalItems={result.total_count ?? approvalList.length}
-        />
+        <BirthApplicationsTable status="VERIFIED" columns={columns} />
       </div>
     </PageContainer>
   );
