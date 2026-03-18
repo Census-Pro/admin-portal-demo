@@ -1,21 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import {
   IconUser,
-  IconCalendar,
-  IconClock,
   IconMapPin,
   IconHome,
   IconUsers,
-  IconWeight,
   IconShieldCheck,
   IconFileText,
   IconCheck,
@@ -23,35 +21,59 @@ import {
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
 import { BirthCertificateViewer } from '../../_components/birth-certificate-viewer';
+import { updateBirthApplicationStatus } from '@/actions/common/birth-registration-actions';
 
 interface BirthRegistrationData {
   applicant_cid: string;
+  applicant_contact_no?: string;
+  applicant_is?: string;
   is_born_in_bhutan: boolean;
-  is_applicant_parent: boolean;
+  is_applicant_parent?: boolean;
   is_epis_registered: boolean;
-  birth_country_id: string;
-  birth_city_id: string;
-  birth_dzongkhag_id: string;
-  birth_gewog_id: string;
-  birth_village_id: string;
+  birth_country_id?: string;
+  birth_city_id?: string;
+  birth_dzongkhag_id?: string;
+  birth_gewog_id?: string;
+  birth_village_id?: string;
+  // Enriched location names
+  birth_country_name?: string;
+  birth_city_name?: string;
+  birth_dzongkhag_name?: string;
+  birth_gewog_name?: string;
+  birth_village_name?: string;
+  dzongkhag_name?: string;
+  gewog_name?: string;
+  village_name?: string;
   first_name: string;
-  middle_name: string;
+  middle_name?: string;
   last_name: string;
   date_of_birth: string;
-  time_of_birth: string;
-  gender: string;
-  weight: number;
-  is_mc_valid: boolean;
-  father_cid: string;
-  mother_cid: string;
-  guarantor_cid: string;
-  relationship: string;
-  house_hold_no: string;
-  house_no: string;
-  dzongkhag_id: string;
-  gewog_id: string;
-  village_id: string;
-  birth_certificate_url: string;
+  time_of_birth?: string;
+  gender?: string;
+  weight?: number;
+  is_mc_valid?: boolean;
+  father_cid?: string;
+  fathers_contact_no?: string;
+  is_father_alive?: boolean;
+  father_approval?: string;
+  mother_cid?: string;
+  mothers_contact_no?: string;
+  is_mother_alive?: boolean;
+  mother_approval?: string;
+  guarantor_cid?: string;
+  guarantor_contact_no?: string;
+  guarantor_approval?: string;
+  relationship?: string;
+  hoh_cid?: string;
+  hoh_contact_no?: string;
+  hoh_approval?: string;
+  house_hold_no?: string;
+  house_no?: string;
+  tharm_no?: string;
+  dzongkhag_id?: string;
+  gewog_id?: string;
+  village_id?: string;
+  birth_certificate_url?: string;
   status: string;
 }
 
@@ -64,18 +86,50 @@ export function BirthRegistrationVerifyView({
   data,
   applicationId
 }: BirthRegistrationVerifyViewProps) {
-  const [activeTab, setActiveTab] = useState('birth_certificate');
+  const router = useRouter();
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
 
-  const handleVerify = () => {
-    toast.success('Birth registration verified successfully!');
-    console.log('Verifying birth registration...');
-    // TODO: Implement verification logic
+  const handleVerify = async () => {
+    try {
+      setIsVerifying(true);
+      const result = await updateBirthApplicationStatus(
+        applicationId,
+        'VERIFIED'
+      );
+      if (result.success) {
+        toast.success('Birth registration verified successfully!');
+        router.push('/dashboard/birth-registration/verify');
+        router.refresh();
+      } else {
+        toast.error(result.error || 'Failed to verify birth registration');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
-  const handleReject = () => {
-    toast.error('Birth registration rejected');
-    console.log('Rejecting birth registration...');
-    // TODO: Implement rejection logic
+  const handleReject = async () => {
+    try {
+      setIsRejecting(true);
+      const result = await updateBirthApplicationStatus(
+        applicationId,
+        'REJECTED'
+      );
+      if (result.success) {
+        toast.error('Birth registration rejected');
+        router.push('/dashboard/birth-registration/verify');
+        router.refresh();
+      } else {
+        toast.error(result.error || 'Failed to reject birth registration');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsRejecting(false);
+    }
   };
 
   const { variant, className: statusClassName } = getStatusColor(data.status);
@@ -194,27 +248,51 @@ export function BirthRegistrationVerifyView({
                   </div>
                   <div className="flex items-start gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Country ID
+                      Country
                     </Label>
-                    <p className="flex-1 text-sm">{data.birth_country_id}</p>
+                    <p className="flex-1 text-sm">
+                      {data.birth_country_name ||
+                        data.birth_country_id ||
+                        'N/A'}
+                    </p>
+                  </div>
+                  {data.birth_city_name || data.birth_city_id ? (
+                    <div className="flex items-start gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        City
+                      </Label>
+                      <p className="flex-1 text-sm">
+                        {data.birth_city_name || data.birth_city_id}
+                      </p>
+                    </div>
+                  ) : null}
+                  <div className="flex items-start gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Dzongkhag
+                    </Label>
+                    <p className="flex-1 text-sm">
+                      {data.birth_dzongkhag_name ||
+                        data.birth_dzongkhag_id ||
+                        'N/A'}
+                    </p>
                   </div>
                   <div className="flex items-start gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Dzongkhag ID
+                      Gewog
                     </Label>
-                    <p className="flex-1 text-sm">{data.birth_dzongkhag_id}</p>
+                    <p className="flex-1 text-sm">
+                      {data.birth_gewog_name || data.birth_gewog_id || 'N/A'}
+                    </p>
                   </div>
                   <div className="flex items-start gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Gewog ID
+                      Village
                     </Label>
-                    <p className="flex-1 text-sm">{data.birth_gewog_id}</p>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Village ID
-                    </Label>
-                    <p className="flex-1 text-sm">{data.birth_village_id}</p>
+                    <p className="flex-1 text-sm">
+                      {data.birth_village_name ||
+                        data.birth_village_id ||
+                        'N/A'}
+                    </p>
                   </div>
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
@@ -255,17 +333,77 @@ export function BirthRegistrationVerifyView({
                     Father's CID
                   </Label>
                   <p className="flex-1 text-sm font-medium">
-                    {data.father_cid}
+                    {data.father_cid || 'N/A'}
                   </p>
                 </div>
+                {data.fathers_contact_no && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Father's Contact
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.fathers_contact_no}
+                    </p>
+                  </div>
+                )}
+                {data.is_father_alive != null && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Father Alive
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.is_father_alive ? 'Yes' : 'No'}
+                    </p>
+                  </div>
+                )}
+                {data.father_approval && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Father Approval
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.father_approval}
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     Mother's CID
                   </Label>
                   <p className="flex-1 text-sm font-medium">
-                    {data.mother_cid}
+                    {data.mother_cid || 'N/A'}
                   </p>
                 </div>
+                {data.mothers_contact_no && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Mother's Contact
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.mothers_contact_no}
+                    </p>
+                  </div>
+                )}
+                {data.is_mother_alive != null && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Mother Alive
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.is_mother_alive ? 'Yes' : 'No'}
+                    </p>
+                  </div>
+                )}
+                {data.mother_approval && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Mother Approval
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.mother_approval}
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     Marriage Certificate Valid
@@ -276,32 +414,8 @@ export function BirthRegistrationVerifyView({
                 </div>
               </div>
 
-              {/* Rest of Parent Information - Outside Border */}
+              {/* Applicant & Guarantor Details */}
               <div className="space-y-2">
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Father's CID
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.father_cid}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Mother's CID
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.mother_cid}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Marriage Certificate Valid
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.is_mc_valid ? 'Yes' : 'No'}
-                  </p>
-                </div>
                 <div className="flex items-center gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     Applicant CID
@@ -310,30 +424,104 @@ export function BirthRegistrationVerifyView({
                     {data.applicant_cid}
                   </p>
                 </div>
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Is Applicant Parent
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.is_applicant_parent ? 'Yes' : 'No'}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Guarantor CID
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.guarantor_cid}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Relationship
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.relationship}
-                  </p>
-                </div>
+                {data.applicant_contact_no && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Applicant Contact
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.applicant_contact_no}
+                    </p>
+                  </div>
+                )}
+                {data.applicant_is && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Applicant Is
+                    </Label>
+                    <p className="flex-1 text-sm font-medium capitalize">
+                      {data.applicant_is}
+                    </p>
+                  </div>
+                )}
+                {data.is_applicant_parent != null && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Is Applicant Parent
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.is_applicant_parent ? 'Yes' : 'No'}
+                    </p>
+                  </div>
+                )}
+                {data.guarantor_cid && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Guarantor CID
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.guarantor_cid}
+                    </p>
+                  </div>
+                )}
+                {data.guarantor_contact_no && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Guarantor Contact
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.guarantor_contact_no}
+                    </p>
+                  </div>
+                )}
+                {data.relationship && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Relationship
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.relationship}
+                    </p>
+                  </div>
+                )}
+                {data.guarantor_approval && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Guarantor Approval
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.guarantor_approval}
+                    </p>
+                  </div>
+                )}
+                {data.hoh_cid && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      HOH CID
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">{data.hoh_cid}</p>
+                  </div>
+                )}
+                {data.hoh_contact_no && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      HOH Contact
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.hoh_contact_no}
+                    </p>
+                  </div>
+                )}
+                {data.hoh_approval && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      HOH Approval
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.hoh_approval}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -351,32 +539,50 @@ export function BirthRegistrationVerifyView({
                     Household No.
                   </Label>
                   <p className="flex-1 text-sm font-medium">
-                    {data.house_hold_no}
+                    {data.house_hold_no || 'N/A'}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     House No.
                   </Label>
-                  <p className="flex-1 text-sm font-medium">{data.house_no}</p>
+                  <p className="flex-1 text-sm font-medium">
+                    {data.house_no || 'N/A'}
+                  </p>
+                </div>
+                {data.tharm_no && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Tharm No.
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.tharm_no}
+                    </p>
+                  </div>
+                )}
+                <div className="flex items-start gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Dzongkhag
+                  </Label>
+                  <p className="flex-1 text-sm">
+                    {data.dzongkhag_name || data.dzongkhag_id || 'N/A'}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Dzongkhag ID
+                    Gewog
                   </Label>
-                  <p className="flex-1 text-sm">{data.dzongkhag_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.gewog_name || data.gewog_id || 'N/A'}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Gewog ID
+                    Village
                   </Label>
-                  <p className="flex-1 text-sm">{data.gewog_id}</p>
-                </div>
-                <div className="flex items-start gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Village ID
-                  </Label>
-                  <p className="flex-1 text-sm">{data.village_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.village_name || data.village_id || 'N/A'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -406,18 +612,20 @@ export function BirthRegistrationVerifyView({
               <div className="flex gap-3 pt-4">
                 <Button
                   onClick={handleVerify}
+                  disabled={isVerifying || isRejecting}
                   className="flex-1 bg-green-600 hover:bg-green-700"
                 >
                   <IconCheck className="mr-2 h-4 w-4" />
-                  Verify
+                  {isVerifying ? 'Verifying...' : 'Verify'}
                 </Button>
                 <Button
                   onClick={handleReject}
+                  disabled={isVerifying || isRejecting}
                   variant="destructive"
                   className="flex-1"
                 >
                   <IconX className="mr-2 h-4 w-4" />
-                  Reject
+                  {isRejecting ? 'Rejecting...' : 'Reject'}
                 </Button>
               </div>
             </div>
@@ -436,44 +644,10 @@ export function BirthRegistrationVerifyView({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
-              <TabsList className="mb-4 grid w-full grid-cols-2">
-                <TabsTrigger value="birth_certificate" className="text-xs">
-                  Birth Certificate
-                </TabsTrigger>
-                <TabsTrigger value="cid_photo" className="text-xs">
-                  CID Photo
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="birth_certificate" className="mt-0">
-                <BirthCertificateViewer
-                  applicationId={applicationId}
-                  hasCertificateUrl={!!data.birth_certificate_url}
-                />
-              </TabsContent>
-
-              <TabsContent value="cid_photo" className="mt-0">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium">CID Photo</p>
-                    <Badge variant="secondary">IMAGE</Badge>
-                  </div>
-                  <div className="border-muted overflow-hidden rounded-lg border">
-                    <img
-                      src="/sampleCid.png"
-                      alt="CID Photo"
-                      className="h-auto w-full object-contain"
-                      style={{ maxHeight: '600px' }}
-                    />
-                  </div>
-                </div>
-              </TabsContent>
-            </Tabs>
+            <BirthCertificateViewer
+              applicationId={applicationId}
+              hasCertificateUrl={!!data.birth_certificate_url}
+            />
           </CardContent>
         </Card>
       </div>
