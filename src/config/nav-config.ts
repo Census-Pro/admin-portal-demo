@@ -218,18 +218,6 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: [
       {
-        title: 'Pending Applications',
-        url: '/dashboard/birth-registration/pending',
-        subject: 'Birth Registration Pending',
-        access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_BIRTH_REGISTRATION_PENDING,
-            PERMS.MANAGE_BIRTH_REGISTRATION
-          ]
-        }
-      },
-      {
         title: 'Endorse',
         url: '/dashboard/birth-registration/endorse',
         subject: 'Birth Registration Endorse',
@@ -274,18 +262,6 @@ export const navItems: NavItem[] = [
     icon: 'grave',
     isActive: false,
     items: [
-      {
-        title: 'Pending Applications',
-        url: '/dashboard/death-registration/pending',
-        subject: 'Death Registration Pending',
-        access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_DEATH_REGISTRATION_PENDING,
-            PERMS.MANAGE_DEATH_REGISTRATION
-          ]
-        }
-      },
       {
         title: 'Endorse',
         url: '/dashboard/death-registration/endorse',

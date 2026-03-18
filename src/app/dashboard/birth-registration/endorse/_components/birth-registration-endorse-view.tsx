@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,9 +16,11 @@ import {
   IconUsers,
   IconShieldCheck,
   IconFileText,
-  IconCheck
+  IconCheck,
+  IconLoader2
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { updateBirthApplicationStatus } from '@/actions/common/birth-registration-actions';
 
 interface BirthRegistrationData {
   applicant_cid: string;
@@ -52,20 +55,40 @@ interface BirthRegistrationData {
 
 interface BirthRegistrationEndorseViewProps {
   data: BirthRegistrationData;
+  applicationId: string;
 }
 
 export function BirthRegistrationEndorseView({
-  data
+  data,
+  applicationId
 }: BirthRegistrationEndorseViewProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('birth_certificate');
+  const [isEndorsing, setIsEndorsing] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(data.status);
 
-  const handleEndorse = () => {
-    toast.success('Birth registration endorsed successfully!');
-    console.log('Endorsing birth registration...');
-    // TODO: Implement endorsement logic
+  const handleEndorse = async () => {
+    setIsEndorsing(true);
+    try {
+      const result = await updateBirthApplicationStatus(
+        applicationId,
+        'ENDORSED'
+      );
+      if (result.success) {
+        setCurrentStatus('ENDORSED');
+        toast.success('Birth registration endorsed successfully!');
+        router.push('/dashboard/birth-registration/endorse');
+      } else {
+        toast.error(result.error || 'Failed to endorse birth registration');
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred while endorsing');
+    } finally {
+      setIsEndorsing(false);
+    }
   };
 
-  const { variant, className: statusClassName } = getStatusColor(data.status);
+  const { variant, className: statusClassName } = getStatusColor(currentStatus);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
@@ -383,7 +406,7 @@ export function BirthRegistrationEndorseView({
                   </Label>
                   <div className="flex-1">
                     <Badge variant={variant} className={statusClassName}>
-                      {data.status}
+                      {currentStatus}
                     </Badge>
                   </div>
                 </div>
@@ -393,10 +416,20 @@ export function BirthRegistrationEndorseView({
               <div className="pt-4">
                 <Button
                   onClick={handleEndorse}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  disabled={isEndorsing || currentStatus === 'ENDORSED'}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60"
                 >
-                  <IconCheck className="mr-2 h-4 w-4" />
-                  Endorse
+                  {isEndorsing ? (
+                    <>
+                      <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Endorsing...
+                    </>
+                  ) : (
+                    <>
+                      <IconCheck className="mr-2 h-4 w-4" />
+                      {currentStatus === 'ENDORSED' ? 'Endorsed' : 'Endorse'}
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

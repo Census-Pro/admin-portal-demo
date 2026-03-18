@@ -64,7 +64,7 @@ export default async function EndorseDetailPage({
         </Link>
       }
     >
-      <BirthRegistrationEndorseView data={dummyData} />
+      <BirthRegistrationEndorseView data={dummyData} applicationId={id} />
     </PageContainer>
   );
 }
