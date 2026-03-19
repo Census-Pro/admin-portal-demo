@@ -276,6 +276,18 @@ export const navItems: NavItem[] = [
             PERMS.MANAGE_BIRTH_REGISTRATION
           ]
         }
+      },
+      {
+        title: 'Approve List',
+        url: '/dashboard/birth-registration/approve-list',
+        subject: 'Birth Registration Approve',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_BIRTH_REGISTRATION_APPROVE,
+            PERMS.MANAGE_BIRTH_REGISTRATION
+          ]
+        }
       }
     ]
     // Parent access is automatic - shows if user has access to ANY workflow permission
