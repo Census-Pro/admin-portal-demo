@@ -25,6 +25,7 @@ interface AddDzongkhagModalProps {
     id: string;
     name: string;
     dzongkha_name?: string;
+    code?: string;
   } | null;
 }
 
@@ -39,15 +40,18 @@ export function AddDzongkhagModal({
   const [dzongkhaName, setDzongkhaName] = useState(
     initialData?.dzongkha_name || ''
   );
+  const [code, setCode] = useState(initialData?.code || '');
 
   // Update fields when initialData changes
   useEffect(() => {
     if (initialData) {
       setName(initialData.name);
       setDzongkhaName(initialData.dzongkha_name || '');
+      setCode(initialData.code || '');
     } else {
       setName('');
       setDzongkhaName('');
+      setCode('');
     }
   }, [initialData, isOpen]);
 
@@ -60,12 +64,14 @@ export function AddDzongkhagModal({
       if (initialData) {
         result = await updateDzongkhag(initialData.id, {
           name,
-          dzongkha_name: dzongkhaName
+          dzongkha_name: dzongkhaName,
+          code
         });
       } else {
         result = await createDzongkhags({
           name,
-          dzongkha_name: dzongkhaName
+          dzongkha_name: dzongkhaName,
+          code
         });
       }
 
@@ -77,6 +83,7 @@ export function AddDzongkhagModal({
         onClose();
         setName('');
         setDzongkhaName('');
+        setCode('');
       } else {
         toast.error(
           result?.message ||
@@ -127,6 +134,17 @@ export function AddDzongkhagModal({
             <p className="text-muted-foreground text-xs">
               Optional: Enter the Dzongkha name for the dzongkhag
             </p>
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="code">Dzongkhag Code *</Label>
+            <Input
+              id="code"
+              required
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Enter dzongkhag code (e.g., 01, 02)"
+            />
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

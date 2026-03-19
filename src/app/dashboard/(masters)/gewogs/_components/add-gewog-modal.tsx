@@ -37,6 +37,7 @@ interface AddGewogModalProps {
     name: string;
     dzongkha_name?: string;
     dzongkhag_id?: string;
+    code?: string;
   } | null;
 }
 
@@ -54,6 +55,7 @@ export function AddGewogModal({
   const [dzongkhagId, setDzongkhagId] = useState(
     initialData?.dzongkhag_id || ''
   );
+  const [code, setCode] = useState(initialData?.code || '');
   const [dzongkhags, setDzongkhags] = useState<Dzongkhag[]>([]);
   const [loadingDzongkhags, setLoadingDzongkhags] = useState(false);
 
@@ -83,10 +85,12 @@ export function AddGewogModal({
       setName(initialData.name);
       setDzongkhaName(initialData.dzongkha_name || '');
       setDzongkhagId(initialData.dzongkhag_id || '');
+      setCode(initialData.code || '');
     } else {
       setName('');
       setDzongkhaName('');
       setDzongkhagId('');
+      setCode('');
     }
   }, [initialData, isOpen]);
 
@@ -100,13 +104,15 @@ export function AddGewogModal({
         result = await updateGewog(initialData.id, {
           name,
           dzongkha_name: dzongkhaName,
-          dzongkhag_id: dzongkhagId
+          dzongkhag_id: dzongkhagId,
+          code
         });
       } else {
         result = await createGewogs({
           name,
           dzongkha_name: dzongkhaName,
-          dzongkhag_id: dzongkhagId
+          dzongkhag_id: dzongkhagId,
+          code
         });
       }
 
@@ -119,6 +125,7 @@ export function AddGewogModal({
         setName('');
         setDzongkhaName('');
         setDzongkhagId('');
+        setCode('');
       } else {
         toast.error(
           result?.message ||
@@ -163,6 +170,17 @@ export function AddGewogModal({
               value={dzongkhaName}
               onChange={(e) => setDzongkhaName(e.target.value)}
               placeholder="Enter dzongkha name (e.g., ཀ་ཝང)"
+            />
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="code">Gewog Code *</Label>
+            <Input
+              id="code"
+              required
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Enter gewog code (e.g., 01, 02)"
             />
           </div>
 

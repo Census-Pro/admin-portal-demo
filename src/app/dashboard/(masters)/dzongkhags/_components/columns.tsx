@@ -19,6 +19,7 @@ interface Dzongkhag {
   id: string;
   name: string;
   dzongkha_name?: string;
+  code?: string;
   description?: string;
   isActive: boolean;
   createdAt: string;
@@ -67,6 +68,14 @@ export const createColumns = (
       return (
         <div className="font-medium">{dzongkhag.dzongkha_name || '-'}</div>
       );
+    }
+  },
+  {
+    accessorKey: 'code',
+    header: 'Code',
+    cell: ({ row }) => {
+      const dzongkhag = row.original;
+      return <div className="font-medium">{dzongkhag.code || '-'}</div>;
     }
   },
   {

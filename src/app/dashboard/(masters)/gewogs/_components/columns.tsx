@@ -19,6 +19,7 @@ interface Gewog {
   id: string;
   name: string;
   dzongkha_name?: string;
+  code?: string;
 }
 
 export const columns: ColumnDef<Gewog>[] = [
@@ -58,6 +59,14 @@ export const columns: ColumnDef<Gewog>[] = [
     cell: ({ row }) => {
       const gewog = row.original;
       return <div className="font-medium">{gewog.dzongkha_name || '-'}</div>;
+    }
+  },
+  {
+    accessorKey: 'code',
+    header: 'Code',
+    cell: ({ row }) => {
+      const gewog = row.original;
+      return <div className="font-medium">{gewog.code || '-'}</div>;
     }
   },
   {

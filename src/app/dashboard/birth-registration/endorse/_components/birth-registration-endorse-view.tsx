@@ -418,19 +418,25 @@ export function BirthRegistrationEndorseView({
                 Parent Information
               </h3>
 
-              {/* Father, Mother, Marriage Certificate - Bordered Section */}
+              {/* Marriage Certificate Valid + Father's CID - standalone bordered box */}
               <div
-                className={`relative space-y-2 rounded-lg border-2 p-4 ${data.is_mc_valid ? 'border-green-500' : 'border-yellow-500'}`}
+                className={`relative space-y-2 rounded-lg border-2 p-3 ${data.is_mc_valid ? 'border-green-500' : 'border-yellow-400'}`}
               >
-                {/* Data Source Label */}
-                <div className="bg-background absolute -top-3 right-4 px-2">
+                <div className="bg-background absolute -top-3 right-3 px-2">
                   <span
-                    className={`text-xs font-medium ${data.is_mc_valid ? 'text-green-600' : 'text-yellow-600'}`}
+                    className={`text-xs font-medium ${data.is_mc_valid ? 'text-green-600' : 'text-yellow-500'}`}
                   >
-                    {data.is_mc_valid ? 'Trusted Source' : 'Manual Entry'}
+                    {data.is_mc_valid ? 'Judiciary' : 'Manual Entry'}
                   </span>
                 </div>
-
+                <div className="flex items-center gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Marriage Certificate Valid
+                  </Label>
+                  <p className="flex-1 text-sm font-medium">
+                    {data.is_mc_valid ? 'Yes' : 'No'}
+                  </p>
+                </div>
                 <div className="flex items-center gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     Father's CID
@@ -439,6 +445,16 @@ export function BirthRegistrationEndorseView({
                     {data.father_cid || 'N/A'}
                   </p>
                 </div>
+              </div>
+
+              {/* Father's Contact → HOH Approval - Manual Entry bordered box */}
+              <div className="relative space-y-2 rounded-lg border-2 border-yellow-500 p-4">
+                <div className="bg-background absolute -top-3 right-4 px-2">
+                  <span className="text-xs font-medium text-yellow-600">
+                    Manual Entry
+                  </span>
+                </div>
+
                 {data.fathers_contact_no && (
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
@@ -507,26 +523,16 @@ export function BirthRegistrationEndorseView({
                     </p>
                   </div>
                 )}
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Marriage Certificate Valid
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.is_mc_valid ? 'Yes' : 'No'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Applicant & Guarantor Details */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Applicant CID
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.applicant_cid}
-                  </p>
-                </div>
+                {data.applicant_cid && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Applicant CID
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.applicant_cid}
+                    </p>
+                  </div>
+                )}
                 {data.applicant_contact_no && (
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
