@@ -20,7 +20,9 @@ export function EndorseListSearchBar() {
   const handleSearch = (value: string) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
-      startTransition(() => setSearchParams({ q: value.trim(), page: 1 }));
+      startTransition(() => {
+        setSearchParams({ q: value.trim(), page: 1 });
+      });
     }, 300);
   };
 
