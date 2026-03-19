@@ -254,6 +254,18 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Verify List',
+        url: '/dashboard/birth-registration/verify-list',
+        subject: 'Birth Registration Verify',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_BIRTH_REGISTRATION_VERIFY,
+            PERMS.MANAGE_BIRTH_REGISTRATION
+          ]
+        }
+      },
+      {
         title: 'Approve',
         url: '/dashboard/birth-registration/approve',
         subject: 'Birth Registration Approve',
