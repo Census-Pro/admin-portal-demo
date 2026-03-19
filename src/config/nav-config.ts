@@ -311,6 +311,18 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Endorse List',
+        url: '/dashboard/death-registration/endorse-list',
+        subject: 'Death Registration Endorse',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
+            PERMS.MANAGE_DEATH_REGISTRATION
+          ]
+        }
+      },
+      {
         title: 'Verify',
         url: '/dashboard/death-registration/verify',
         subject: 'Death Registration Verify',
@@ -323,8 +335,32 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Verify List',
+        url: '/dashboard/death-registration/verify-list',
+        subject: 'Death Registration Verify',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_DEATH_REGISTRATION_VERIFY,
+            PERMS.MANAGE_DEATH_REGISTRATION
+          ]
+        }
+      },
+      {
         title: 'Approve',
         url: '/dashboard/death-registration/approve',
+        subject: 'Death Registration Approve',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_DEATH_REGISTRATION_APPROVE,
+            PERMS.MANAGE_DEATH_REGISTRATION
+          ]
+        }
+      },
+      {
+        title: 'Approve List',
+        url: '/dashboard/death-registration/approve-list',
         subject: 'Death Registration Approve',
         access: {
           permissions: [

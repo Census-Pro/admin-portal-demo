@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconEye, IconUserCheck } from '@tabler/icons-react';
+import { IconEye } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
@@ -21,7 +21,6 @@ interface DeathRegistration {
 
 function ActionsCell({ registration }: { registration: DeathRegistration }) {
   const router = useRouter();
-
   return (
     <div className="flex items-center gap-2">
       <Button
@@ -36,47 +35,27 @@ function ActionsCell({ registration }: { registration: DeathRegistration }) {
         <IconEye className="h-4 w-4" />
         <span className="sr-only">View Details</span>
       </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        className="h-8 gap-1.5 border-teal-600 bg-teal-600 text-xs text-white hover:border-teal-700 hover:bg-teal-700 hover:text-white"
-        onClick={() => {}}
-      >
-        <IconUserCheck className="h-3.5 w-3.5" />
-        Assign to me
-      </Button>
     </div>
   );
 }
 
-export const columns: ColumnDef<DeathRegistration>[] = [
+export const endorseListColumns: ColumnDef<DeathRegistration>[] = [
   {
     accessorKey: 'deceased_cid',
     header: 'Deceased CID',
     enableSorting: true,
-    cell: ({ row }) => {
-      return <div className="font-medium">{row.getValue('deceased_cid')}</div>;
-    }
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue('deceased_cid')}</div>
+    )
   },
-  {
-    accessorKey: 'first_name',
-    header: 'First Name',
-    enableSorting: true
-  },
+  { accessorKey: 'first_name', header: 'First Name', enableSorting: true },
   {
     accessorKey: 'middle_name',
     header: 'Middle Name',
     enableSorting: false,
-    cell: ({ row }) => {
-      const middleName = row.getValue('middle_name') as string;
-      return middleName || '-';
-    }
+    cell: ({ row }) => (row.getValue('middle_name') as string) || '-'
   },
-  {
-    accessorKey: 'last_name',
-    header: 'Last Name',
-    enableSorting: true
-  },
+  { accessorKey: 'last_name', header: 'Last Name', enableSorting: true },
   {
     accessorKey: 'date_of_death',
     header: 'Date of Death',
@@ -111,7 +90,6 @@ export const columns: ColumnDef<DeathRegistration>[] = [
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
       const { variant, className } = getStatusColor(status);
-
       return (
         <Badge variant={variant} className={`uppercase ${className}`}>
           {status}
@@ -119,13 +97,9 @@ export const columns: ColumnDef<DeathRegistration>[] = [
       );
     }
   },
-
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => {
-      const registration = row.original;
-      return <ActionsCell registration={registration} />;
-    }
+    cell: ({ row }) => <ActionsCell registration={row.original} />
   }
 ];

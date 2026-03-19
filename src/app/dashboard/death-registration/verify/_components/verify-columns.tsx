@@ -3,7 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { IconEye } from '@tabler/icons-react';
+import { IconEye, IconUserCheck } from '@tabler/icons-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { getStatusColor } from '@/lib/status-utils';
@@ -91,6 +91,15 @@ export const columns: ColumnDef<DeathRegistrationVerify>[] = [
               <IconEye className="h-4 w-4" />
             </Button>
           </Link>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 border-teal-600 bg-teal-600 text-xs text-white hover:border-teal-700 hover:bg-teal-700 hover:text-white"
+            onClick={() => {}}
+          >
+            <IconUserCheck className="h-3.5 w-3.5" />
+            Assign to me
+          </Button>
         </div>
       );
     }
