@@ -5,6 +5,8 @@ import { DataTable } from '@/components/ui/table/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   getBirthApplicationsByStatus,
+  getSubmittedBirthApplications,
+  getEndorsedBirthApplications,
   BirthApplicationStatus
 } from '@/actions/common/birth-registration-actions';
 
@@ -32,7 +34,11 @@ export function BirthApplicationsTable<TData>({
       try {
         const statuses = Array.isArray(status) ? status : [status];
         const results = await Promise.all(
-          statuses.map((s) => getBirthApplicationsByStatus(s))
+          statuses.map((s) => {
+            if (s === 'SUBMITTED') return getSubmittedBirthApplications();
+            if (s === 'ENDORSED') return getEndorsedBirthApplications();
+            return getBirthApplicationsByStatus(s);
+          })
         );
         if (cancelled) return;
 

@@ -85,6 +85,102 @@ export async function getBirthApplicationsByStatus(
   }
 }
 
+export async function getSubmittedBirthApplications() {
+  try {
+    const headers = await instance();
+    const url = `${BIRTH_DEATH_API_URL}/birth-applications/submitted`;
+
+    console.log('[getSubmittedBirthApplications] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch submitted birth applications';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+      return { success: false, error: errorMessage, data: [], total_count: 0 };
+    }
+
+    const result = await response.json();
+    return {
+      success: true,
+      data: result.data || result || [],
+      total_count: result.total_count ?? result.data?.length ?? 0
+    };
+  } catch (error) {
+    const isConnRefused =
+      error instanceof Error &&
+      (error.message.includes('ECONNREFUSED') ||
+        error.message.includes('fetch failed'));
+    return {
+      success: false,
+      error: isConnRefused
+        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
+        : error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred',
+      data: [],
+      total_count: 0
+    };
+  }
+}
+
+export async function getEndorsedBirthApplications() {
+  try {
+    const headers = await instance();
+    const url = `${BIRTH_DEATH_API_URL}/birth-applications/endorsed`;
+
+    console.log('[getEndorsedBirthApplications] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch endorsed birth applications';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+      return { success: false, error: errorMessage, data: [], total_count: 0 };
+    }
+
+    const result = await response.json();
+    return {
+      success: true,
+      data: result.data || result || [],
+      total_count: result.total_count ?? result.data?.length ?? 0
+    };
+  } catch (error) {
+    const isConnRefused =
+      error instanceof Error &&
+      (error.message.includes('ECONNREFUSED') ||
+        error.message.includes('fetch failed'));
+    return {
+      success: false,
+      error: isConnRefused
+        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
+        : error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred',
+      data: [],
+      total_count: 0
+    };
+  }
+}
+
 export async function getBirthRegistrations() {
   try {
     const headers = await instance();
