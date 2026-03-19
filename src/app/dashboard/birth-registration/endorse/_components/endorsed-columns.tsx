@@ -1,7 +1,7 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconEye, IconUserCheck } from '@tabler/icons-react';
+import { IconEye } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
@@ -36,20 +36,11 @@ function ActionsCell({ registration }: { registration: BirthRegistration }) {
         <IconEye className="h-4 w-4" />
         <span className="sr-only">View Details</span>
       </Button>
-      <Button
-        variant="outline"
-        size="sm"
-        className="h-8 gap-1.5 border-teal-600 bg-teal-600 text-xs text-white hover:border-teal-700 hover:bg-teal-700 hover:text-white"
-        onClick={() => {}}
-      >
-        <IconUserCheck className="h-3.5 w-3.5" />
-        Assign to me
-      </Button>
     </div>
   );
 }
 
-export const columns: ColumnDef<BirthRegistration>[] = [
+export const endorsedColumns: ColumnDef<BirthRegistration>[] = [
   {
     accessorKey: 'applicant_cid',
     header: 'Applicant CID',
@@ -119,7 +110,6 @@ export const columns: ColumnDef<BirthRegistration>[] = [
       );
     }
   },
-
   {
     id: 'actions',
     header: 'Actions',

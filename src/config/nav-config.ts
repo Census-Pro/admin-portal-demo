@@ -230,6 +230,18 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Endorse List',
+        url: '/dashboard/birth-registration/endorsed-list',
+        subject: 'Birth Registration Endorse',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
+            PERMS.MANAGE_BIRTH_REGISTRATION
+          ]
+        }
+      },
+      {
         title: 'Verify',
         url: '/dashboard/birth-registration/verify',
         subject: 'Birth Registration Verify',
