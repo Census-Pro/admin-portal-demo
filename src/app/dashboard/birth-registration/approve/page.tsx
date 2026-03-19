@@ -15,7 +15,10 @@ export default function BirthRegistrationApprovePage() {
     >
       <div className="space-y-4">
         <ApproveSearchBar />
-        <BirthApplicationsTable status="VERIFIED" columns={columns} />
+        <BirthApplicationsTable
+          status={['VERIFIED', 'APPROVED']}
+          columns={columns}
+        />
       </div>
     </PageContainer>
   );

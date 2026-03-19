@@ -9,7 +9,7 @@ import {
 } from '@/actions/common/birth-registration-actions';
 
 interface BirthApplicationsTableProps<TData> {
-  status: BirthApplicationStatus;
+  status: BirthApplicationStatus | BirthApplicationStatus[];
 
   columns: ColumnDef<TData, any>[];
 }
@@ -30,14 +30,25 @@ export function BirthApplicationsTable<TData>({
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getBirthApplicationsByStatus(status);
+        const statuses = Array.isArray(status) ? status : [status];
+        const results = await Promise.all(
+          statuses.map((s) => getBirthApplicationsByStatus(s))
+        );
         if (cancelled) return;
-        if (result.success) {
-          setData(result.data as TData[]);
-          setTotalItems(result.total_count ?? result.data.length);
-        } else {
-          setError(result.error ?? 'Failed to fetch applications');
+
+        const hasError = results.find((r) => !r.success);
+        if (hasError) {
+          setError(hasError.error ?? 'Failed to fetch applications');
+          return;
         }
+
+        const combined = results.flatMap((r) => r.data as TData[]);
+        const total = results.reduce(
+          (sum, r) => sum + (r.total_count ?? r.data.length),
+          0
+        );
+        setData(combined);
+        setTotalItems(total);
       } catch (err) {
         if (cancelled) return;
         setError(

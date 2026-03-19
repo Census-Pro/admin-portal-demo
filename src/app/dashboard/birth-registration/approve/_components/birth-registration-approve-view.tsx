@@ -142,26 +142,163 @@ export function BirthRegistrationApproveView({
             <CardTitle>Birth Registration Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Child Information & Birth Location - Combined */}
-            <div
-              className={`relative space-y-4 rounded-lg border-2 p-4 ${data.is_epis_registered ? 'border-green-500' : 'border-yellow-500'}`}
-            >
-              {/* Data Source Label */}
-              <div className="bg-background absolute -top-3 right-4 px-2">
-                <span
-                  className={`text-xs font-medium ${data.is_epis_registered ? 'text-green-600' : 'text-yellow-600'}`}
-                >
-                  {data.is_epis_registered ? 'Trusted Source' : 'Manual Entry'}
-                </span>
-              </div>
+            {/* Child Information & Birth Location */}
+            <div className="space-y-3">
+              <h3 className="flex items-center gap-2 text-sm font-semibold">
+                <IconUser className="h-4 w-4" />
+                Child Information
+              </h3>
 
-              {/* Child Information */}
-              <div className="space-y-3">
-                <h3 className="flex items-center gap-2 text-sm font-semibold">
-                  <IconUser className="h-4 w-4" />
-                  Child Information
-                </h3>
-                <div className="space-y-2">
+              {data.is_epis_registered ? (
+                /* ── EPIS = YES: names/gender outside, EPIS data in green border ── */
+                <>
+                  {/* Outside border: First Name → Gender */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        First Name
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.first_name}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Middle Name
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.middle_name || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Last Name
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.last_name}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Gender
+                      </Label>
+                      <p className="flex-1 text-sm font-medium capitalize">
+                        {data.gender}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Green border: Date of Birth → EPIS Registered */}
+                  <div className="relative space-y-2 rounded-lg border-2 border-green-500 p-4">
+                    <div className="bg-background absolute -top-3 right-4 px-2">
+                      <span className="text-xs font-medium text-green-600">
+                        EPIS
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Date of Birth
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {new Date(data.date_of_birth).toLocaleDateString(
+                          'en-GB',
+                          { day: '2-digit', month: 'short', year: 'numeric' }
+                        )}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Time of Birth
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.time_of_birth || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Weight (g)
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.weight != null ? `${data.weight} g` : 'N/A'}
+                      </p>
+                    </div>
+                    <Separator className="my-2" />
+                    <h3 className="flex items-center gap-2 text-sm font-semibold">
+                      <IconMapPin className="h-4 w-4" />
+                      Birth Location
+                    </h3>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Born in Bhutan
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.is_born_in_bhutan ? 'Yes' : 'No'}
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Country
+                      </Label>
+                      <p className="flex-1 text-sm">
+                        {data.birth_country_name ||
+                          data.birth_country_id ||
+                          'N/A'}
+                      </p>
+                    </div>
+                    {(data.birth_city_name || data.birth_city_id) && (
+                      <div className="flex items-start gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          City
+                        </Label>
+                        <p className="flex-1 text-sm">
+                          {data.birth_city_name || data.birth_city_id}
+                        </p>
+                      </div>
+                    )}
+                    <div className="flex items-start gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Dzongkhag
+                      </Label>
+                      <p className="flex-1 text-sm">
+                        {data.birth_dzongkhag_name ||
+                          data.birth_dzongkhag_id ||
+                          'N/A'}
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Gewog
+                      </Label>
+                      <p className="flex-1 text-sm">
+                        {data.birth_gewog_name || data.birth_gewog_id || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Village
+                      </Label>
+                      <p className="flex-1 text-sm">
+                        {data.birth_village_name ||
+                          data.birth_village_id ||
+                          'N/A'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        EPIS Registered
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">Yes</p>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                /* ── EPIS = NO: everything in one yellow border ── */
+                <div className="relative space-y-2 rounded-lg border-2 border-yellow-500 p-4">
+                  <div className="bg-background absolute -top-3 right-4 px-2">
+                    <span className="text-xs font-medium text-yellow-600">
+                      Manual Entry
+                    </span>
+                  </div>
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                       First Name
@@ -194,6 +331,7 @@ export function BirthRegistrationApproveView({
                       {data.gender}
                     </p>
                   </div>
+                  <Separator className="my-2" />
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                       Date of Birth
@@ -201,11 +339,7 @@ export function BirthRegistrationApproveView({
                     <p className="flex-1 text-sm font-medium">
                       {new Date(data.date_of_birth).toLocaleDateString(
                         'en-GB',
-                        {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        }
+                        { day: '2-digit', month: 'short', year: 'numeric' }
                       )}
                     </p>
                   </div>
@@ -219,24 +353,17 @@ export function BirthRegistrationApproveView({
                   </div>
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                      Weight (kg)
+                      Weight (g)
                     </Label>
                     <p className="flex-1 text-sm font-medium">
-                      {data.weight != null ? `${data.weight} kg` : 'N/A'}
+                      {data.weight != null ? `${data.weight} g` : 'N/A'}
                     </p>
                   </div>
-                </div>
-              </div>
-
-              <Separator className="my-4" />
-
-              {/* Birth Location */}
-              <div className="space-y-3">
-                <h3 className="flex items-center gap-2 text-sm font-semibold">
-                  <IconMapPin className="h-4 w-4" />
-                  Birth Location
-                </h3>
-                <div className="space-y-2">
+                  <Separator className="my-2" />
+                  <h3 className="flex items-center gap-2 text-sm font-semibold">
+                    <IconMapPin className="h-4 w-4" />
+                    Birth Location
+                  </h3>
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                       Born in Bhutan
@@ -255,7 +382,7 @@ export function BirthRegistrationApproveView({
                         'N/A'}
                     </p>
                   </div>
-                  {data.birth_city_name || data.birth_city_id ? (
+                  {(data.birth_city_name || data.birth_city_id) && (
                     <div className="flex items-start gap-4">
                       <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                         City
@@ -264,7 +391,7 @@ export function BirthRegistrationApproveView({
                         {data.birth_city_name || data.birth_city_id}
                       </p>
                     </div>
-                  ) : null}
+                  )}
                   <div className="flex items-start gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                       Dzongkhag
@@ -297,12 +424,10 @@ export function BirthRegistrationApproveView({
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                       EPIS Registered
                     </Label>
-                    <p className="flex-1 text-sm font-medium">
-                      {data.is_epis_registered ? 'Yes' : 'No'}
-                    </p>
+                    <p className="flex-1 text-sm font-medium">No</p>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <Separator />
