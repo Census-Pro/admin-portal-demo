@@ -63,8 +63,11 @@ export default function CountriesTable() {
   useEffect(() => {
     const handleCountryCreated = (event: Event) => {
       const customEvent = event as CustomEvent<Country>;
-      if (customEvent.detail) {
+      if (customEvent.detail && customEvent.detail.id) {
         handleCreate(customEvent.detail);
+      } else {
+        // Fallback: re-fetch the list if the returned data is incomplete
+        fetchCountries();
       }
     };
 

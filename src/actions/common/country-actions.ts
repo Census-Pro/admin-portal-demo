@@ -56,6 +56,27 @@ export async function getCountries(page: number = 1, take: number = 100) {
   }
 }
 
+export async function getCountryById(id: string) {
+  try {
+    const response = await fetch(`${API_URL}/countries/${id}`, {
+      headers: await instance(),
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      return {
+        error: true,
+        message: `Failed to fetch country: ${response.statusText}`
+      };
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching country:', error);
+    return { error: true, message: 'Failed to fetch country' };
+  }
+}
+
 export async function createCountry(data: {
   name: string;
   nationality: string;
@@ -96,7 +117,7 @@ export async function createCountry(data: {
     return {
       success: true,
       message: result.message || 'Country created successfully',
-      data: result.data
+      data: result.data || result
     };
   } catch (error) {
     console.error('createCountry error:', error);

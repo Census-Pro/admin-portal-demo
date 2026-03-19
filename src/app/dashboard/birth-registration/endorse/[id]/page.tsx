@@ -4,6 +4,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { getBirthApplicationById } from '@/actions/common/birth-registration-actions';
+import { getDzongkhagById } from '@/actions/common/dzongkhag-actions';
+import { getGewogById } from '@/actions/common/gewog-actions';
+import { getChiwogById } from '@/actions/common/chiwog-actions';
+import { getVillageById } from '@/actions/common/village-actions';
 
 export const metadata = {
   title: 'Birth Registration - Endorse Details'
@@ -46,13 +50,37 @@ export default async function EndorseDetailPage({
     );
   }
 
+  const appData = result.data;
+
+  // Resolve location IDs to names in parallel
+  const [dzongkhagRes, gewogRes, chiwogRes, villageRes] = await Promise.all([
+    appData.dzongkhag_id ? getDzongkhagById(appData.dzongkhag_id) : null,
+    appData.gewog_id ? getGewogById(appData.gewog_id) : null,
+    appData.chiwog_id ? getChiwogById(appData.chiwog_id) : null,
+    appData.village_id ? getVillageById(appData.village_id) : null
+  ]);
+
+  const enrichedData = {
+    ...appData,
+    dzongkhag_name:
+      dzongkhagRes && !dzongkhagRes.error
+        ? dzongkhagRes.name
+        : appData.dzongkhag_name,
+    gewog_name:
+      gewogRes && !gewogRes.error ? gewogRes.name : appData.gewog_name,
+    chiwog_name:
+      chiwogRes && !chiwogRes.error ? chiwogRes.name : appData.chiwog_name,
+    village_name:
+      villageRes && !villageRes.error ? villageRes.name : appData.village_name
+  };
+
   return (
     <PageContainer
       pageTitle="Birth Registration - Endorse Details"
       pageDescription={`Reviewing birth registration application #${id}`}
       pageHeaderAction={backButton}
     >
-      <BirthRegistrationEndorseView data={result.data} applicationId={id} />
+      <BirthRegistrationEndorseView data={enrichedData} applicationId={id} />
     </PageContainer>
   );
 }

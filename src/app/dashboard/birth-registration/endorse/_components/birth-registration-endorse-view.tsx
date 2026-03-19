@@ -42,6 +42,7 @@ interface BirthRegistrationData {
   birth_village_name?: string;
   dzongkhag_name?: string;
   gewog_name?: string;
+  chiwog_name?: string;
   village_name?: string;
   first_name: string;
   middle_name?: string;
@@ -71,6 +72,7 @@ interface BirthRegistrationData {
   hoh_approval?: string;
   dzongkhag_id?: string;
   gewog_id?: string;
+  chiwog_id?: string;
   village_id?: string;
   birth_certificate_url?: string;
   status: string;
@@ -673,6 +675,14 @@ export function BirthRegistrationEndorseView({
                   </Label>
                   <p className="flex-1 text-sm">
                     {data.gewog_name || data.gewog_id || 'N/A'}
+                  </p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Chiwog
+                  </Label>
+                  <p className="flex-1 text-sm">
+                    {data.chiwog_name || data.chiwog_id || 'N/A'}
                   </p>
                 </div>
                 <div className="flex items-start gap-4">
