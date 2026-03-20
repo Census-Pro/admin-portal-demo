@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
   IconUser,
-  IconCalendar,
   IconMapPin,
   IconHome,
   IconShieldCheck,
@@ -47,28 +47,37 @@ interface DeathRegistrationData {
   city_id: string;
   death_certificate_url: string;
   status: string;
+  // Resolved names
+  dzongkhag_name?: string;
+  gewog_name?: string;
+  village_name?: string;
+  dzongkhag_of_death_name?: string;
+  gewog_of_death_name?: string;
+  village_of_death_name?: string;
+  country_of_death_name?: string;
 }
 
 interface DeathRegistrationApproveViewProps {
   data: DeathRegistrationData;
+  applicationId: string;
 }
 
 export function DeathRegistrationApproveView({
-  data
+  data,
+  applicationId
 }: DeathRegistrationApproveViewProps) {
   const [currentDocIndex, setCurrentDocIndex] = useState(0);
 
   const documents = [
-    {
-      name: 'Sample CID',
-      type: 'image',
-      url: '/sampleCid.png'
-    },
-    {
-      name: 'Sample Certificate',
-      type: 'pdf',
-      url: '/samepleCeritificate.pdf'
-    }
+    ...(data.death_certificate_url
+      ? [
+          {
+            name: 'Death Certificate',
+            type: 'pdf',
+            url: `/api/death-applications/${applicationId}/certificate`
+          }
+        ]
+      : [])
   ];
 
   const handleNextDoc = () => {
@@ -243,9 +252,7 @@ export function DeathRegistrationApproveView({
                 </div>
               </div>
             </div>
-
             <Separator />
-
             {/* Death Location */}
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
@@ -255,39 +262,39 @@ export function DeathRegistrationApproveView({
               <div className="space-y-2">
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Country ID
+                    Country
                   </Label>
-                  <p className="flex-1 text-sm">{data.country_of_death_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.country_of_death_name || data.country_of_death_id}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    City ID
+                    Dzongkhag
                   </Label>
-                  <p className="flex-1 text-sm">{data.city_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.dzongkhag_of_death_name || data.dzongkhag_of_death_id}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Dzongkhag ID
+                    Gewog
                   </Label>
-                  <p className="flex-1 text-sm">{data.dzongkhag_of_death_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.gewog_of_death_name || data.gewog_of_death_id}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Gewog ID
+                    Village
                   </Label>
-                  <p className="flex-1 text-sm">{data.gewog_of_death_id}</p>
-                </div>
-                <div className="flex items-start gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Village ID
-                  </Label>
-                  <p className="flex-1 text-sm">{data.village_of_death_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.village_of_death_name || data.village_of_death_id}
+                  </p>
                 </div>
               </div>
-            </div>
-
+            </div>{' '}
             <Separator />
-
             {/* Applicant & Residential Address */}
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
@@ -319,27 +326,31 @@ export function DeathRegistrationApproveView({
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Dzongkhag ID
+                    Dzongkhag
                   </Label>
-                  <p className="flex-1 text-sm">{data.dzongkhag_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.dzongkhag_name || data.dzongkhag_id}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Gewog ID
+                    Gewog
                   </Label>
-                  <p className="flex-1 text-sm">{data.gewog_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.gewog_name || data.gewog_id}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Village ID
+                    Village
                   </Label>
-                  <p className="flex-1 text-sm">{data.village_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.village_name || data.village_id}
+                  </p>
                 </div>
               </div>
             </div>
-
             <Separator />
-
             {/* Application Status & Approval Details */}
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
@@ -402,7 +413,9 @@ export function DeathRegistrationApproveView({
                   <IconChevronLeft className="h-4 w-4" />
                 </Button>
                 <span className="text-muted-foreground text-sm">
-                  {currentDocIndex + 1} / {documents.length}
+                  {documents.length > 0
+                    ? `${currentDocIndex + 1} / ${documents.length}`
+                    : '0 / 0'}
                 </span>
                 <Button
                   variant="outline"
@@ -416,34 +429,44 @@ export function DeathRegistrationApproveView({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {/* Document Name */}
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">
-                  {documents[currentDocIndex].name}
-                </p>
-                <Badge variant="secondary">
-                  {documents[currentDocIndex].type.toUpperCase()}
-                </Badge>
+            {documents.length === 0 ? (
+              <div className="text-muted-foreground flex h-48 items-center justify-center text-sm">
+                No supporting documents available.
               </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Document Name */}
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium">
+                    {documents[currentDocIndex].name}
+                  </p>
+                  <Badge variant="secondary">
+                    {documents[currentDocIndex].type.toUpperCase()}
+                  </Badge>
+                </div>
 
-              {/* Document Viewer */}
-              <div className="border-muted overflow-hidden rounded-lg border">
-                {documents[currentDocIndex].type === 'image' ? (
-                  <img
-                    src={documents[currentDocIndex].url}
-                    alt={documents[currentDocIndex].name}
-                    className="h-auto w-full"
-                  />
-                ) : (
-                  <iframe
-                    src={documents[currentDocIndex].url}
-                    className="h-[600px] w-full"
-                    title={documents[currentDocIndex].name}
-                  />
-                )}
+                {/* Document Viewer */}
+                <div className="border-muted overflow-hidden rounded-lg border">
+                  {documents[currentDocIndex].type === 'image' ? (
+                    <div className="relative h-[600px] w-full">
+                      <Image
+                        src={documents[currentDocIndex].url}
+                        alt={documents[currentDocIndex].name}
+                        fill
+                        className="object-contain"
+                        unoptimized
+                      />
+                    </div>
+                  ) : (
+                    <iframe
+                      src={documents[currentDocIndex].url}
+                      className="h-[600px] w-full"
+                      title={documents[currentDocIndex].name}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>

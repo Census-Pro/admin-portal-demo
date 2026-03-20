@@ -4,47 +4,73 @@ import { Button } from '@/components/ui/button';
 import { IconArrowLeft } from '@tabler/icons-react';
 import Link from 'next/link';
 import { DeathRegistrationApproveView } from '../_components/death-registration-approve-view';
+import { getDeathApplicationById } from '@/actions/common/death-registration-actions';
+import { getDzongkhagById } from '@/actions/common/dzongkhag-actions';
+import { getGewogById } from '@/actions/common/gewog-actions';
+import { getVillageById } from '@/actions/common/village-actions';
+import { getCountryById } from '@/actions/common/country-actions';
+import { notFound } from 'next/navigation';
 
 export const metadata = {
   title: 'Approve Death Registration'
 };
 
-// Dummy data for testing
-const dummyData = {
-  applicant_cid: '10304001088',
-  deceased_cid: '11101001234',
-  first_name: 'Kinley',
-  middle_name: 'Zangmo',
-  last_name: 'Dorji',
-  date_of_birth: '1945-03-15',
-  gender: 'female',
-  dzongkhag_id: 'Pema Gatshel',
-  gewog_id: 'Nanong',
-  village_id: 'Terphu',
-  house_hold_no: '112674',
-  house_no: 'Ga-3-879',
-  is_health_registered: false,
-  date_of_death: '2026-01-18',
-  time_of_death: '09:15:00',
-  cause_of_death: 'Natural causes',
-  place_of_death: 'Paro',
-  country_of_death_id: 'Bhutan',
-  dzongkhag_of_death_id: 'Pema Gatshel',
-  gewog_of_death_id: 'Nanong',
-  village_of_death_id: 'Terphu',
-  city_id: 'Pema Gatshel',
-  death_certificate_url: 'https://example.com/certificate.pdf',
-  status: 'VERIFIED'
-};
+async function resolveName(
+  fn: (id: string) => Promise<any>,
+  id: string | null | undefined
+): Promise<string> {
+  if (!id) return 'N/A';
+  try {
+    const result = await fn(id);
+    return result?.name || id;
+  } catch {
+    return id;
+  }
+}
 
 export default async function DeathRegistrationApproveDetailPage({
   params
 }: {
   params: Promise<{ id: string }>;
 }) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id } = await params;
-  // TODO: Use id to fetch actual data from API when backend is ready
+  const result = await getDeathApplicationById(id);
+
+  if (!result.success || !result.data) {
+    notFound();
+  }
+
+  const d = result.data;
+
+  // Resolve all location IDs to names in parallel
+  const [
+    dzongkhagName,
+    gewogName,
+    villageName,
+    dzongkhagOfDeathName,
+    gewogOfDeathName,
+    villageOfDeathName,
+    countryOfDeathName
+  ] = await Promise.all([
+    resolveName(getDzongkhagById, d.dzongkhag_id),
+    resolveName(getGewogById, d.gewog_id),
+    resolveName(getVillageById, d.village_id),
+    resolveName(getDzongkhagById, d.dzongkhag_of_death_id),
+    resolveName(getGewogById, d.gewog_of_death_id),
+    resolveName(getVillageById, d.village_of_death_id),
+    resolveName(getCountryById, d.country_of_death_id)
+  ]);
+
+  const resolvedData = {
+    ...d,
+    dzongkhag_name: dzongkhagName,
+    gewog_name: gewogName,
+    village_name: villageName,
+    dzongkhag_of_death_name: dzongkhagOfDeathName,
+    gewog_of_death_name: gewogOfDeathName,
+    village_of_death_name: villageOfDeathName,
+    country_of_death_name: countryOfDeathName
+  };
 
   return (
     <PageContainer
@@ -60,7 +86,10 @@ export default async function DeathRegistrationApproveDetailPage({
         </Link>
 
         <Suspense fallback={<div>Loading...</div>}>
-          <DeathRegistrationApproveView data={dummyData} />
+          <DeathRegistrationApproveView
+            data={resolvedData}
+            applicationId={id}
+          />
         </Suspense>
       </div>
     </PageContainer>
