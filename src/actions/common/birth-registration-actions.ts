@@ -237,13 +237,20 @@ export async function getBirthRegistrations() {
 
 export async function updateBirthApplicationStatus(
   id: string,
-  status: BirthApplicationStatus
+  status: BirthApplicationStatus,
+  remarks?: string
 ) {
   try {
     const headers = await instance();
     const url = `${BIRTH_DEATH_API_URL}/birth-applications/${id}`;
 
-    console.log('[updateBirthApplicationStatus] Patching:', url, { status });
+    console.log('[updateBirthApplicationStatus] Patching:', url, {
+      status,
+      remarks
+    });
+
+    const body: Record<string, string> = { status };
+    if (remarks) body.remarks = remarks;
 
     const response = await fetch(url, {
       method: 'PATCH',
@@ -251,7 +258,7 @@ export async function updateBirthApplicationStatus(
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ status })
+      body: JSON.stringify(body)
     });
 
     console.log(
