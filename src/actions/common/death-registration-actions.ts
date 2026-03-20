@@ -195,6 +195,64 @@ export async function getDeathRegistrations() {
   }
 }
 
+export async function updateDeathApplicationStatus(
+  id: string,
+  status: DeathApplicationStatus
+) {
+  try {
+    const headers = await instance();
+    const url = `${BIRTH_DEATH_API_URL}/death-applications/${id}`;
+
+    console.log('[updateDeathApplicationStatus] Patching:', url, { status });
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status })
+    });
+
+    console.log(
+      '[updateDeathApplicationStatus] Response status:',
+      response.status
+    );
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to update death application status';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[updateDeathApplicationStatus] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
+
+    const result = await response.json();
+    console.log('[updateDeathApplicationStatus] Updated successfully');
+
+    return {
+      success: true,
+      data: result.data || result
+    };
+  } catch (error) {
+    console.error('[updateDeathApplicationStatus] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}
+
 export async function getDeathRegistrationById(id: string) {
   try {
     const headers = await instance();

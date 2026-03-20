@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,7 @@ import {
   IconSkull
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { updateDeathApplicationStatus } from '@/actions/common/death-registration-actions';
 
 interface DeathRegistrationData {
   applicant_cid: string;
@@ -66,7 +68,10 @@ export function DeathRegistrationApproveView({
   data,
   applicationId
 }: DeathRegistrationApproveViewProps) {
+  const router = useRouter();
   const [currentDocIndex, setCurrentDocIndex] = useState(0);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
 
   const documents = [
     ...(data.death_certificate_url
@@ -90,16 +95,46 @@ export function DeathRegistrationApproveView({
     );
   };
 
-  const handleApprove = () => {
-    toast.success('Death registration approved successfully!');
-    console.log('Approving death registration...');
-    // TODO: Implement approval logic
+  const handleApprove = async () => {
+    try {
+      setIsApproving(true);
+      const result = await updateDeathApplicationStatus(
+        applicationId,
+        'APPROVED'
+      );
+      if (result.success) {
+        toast.success('Death registration approved successfully!');
+        router.push('/dashboard/death-registration/approve');
+        router.refresh();
+      } else {
+        toast.error(result.error || 'Failed to approve death registration');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsApproving(false);
+    }
   };
 
-  const handleReject = () => {
-    toast.error('Death registration rejected');
-    console.log('Rejecting death registration...');
-    // TODO: Implement rejection logic
+  const handleReject = async () => {
+    try {
+      setIsRejecting(true);
+      const result = await updateDeathApplicationStatus(
+        applicationId,
+        'REJECTED'
+      );
+      if (result.success) {
+        toast.error('Death registration rejected');
+        router.push('/dashboard/death-registration/approve');
+        router.refresh();
+      } else {
+        toast.error(result.error || 'Failed to reject death registration');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsRejecting(false);
+    }
   };
 
   const { variant, className: statusClassName } = getStatusColor(data.status);
@@ -363,18 +398,20 @@ export function DeathRegistrationApproveView({
                 <div className="flex gap-3 pt-4">
                   <Button
                     onClick={handleApprove}
+                    disabled={isApproving || isRejecting}
                     className="flex-1 bg-green-600 hover:bg-green-700"
                   >
                     <IconCheck className="mr-2 h-4 w-4" />
-                    Approve
+                    {isApproving ? 'Approving...' : 'Approve'}
                   </Button>
                   <Button
                     onClick={handleReject}
+                    disabled={isApproving || isRejecting}
                     variant="destructive"
                     className="flex-1"
                   >
                     <IconX className="mr-2 h-4 w-4" />
-                    Reject
+                    {isRejecting ? 'Rejecting...' : 'Reject'}
                   </Button>
                 </div>
               )}
