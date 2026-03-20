@@ -50,19 +50,18 @@ export default async function DeathRegistrationVerifyDetailPage({
     <PageContainer
       pageTitle="Verify Death Registration"
       pageDescription="Review and verify the death registration details"
-    >
-      <div className="space-y-4">
+      pageHeaderAction={
         <Link href="/dashboard/death-registration/verify">
           <Button variant="outline" size="sm">
             <IconArrowLeft className="mr-2 h-4 w-4" />
             Back to Verification List
           </Button>
         </Link>
-
-        <Suspense fallback={<div>Loading...</div>}>
-          <DeathRegistrationVerifyView data={dummyData} />
-        </Suspense>
-      </div>
+      }
+    >
+      <Suspense fallback={<div>Loading...</div>}>
+        <DeathRegistrationVerifyView data={dummyData} />
+      </Suspense>
     </PageContainer>
   );
 }

@@ -76,22 +76,18 @@ export default async function DeathRegistrationApproveDetailPage({
     <PageContainer
       pageTitle="Approve Death Registration"
       pageDescription="Review and approve the death registration"
-    >
-      <div className="space-y-4">
+      pageHeaderAction={
         <Link href="/dashboard/death-registration/approve">
           <Button variant="outline" size="sm">
             <IconArrowLeft className="mr-2 h-4 w-4" />
             Back to Approval List
           </Button>
         </Link>
-
-        <Suspense fallback={<div>Loading...</div>}>
-          <DeathRegistrationApproveView
-            data={resolvedData}
-            applicationId={id}
-          />
-        </Suspense>
-      </div>
+      }
+    >
+      <Suspense fallback={<div>Loading...</div>}>
+        <DeathRegistrationApproveView data={resolvedData} applicationId={id} />
+      </Suspense>
     </PageContainer>
   );
 }
