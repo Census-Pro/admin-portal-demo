@@ -9,6 +9,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
+import {
   IconUser,
   IconMapPin,
   IconHome,
@@ -16,7 +27,8 @@ import {
   IconShieldCheck,
   IconFileText,
   IconCheck,
-  IconLoader2
+  IconLoader2,
+  IconX
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
 import { BirthCertificateViewer } from '../../_components/birth-certificate-viewer';
@@ -89,6 +101,7 @@ export function BirthRegistrationEndorseView({
 }: BirthRegistrationEndorseViewProps) {
   const router = useRouter();
   const [isEndorsing, setIsEndorsing] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
   const [currentStatus, setCurrentStatus] = useState(data.status);
 
   const handleEndorse = async () => {
@@ -109,6 +122,26 @@ export function BirthRegistrationEndorseView({
       toast.error('An unexpected error occurred while endorsing');
     } finally {
       setIsEndorsing(false);
+    }
+  };
+
+  const handleReject = async () => {
+    setIsRejecting(true);
+    try {
+      const result = await updateBirthApplicationStatus(
+        applicationId,
+        'REJECTED'
+      );
+      if (result.success) {
+        toast.error('Birth registration rejected');
+        router.push('/dashboard/birth-registration/endorse');
+      } else {
+        toast.error(result.error || 'Failed to reject birth registration');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsRejecting(false);
     }
   };
 
@@ -908,24 +941,88 @@ export function BirthRegistrationEndorseView({
               </div>
 
               {/* Action Button */}
-              <div className="pt-4">
-                <Button
-                  onClick={handleEndorse}
-                  disabled={isEndorsing || currentStatus === 'ENDORSED'}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60"
-                >
-                  {isEndorsing ? (
-                    <>
-                      <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Endorsing...
-                    </>
-                  ) : (
-                    <>
-                      <IconCheck className="mr-2 h-4 w-4" />
-                      {currentStatus === 'ENDORSED' ? 'Endorsed' : 'Endorse'}
-                    </>
-                  )}
-                </Button>
+              <div className="flex gap-3 pt-4">
+                {/* Endorse Confirmation Dialog */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      disabled={
+                        isEndorsing ||
+                        isRejecting ||
+                        currentStatus === 'ENDORSED'
+                      }
+                      className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-60"
+                    >
+                      {isEndorsing ? (
+                        <>
+                          <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Endorsing...
+                        </>
+                      ) : (
+                        <>
+                          <IconCheck className="mr-2 h-4 w-4" />
+                          {currentStatus === 'ENDORSED'
+                            ? 'Endorsed'
+                            : 'Endorse'}
+                        </>
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Endorsement</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to endorse this birth registration
+                        application? This action will move the application to
+                        the verification stage.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleEndorse}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <IconCheck className="mr-2 h-4 w-4" />
+                        Yes, Endorse
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
+                {/* Reject Confirmation Dialog */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      disabled={isEndorsing || isRejecting}
+                      variant="destructive"
+                      className="flex-1"
+                    >
+                      <IconX className="mr-2 h-4 w-4" />
+                      {isRejecting ? 'Rejecting...' : 'Reject'}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Rejection</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to reject this birth registration
+                        application? This action cannot be undone and the
+                        applicant will be notified of the rejection.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleReject}
+                        className="bg-destructive hover:bg-destructive/90 text-white"
+                      >
+                        <IconX className="mr-2 h-4 w-4" />
+                        Yes, Reject
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </CardContent>

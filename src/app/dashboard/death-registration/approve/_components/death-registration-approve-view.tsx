@@ -10,6 +10,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
+import {
   IconUser,
   IconMapPin,
   IconHome,
@@ -396,23 +407,72 @@ export function DeathRegistrationApproveView({
               {/* Action Buttons - only show when status is VERIFIED (pending approval) */}
               {data.status === 'VERIFIED' && (
                 <div className="flex gap-3 pt-4">
-                  <Button
-                    onClick={handleApprove}
-                    disabled={isApproving || isRejecting}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    {isApproving ? 'Approving...' : 'Approve'}
-                  </Button>
-                  <Button
-                    onClick={handleReject}
-                    disabled={isApproving || isRejecting}
-                    variant="destructive"
-                    className="flex-1"
-                  >
-                    <IconX className="mr-2 h-4 w-4" />
-                    {isRejecting ? 'Rejecting...' : 'Reject'}
-                  </Button>
+                  {/* Approve Confirmation Dialog */}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        disabled={isApproving || isRejecting}
+                        className="flex-1 bg-green-600 hover:bg-green-700"
+                      >
+                        <IconCheck className="mr-2 h-4 w-4" />
+                        {isApproving ? 'Approving...' : 'Approve'}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to approve this death
+                          registration application? This action will mark the
+                          application as approved.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleApprove}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          <IconCheck className="mr-2 h-4 w-4" />
+                          Yes, Approve
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+
+                  {/* Reject Confirmation Dialog */}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        disabled={isApproving || isRejecting}
+                        variant="destructive"
+                        className="flex-1"
+                      >
+                        <IconX className="mr-2 h-4 w-4" />
+                        {isRejecting ? 'Rejecting...' : 'Reject'}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirm Rejection</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to reject this death
+                          registration application? This action cannot be undone
+                          and the applicant will be notified of the rejection.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleReject}
+                          className="bg-destructive hover:bg-destructive/90 text-white"
+                        >
+                          <IconX className="mr-2 h-4 w-4" />
+                          Yes, Reject
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               )}
             </div>

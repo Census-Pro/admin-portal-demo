@@ -8,6 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
+import {
   IconUser,
   IconCalendar,
   IconMapPin,
@@ -361,21 +372,65 @@ export function DeathRegistrationVerifyView({
 
               {/* Action Buttons */}
               <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={handleVerify}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                >
-                  <IconCheck className="mr-2 h-4 w-4" />
-                  Verify
-                </Button>
-                <Button
-                  onClick={handleReject}
-                  variant="destructive"
-                  className="flex-1"
-                >
-                  <IconX className="mr-2 h-4 w-4" />
-                  Reject
-                </Button>
+                {/* Verify Confirmation Dialog */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                      <IconCheck className="mr-2 h-4 w-4" />
+                      Verify
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Verification</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to verify this death registration
+                        application? This action will mark the application as
+                        verified and move it to the next stage.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleVerify}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <IconCheck className="mr-2 h-4 w-4" />
+                        Yes, Verify
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
+                {/* Reject Confirmation Dialog */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="flex-1">
+                      <IconX className="mr-2 h-4 w-4" />
+                      Reject
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Rejection</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to reject this death registration
+                        application? This action cannot be undone and the
+                        applicant will be notified of the rejection.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleReject}
+                        className="bg-destructive hover:bg-destructive/90 text-white"
+                      >
+                        <IconX className="mr-2 h-4 w-4" />
+                        Yes, Reject
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </CardContent>

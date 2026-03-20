@@ -8,6 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
+import {
   IconUser,
   IconMapPin,
   IconHome,
@@ -353,13 +364,34 @@ export function DeathRegistrationEndorseView({
 
               {/* Action Button */}
               <div className="pt-4">
-                <Button
-                  onClick={handleEndorse}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  <IconCheck className="mr-2 h-4 w-4" />
-                  Endorse
-                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="w-full bg-green-600 hover:bg-green-700">
+                      <IconCheck className="mr-2 h-4 w-4" />
+                      Endorse
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Endorsement</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to endorse this death registration
+                        application? This action will move the application to
+                        the verification stage.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleEndorse}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <IconCheck className="mr-2 h-4 w-4" />
+                        Yes, Endorse
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </CardContent>
