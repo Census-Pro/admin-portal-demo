@@ -439,16 +439,12 @@ export function BirthRegistrationApproveView({
                 Parent Information
               </h3>
 
-              {/* Father, Mother, Marriage Certificate - Bordered Section */}
-              <div
-                className={`relative space-y-2 rounded-lg border-2 p-4 ${data.is_mc_valid ? 'border-green-500' : 'border-yellow-500'}`}
-              >
-                {/* Data Source Label */}
+              {/* Father's CID & Marriage Certificate - Judiciary Bordered Section */}
+              <div className="relative space-y-2 rounded-lg border-2 border-green-500 p-4">
+                {/* Judiciary Label */}
                 <div className="bg-background absolute -top-3 right-4 px-2">
-                  <span
-                    className={`text-xs font-medium ${data.is_mc_valid ? 'text-green-600' : 'text-yellow-600'}`}
-                  >
-                    {data.is_mc_valid ? 'Trusted Source' : 'Manual Entry'}
+                  <span className="text-xs font-medium text-green-600">
+                    Judiciary
                   </span>
                 </div>
 
@@ -460,6 +456,18 @@ export function BirthRegistrationApproveView({
                     {data.father_cid || 'N/A'}
                   </p>
                 </div>
+                <div className="flex items-center gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Marriage Certificate Valid
+                  </Label>
+                  <p className="flex-1 text-sm font-medium">
+                    {data.is_mc_valid ? 'Yes' : 'No'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Remaining Parent Details */}
+              <div className="space-y-2">
                 {data.fathers_contact_no && (
                   <div className="flex items-center gap-4">
                     <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
@@ -528,14 +536,6 @@ export function BirthRegistrationApproveView({
                     </p>
                   </div>
                 )}
-                <div className="flex items-center gap-4">
-                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Marriage Certificate Valid
-                  </Label>
-                  <p className="flex-1 text-sm font-medium">
-                    {data.is_mc_valid ? 'Yes' : 'No'}
-                  </p>
-                </div>
               </div>
 
               {/* Applicant & Guarantor Details */}
@@ -732,26 +732,28 @@ export function BirthRegistrationApproveView({
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={handleApprove}
-                  disabled={isApproving || isRejecting}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                >
-                  <IconCheck className="mr-2 h-4 w-4" />
-                  {isApproving ? 'Approving...' : 'Approve'}
-                </Button>
-                <Button
-                  onClick={handleReject}
-                  disabled={isApproving || isRejecting}
-                  variant="destructive"
-                  className="flex-1"
-                >
-                  <IconX className="mr-2 h-4 w-4" />
-                  {isRejecting ? 'Rejecting...' : 'Reject'}
-                </Button>
-              </div>
+              {/* Action Buttons - only show when status is VERIFIED (pending approval) */}
+              {data.status === 'VERIFIED' && (
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={handleApprove}
+                    disabled={isApproving || isRejecting}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    <IconCheck className="mr-2 h-4 w-4" />
+                    {isApproving ? 'Approving...' : 'Approve'}
+                  </Button>
+                  <Button
+                    onClick={handleReject}
+                    disabled={isApproving || isRejecting}
+                    variant="destructive"
+                    className="flex-1"
+                  >
+                    <IconX className="mr-2 h-4 w-4" />
+                    {isRejecting ? 'Rejecting...' : 'Reject'}
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

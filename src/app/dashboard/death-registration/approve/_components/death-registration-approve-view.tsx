@@ -370,24 +370,26 @@ export function DeathRegistrationApproveView({
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={handleApprove}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                >
-                  <IconCheck className="mr-2 h-4 w-4" />
-                  Approve
-                </Button>
-                <Button
-                  onClick={handleReject}
-                  variant="destructive"
-                  className="flex-1"
-                >
-                  <IconX className="mr-2 h-4 w-4" />
-                  Reject
-                </Button>
-              </div>
+              {/* Action Buttons - only show when status is VERIFIED (pending approval) */}
+              {data.status === 'VERIFIED' && (
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={handleApprove}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    <IconCheck className="mr-2 h-4 w-4" />
+                    Approve
+                  </Button>
+                  <Button
+                    onClick={handleReject}
+                    variant="destructive"
+                    className="flex-1"
+                  >
+                    <IconX className="mr-2 h-4 w-4" />
+                    Reject
+                  </Button>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
