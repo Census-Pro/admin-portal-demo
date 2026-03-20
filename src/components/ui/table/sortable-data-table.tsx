@@ -25,6 +25,8 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
+  PaginationState,
   useReactTable,
   Row
 } from '@tanstack/react-table';
@@ -36,14 +38,37 @@ import {
   TableHeader,
   TableRow
 } from '@/components/ui/table';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@/components/ui/tooltip';
+import {
+  ChevronFirst,
+  ChevronLast,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react';
 import { IconGripVertical } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import { parseAsInteger, useQueryState } from 'nuqs';
 
 interface SortableDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   totalItems: number;
   onReorder?: (newData: TData[]) => void;
+  pageSizeOptions?: number[];
 }
 
 function DragHandle({ attributes, listeners, isDragging }: any) {
@@ -160,10 +185,42 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
   columns,
   data,
   totalItems,
-  onReorder
+  onReorder,
+  pageSizeOptions = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 }: SortableDataTableProps<TData, TValue>) {
   const [items, setItems] = React.useState(data);
   const [activeId, setActiveId] = React.useState<string | null>(null);
+
+  const [currentPage, setCurrentPage] = useQueryState(
+    'page',
+    parseAsInteger.withOptions({ shallow: false }).withDefault(1)
+  );
+  const [pageSize, setPageSize] = useQueryState(
+    'limit',
+    parseAsInteger
+      .withOptions({ shallow: false, history: 'push' })
+      .withDefault(10)
+  );
+
+  const paginationState: PaginationState = {
+    pageIndex: currentPage - 1,
+    pageSize: pageSize
+  };
+
+  const pageCount = Math.ceil(totalItems / pageSize);
+
+  const handlePaginationChange = (
+    updaterOrValue:
+      | PaginationState
+      | ((old: PaginationState) => PaginationState)
+  ) => {
+    const pagination =
+      typeof updaterOrValue === 'function'
+        ? updaterOrValue(paginationState)
+        : updaterOrValue;
+    setCurrentPage(pagination.pageIndex + 1);
+    setPageSize(pagination.pageSize);
+  };
 
   React.useEffect(() => {
     setItems(data);
@@ -181,7 +238,12 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
   const table = useReactTable({
     data: items,
     columns,
-    getCoreRowModel: getCoreRowModel()
+    pageCount,
+    state: { pagination: paginationState },
+    onPaginationChange: handlePaginationChange,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    manualPagination: true
   });
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -218,84 +280,227 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
     [activeId, table]
   );
 
+  const tableHeader = (
+    <TableHeader className="bg-primary/10">
+      {table.getHeaderGroups().map((headerGroup) => (
+        <TableRow key={headerGroup.id}>
+          <TableHead className="w-[50px]">
+            <span className="text-muted-foreground/60 text-[10px] font-medium tracking-widest uppercase select-none">
+              Order
+            </span>
+          </TableHead>
+          {headerGroup.headers.map((header) => (
+            <TableHead
+              key={header.id}
+              style={{
+                width: header.column.columnDef.size
+                  ? `${header.column.columnDef.size}px`
+                  : undefined,
+                minWidth: header.column.columnDef.size
+                  ? `${header.column.columnDef.size}px`
+                  : undefined
+              }}
+            >
+              {header.isPlaceholder
+                ? null
+                : flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+            </TableHead>
+          ))}
+        </TableRow>
+      ))}
+    </TableHeader>
+  );
+
+  const paginationFooter = (
+    <div className="flex flex-col items-center justify-end gap-2 space-x-2 py-4 sm:flex-row">
+      <div className="flex w-full items-center justify-between">
+        <div className="text-muted-foreground flex-1 text-sm">
+          {totalItems > 0 ? (
+            <>
+              Showing {paginationState.pageIndex * paginationState.pageSize + 1}{' '}
+              to{' '}
+              {Math.min(
+                (paginationState.pageIndex + 1) * paginationState.pageSize,
+                totalItems
+              )}{' '}
+              of {totalItems} entries
+            </>
+          ) : (
+            'No entries found'
+          )}
+        </div>
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6 lg:gap-8">
+          <div className="flex items-center space-x-2">
+            <p className="text-sm font-medium whitespace-nowrap">
+              Rows per page
+            </p>
+            <Select
+              value={`${paginationState.pageSize}`}
+              onValueChange={(value) => table.setPageSize(Number(value))}
+            >
+              <SelectTrigger className="h-8 w-[70px]">
+                <SelectValue placeholder={paginationState.pageSize} />
+              </SelectTrigger>
+              <SelectContent side="top">
+                {pageSizeOptions.map((size) => (
+                  <SelectItem key={size} value={`${size}`}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </div>
+      <div className="flex w-full items-center justify-between gap-2 sm:justify-end">
+        <div className="flex w-[150px] items-center justify-center text-sm font-medium">
+          {totalItems > 0 ? (
+            <>
+              Page {paginationState.pageIndex + 1} of {table.getPageCount()}
+            </>
+          ) : (
+            'No pages'
+          )}
+        </div>
+        <TooltipProvider delayDuration={300}>
+          <div className="flex items-center space-x-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label="Go to first page"
+                  variant="outline"
+                  className="hidden h-8 w-8 p-0 lg:flex"
+                  onClick={() => table.setPageIndex(0)}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <ChevronFirst className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={5}>
+                First page
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label="Go to previous page"
+                  variant="outline"
+                  className="h-8 w-8 p-0"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={5}>
+                Previous page
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label="Go to next page"
+                  variant="outline"
+                  className="h-8 w-8 p-0"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={5}>
+                Next page
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label="Go to last page"
+                  variant="outline"
+                  className="hidden h-8 w-8 p-0 lg:flex"
+                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                  disabled={!table.getCanNextPage()}
+                >
+                  <ChevronLast className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={5}>
+                Last page
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+      </div>
+    </div>
+  );
+
   if (items.length === 0) {
-    return null;
+    return (
+      <div className="w-full space-y-4">
+        <ScrollArea className="bg-table h-[calc(80vh-220px)] rounded-md border md:h-[calc(90dvh-240px)]">
+          <Table>
+            {tableHeader}
+            <TableBody>
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length + 1}
+                  className="text-muted-foreground h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+        {paginationFooter}
+      </div>
+    );
   }
 
   return (
-    <div className="rounded-md border">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragCancel={handleDragCancel}
-      >
-        <Table>
-          <TableHeader className="bg-primary/10">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                <TableHead className="w-[50px]">
-                  <span className="text-muted-foreground/60 text-[10px] font-medium tracking-widest uppercase select-none">
-                    Order
-                  </span>
-                </TableHead>
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    style={{
-                      width: header.column.columnDef.size
-                        ? `${header.column.columnDef.size}px`
-                        : undefined,
-                      minWidth: header.column.columnDef.size
-                        ? `${header.column.columnDef.size}px`
-                        : undefined
-                    }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
+    <div className="w-full space-y-4">
+      <ScrollArea className="bg-table h-[calc(80vh-220px)] rounded-md border md:h-[calc(90dvh-240px)]">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          <Table>
+            {tableHeader}
+            <TableBody>
+              <SortableContext
+                items={items.map((item) => item.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {table.getRowModel().rows.map((row) => (
+                  <SortableRow key={row.id} row={row} />
                 ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            <SortableContext
-              items={items.map((item) => item.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {table.getRowModel().rows?.length ? (
-                table
-                  .getRowModel()
-                  .rows.map((row) => <SortableRow key={row.id} row={row} />)
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length + 1}
-                    className="h-24 text-center"
-                  >
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </SortableContext>
-          </TableBody>
-        </Table>
+              </SortableContext>
+            </TableBody>
+          </Table>
 
-        <DragOverlay dropAnimation={dropAnimationConfig}>
-          {activeRow ? (
-            <Table>
-              <TableBody>
-                <OverlayRow row={activeRow} />
-              </TableBody>
-            </Table>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          <DragOverlay dropAnimation={dropAnimationConfig}>
+            {activeRow ? (
+              <Table>
+                <TableBody>
+                  <OverlayRow row={activeRow} />
+                </TableBody>
+              </Table>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+      {paginationFooter}
     </div>
   );
 }
