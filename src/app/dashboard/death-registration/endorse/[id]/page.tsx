@@ -60,7 +60,7 @@ export default async function EndorseDetailPage({
         </Link>
       }
     >
-      <DeathRegistrationEndorseView data={dummyData} />
+      <DeathRegistrationEndorseView data={dummyData} applicationId={id} />
     </PageContainer>
   );
 }

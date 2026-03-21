@@ -195,6 +195,53 @@ export async function getDeathRegistrations() {
   }
 }
 
+export async function rejectDeathApplication(id: string, remarks: string) {
+  try {
+    const headers = await instance();
+    const url = `${BIRTH_DEATH_API_URL}/death-applications/${id}/reject`;
+
+    console.log('[rejectDeathApplication] Patching:', url, { remarks });
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ remarks })
+    });
+
+    console.log('[rejectDeathApplication] Response status:', response.status);
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to reject death application';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+      console.error('[rejectDeathApplication] API Error:', errorMessage);
+      return { success: false, error: errorMessage };
+    }
+
+    const result = await response.json();
+    console.log('[rejectDeathApplication] Rejected successfully');
+
+    return {
+      success: true,
+      data: result.data || result
+    };
+  } catch (error) {
+    console.error('[rejectDeathApplication] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}
+
 export async function updateDeathApplicationStatus(
   id: string,
   status: DeathApplicationStatus

@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,17 +21,30 @@ import {
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
+import {
   IconUser,
   IconMapPin,
   IconHome,
   IconShieldCheck,
   IconFileText,
   IconCheck,
+  IconX,
   IconChevronLeft,
   IconChevronRight,
   IconSkull
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import {
+  updateDeathApplicationStatus,
+  rejectDeathApplication
+} from '@/actions/common/death-registration-actions';
 
 interface DeathRegistrationData {
   applicant_cid: string;
@@ -60,11 +75,18 @@ interface DeathRegistrationData {
 
 interface DeathRegistrationEndorseViewProps {
   data: DeathRegistrationData;
+  applicationId: string;
 }
 
 export function DeathRegistrationEndorseView({
-  data
+  data,
+  applicationId
 }: DeathRegistrationEndorseViewProps) {
+  const router = useRouter();
+  const [isEndorsing, setIsEndorsing] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [remarks, setRemarks] = useState('');
   const [currentDocIndex, setCurrentDocIndex] = useState(0);
 
   const documents = [
@@ -90,10 +112,45 @@ export function DeathRegistrationEndorseView({
     );
   };
 
-  const handleEndorse = () => {
-    toast.success('Death registration endorsed successfully!');
-    console.log('Endorsing death registration...');
-    // TODO: Implement endorsement logic
+  const handleEndorse = async () => {
+    setIsEndorsing(true);
+    try {
+      const result = await updateDeathApplicationStatus(
+        applicationId,
+        'ENDORSED'
+      );
+      if (result.success) {
+        toast.success('Death registration endorsed successfully!');
+        router.push('/dashboard/death-registration/endorse');
+      } else {
+        toast.error(result.error || 'Failed to endorse death registration');
+      }
+    } catch {
+      toast.error('An unexpected error occurred while endorsing');
+    } finally {
+      setIsEndorsing(false);
+    }
+  };
+
+  const handleReject = async () => {
+    setIsRejecting(true);
+    try {
+      const result = await rejectDeathApplication(
+        applicationId,
+        remarks.trim()
+      );
+      if (result.success) {
+        setRejectDialogOpen(false);
+        toast.error('Death registration rejected');
+        router.push('/dashboard/death-registration/endorse');
+      } else {
+        toast.error(result.error || 'Failed to reject death registration');
+      }
+    } catch {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsRejecting(false);
+    }
   };
 
   const { variant, className: statusClassName } = getStatusColor(data.status);
@@ -362,13 +419,17 @@ export function DeathRegistrationEndorseView({
                 </div>
               </div>
 
-              {/* Action Button */}
-              <div className="pt-4">
+              {/* Action Buttons */}
+              <div className="flex gap-2 pt-4">
+                {/* Endorse Button */}
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button className="w-full bg-green-600 hover:bg-green-700">
+                    <Button
+                      disabled={isEndorsing || isRejecting}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
                       <IconCheck className="mr-2 h-4 w-4" />
-                      Endorse
+                      {isEndorsing ? 'Endorsing...' : 'Endorse'}
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -392,6 +453,74 @@ export function DeathRegistrationEndorseView({
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
+
+                {/* Reject Button */}
+                <Button
+                  disabled={isEndorsing || isRejecting}
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => {
+                    setRemarks('');
+                    setRejectDialogOpen(true);
+                  }}
+                >
+                  <IconX className="mr-2 h-4 w-4" />
+                  {isRejecting ? 'Rejecting...' : 'Reject'}
+                </Button>
+                <Dialog
+                  open={rejectDialogOpen}
+                  onOpenChange={(open) => {
+                    if (!isRejecting) setRejectDialogOpen(open);
+                  }}
+                >
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Confirm Rejection</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to reject this death registration
+                        application? This action cannot be undone and the
+                        applicant will be notified of the rejection.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2 py-2">
+                      <Label htmlFor="endorse-rejection-remarks">
+                        Rejection Remarks
+                        <span className="text-destructive ml-1">*</span>
+                      </Label>
+                      <Textarea
+                        id="endorse-rejection-remarks"
+                        placeholder="Please provide a reason for rejection (e.g. incomplete documentation, invalid information...)"
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                        rows={4}
+                        className="resize-none"
+                        disabled={isRejecting}
+                      />
+                      {remarks.trim() === '' && (
+                        <p className="text-muted-foreground text-xs">
+                          Remarks are required to reject the application.
+                        </p>
+                      )}
+                    </div>
+                    <DialogFooter className="gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setRejectDialogOpen(false)}
+                        disabled={isRejecting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleReject}
+                        disabled={isRejecting || remarks.trim() === ''}
+                      >
+                        <IconX className="mr-2 h-4 w-4" />
+                        {isRejecting ? 'Rejecting...' : 'Yes, Reject'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </CardContent>
