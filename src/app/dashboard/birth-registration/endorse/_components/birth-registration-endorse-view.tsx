@@ -41,7 +41,10 @@ import {
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
 import { BirthCertificateViewer } from '../../_components/birth-certificate-viewer';
-import { updateBirthApplicationStatus } from '@/actions/common/birth-registration-actions';
+import {
+  updateBirthApplicationStatus,
+  rejectBirthApplication
+} from '@/actions/common/birth-registration-actions';
 
 interface BirthRegistrationData {
   applicant_cid: string;
@@ -139,10 +142,9 @@ export function BirthRegistrationEndorseView({
   const handleReject = async () => {
     setIsRejecting(true);
     try {
-      const result = await updateBirthApplicationStatus(
+      const result = await rejectBirthApplication(
         applicationId,
-        'REJECTED',
-        remarks.trim() || undefined
+        remarks.trim()
       );
       if (result.success) {
         setRejectDialogOpen(false);

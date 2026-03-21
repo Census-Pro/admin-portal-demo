@@ -40,7 +40,10 @@ import {
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
 import { BirthCertificateViewer } from '../../_components/birth-certificate-viewer';
-import { updateBirthApplicationStatus } from '@/actions/common/birth-registration-actions';
+import {
+  updateBirthApplicationStatus,
+  rejectBirthApplication
+} from '@/actions/common/birth-registration-actions';
 
 interface BirthRegistrationData {
   applicant_cid: string;
@@ -121,7 +124,6 @@ export function BirthRegistrationApproveView({
       if (result.success) {
         toast.success('Birth registration approved successfully!');
         router.push('/dashboard/birth-registration/approve');
-        router.refresh();
       } else {
         toast.error(result.error || 'Failed to approve birth registration');
       }
@@ -135,16 +137,14 @@ export function BirthRegistrationApproveView({
   const handleReject = async () => {
     try {
       setIsRejecting(true);
-      const result = await updateBirthApplicationStatus(
+      const result = await rejectBirthApplication(
         applicationId,
-        'REJECTED',
-        remarks.trim() || undefined
+        remarks.trim()
       );
       if (result.success) {
         setRejectDialogOpen(false);
         toast.error('Birth registration rejected');
         router.push('/dashboard/birth-registration/approve');
-        router.refresh();
       } else {
         toast.error(result.error || 'Failed to reject birth registration');
       }
