@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/alert-dialog';
 import {
   IconUser,
-  IconCalendar,
   IconMapPin,
   IconHome,
   IconShieldCheck,
@@ -116,20 +115,7 @@ export function DeathRegistrationVerifyView({
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Deceased Information & Death Details - Combined */}
-            <div
-              className={`relative space-y-4 rounded-lg border-2 p-4 ${data.is_health_registered ? 'border-green-500' : 'border-yellow-500'}`}
-            >
-              {/* Data Source Label */}
-              <div className="bg-background absolute -top-3 right-4 px-2">
-                <span
-                  className={`text-xs font-medium ${data.is_health_registered ? 'text-green-600' : 'text-yellow-600'}`}
-                >
-                  {data.is_health_registered
-                    ? 'Trusted Source'
-                    : 'Manual Entry'}
-                </span>
-              </div>
-
+            <div className="space-y-4">
               {/* Deceased Information */}
               <div className="space-y-3">
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
@@ -197,8 +183,18 @@ export function DeathRegistrationVerifyView({
 
               <Separator className="my-4" />
 
-              {/* Death Details */}
-              <div className="space-y-3">
+              {/* Death Details — bordered by EPIS (green) or Manual Entry (yellow) */}
+              <div
+                className={`relative space-y-3 rounded-lg border-2 p-4 ${data.is_health_registered ? 'border-green-500' : 'border-yellow-500'}`}
+              >
+                {/* Source label */}
+                <div className="bg-background absolute -top-3 left-4 px-2">
+                  <span
+                    className={`text-xs font-semibold ${data.is_health_registered ? 'text-green-600' : 'text-yellow-600'}`}
+                  >
+                    {data.is_health_registered ? 'EPIS' : 'Manual Entry'}
+                  </span>
+                </div>
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <IconSkull className="h-4 w-4" />
                   Death Details
