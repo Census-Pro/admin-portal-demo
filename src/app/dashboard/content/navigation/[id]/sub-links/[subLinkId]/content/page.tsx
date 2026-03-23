@@ -50,37 +50,6 @@ async function ContentPagesContent({
 
   return (
     <>
-      {/* ── Breadcrumb trail ── */}
-      <nav
-        aria-label="Breadcrumb"
-        className="mb-4 flex items-center gap-1.5 text-sm"
-      >
-        <a
-          href="/dashboard/content"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Content
-        </a>
-        <span className="text-muted-foreground">/</span>
-        <a
-          href="/dashboard/content/navigation"
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Navigation
-        </a>
-        <span className="text-muted-foreground">/</span>
-        <a
-          href={`/dashboard/content/navigation/${navigationId}/sub-links`}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {navItem?.label ?? 'Sub-Links'}
-        </a>
-        <span className="text-muted-foreground">/</span>
-        <span className="text-foreground font-medium">{subLink.label}</span>
-        <span className="text-muted-foreground">/</span>
-        <span className="text-foreground font-medium">Content</span>
-      </nav>
-
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">

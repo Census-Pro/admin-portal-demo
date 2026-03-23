@@ -35,7 +35,11 @@ export default async function AnnouncementsPage({
 
         {/* ── Notices tab ── */}
         <TabsContent value="notices" className="space-y-4">
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground text-sm">
+              Manage public notices. You can create, edit, and publish
+              announcements here.
+            </p>
             <AddAnnouncementButton />
           </div>
           <Suspense

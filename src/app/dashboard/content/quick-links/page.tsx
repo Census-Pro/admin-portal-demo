@@ -29,7 +29,11 @@ export default async function QuickLinksPage() {
 
         {/* ── Quick Links tab ── */}
         <TabsContent value="links" className="space-y-4">
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground text-sm">
+              Manage individual quick links, external resources, and sidebar
+              links.
+            </p>
             <AddQuickLinkButton />
           </div>
           <Suspense
