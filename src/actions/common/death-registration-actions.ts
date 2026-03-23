@@ -85,6 +85,75 @@ export async function getDeathApplicationsByStatus(
   }
 }
 
+export async function getSubmittedDeathApplications() {
+  try {
+    const headers = await instance();
+    const url = `${BIRTH_DEATH_API_URL}/death-applications/submitted`;
+
+    console.log('[getSubmittedDeathApplications] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    console.log(
+      '[getSubmittedDeathApplications] Response status:',
+      response.status
+    );
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch submitted death applications';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[getSubmittedDeathApplications] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage,
+        data: [],
+        total_count: 0
+      };
+    }
+
+    const result = await response.json();
+    const data = Array.isArray(result) ? result : result.data || [];
+
+    console.log(
+      '[getSubmittedDeathApplications] Fetched successfully:',
+      data.length
+    );
+
+    return {
+      success: true,
+      data,
+      total_count: data.length
+    };
+  } catch (error) {
+    console.error('[getSubmittedDeathApplications] Unexpected error:', error);
+    const isConnRefused =
+      error instanceof Error &&
+      (error.message.includes('ECONNREFUSED') ||
+        error.message.includes('fetch failed'));
+    return {
+      success: false,
+      error: isConnRefused
+        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
+        : error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred',
+      data: [],
+      total_count: 0
+    };
+  }
+}
+
 export async function getDeathApplicationById(id: string) {
   try {
     const headers = await instance();

@@ -8,14 +8,23 @@ import {
   DeathApplicationStatus
 } from '@/actions/common/death-registration-actions';
 
+type FetchResult = {
+  success: boolean;
+  data: unknown[];
+  total_count?: number;
+  error?: string;
+};
+
 interface DeathApplicationsTableProps<TData> {
-  status: DeathApplicationStatus | DeathApplicationStatus[];
+  status?: DeathApplicationStatus | DeathApplicationStatus[];
   columns: ColumnDef<TData, any>[];
+  fetchFn?: () => Promise<FetchResult>;
 }
 
 export function DeathApplicationsTable<TData>({
   status,
-  columns
+  columns,
+  fetchFn
 }: DeathApplicationsTableProps<TData>) {
   const [data, setData] = useState<TData[]>([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -29,25 +38,36 @@ export function DeathApplicationsTable<TData>({
       setIsLoading(true);
       setError(null);
       try {
-        const statuses = Array.isArray(status) ? status : [status];
-        const results = await Promise.all(
-          statuses.map((s) => getDeathApplicationsByStatus(s))
-        );
-        if (cancelled) return;
+        if (fetchFn) {
+          const result = await fetchFn();
+          if (cancelled) return;
+          if (!result.success) {
+            setError(result.error ?? 'Failed to fetch applications');
+            return;
+          }
+          setData(result.data as TData[]);
+          setTotalItems(result.total_count ?? result.data.length);
+        } else if (status) {
+          const statuses = Array.isArray(status) ? status : [status];
+          const results = await Promise.all(
+            statuses.map((s) => getDeathApplicationsByStatus(s))
+          );
+          if (cancelled) return;
 
-        const hasError = results.find((r) => !r.success);
-        if (hasError) {
-          setError(hasError.error ?? 'Failed to fetch applications');
-          return;
+          const hasError = results.find((r) => !r.success);
+          if (hasError) {
+            setError(hasError.error ?? 'Failed to fetch applications');
+            return;
+          }
+
+          const combined = results.flatMap((r) => r.data as TData[]);
+          const total = results.reduce(
+            (sum, r) => sum + (r.total_count ?? r.data.length),
+            0
+          );
+          setData(combined);
+          setTotalItems(total);
         }
-
-        const combined = results.flatMap((r) => r.data as TData[]);
-        const total = results.reduce(
-          (sum, r) => sum + (r.total_count ?? r.data.length),
-          0
-        );
-        setData(combined);
-        setTotalItems(total);
       } catch (err) {
         if (cancelled) return;
         setError(
@@ -62,7 +82,7 @@ export function DeathApplicationsTable<TData>({
     return () => {
       cancelled = true;
     };
-  }, [status]);
+  }, [status, fetchFn]);
 
   if (isLoading) {
     return (
