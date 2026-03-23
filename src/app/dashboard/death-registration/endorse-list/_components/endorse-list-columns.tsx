@@ -16,7 +16,7 @@ interface DeathRegistration {
   deceased_cid: string;
   date_of_death: string;
   status: string;
-  created_at?: string;
+  createdAt?: string;
 }
 
 function ActionsCell({ registration }: { registration: DeathRegistration }) {
@@ -70,11 +70,11 @@ export const endorseListColumns: ColumnDef<DeathRegistration>[] = [
     }
   },
   {
-    accessorKey: 'created_at',
+    accessorKey: 'createdAt',
     header: 'Submitted Date',
     enableSorting: true,
     cell: ({ row }) => {
-      const date = row.getValue('created_at') as string;
+      const date = row.getValue('createdAt') as string;
       if (!date) return '-';
       try {
         return format(new Date(date), 'MMM dd, yyyy');
