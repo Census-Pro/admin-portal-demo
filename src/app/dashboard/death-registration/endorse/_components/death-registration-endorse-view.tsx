@@ -46,6 +46,10 @@ import {
   rejectDeathApplication,
   getDeathApplicationById
 } from '@/actions/common/death-registration-actions';
+import { getDzongkhagById } from '@/actions/common/dzongkhag-actions';
+import { getGewogById } from '@/actions/common/gewog-actions';
+import { getChiwogById } from '@/actions/common/chiwog-actions';
+import { getVillageById } from '@/actions/common/village-actions';
 
 interface DeathRegistrationData {
   applicant_cid?: string;
@@ -57,6 +61,7 @@ interface DeathRegistrationData {
   gender?: string;
   dzongkhag_id?: string;
   gewog_id?: string;
+  chiwog_id?: string;
   village_id?: string;
   house_hold_no?: string;
   house_no?: string;
@@ -72,6 +77,14 @@ interface DeathRegistrationData {
   city_id?: string;
   death_certificate_url?: string;
   status?: string;
+  // Resolved names
+  dzongkhag_name?: string;
+  gewog_name?: string;
+  chiwog_name?: string;
+  village_name?: string;
+  dzongkhag_of_death_name?: string;
+  gewog_of_death_name?: string;
+  village_of_death_name?: string;
   [key: string]: unknown;
 }
 
@@ -104,7 +117,45 @@ export function DeathRegistrationEndorseView({
           setFetchError(result.error ?? 'Application not found');
           return;
         }
-        setData(result.data as DeathRegistrationData);
+        const app = result.data as DeathRegistrationData;
+
+        // Resolve names in parallel
+        const [
+          dzongkhagRes,
+          gewogRes,
+          chiwogRes,
+          villageRes,
+          dzongkhagOfDeathRes,
+          gewogOfDeathRes,
+          villageOfDeathRes
+        ] = await Promise.all([
+          app.dzongkhag_id ? getDzongkhagById(app.dzongkhag_id) : null,
+          app.gewog_id ? getGewogById(app.gewog_id) : null,
+          app.chiwog_id ? getChiwogById(app.chiwog_id) : null,
+          app.village_id ? getVillageById(app.village_id) : null,
+          app.dzongkhag_of_death_id
+            ? getDzongkhagById(app.dzongkhag_of_death_id)
+            : null,
+          app.gewog_of_death_id ? getGewogById(app.gewog_of_death_id) : null,
+          app.village_of_death_id
+            ? getVillageById(app.village_of_death_id)
+            : null
+        ]);
+
+        if (cancelled) return;
+
+        setData({
+          ...app,
+          dzongkhag_name: dzongkhagRes?.name ?? app.dzongkhag_id,
+          gewog_name: gewogRes?.name ?? app.gewog_id,
+          chiwog_name: chiwogRes?.name ?? app.chiwog_id,
+          village_name: villageRes?.name ?? app.village_id,
+          dzongkhag_of_death_name:
+            dzongkhagOfDeathRes?.name ?? app.dzongkhag_of_death_id,
+          gewog_of_death_name: gewogOfDeathRes?.name ?? app.gewog_of_death_id,
+          village_of_death_name:
+            villageOfDeathRes?.name ?? app.village_of_death_id
+        });
       } catch (err) {
         if (!cancelled)
           setFetchError(
@@ -121,16 +172,15 @@ export function DeathRegistrationEndorseView({
   }, [applicationId]);
 
   const documents = [
-    {
-      name: 'Sample CID',
-      type: 'image',
-      url: '/sampleCid.png'
-    },
-    {
-      name: 'Sample Certificate',
-      type: 'pdf',
-      url: '/samepleCeritificate.pdf'
-    }
+    ...(data?.death_certificate_url
+      ? [
+          {
+            name: 'Death Certificate',
+            type: 'pdf',
+            url: `/api/death-applications/${applicationId}/certificate`
+          }
+        ]
+      : [])
   ];
 
   const handleNextDoc = () => {
@@ -365,31 +415,37 @@ export function DeathRegistrationEndorseView({
               <div className="space-y-2">
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Country ID
+                    Country
                   </Label>
                   <p className="flex-1 text-sm">{data.country_of_death_id}</p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Dzongkhag ID
+                    Dzongkhag
                   </Label>
-                  <p className="flex-1 text-sm">{data.dzongkhag_of_death_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.dzongkhag_of_death_name || 'N/A'}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Gewog ID
+                    Gewog
                   </Label>
-                  <p className="flex-1 text-sm">{data.gewog_of_death_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.gewog_of_death_name || 'N/A'}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Village ID
+                    Village
                   </Label>
-                  <p className="flex-1 text-sm">{data.village_of_death_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.village_of_death_name || 'N/A'}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    City ID
+                    City
                   </Label>
                   <p className="flex-1 text-sm">{data.city_id}</p>
                 </div>
@@ -429,21 +485,29 @@ export function DeathRegistrationEndorseView({
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Dzongkhag ID
+                    Dzongkhag
                   </Label>
-                  <p className="flex-1 text-sm">{data.dzongkhag_id}</p>
+                  <p className="flex-1 text-sm">
+                    {data.dzongkhag_name || 'N/A'}
+                  </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Gewog ID
+                    Gewog
                   </Label>
-                  <p className="flex-1 text-sm">{data.gewog_id}</p>
+                  <p className="flex-1 text-sm">{data.gewog_name || 'N/A'}</p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
-                    Village ID
+                    Chiwog
                   </Label>
-                  <p className="flex-1 text-sm">{data.village_id}</p>
+                  <p className="flex-1 text-sm">{data.chiwog_name || 'N/A'}</p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Village
+                  </Label>
+                  <p className="flex-1 text-sm">{data.village_name || 'N/A'}</p>
                 </div>
               </div>
             </div>
@@ -597,7 +661,9 @@ export function DeathRegistrationEndorseView({
                   <IconChevronLeft className="h-4 w-4" />
                 </Button>
                 <span className="text-muted-foreground text-sm">
-                  {currentDocIndex + 1} / {documents.length}
+                  {documents.length > 0
+                    ? `${currentDocIndex + 1} / ${documents.length}`
+                    : '0 / 0'}
                 </span>
                 <Button
                   variant="outline"
@@ -611,34 +677,40 @@ export function DeathRegistrationEndorseView({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {/* Document Name */}
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">
-                  {documents[currentDocIndex].name}
-                </p>
-                <Badge variant="secondary">
-                  {documents[currentDocIndex].type.toUpperCase()}
-                </Badge>
+            {documents.length === 0 ? (
+              <div className="text-muted-foreground flex h-32 items-center justify-center text-sm">
+                No supporting documents available.
               </div>
+            ) : (
+              <div className="space-y-4">
+                {/* Document Name */}
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium">
+                    {documents[currentDocIndex].name}
+                  </p>
+                  <Badge variant="secondary">
+                    {documents[currentDocIndex].type.toUpperCase()}
+                  </Badge>
+                </div>
 
-              {/* Document Viewer */}
-              <div className="border-muted overflow-hidden rounded-lg border">
-                {documents[currentDocIndex].type === 'image' ? (
-                  <img
-                    src={documents[currentDocIndex].url}
-                    alt={documents[currentDocIndex].name}
-                    className="h-auto w-full"
-                  />
-                ) : (
-                  <iframe
-                    src={documents[currentDocIndex].url}
-                    className="h-[600px] w-full"
-                    title={documents[currentDocIndex].name}
-                  />
-                )}
+                {/* Document Viewer */}
+                <div className="border-muted overflow-hidden rounded-lg border">
+                  {documents[currentDocIndex].type === 'image' ? (
+                    <img
+                      src={documents[currentDocIndex].url}
+                      alt={documents[currentDocIndex].name}
+                      className="h-auto w-full"
+                    />
+                  ) : (
+                    <iframe
+                      src={documents[currentDocIndex].url}
+                      className="h-[600px] w-full"
+                      title={documents[currentDocIndex].name}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
