@@ -8,34 +8,6 @@ export const metadata = {
   title: 'Death Registration - Endorse Details'
 };
 
-// Dummy data for testing
-const dummyData = {
-  applicant_cid: '10203004567',
-  deceased_cid: '10203004567',
-  first_name: 'Pema',
-  middle_name: 'Dorji',
-  last_name: 'Tshering',
-  date_of_birth: '1960-05-15',
-  gender: 'male',
-  dzongkhag_id: 'Thimphu',
-  gewog_id: 'Chang',
-  village_id: 'Babesa',
-  house_hold_no: '112890',
-  house_no: 'Th-4-123',
-  is_health_registered: true,
-  date_of_death: '2026-01-15',
-  time_of_death: '14:30:00',
-  cause_of_death: 'Natural causes',
-  place_of_death: 'JDWNRH Hospital',
-  country_of_death_id: 'Bhutan',
-  dzongkhag_of_death_id: 'Thimphu',
-  gewog_of_death_id: 'Chang',
-  village_of_death_id: 'Babesa',
-  city_id: 'Thimphu City',
-  death_certificate_url: './certificate.com',
-  status: 'SUBMITTED'
-};
-
 interface EndorseDetailPageProps {
   params: Promise<{
     id: string;
@@ -60,7 +32,7 @@ export default async function EndorseDetailPage({
         </Link>
       }
     >
-      <DeathRegistrationEndorseView data={dummyData} applicationId={id} />
+      <DeathRegistrationEndorseView applicationId={id} />
     </PageContainer>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -43,51 +43,82 @@ import {
 import { getStatusColor } from '@/lib/status-utils';
 import {
   updateDeathApplicationStatus,
-  rejectDeathApplication
+  rejectDeathApplication,
+  getDeathApplicationById
 } from '@/actions/common/death-registration-actions';
 
 interface DeathRegistrationData {
-  applicant_cid: string;
-  deceased_cid: string;
-  first_name: string;
-  middle_name: string;
-  last_name: string;
-  date_of_birth: string;
-  gender: string;
-  dzongkhag_id: string;
-  gewog_id: string;
-  village_id: string;
-  house_hold_no: string;
-  house_no: string;
-  is_health_registered: boolean;
-  date_of_death: string;
-  time_of_death: string;
-  cause_of_death: string;
-  place_of_death: string;
-  country_of_death_id: string;
-  dzongkhag_of_death_id: string;
-  gewog_of_death_id: string;
-  village_of_death_id: string;
-  city_id: string;
-  death_certificate_url: string;
-  status: string;
+  applicant_cid?: string;
+  deceased_cid?: string;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  date_of_birth?: string;
+  gender?: string;
+  dzongkhag_id?: string;
+  gewog_id?: string;
+  village_id?: string;
+  house_hold_no?: string;
+  house_no?: string;
+  is_health_registered?: boolean;
+  date_of_death?: string;
+  time_of_death?: string;
+  cause_of_death?: string;
+  place_of_death?: string;
+  country_of_death_id?: string;
+  dzongkhag_of_death_id?: string;
+  gewog_of_death_id?: string;
+  village_of_death_id?: string;
+  city_id?: string;
+  death_certificate_url?: string;
+  status?: string;
+  [key: string]: unknown;
 }
 
 interface DeathRegistrationEndorseViewProps {
-  data: DeathRegistrationData;
   applicationId: string;
 }
 
 export function DeathRegistrationEndorseView({
-  data,
   applicationId
 }: DeathRegistrationEndorseViewProps) {
   const router = useRouter();
+  const [data, setData] = useState<DeathRegistrationData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [isEndorsing, setIsEndorsing] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [remarks, setRemarks] = useState('');
   const [currentDocIndex, setCurrentDocIndex] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchData() {
+      setIsLoading(true);
+      setFetchError(null);
+      try {
+        const result = await getDeathApplicationById(applicationId);
+        if (cancelled) return;
+        if (!result.success || !result.data) {
+          setFetchError(result.error ?? 'Application not found');
+          return;
+        }
+        setData(result.data as DeathRegistrationData);
+      } catch (err) {
+        if (!cancelled)
+          setFetchError(
+            err instanceof Error ? err.message : 'An unexpected error occurred'
+          );
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+    fetchData();
+    return () => {
+      cancelled = true;
+    };
+  }, [applicationId]);
 
   const documents = [
     {
@@ -153,7 +184,25 @@ export function DeathRegistrationEndorseView({
     }
   };
 
-  const { variant, className: statusClassName } = getStatusColor(data.status);
+  const { variant, className: statusClassName } = getStatusColor(
+    data?.status ?? ''
+  );
+
+  if (isLoading) {
+    return (
+      <div className="text-muted-foreground flex h-64 items-center justify-center text-sm">
+        Loading application…
+      </div>
+    );
+  }
+
+  if (fetchError || !data) {
+    return (
+      <div className="flex h-64 items-center justify-center text-sm text-red-500">
+        {fetchError ?? 'Application not found'}
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
@@ -218,14 +267,16 @@ export function DeathRegistrationEndorseView({
                       Date of Birth
                     </Label>
                     <p className="flex-1 text-sm font-medium">
-                      {new Date(data.date_of_birth).toLocaleDateString(
-                        'en-GB',
-                        {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        }
-                      )}
+                      {data.date_of_birth
+                        ? new Date(data.date_of_birth).toLocaleDateString(
+                            'en-GB',
+                            {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric'
+                            }
+                          )
+                        : 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -255,14 +306,16 @@ export function DeathRegistrationEndorseView({
                       Date of Death
                     </Label>
                     <p className="flex-1 text-sm font-medium">
-                      {new Date(data.date_of_death).toLocaleDateString(
-                        'en-GB',
-                        {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        }
-                      )}
+                      {data.date_of_death
+                        ? new Date(data.date_of_death).toLocaleDateString(
+                            'en-GB',
+                            {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric'
+                            }
+                          )
+                        : 'N/A'}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
