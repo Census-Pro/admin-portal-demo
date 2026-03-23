@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import Image from 'next/image';
@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +21,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from '@/components/ui/dialog';
 import {
   IconUser,
   IconMapPin,
@@ -33,59 +42,136 @@ import {
   IconSkull
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
-import { updateDeathApplicationStatus } from '@/actions/common/death-registration-actions';
+import {
+  getDeathApplicationById,
+  updateDeathApplicationStatus,
+  rejectDeathApplication
+} from '@/actions/common/death-registration-actions';
+import { getDzongkhagById } from '@/actions/common/dzongkhag-actions';
+import { getGewogById } from '@/actions/common/gewog-actions';
+import { getChiwogById } from '@/actions/common/chiwog-actions';
+import { getVillageById } from '@/actions/common/village-actions';
 
 interface DeathRegistrationData {
-  applicant_cid: string;
-  deceased_cid: string;
-  first_name: string;
-  middle_name: string;
-  last_name: string;
-  date_of_birth: string;
-  gender: string;
-  dzongkhag_id: string;
-  gewog_id: string;
-  village_id: string;
-  house_hold_no: string;
-  house_no: string;
-  is_health_registered: boolean;
-  date_of_death: string;
-  time_of_death: string;
-  cause_of_death: string;
-  place_of_death: string;
-  country_of_death_id: string;
-  dzongkhag_of_death_id: string;
-  gewog_of_death_id: string;
-  village_of_death_id: string;
-  city_id: string;
-  death_certificate_url: string;
-  status: string;
-  // Resolved names
+  applicant_cid?: string;
+  deceased_cid?: string;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  date_of_birth?: string;
+  gender?: string;
+  dzongkhag_id?: string;
+  gewog_id?: string;
+  chiwog_id?: string;
+  village_id?: string;
+  house_hold_no?: string;
+  house_no?: string;
+  is_health_registered?: boolean;
+  date_of_death?: string;
+  time_of_death?: string;
+  cause_of_death?: string;
+  place_of_death?: string;
+  country_of_death_id?: string;
+  dzongkhag_of_death_id?: string;
+  gewog_of_death_id?: string;
+  village_of_death_id?: string;
+  city_id?: string;
+  death_certificate_url?: string;
+  status?: string;
   dzongkhag_name?: string;
   gewog_name?: string;
+  chiwog_name?: string;
   village_name?: string;
   dzongkhag_of_death_name?: string;
   gewog_of_death_name?: string;
   village_of_death_name?: string;
-  country_of_death_name?: string;
+  [key: string]: unknown;
 }
 
 interface DeathRegistrationApproveViewProps {
-  data: DeathRegistrationData;
   applicationId: string;
 }
 
 export function DeathRegistrationApproveView({
-  data,
   applicationId
 }: DeathRegistrationApproveViewProps) {
   const router = useRouter();
+  const [data, setData] = useState<DeathRegistrationData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [currentDocIndex, setCurrentDocIndex] = useState(0);
   const [isApproving, setIsApproving] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [remarks, setRemarks] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchData() {
+      setIsLoading(true);
+      setFetchError(null);
+      try {
+        const result = await getDeathApplicationById(applicationId);
+        if (cancelled) return;
+        if (!result.success || !result.data) {
+          setFetchError(result.error ?? 'Application not found');
+          return;
+        }
+        const app = result.data as DeathRegistrationData;
+
+        const [
+          dzongkhagRes,
+          gewogRes,
+          chiwogRes,
+          villageRes,
+          dzongkhagOfDeathRes,
+          gewogOfDeathRes,
+          villageOfDeathRes
+        ] = await Promise.all([
+          app.dzongkhag_id ? getDzongkhagById(app.dzongkhag_id) : null,
+          app.gewog_id ? getGewogById(app.gewog_id) : null,
+          app.chiwog_id ? getChiwogById(app.chiwog_id) : null,
+          app.village_id ? getVillageById(app.village_id) : null,
+          app.dzongkhag_of_death_id
+            ? getDzongkhagById(app.dzongkhag_of_death_id)
+            : null,
+          app.gewog_of_death_id ? getGewogById(app.gewog_of_death_id) : null,
+          app.village_of_death_id
+            ? getVillageById(app.village_of_death_id)
+            : null
+        ]);
+
+        if (cancelled) return;
+
+        setData({
+          ...app,
+          dzongkhag_name: dzongkhagRes?.name ?? app.dzongkhag_id,
+          gewog_name: gewogRes?.name ?? app.gewog_id,
+          chiwog_name: chiwogRes?.name ?? app.chiwog_id,
+          village_name: villageRes?.name ?? app.village_id,
+          dzongkhag_of_death_name:
+            dzongkhagOfDeathRes?.name ?? app.dzongkhag_of_death_id,
+          gewog_of_death_name: gewogOfDeathRes?.name ?? app.gewog_of_death_id,
+          village_of_death_name:
+            villageOfDeathRes?.name ?? app.village_of_death_id
+        });
+      } catch (err) {
+        if (!cancelled)
+          setFetchError(
+            err instanceof Error ? err.message : 'An unexpected error occurred'
+          );
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+    fetchData();
+    return () => {
+      cancelled = true;
+    };
+  }, [applicationId]);
 
   const documents = [
-    ...(data.death_certificate_url
+    ...(data?.death_certificate_url
       ? [
           {
             name: 'Death Certificate',
@@ -96,15 +182,12 @@ export function DeathRegistrationApproveView({
       : [])
   ];
 
-  const handleNextDoc = () => {
+  const handleNextDoc = () =>
     setCurrentDocIndex((prev) => (prev + 1) % documents.length);
-  };
-
-  const handlePrevDoc = () => {
+  const handlePrevDoc = () =>
     setCurrentDocIndex(
       (prev) => (prev - 1 + documents.length) % documents.length
     );
-  };
 
   const handleApprove = async () => {
     try {
@@ -116,7 +199,6 @@ export function DeathRegistrationApproveView({
       if (result.success) {
         toast.success('Death registration approved successfully!');
         router.push('/dashboard/death-registration/approve');
-        router.refresh();
       } else {
         toast.error(result.error || 'Failed to approve death registration');
       }
@@ -130,14 +212,14 @@ export function DeathRegistrationApproveView({
   const handleReject = async () => {
     try {
       setIsRejecting(true);
-      const result = await updateDeathApplicationStatus(
+      const result = await rejectDeathApplication(
         applicationId,
-        'REJECTED'
+        remarks.trim()
       );
       if (result.success) {
+        setRejectDialogOpen(false);
         toast.error('Death registration rejected');
         router.push('/dashboard/death-registration/approve');
-        router.refresh();
       } else {
         toast.error(result.error || 'Failed to reject death registration');
       }
@@ -148,18 +230,34 @@ export function DeathRegistrationApproveView({
     }
   };
 
-  const { variant, className: statusClassName } = getStatusColor(data.status);
+  if (isLoading) {
+    return (
+      <div className="text-muted-foreground flex h-64 items-center justify-center text-sm">
+        Loading application…
+      </div>
+    );
+  }
+
+  if (fetchError || !data) {
+    return (
+      <div className="flex h-64 items-center justify-center text-sm text-red-500">
+        {fetchError ?? 'Application not found'}
+      </div>
+    );
+  }
+
+  const { variant, className: statusClassName } = getStatusColor(
+    data.status ?? ''
+  );
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-      {/* Left Side - All Information in One Card - 40% */}
       <div className="space-y-6 lg:col-span-2">
         <Card>
           <CardHeader>
             <CardTitle>Death Registration Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Deceased Information */}
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <IconUser className="h-4 w-4" />
@@ -209,16 +307,16 @@ export function DeathRegistrationApproveView({
                     Date of Birth
                   </Label>
                   <p className="flex-1 text-sm font-medium">
-                    {new Date(data.date_of_birth).toLocaleDateString('en-GB', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
+                    {data.date_of_birth
+                      ? new Date(data.date_of_birth).toLocaleDateString(
+                          'en-GB',
+                          { day: '2-digit', month: 'short', year: 'numeric' }
+                        )
+                      : 'N/A'}
                   </p>
                 </div>
               </div>
 
-              {/* Date of Death → Health Registered: bordered by health registration status */}
               <div
                 className={`relative space-y-2 rounded-lg border-2 p-4 ${data.is_health_registered ? 'border-green-500' : 'border-yellow-500'}`}
               >
@@ -229,8 +327,6 @@ export function DeathRegistrationApproveView({
                     {data.is_health_registered ? 'EPIS' : 'Manual Entry'}
                   </span>
                 </div>
-
-                {/* Death Details */}
                 <h3 className="flex items-center gap-2 text-sm font-semibold">
                   <IconSkull className="h-4 w-4" />
                   Death Details
@@ -241,14 +337,12 @@ export function DeathRegistrationApproveView({
                       Date of Death
                     </Label>
                     <p className="flex-1 text-sm font-medium">
-                      {new Date(data.date_of_death).toLocaleDateString(
-                        'en-GB',
-                        {
-                          day: '2-digit',
-                          month: 'short',
-                          year: 'numeric'
-                        }
-                      )}
+                      {data.date_of_death
+                        ? new Date(data.date_of_death).toLocaleDateString(
+                            'en-GB',
+                            { day: '2-digit', month: 'short', year: 'numeric' }
+                          )
+                        : 'N/A'}
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
@@ -286,8 +380,9 @@ export function DeathRegistrationApproveView({
                 </div>
               </div>
             </div>
+
             <Separator />
-            {/* Death Location */}
+
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <IconMapPin className="h-4 w-4" />
@@ -299,15 +394,21 @@ export function DeathRegistrationApproveView({
                     Country
                   </Label>
                   <p className="flex-1 text-sm">
-                    {data.country_of_death_name || data.country_of_death_id}
+                    {data.country_of_death_id || 'N/A'}
                   </p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    City
+                  </Label>
+                  <p className="flex-1 text-sm">{data.city_id || 'N/A'}</p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     Dzongkhag
                   </Label>
                   <p className="flex-1 text-sm">
-                    {data.dzongkhag_of_death_name || data.dzongkhag_of_death_id}
+                    {data.dzongkhag_of_death_name || 'N/A'}
                   </p>
                 </div>
                 <div className="flex items-start gap-4">
@@ -315,7 +416,7 @@ export function DeathRegistrationApproveView({
                     Gewog
                   </Label>
                   <p className="flex-1 text-sm">
-                    {data.gewog_of_death_name || data.gewog_of_death_id}
+                    {data.gewog_of_death_name || 'N/A'}
                   </p>
                 </div>
                 <div className="flex items-start gap-4">
@@ -323,13 +424,14 @@ export function DeathRegistrationApproveView({
                     Village
                   </Label>
                   <p className="flex-1 text-sm">
-                    {data.village_of_death_name || data.village_of_death_id}
+                    {data.village_of_death_name || 'N/A'}
                   </p>
                 </div>
               </div>
-            </div>{' '}
+            </div>
+
             <Separator />
-            {/* Applicant & Residential Address */}
+
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <IconHome className="h-4 w-4" />
@@ -363,29 +465,32 @@ export function DeathRegistrationApproveView({
                     Dzongkhag
                   </Label>
                   <p className="flex-1 text-sm">
-                    {data.dzongkhag_name || data.dzongkhag_id}
+                    {data.dzongkhag_name || 'N/A'}
                   </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     Gewog
                   </Label>
-                  <p className="flex-1 text-sm">
-                    {data.gewog_name || data.gewog_id}
-                  </p>
+                  <p className="flex-1 text-sm">{data.gewog_name || 'N/A'}</p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Chiwog
+                  </Label>
+                  <p className="flex-1 text-sm">{data.chiwog_name || 'N/A'}</p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     Village
                   </Label>
-                  <p className="flex-1 text-sm">
-                    {data.village_name || data.village_id}
-                  </p>
+                  <p className="flex-1 text-sm">{data.village_name || 'N/A'}</p>
                 </div>
               </div>
             </div>
+
             <Separator />
-            {/* Application Status & Approval Details */}
+
             <div className="space-y-3">
               <h3 className="flex items-center gap-2 text-sm font-semibold">
                 <IconShieldCheck className="h-4 w-4" />
@@ -404,10 +509,8 @@ export function DeathRegistrationApproveView({
                 </div>
               </div>
 
-              {/* Action Buttons - only show when status is VERIFIED (pending approval) */}
               {data.status === 'VERIFIED' && (
                 <div className="flex gap-3 pt-4">
-                  {/* Approve Confirmation Dialog */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button
@@ -440,39 +543,72 @@ export function DeathRegistrationApproveView({
                     </AlertDialogContent>
                   </AlertDialog>
 
-                  {/* Reject Confirmation Dialog */}
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        disabled={isApproving || isRejecting}
-                        variant="destructive"
-                        className="flex-1"
-                      >
-                        <IconX className="mr-2 h-4 w-4" />
-                        {isRejecting ? 'Rejecting...' : 'Reject'}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Confirm Rejection</AlertDialogTitle>
-                        <AlertDialogDescription>
+                  <Button
+                    disabled={isApproving || isRejecting}
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => {
+                      setRemarks('');
+                      setRejectDialogOpen(true);
+                    }}
+                  >
+                    <IconX className="mr-2 h-4 w-4" />
+                    {isRejecting ? 'Rejecting...' : 'Reject'}
+                  </Button>
+                  <Dialog
+                    open={rejectDialogOpen}
+                    onOpenChange={(open) => {
+                      if (!isRejecting) setRejectDialogOpen(open);
+                    }}
+                  >
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>Confirm Rejection</DialogTitle>
+                        <DialogDescription>
                           Are you sure you want to reject this death
                           registration application? This action cannot be undone
                           and the applicant will be notified of the rejection.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-2 py-2">
+                        <Label htmlFor="approve-rejection-remarks">
+                          Rejection Remarks{' '}
+                          <span className="text-destructive">*</span>
+                        </Label>
+                        <Textarea
+                          id="approve-rejection-remarks"
+                          placeholder="Please provide a reason for rejection..."
+                          value={remarks}
+                          onChange={(e) => setRemarks(e.target.value)}
+                          rows={4}
+                          className="resize-none"
+                          disabled={isRejecting}
+                        />
+                        {remarks.trim() === '' && (
+                          <p className="text-muted-foreground text-xs">
+                            Remarks are required to reject the application.
+                          </p>
+                        )}
+                      </div>
+                      <DialogFooter className="gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setRejectDialogOpen(false)}
+                          disabled={isRejecting}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="destructive"
                           onClick={handleReject}
-                          className="bg-destructive hover:bg-destructive/90 text-white"
+                          disabled={isRejecting || remarks.trim() === ''}
                         >
                           <IconX className="mr-2 h-4 w-4" />
-                          Yes, Reject
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                          {isRejecting ? 'Rejecting...' : 'Yes, Reject'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               )}
             </div>
@@ -480,9 +616,7 @@ export function DeathRegistrationApproveView({
         </Card>
       </div>
 
-      {/* Right Side - Supporting Documents - 60% */}
       <div className="space-y-6 lg:col-span-3">
-        {/* Supporting Documents */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -522,7 +656,6 @@ export function DeathRegistrationApproveView({
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Document Name */}
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-medium">
                     {documents[currentDocIndex].name}
@@ -531,8 +664,6 @@ export function DeathRegistrationApproveView({
                     {documents[currentDocIndex].type.toUpperCase()}
                   </Badge>
                 </div>
-
-                {/* Document Viewer */}
                 <div className="border-muted overflow-hidden rounded-lg border">
                   {documents[currentDocIndex].type === 'image' ? (
                     <div className="relative h-[600px] w-full">
