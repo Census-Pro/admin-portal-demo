@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import Link from 'next/link';
 import {
   Announcement,
   AnnouncementCategory,
@@ -216,8 +217,15 @@ export function AnnouncementDialog({
                 </SelectContent>
               </Select>
               {!loadingCategories && categories.length === 0 && (
-                <p className="text-muted-foreground text-destructive text-xs">
-                  No categories available. Please create categories first.
+                <p className="text-destructive text-xs">
+                  No categories yet.{' '}
+                  <Link
+                    href="/dashboard/content/announcements?tab=categories"
+                    className="underline underline-offset-2"
+                    onClick={() => onOpenChange(false)}
+                  >
+                    Create a Notice Category first →
+                  </Link>
                 </p>
               )}
             </div>

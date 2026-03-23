@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { IconEdit, IconTrash, IconPower } from '@tabler/icons-react';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { PageDialog } from './page-dialog';
 import {
@@ -90,21 +92,30 @@ export function ActionCell({ data }: ActionCellProps) {
         title="Delete Page"
         description="Are you sure you want to delete this page? This action cannot be undone."
       />
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleToggleStatus}
-          title={data.status === 'published' ? 'Draft' : 'Publish'}
-        >
-          <IconPower
-            className={`h-4 w-4 ${
+      <div className="flex items-center gap-3">
+        {/* Visible Publish/Draft toggle */}
+        <div className="flex items-center gap-1.5">
+          <Switch
+            id={`status-${data.id}`}
+            checked={data.status === 'published'}
+            onCheckedChange={handleToggleStatus}
+            className="scale-90"
+            aria-label={
+              data.status === 'published' ? 'Set to draft' : 'Publish page'
+            }
+          />
+          <Label
+            htmlFor={`status-${data.id}`}
+            className={`cursor-pointer text-xs font-medium ${
               data.status === 'published'
-                ? 'text-green-600'
+                ? 'text-green-600 dark:text-green-400'
                 : 'text-muted-foreground'
             }`}
-          />
-        </Button>
+          >
+            {data.status === 'published' ? 'Published' : 'Draft'}
+          </Label>
+        </div>
+
         <Button
           variant="ghost"
           size="icon"

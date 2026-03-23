@@ -1,9 +1,15 @@
 import { Suspense } from 'react';
 import PageContainer from '@/components/layout/page-container';
-import { getQuickLinks } from '@/actions/common/cms-actions';
+import {
+  getQuickLinks,
+  getQuickLinkCategories
+} from '@/actions/common/cms-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AddQuickLinkButton } from './_components/add-link-button';
 import { QuickLinksTable } from './_components/quick-links-table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AddCategoryButton } from '../quick-link-categories/_components/add-category-button';
+import { CategoriesTable } from '../quick-link-categories/_components/categories-table';
 
 export const metadata = {
   title: 'Dashboard: Quick Links'
@@ -13,16 +19,42 @@ export default async function QuickLinksPage() {
   return (
     <PageContainer
       pageTitle="Quick Links"
-      pageDescription="Manage sidebar links, downloads, and external resources"
-      pageHeaderAction={<AddQuickLinkButton />}
+      pageDescription="Manage sidebar links, downloads, and external resources — and their categories."
     >
-      <div className="space-y-4">
-        <Suspense
-          fallback={<DataTableSkeleton columnCount={6} rowCount={10} />}
-        >
-          <QuickLinksDataWrapper />
-        </Suspense>
-      </div>
+      <Tabs defaultValue="links" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="links">Quick Links</TabsTrigger>
+          <TabsTrigger value="categories">Link Categories</TabsTrigger>
+        </TabsList>
+
+        {/* ── Quick Links tab ── */}
+        <TabsContent value="links" className="space-y-4">
+          <div className="flex justify-end">
+            <AddQuickLinkButton />
+          </div>
+          <Suspense
+            fallback={<DataTableSkeleton columnCount={6} rowCount={10} />}
+          >
+            <QuickLinksDataWrapper />
+          </Suspense>
+        </TabsContent>
+
+        {/* ── Categories tab ── */}
+        <TabsContent value="categories" className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground text-sm">
+              Categories organise quick links into groups. Create a category
+              before adding links.
+            </p>
+            <AddCategoryButton />
+          </div>
+          <Suspense
+            fallback={<DataTableSkeleton columnCount={6} rowCount={6} />}
+          >
+            <QLCategoriesDataWrapper />
+          </Suspense>
+        </TabsContent>
+      </Tabs>
     </PageContainer>
   );
 }
@@ -39,6 +71,20 @@ async function QuickLinksDataWrapper() {
   }
 
   const links = result.data || [];
-
   return <QuickLinksTable data={links} />;
+}
+
+async function QLCategoriesDataWrapper() {
+  const result = await getQuickLinkCategories();
+
+  if (!result.success) {
+    return (
+      <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-6 text-center">
+        <p className="text-destructive">{result.error}</p>
+      </div>
+    );
+  }
+
+  const categories = result.data || [];
+  return <CategoriesTable data={categories} />;
 }

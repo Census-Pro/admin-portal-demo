@@ -5,7 +5,6 @@ import {
   getSubLinksByNavigation
 } from '@/actions/common/cms-actions';
 import PageContainer from '@/components/layout/page-container';
-import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SubLinksTable } from './_components/sub-links-table';
 import { AddSubLinkButton } from './_components/add-sub-link-button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,13 +32,15 @@ async function SubLinksContent({ navigationId }: { navigationId: string }) {
 
   return (
     <>
+      {/* Breadcrumb removed to avoid double breadcrumbs */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">
             Sub-Links for "{navigationItem.label}"
           </h2>
           <p className="text-muted-foreground mt-1">
-            Manage categories and groups under this navigation item
+            Manage categories and groups under this navigation item. Each
+            sub-link can hold multiple content pages.
           </p>
         </div>
         <AddSubLinkButton navigationId={navigationId} />

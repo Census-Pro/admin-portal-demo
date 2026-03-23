@@ -1,6 +1,10 @@
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { getSubLinks, getCmsPages } from '@/actions/common/cms-actions';
+import {
+  getSubLinks,
+  getCmsPages,
+  getNavigationItems
+} from '@/actions/common/cms-actions';
 import PageContainer from '@/components/layout/page-container';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ContentPagesTable } from './_components/content-pages-table';
@@ -30,6 +34,12 @@ async function ContentPagesContent({
     notFound();
   }
 
+  // Fetch the parent nav item label for the breadcrumb
+  const navResult = await getNavigationItems();
+  const navItem = navResult.success
+    ? navResult.data.find((nav: any) => nav.id === navigationId)
+    : null;
+
   // Fetch content pages for this sub-link
   const pagesResult = await getCmsPages();
   const contentPages = pagesResult.success
@@ -40,6 +50,37 @@ async function ContentPagesContent({
 
   return (
     <>
+      {/* ── Breadcrumb trail ── */}
+      <nav
+        aria-label="Breadcrumb"
+        className="mb-4 flex items-center gap-1.5 text-sm"
+      >
+        <a
+          href="/dashboard/content"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Content
+        </a>
+        <span className="text-muted-foreground">/</span>
+        <a
+          href="/dashboard/content/navigation"
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          Navigation
+        </a>
+        <span className="text-muted-foreground">/</span>
+        <a
+          href={`/dashboard/content/navigation/${navigationId}/sub-links`}
+          className="text-muted-foreground hover:text-foreground transition-colors"
+        >
+          {navItem?.label ?? 'Sub-Links'}
+        </a>
+        <span className="text-muted-foreground">/</span>
+        <span className="text-foreground font-medium">{subLink.label}</span>
+        <span className="text-muted-foreground">/</span>
+        <span className="text-foreground font-medium">Content</span>
+      </nav>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">

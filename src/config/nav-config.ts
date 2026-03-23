@@ -375,7 +375,7 @@ export const navItems: NavItem[] = [
   },
   {
     title: 'Content',
-    url: '#',
+    url: '/dashboard/content',
     icon: 'page',
     isActive: false,
     subject: 'Content',
@@ -384,7 +384,7 @@ export const navItems: NavItem[] = [
         title: 'PUBLICATION',
         url: '#',
         isHeader: true,
-        subject: 'Publication', // Grant subject "Publication" → entire group visible
+        subject: 'Publication',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ANNOUNCEMENTS]
         }
@@ -393,16 +393,7 @@ export const navItems: NavItem[] = [
         title: 'Public Notices',
         url: '/dashboard/content/announcements',
         shortcut: ['a', 'n'],
-        subject: 'Publication', // Same group subject
-        access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ANNOUNCEMENTS]
-        }
-      },
-      {
-        title: 'Notice Categories',
-        url: '/dashboard/content/categories',
-        shortcut: ['a', 'c'],
-        subject: 'Publication', // Same group subject
+        subject: 'Publication',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ANNOUNCEMENTS]
         }
@@ -411,7 +402,7 @@ export const navItems: NavItem[] = [
         title: 'CMS ASSETS',
         url: '#',
         isHeader: true,
-        subject: 'CMS Assets', // Grant subject "CMS Assets" → entire group visible
+        subject: 'CMS Assets',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CMS]
         }
@@ -420,7 +411,7 @@ export const navItems: NavItem[] = [
         title: 'Content Pages',
         url: '/dashboard/content/pages',
         shortcut: ['c', 'o'],
-        subject: 'CMS Assets', // Same group subject
+        subject: 'CMS Assets',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
         }
@@ -429,7 +420,7 @@ export const navItems: NavItem[] = [
         title: 'Media Library',
         url: '/dashboard/content/media',
         shortcut: ['m', 'l'],
-        subject: 'CMS Assets', // Same group subject
+        subject: 'CMS Assets',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MEDIA_LIBRARY]
         }
@@ -438,7 +429,7 @@ export const navItems: NavItem[] = [
         title: 'Navigation',
         url: '/dashboard/content/navigation',
         shortcut: ['n', 'v'],
-        subject: 'CMS Assets', // Same group subject
+        subject: 'CMS Assets',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_NAVIGATION]
         }
@@ -447,7 +438,7 @@ export const navItems: NavItem[] = [
         title: 'QUICK LINKS',
         url: '#',
         isHeader: true,
-        subject: 'Quick Links', // Grant subject "Quick Links" → entire group visible
+        subject: 'Quick Links',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
         }
@@ -456,16 +447,7 @@ export const navItems: NavItem[] = [
         title: 'Quick Links',
         url: '/dashboard/content/quick-links',
         shortcut: ['q', 'l'],
-        subject: 'Quick Links', // Same group subject
-        access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
-        }
-      },
-      {
-        title: 'Quick Link Categories',
-        url: '/dashboard/content/quick-link-categories',
-        shortcut: ['q', 'c'],
-        subject: 'Quick Links', // Same group subject
+        subject: 'Quick Links',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
         }
