@@ -7,6 +7,7 @@ import {
   getBirthApplicationsByStatus,
   getSubmittedBirthApplications,
   getEndorsedBirthApplications,
+  getVerifiedBirthApplications,
   BirthApplicationStatus
 } from '@/actions/common/birth-registration-actions';
 
@@ -37,6 +38,7 @@ export function BirthApplicationsTable<TData>({
           statuses.map((s) => {
             if (s === 'SUBMITTED') return getSubmittedBirthApplications();
             if (s === 'ENDORSED') return getEndorsedBirthApplications();
+            if (s === 'VERIFIED') return getVerifiedBirthApplications();
             return getBirthApplicationsByStatus(s);
           })
         );
