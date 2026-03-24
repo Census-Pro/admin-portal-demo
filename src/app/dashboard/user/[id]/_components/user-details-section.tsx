@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,15 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog';
 import {
   IconUser,
   IconMail,
@@ -51,6 +60,7 @@ export function UserDetailsSection({ user }: UserDetailsSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [resetPasswordOpen, setResetPasswordOpen] = useState(false);
+  const [reloginAlertOpen, setReloginAlertOpen] = useState(false);
   const [agencies, setAgencies] = useState<Agency[]>([]);
   const [officeLocations, setOfficeLocations] = useState<OfficeLocation[]>([]);
   const [formData, setFormData] = useState({
@@ -58,8 +68,8 @@ export function UserDetailsSection({ user }: UserDetailsSectionProps) {
     fullName: user.fullName || user.name || '',
     roleType: user.roleType || 'ADMIN',
     password: '',
-    officeLocationId: user.officeLocation?.id || '',
-    agencyId: user.agency?.id || '',
+    officeLocationId: user.officeLocation?.id || user.officeLocationId || '',
+    agencyId: user.agency?.id || user.agencyId || '',
     mobileNo: user.mobileNo || '',
     email: user.email || ''
   });
@@ -88,9 +98,19 @@ export function UserDetailsSection({ user }: UserDetailsSectionProps) {
     }
   }, [isEditing]);
 
+  const handleReloginAlertClose = async () => {
+    setReloginAlertOpen(false);
+    await signOut({ callbackUrl: '/' });
+  };
+
   const handleSave = async () => {
     setIsLoading(true);
     try {
+      const originalOfficeLocationId =
+        user.officeLocation?.id || user.officeLocationId || '';
+      const officeLocationChanged =
+        formData.officeLocationId !== originalOfficeLocationId;
+
       // Build the update payload conditionally
       const updatePayload: any = {
         cidNo: formData.cidNo,
@@ -112,8 +132,12 @@ export function UserDetailsSection({ user }: UserDetailsSectionProps) {
       if (result.success) {
         toast.success('Admin updated successfully');
         setIsEditing(false);
-        // Refresh the page to get updated data
-        router.refresh();
+        if (officeLocationChanged) {
+          setReloginAlertOpen(true);
+        } else {
+          // Refresh immediately when no re-login notice is required.
+          router.refresh();
+        }
       } else {
         toast.error(result.error || 'Failed to update admin');
       }
@@ -130,8 +154,8 @@ export function UserDetailsSection({ user }: UserDetailsSectionProps) {
       fullName: user.fullName || user.name || '',
       roleType: user.roleType || 'ADMIN',
       password: '',
-      officeLocationId: user.officeLocation?.id || '',
-      agencyId: user.agency?.id || '',
+      officeLocationId: user.officeLocation?.id || user.officeLocationId || '',
+      agencyId: user.agency?.id || user.agencyId || '',
       mobileNo: user.mobileNo || '',
       email: user.email || ''
     });
@@ -148,6 +172,22 @@ export function UserDetailsSection({ user }: UserDetailsSectionProps) {
 
   return (
     <>
+      <AlertDialog open={reloginAlertOpen} onOpenChange={setReloginAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Re-login required</AlertDialogTitle>
+            <AlertDialogDescription>
+              Office location has been updated. Please re-login to start a new
+              session and view data for the newly assigned office location.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={handleReloginAlertClose}>
+              OK
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <ResetPasswordDialog
         open={resetPasswordOpen}
         onOpenChange={setResetPasswordOpen}
