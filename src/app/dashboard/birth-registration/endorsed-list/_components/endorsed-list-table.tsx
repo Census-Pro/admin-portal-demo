@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useQueryState, parseAsString } from 'nuqs';
-import { getSubmittedBirthApplications } from '@/actions/common/birth-registration-actions';
+import { getMyBirthTaskList } from '@/actions/common/birth-registration-actions';
 
 interface EndorsedListTableProps<TData> {
   columns: ColumnDef<TData, any>[];
@@ -25,7 +25,7 @@ export function EndorsedListTable<TData extends Record<string, any>>({
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getSubmittedBirthApplications();
+        const result = await getMyBirthTaskList();
         if (cancelled) return;
         if (!result.success) {
           setError(result.error ?? 'Failed to fetch applications');
