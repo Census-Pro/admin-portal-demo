@@ -88,7 +88,7 @@ export async function getBirthApplicationsByStatus(
 export async function getSubmittedBirthApplications() {
   try {
     const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-applications/submitted`;
+    const url = `${BIRTH_DEATH_API_URL}/birth-task-list/mytasklist`;
 
     console.log('[getSubmittedBirthApplications] Fetching from:', url);
 
@@ -110,10 +110,22 @@ export async function getSubmittedBirthApplications() {
     }
 
     const result = await response.json();
+    const taskList = Array.isArray(result) ? result : (result.data ?? []);
+    const normalizedApplications = taskList
+      .filter((task: any) => task.birth_application?.id)
+      .map((task: any) => {
+        const application = task.birth_application;
+        return {
+          ...application,
+          id: application.id,
+          createdAt: application.createdAt ?? task.assigned_at
+        };
+      });
+
     return {
       success: true,
-      data: result.data || result || [],
-      total_count: result.total_count ?? result.data?.length ?? 0
+      data: normalizedApplications,
+      total_count: normalizedApplications.length
     };
   } catch (error) {
     const isConnRefused =
@@ -444,40 +456,105 @@ export async function getBirthRegistrationById(id: string) {
 export async function getBirthApplicationById(id: string) {
   try {
     const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-applications/${id}`;
+    const fetchByApplicationId = async (applicationId: string) => {
+      const url = `${BIRTH_DEATH_API_URL}/birth-applications/${applicationId}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers,
+        cache: 'no-store'
+      });
 
-    console.log('[getBirthApplicationById] Fetching from:', url);
+      if (!response.ok) {
+        let errorMessage = 'Failed to fetch birth application';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch {
+          errorMessage = `${response.status}: ${response.statusText}`;
+        }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch birth application';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
+        return {
+          success: false as const,
+          status: response.status,
+          error: errorMessage,
+          data: null
+        };
       }
 
-      console.error('[getBirthApplicationById] API Error:', errorMessage);
-
+      const result = await response.json();
       return {
-        success: false,
-        error: errorMessage,
-        data: null
+        success: true as const,
+        status: response.status,
+        data: result
       };
+    };
+
+    console.log('[getBirthApplicationById] Fetching by id:', id);
+    const directResult = await fetchByApplicationId(id);
+    if (directResult.success) {
+      console.log('[getBirthApplicationById] Fetched successfully');
+      return { success: true, data: directResult.data };
     }
 
-    const result = await response.json();
-    console.log('[getBirthApplicationById] Fetched successfully');
+    // When the source is task list, route param may contain task id instead of application id.
+    if (
+      directResult.status === 404 ||
+      directResult.error?.includes('not found')
+    ) {
+      const taskListUrl = `${BIRTH_DEATH_API_URL}/birth-task-list/mytasklist`;
+      const taskListResponse = await fetch(taskListUrl, {
+        method: 'GET',
+        headers,
+        cache: 'no-store'
+      });
 
+      if (taskListResponse.ok) {
+        const taskListResult = await taskListResponse.json();
+        const tasks = Array.isArray(taskListResult)
+          ? taskListResult
+          : (taskListResult.data ?? []);
+        const matchedTask = tasks.find((task: any) => task.id === id);
+
+        if (matchedTask?.application_id) {
+          console.log(
+            '[getBirthApplicationById] Resolved task id to application id:',
+            matchedTask.application_id
+          );
+          const resolvedResult = await fetchByApplicationId(
+            matchedTask.application_id
+          );
+          if (resolvedResult.success) {
+            return { success: true, data: resolvedResult.data };
+          }
+
+          if (
+            resolvedResult.status !== 404 &&
+            !resolvedResult.error?.toLowerCase().includes('not found')
+          ) {
+            console.error(
+              '[getBirthApplicationById] API Error after id resolution:',
+              resolvedResult.error
+            );
+          }
+          return {
+            success: false,
+            error: resolvedResult.error,
+            data: null
+          };
+        }
+      }
+    }
+
+    if (
+      directResult.status !== 404 &&
+      !directResult.error?.toLowerCase().includes('not found')
+    ) {
+      console.error('[getBirthApplicationById] API Error:', directResult.error);
+    }
     return {
-      success: true,
-      data: result
+      success: false,
+      error: directResult.error,
+      data: null
     };
   } catch (error) {
     console.error('[getBirthApplicationById] Unexpected error:', error);
