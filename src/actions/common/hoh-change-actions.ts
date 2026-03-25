@@ -136,3 +136,79 @@ export async function createHohChange(data: any) {
     };
   }
 }
+
+export async function approveHohChange(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${AMENDMENT_API_URL}/hoh-changes/${id}/change-status`;
+
+    console.log('[approveHohChange] Approving:', url);
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status: 'VERIFIED' })
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to approve HOH change application';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+      return { success: false, error: errorMessage };
+    }
+
+    const result = await response.json();
+    return { success: true, data: result };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}
+
+export async function rejectHohChange(applicationNo: string, remarks: string) {
+  try {
+    const headers = await instance();
+    const url = `${AMENDMENT_API_URL}/hoh-changes/${applicationNo}/reject`;
+
+    console.log('[rejectHohChange] Rejecting:', url, { remarks });
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ remarks })
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to reject HOH change application';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+      return { success: false, error: errorMessage };
+    }
+
+    const result = await response.json();
+    return { success: true, data: result };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}

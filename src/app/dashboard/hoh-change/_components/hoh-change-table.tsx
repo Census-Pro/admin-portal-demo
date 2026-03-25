@@ -3,8 +3,9 @@
 import { useEffect, useState, useMemo } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { ColumnDef } from '@tanstack/react-table';
-import { useQueryState, parseAsString } from 'nuqs';
+import { useQueryState, parseAsString, parseAsInteger } from 'nuqs';
 import { getHohChanges } from '@/actions/common/hoh-change-actions';
+import { Input } from '@/components/ui/input';
 
 interface HohChangeTableProps<TData> {
   columns: ColumnDef<TData, any>[];
@@ -16,7 +17,12 @@ export function HohChangeTable<TData extends Record<string, any>>({
   const [data, setData] = useState<TData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [q] = useQueryState('q', parseAsString.withDefault(''));
+  const [q, setQ] = useQueryState('q', parseAsString.withDefault(''));
+
+  const [, setPage] = useQueryState(
+    'page',
+    parseAsInteger.withDefault(1).withOptions({ shallow: false })
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -55,10 +61,16 @@ export function HohChangeTable<TData extends Record<string, any>>({
       const fullName =
         `${row.firstName ?? ''} ${row.middleName ?? ''} ${row.lastName ?? ''}`.toLowerCase();
       const cid = (row.applicantCidNo ?? '').toLowerCase();
+      const hohCid = (row.hohCidNo ?? '').toLowerCase();
+      const newHohCid = (row.newHohCidNo ?? '').toLowerCase();
+      const applicationNo = (row.applicationNo ?? '').toLowerCase();
       const householdNo = (row.householdNo ?? '').toLowerCase();
       return (
         fullName.includes(lower) ||
         cid.includes(lower) ||
+        hohCid.includes(lower) ||
+        newHohCid.includes(lower) ||
+        applicationNo.includes(lower) ||
         householdNo.includes(lower)
       );
     });
@@ -81,6 +93,23 @@ export function HohChangeTable<TData extends Record<string, any>>({
   }
 
   return (
-    <DataTable columns={columns} data={filtered} totalItems={filtered.length} />
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <Input
+          placeholder="Search by application no, CID..."
+          value={q}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setPage(1);
+          }}
+          className="w-full md:max-w-sm"
+        />
+      </div>
+      <DataTable
+        columns={columns}
+        data={filtered}
+        totalItems={filtered.length}
+      />
+    </div>
   );
 }
