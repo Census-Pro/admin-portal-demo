@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useQueryState, parseAsString, parseAsInteger } from 'nuqs';
-import { getHohChanges } from '@/actions/common/hoh-change-actions';
+import { getSubmittedHohChanges } from '@/actions/common/hoh-change-actions';
 import { Input } from '@/components/ui/input';
 
 interface HohChangeTableProps<TData> {
@@ -31,7 +31,7 @@ export function HohChangeTable<TData extends Record<string, any>>({
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getHohChanges();
+        const result = await getSubmittedHohChanges();
         if (cancelled) return;
         if (!result.success) {
           setError(result.error ?? 'Failed to fetch applications');
