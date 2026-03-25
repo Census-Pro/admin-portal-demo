@@ -174,6 +174,16 @@ export const APPROVE_DEATH_REGISTRATION = 'approve:death-registration' as const;
 export const ENDORSE_DEATH_REGISTRATION = 'endorse:death-registration' as const;
 
 // ============================================================================
+// HOH CHANGE MANAGEMENT PERMISSIONS
+// ============================================================================
+
+export const MANAGE_HOH_CHANGE = 'manage:hoh-change' as const;
+export const VIEW_HOH_CHANGE = 'read:hoh-change' as const;
+export const CREATE_HOH_CHANGE = 'create:hoh-change' as const;
+export const EDIT_HOH_CHANGE = 'update:hoh-change' as const;
+export const DELETE_HOH_CHANGE = 'delete:hoh-change' as const;
+
+// ============================================================================
 // COUNTRY PERMISSIONS
 // ============================================================================
 
@@ -397,7 +407,11 @@ export const ADMIN_PERMISSIONS = [
   CREATE_DEATH_REGISTRATION,
   EDIT_DEATH_REGISTRATION,
   VERIFY_DEATH_REGISTRATION,
-  APPROVE_DEATH_REGISTRATION
+  APPROVE_DEATH_REGISTRATION,
+  VIEW_HOH_CHANGE,
+  CREATE_HOH_CHANGE,
+  EDIT_HOH_CHANGE,
+  MANAGE_HOH_CHANGE
 ] as const;
 
 /**
@@ -416,7 +430,8 @@ export const OPERATOR_PERMISSIONS = [
   // VIEW_NATURALIZATION,
   // VERIFY_NATURALIZATION,
   VIEW_DEATH_REGISTRATION,
-  VERIFY_DEATH_REGISTRATION
+  VERIFY_DEATH_REGISTRATION,
+  VIEW_HOH_CHANGE
 ] as const;
 
 // ============================================================================
@@ -495,6 +510,11 @@ export type Permission =
   | typeof MANAGE_DEATH_REGISTRATION_ENDORSE
   | typeof MANAGE_DEATH_REGISTRATION_VERIFY
   | typeof MANAGE_DEATH_REGISTRATION_APPROVE
+  | typeof VIEW_HOH_CHANGE
+  | typeof CREATE_HOH_CHANGE
+  | typeof EDIT_HOH_CHANGE
+  | typeof DELETE_HOH_CHANGE
+  | typeof MANAGE_HOH_CHANGE
   | typeof VIEW_COUNTRIES
   | typeof CREATE_COUNTRIES
   | typeof EDIT_COUNTRIES

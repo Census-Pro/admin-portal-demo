@@ -374,6 +374,17 @@ export const navItems: NavItem[] = [
     // Parent access is automatic - shows if user has access to ANY workflow permission
   },
   {
+    title: 'HOH Change',
+    url: '/dashboard/hoh-change',
+    icon: 'userPen',
+    isActive: false,
+    items: [],
+    subject: 'HOH Change',
+    access: {
+      permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_HOH_CHANGE]
+    }
+  },
+  {
     title: 'Content',
     url: '/dashboard/content',
     icon: 'page',
