@@ -166,9 +166,13 @@ export function HohChangeView({ applicationId }: HohChangeViewProps) {
       toast.error('Please provide rejection remarks');
       return;
     }
+    if (!data?.id) {
+      toast.error('Application data not available');
+      return;
+    }
     setIsRejecting(true);
     try {
-      const result = await rejectHohChange(applicationId, remarks);
+      const result = await rejectHohChange(data.id, remarks);
       if (result.success) {
         setRejectDialogOpen(false);
         toast.success('HOH change application rejected');
