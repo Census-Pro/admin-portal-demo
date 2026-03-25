@@ -16,6 +16,131 @@ export type DeathApplicationStatus =
   | 'APPROVED'
   | 'REJECTED';
 
+export async function getUnassignedDeathApplications() {
+  try {
+    const headers = await instance();
+
+    // Get both available applications and user's assigned applications
+    const verifiedUrl = `${BIRTH_DEATH_API_URL}/death-applications/get-status?status=VERIFIED`;
+    const endorsedUrl = `${BIRTH_DEATH_API_URL}/death-applications/get-status?status=ENDORSED`;
+    const myTaskListUrl = `${BIRTH_DEATH_API_URL}/death-task-list/mytasklist`;
+
+    console.log(
+      '[getUnassignedDeathApplications] Fetching from:',
+      verifiedUrl,
+      endorsedUrl,
+      myTaskListUrl
+    );
+
+    const [verifiedResponse, endorsedResponse, myTaskListResponse] =
+      await Promise.all([
+        fetch(verifiedUrl, {
+          method: 'GET',
+          headers,
+          cache: 'no-store'
+        }),
+        fetch(endorsedUrl, {
+          method: 'GET',
+          headers,
+          cache: 'no-store'
+        }),
+        fetch(myTaskListUrl, {
+          method: 'GET',
+          headers,
+          cache: 'no-store'
+        })
+      ]);
+
+    console.log(
+      '[getUnassignedDeathApplications] Response status:',
+      verifiedResponse.status,
+      endorsedResponse.status,
+      myTaskListResponse.status
+    );
+
+    // Check for errors
+    if (!verifiedResponse.ok || !endorsedResponse.ok) {
+      let errorMessage = 'Failed to fetch death applications';
+      try {
+        const errorData = await (
+          verifiedResponse.ok ? endorsedResponse : verifiedResponse
+        ).json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${verifiedResponse.ok ? endorsedResponse.status : verifiedResponse.status}: ${verifiedResponse.ok ? endorsedResponse.statusText : verifiedResponse.statusText}`;
+      }
+
+      console.error(
+        '[getUnassignedDeathApplications] API Error:',
+        errorMessage
+      );
+
+      return {
+        success: false,
+        error: errorMessage,
+        data: [],
+        total_count: 0
+      };
+    }
+
+    const verifiedResult = await verifiedResponse.json();
+    const endorsedResult = await endorsedResponse.json();
+
+    // Get user's assigned applications (may fail if user has no tasks)
+    let myTaskList = [];
+    if (myTaskListResponse.ok) {
+      const myTaskListResult = await myTaskListResponse.json();
+      const taskList = Array.isArray(myTaskListResult)
+        ? myTaskListResult
+        : (myTaskListResult.data ?? []);
+      myTaskList = taskList
+        .map(
+          (task: { death_application?: { id?: string } }) =>
+            task.death_application?.id
+        )
+        .filter(Boolean);
+    }
+
+    // Combine all available applications
+    const allApplications = [
+      ...(verifiedResult.data || []),
+      ...(endorsedResult.data || [])
+    ];
+
+    // Filter out applications that are already assigned to the current user
+    const unassignedApplications = allApplications.filter(
+      (app: { id?: string }) => app.id && !myTaskList.includes(app.id)
+    );
+
+    console.log(
+      '[getUnassignedDeathApplications] Fetched successfully:',
+      `${unassignedApplications.length} unassigned out of ${allApplications.length} total`
+    );
+
+    return {
+      success: true,
+      data: unassignedApplications,
+      total_count: unassignedApplications.length
+    };
+  } catch (error) {
+    console.error('[getUnassignedDeathApplications] Unexpected error:', error);
+    const isConnRefused =
+      error instanceof Error &&
+      (error.message.includes('ECONNREFUSED') ||
+        error.message.includes('fetch failed'));
+    return {
+      success: false,
+      error: isConnRefused
+        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
+        : error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred',
+      data: [],
+      total_count: 0
+    };
+  }
+}
+
 export async function getDeathApplicationsByStatus(
   status: DeathApplicationStatus
 ) {

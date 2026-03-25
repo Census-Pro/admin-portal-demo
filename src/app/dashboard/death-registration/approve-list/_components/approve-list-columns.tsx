@@ -17,7 +17,7 @@ interface DeathRegistration {
   date_of_death: string;
   status: string;
   created_at?: string;
-  verified_at?: string;
+  updatedAt?: string;
 }
 
 function ActionsCell({ registration }: { registration: DeathRegistration }) {
@@ -71,17 +71,20 @@ export const approveListColumns: ColumnDef<DeathRegistration>[] = [
     }
   },
   {
-    accessorKey: 'verified_at',
-    header: 'Verified Date',
+    accessorKey: 'updatedAt',
+    header: 'Endorse Date',
     enableSorting: true,
     cell: ({ row }) => {
-      const date = row.getValue('verified_at') as string;
-      if (!date) return '-';
-      try {
-        return format(new Date(date), 'MMM dd, yyyy');
-      } catch {
-        return date;
+      const date = row.getValue('updatedAt') as string;
+      const status = row.getValue('status') as string;
+      if (status === 'ENDORSED' && date) {
+        try {
+          return format(new Date(date), 'MMM dd, yyyy');
+        } catch {
+          return date;
+        }
       }
+      return '-';
     }
   },
   {
