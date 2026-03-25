@@ -49,12 +49,62 @@ export const columns: ColumnDef<Permission>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const permission = row.original;
+      const allPermissions = table
+        .getCoreRowModel()
+        .rows.map((r) => r.original);
+
+      // Generate unique initials function
+      const getUniqueInitials = (name: string, allNames: string[]) => {
+        const words = name.trim().split(/\s+/);
+        let initials = '';
+
+        // Try single character first
+        const firstChar = words[0]?.charAt(0).toUpperCase() || '';
+        const sameFirstChar = allNames.filter(
+          (n) =>
+            n.trim().split(/\s+/)[0]?.charAt(0).toUpperCase() === firstChar &&
+            n !== name
+        );
+
+        if (sameFirstChar.length === 0) {
+          initials = firstChar;
+        } else {
+          // Try first two characters of first word
+          const firstTwoChars = words[0]?.substring(0, 2).toUpperCase() || '';
+          const sameFirstTwo = allNames.filter(
+            (n) =>
+              n.trim().split(/\s+/)[0]?.substring(0, 2).toUpperCase() ===
+                firstTwoChars && n !== name
+          );
+
+          if (sameFirstTwo.length === 0 && firstTwoChars.length >= 2) {
+            initials = firstTwoChars;
+          } else if (words.length > 1) {
+            // Try first letter of first two words
+            const firstTwoWords =
+              (words[0]?.charAt(0).toUpperCase() || '') +
+              (words[1]?.charAt(0).toUpperCase() || '');
+            initials = firstTwoWords;
+          } else {
+            // Fallback to first two characters
+            initials = firstTwoChars || firstChar;
+          }
+        }
+
+        return initials.substring(0, 3); // Max 3 characters
+      };
+
+      const initials = getUniqueInitials(
+        permission.name,
+        allPermissions.map((p) => p.name)
+      );
+
       return (
         <div className="flex items-center gap-3">
           <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {permission.name.charAt(0).toUpperCase()}
+            {initials}
           </div>
           <div>
             <div className="font-medium">{permission.name}</div>
