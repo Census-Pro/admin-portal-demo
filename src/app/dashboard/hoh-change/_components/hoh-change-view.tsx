@@ -65,6 +65,7 @@ interface HohChangeData {
   chiwog_id?: string;
   village_id?: string;
   house_no?: string;
+  houseNo?: string; // Backend camelCase field
   // Reason for change
   reasonForChange?: string;
   // Supporting documents
@@ -122,7 +123,9 @@ export function HohChangeView({ applicationId }: HohChangeViewProps) {
             app.dzongkhagName ?? app.dzongkhag_name ?? app.dzongkhag_id,
           gewog_name: app.gewogName ?? app.gewog_name ?? app.gewog_id,
           chiwog_name: app.chiwogName ?? app.chiwog_name ?? app.chiwog_id,
-          village_name: app.villageName ?? app.village_name ?? app.village_id
+          village_name: app.villageName ?? app.village_name ?? app.village_id,
+          // Handle house number field mapping
+          house_no: app.houseNo ?? app.house_no
         });
       } catch (err) {
         if (!cancelled)
