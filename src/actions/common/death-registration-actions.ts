@@ -154,6 +154,73 @@ export async function getSubmittedDeathApplications() {
   }
 }
 
+export async function getMyDeathTaskList() {
+  try {
+    const headers = await instance();
+    const url = `${BIRTH_DEATH_API_URL}/death-task-list/mytasklist`;
+
+    console.log('[getMyDeathTaskList] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch my death task list';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+      return { success: false, error: errorMessage, data: [], total_count: 0 };
+    }
+
+    const result = await response.json();
+    const taskList = Array.isArray(result) ? result : (result.data ?? []);
+    const normalizedApplications = taskList
+      .filter((task: { death_application?: { id?: string } }) =>
+        Boolean(task.death_application?.id)
+      )
+      .map(
+        (task: {
+          death_application: Record<string, unknown> & { id: string };
+          assigned_at?: string;
+        }) => {
+          const application = task.death_application;
+          return {
+            ...application,
+            id: application.id,
+            createdAt: application.createdAt ?? task.assigned_at
+          };
+        }
+      );
+
+    return {
+      success: true,
+      data: normalizedApplications,
+      total_count: normalizedApplications.length
+    };
+  } catch (error) {
+    const isConnRefused =
+      error instanceof Error &&
+      (error.message.includes('ECONNREFUSED') ||
+        error.message.includes('fetch failed'));
+    return {
+      success: false,
+      error: isConnRefused
+        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
+        : error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred',
+      data: [],
+      total_count: 0
+    };
+  }
+}
+
 export async function getEndorsedDeathApplications() {
   try {
     const headers = await instance();
@@ -430,6 +497,51 @@ export async function updateDeathApplicationStatus(
     };
   } catch (error) {
     console.error('[updateDeathApplicationStatus] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}
+
+export async function assignDeathTask(applicationId: string) {
+  try {
+    const headers = await instance();
+    const url = `${BIRTH_DEATH_API_URL}/death-task-list`;
+
+    console.log('[assignDeathTask] Posting to:', url, { applicationId });
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ application_id: applicationId })
+    });
+
+    console.log('[assignDeathTask] Response status:', response.status);
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to assign task';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[assignDeathTask] API Error:', errorMessage);
+      return { success: false, error: errorMessage };
+    }
+
+    const result = await response.json();
+    console.log('[assignDeathTask] Assigned successfully');
+
+    return { success: true, data: result.data || result };
+  } catch (error) {
+    console.error('[assignDeathTask] Unexpected error:', error);
     return {
       success: false,
       error:
