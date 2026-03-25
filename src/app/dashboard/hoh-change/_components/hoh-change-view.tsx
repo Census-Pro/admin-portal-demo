@@ -44,10 +44,6 @@ import {
   approveHohChange,
   rejectHohChange
 } from '@/actions/common/hoh-change-actions';
-import { getDzongkhagById } from '@/actions/common/dzongkhag-actions';
-import { getGewogById } from '@/actions/common/gewog-actions';
-import { getChiwogById } from '@/actions/common/chiwog-actions';
-import { getVillageById } from '@/actions/common/village-actions';
 
 interface HohChangeData {
   id: string;
@@ -73,7 +69,12 @@ interface HohChangeData {
   reasonForChange?: string;
   // Supporting documents
   supportingDocuments?: string[];
-  // Resolved names
+  // Resolved names - matching backend camelCase response
+  dzongkhagName?: string;
+  gewogName?: string;
+  chiwogName?: string;
+  villageName?: string;
+  // Legacy snake_case fields for backward compatibility
   dzongkhag_name?: string;
   gewog_name?: string;
   chiwog_name?: string;
@@ -110,23 +111,18 @@ export function HohChangeView({ applicationId }: HohChangeViewProps) {
         }
         const app = result.data as HohChangeData;
 
-        // Fetch location names if IDs are available
-        const [dzongkhagRes, gewogRes, chiwogRes, villageRes] =
-          await Promise.all([
-            app.dzongkhag_id ? getDzongkhagById(app.dzongkhag_id) : null,
-            app.gewog_id ? getGewogById(app.gewog_id) : null,
-            app.chiwog_id ? getChiwogById(app.chiwog_id) : null,
-            app.village_id ? getVillageById(app.village_id) : null
-          ]);
-
+        // The backend now provides resolved address names, so no need for separate API calls
+        // Just use the names provided by the backend, falling back to IDs if not available
         if (cancelled) return;
 
         setData({
           ...app,
-          dzongkhag_name: dzongkhagRes?.name ?? app.dzongkhag_id,
-          gewog_name: gewogRes?.name ?? app.gewog_id,
-          chiwog_name: chiwogRes?.name ?? app.chiwog_id,
-          village_name: villageRes?.name ?? app.village_id
+          // Use camelCase field names from backend, fall back to snake_case for compatibility
+          dzongkhag_name:
+            app.dzongkhagName ?? app.dzongkhag_name ?? app.dzongkhag_id,
+          gewog_name: app.gewogName ?? app.gewog_name ?? app.gewog_id,
+          chiwog_name: app.chiwogName ?? app.chiwog_name ?? app.chiwog_id,
+          village_name: app.villageName ?? app.village_name ?? app.village_id
         });
       } catch (err) {
         if (!cancelled)
