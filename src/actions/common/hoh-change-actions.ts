@@ -52,6 +52,55 @@ export async function getHohChanges(filters: any = {}) {
   }
 }
 
+export async function getHohChangeByApplicationNo(applicationNo: string) {
+  try {
+    const headers = await instance();
+    const url = `${AMENDMENT_API_URL}/hoh-changes/${applicationNo}`;
+
+    console.log('[getHohChangeByApplicationNo] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch HOH change application';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[getHohChangeByApplicationNo] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage,
+        data: null
+      };
+    }
+
+    const result = await response.json();
+    console.log('[getHohChangeByApplicationNo] Fetched successfully');
+
+    return {
+      success: true,
+      data: result.data || result
+    };
+  } catch (error) {
+    console.error('[getHohChangeByApplicationNo] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: null
+    };
+  }
+}
+
 export async function createHohChange(data: any) {
   try {
     const headers = await instance();

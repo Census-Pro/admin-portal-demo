@@ -26,13 +26,18 @@ export interface HohChange {
 function ActionsCell({ registration }: { registration: HohChange }) {
   const router = useRouter();
 
+  const handleClick = () => {
+    console.log(
+      'Navigating to application with applicationNo:',
+      registration.applicationNo
+    );
+    console.log('Full registration data:', registration);
+    router.push(`/dashboard/hoh-change/${registration.applicationNo}`);
+  };
+
   return (
     <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => router.push(`/dashboard/hoh-change/${registration.id}`)}
-      >
+      <Button variant="ghost" size="icon" onClick={handleClick}>
         <IconEye className="h-4 w-4" />
         <span className="sr-only">View Details</span>
       </Button>
