@@ -64,13 +64,22 @@ export function SubLinksDialog({
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-muted-foreground text-sm">
-              {subLinks.length} {subLinks.length === 1 ? 'page' : 'pages'}
-            </p>
-            <Button onClick={() => onAddSubLink(navigationItem.id)} size="sm">
-              <Icons.add className="mr-2 h-4 w-4" />
-              Add Page
-            </Button>
+            <div>
+              <p className="text-muted-foreground text-sm font-medium">
+                {subLinks.length} {subLinks.length === 1 ? 'page' : 'pages'}
+              </p>
+              {subLinks.length >= 1 && (
+                <p className="text-muted-foreground text-[10px]">
+                  * Only one direct page allowed. For more, use Sub-Links.
+                </p>
+              )}
+            </div>
+            {subLinks.length === 0 && (
+              <Button onClick={() => onAddSubLink(navigationItem.id)} size="sm">
+                <Icons.add className="mr-2 h-4 w-4" />
+                Add Page
+              </Button>
+            )}
           </div>
 
           <ScrollArea className="h-[400px] pr-4">
