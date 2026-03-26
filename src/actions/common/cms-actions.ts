@@ -918,6 +918,7 @@ export async function uploadMediaFile(formData: FormData) {
     // Reconstruct FormData server-side (Next.js deserializes it across the action boundary)
     const file = formData.get('file') as File | null;
     const category = formData.get('category') as string | null;
+    const fileName = formData.get('file_name') as string | null;
 
     if (!file) {
       return { success: false, error: 'No file provided' };
@@ -926,10 +927,13 @@ export async function uploadMediaFile(formData: FormData) {
     const serverFormData = new FormData();
     serverFormData.append('file', file);
     serverFormData.append('category', category || 'media');
+    if (fileName) {
+      serverFormData.append('file_name', fileName);
+    }
 
     console.log(
       '[uploadMediaFile] Uploading:',
-      file.name,
+      fileName || file.name,
       'size:',
       file.size,
       'category:',
@@ -1019,10 +1023,19 @@ export async function updateMediaFileWithUpload(
     const headersWithoutContentType = { ...headers };
     delete headersWithoutContentType['Content-Type'];
 
+    const fileName = formData.get('file_name') as string | null;
+    const file = formData.get('file') as File | null;
+    const category = formData.get('category') as string | null;
+
+    const serverFormData = new FormData();
+    if (file) serverFormData.append('file', file);
+    if (category) serverFormData.append('category', category);
+    if (fileName) serverFormData.append('file_name', fileName);
+
     const response = await fetch(url, {
       method: 'PATCH',
       headers: headersWithoutContentType,
-      body: formData
+      body: serverFormData
     });
 
     if (!response.ok) {

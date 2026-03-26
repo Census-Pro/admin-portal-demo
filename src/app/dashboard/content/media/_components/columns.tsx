@@ -129,7 +129,7 @@ export const columns: ColumnDef<MediaItem>[] = [
   },
   {
     accessorKey: 'file_name',
-    header: 'File Name',
+    header: 'Media Name',
     cell: ({ row }) => (
       <div className="max-w-xs truncate" title={row.original.file_name}>
         {row.original.file_name}

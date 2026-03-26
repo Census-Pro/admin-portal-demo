@@ -43,15 +43,18 @@ export function MediaDialog({
   onSave
 }: MediaDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState('');
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (media) {
       setPreview(media.url || null);
+      setFileName(media.file_name || '');
     } else {
       setSelectedFile(null);
       setPreview(null);
+      setFileName('');
     }
   }, [media, open]);
 
@@ -86,6 +89,11 @@ export function MediaDialog({
     }
 
     setSelectedFile(file);
+
+    // If no filename is set, use the file's name (without extension if preferred)
+    if (!fileName) {
+      setFileName(file.name);
+    }
 
     // Generate preview for images
     if (file.type.startsWith('image/')) {
@@ -127,10 +135,13 @@ export function MediaDialog({
         const formData = new FormData();
         formData.append('file', selectedFile);
         formData.append('category', 'media');
+        if (fileName) {
+          formData.append('file_name', fileName);
+        }
         await onSave(formData, selectedFile);
       } else if (media) {
         // Updating metadata only
-        await onSave({ category: 'media' });
+        await onSave({ category: 'media', file_name: fileName });
       }
 
       onOpenChange(false);
@@ -175,6 +186,17 @@ export function MediaDialog({
           <DialogTitle>{media ? 'Edit Media' : 'Upload Media'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="media-name">Media Name *</Label>
+            <Input
+              id="media-name"
+              placeholder="Enter a descriptive name"
+              value={fileName}
+              onChange={(e) => setFileName(e.target.value)}
+              required
+            />
+          </div>
+
           {!media && (
             <div className="space-y-2">
               <Label htmlFor="file-upload">Choose File *</Label>
@@ -213,7 +235,7 @@ export function MediaDialog({
               </label>
               {selectedFile && (
                 <p className="text-muted-foreground mt-2 text-xs">
-                  Selected: {selectedFile.name} (
+                  Original File: {selectedFile.name} (
                   {(selectedFile.size / 1024).toFixed(1)} KB)
                 </p>
               )}
@@ -267,18 +289,12 @@ export function MediaDialog({
           )}
 
           {selectedFile && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>File Name</Label>
-                <Input disabled value={selectedFile.name} />
-              </div>
-              <div className="space-y-2">
-                <Label>File Size</Label>
-                <Input
-                  disabled
-                  value={`${(selectedFile.size / 1024).toFixed(1)} KB`}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label>File Size</Label>
+              <Input
+                disabled
+                value={`${(selectedFile.size / 1024).toFixed(1)} KB`}
+              />
             </div>
           )}
 
