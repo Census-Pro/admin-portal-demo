@@ -86,7 +86,7 @@ export async function revalidateNavigation() {
 export async function revalidateContentPages(slug?: string) {
   return revalidateClientPortal({
     type: 'content-pages',
-    path: slug ? `/${slug}` : undefined
+    path: slug ? `/pages/${slug.replace(/^\//, '')}` : undefined
   });
 }
 

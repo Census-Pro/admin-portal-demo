@@ -647,6 +647,7 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
 
     // Trigger Client Portal revalidation
     await revalidateContentPages(result.slug);
+    await revalidateNavigation();
 
     return {
       success: true,
@@ -751,6 +752,7 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
 
     // Trigger Client Portal revalidation
     await revalidateContentPages(result.slug);
+    await revalidateNavigation();
 
     return {
       success: true,
@@ -818,7 +820,13 @@ export async function toggleCmsPageStatus(
       };
     }
 
+    const result = await response.json().catch(() => ({}));
     revalidatePath('/dashboard/content/pages');
+
+    // Trigger Client Portal revalidation
+    await revalidateContentPages(result.slug);
+    await revalidateNavigation();
+
     return {
       success: true,
       message: `Page ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`
@@ -1344,6 +1352,10 @@ export async function createSubLink(data: Omit<SubLink, 'id'>) {
 
     const result = await response.json();
     revalidatePath('/dashboard/content/navigation');
+
+    // Trigger Client Portal revalidation
+    await revalidateNavigation();
+
     return {
       success: true,
       message: 'Sub-link created successfully',
@@ -1390,6 +1402,10 @@ export async function updateSubLink(id: string, data: Partial<SubLink>) {
 
     const result = await response.json();
     revalidatePath('/dashboard/content/navigation');
+
+    // Trigger Client Portal revalidation
+    await revalidateNavigation();
+
     return {
       success: true,
       message: 'Sub-link updated successfully',
@@ -1416,6 +1432,10 @@ export async function deleteSubLink(id: string) {
     }
 
     revalidatePath('/dashboard/content/navigation');
+
+    // Trigger Client Portal revalidation
+    await revalidateNavigation();
+
     return { success: true, message: 'Sub-link deleted successfully' };
   } catch (error) {
     console.error('[deleteSubLink] Error:', error);
