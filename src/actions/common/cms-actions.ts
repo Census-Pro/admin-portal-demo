@@ -62,6 +62,8 @@ export interface CmsPage {
   updated_by_name?: string;
   published_by_id?: string;
   published_by_name?: string;
+  created_by_id?: string;
+  created_by_name?: string;
   order?: number;
   createdAt?: string;
   updatedAt?: string;
@@ -605,9 +607,16 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
           : null
     };
 
+    const session = await auth();
+
+    // Set creator info
+    cleanedData.created_by_id =
+      session?.user?.id || session?.user?.sessionId || undefined;
+    cleanedData.created_by_name =
+      session?.user?.fullName || session?.user?.name || 'Admin User';
+
     // If status is published on creation, record who published it
     if (data.status === 'published') {
-      const session = await auth();
       cleanedData.published_by_id =
         session?.user?.id || session?.user?.sessionId || undefined;
       cleanedData.published_by_name =

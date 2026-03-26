@@ -44,6 +44,22 @@ export const columns: ColumnDef<CmsPage>[] = [
     }
   },
   {
+    accessorKey: 'created_by_name',
+    header: 'Created By',
+    cell: ({ row }) => (
+      <div className="text-sm">{row.original.created_by_name || '-'}</div>
+    )
+  },
+  {
+    accessorKey: 'published_by_name',
+    header: 'Published By',
+    cell: ({ row }) => (
+      <div className="text-sm font-medium">
+        {row.original.published_by_name || '-'}
+      </div>
+    )
+  },
+  {
     accessorKey: 'updated_by_name',
     header: 'Updated By',
     cell: ({ row }) => (
@@ -57,15 +73,6 @@ export const columns: ColumnDef<CmsPage>[] = [
       const date = row.original.updatedAt;
       return date ? new Date(date).toLocaleDateString() : '-';
     }
-  },
-  {
-    accessorKey: 'published_by_name',
-    header: 'Published By',
-    cell: ({ row }) => (
-      <div className="text-sm font-medium">
-        {row.original.published_by_name || '-'}
-      </div>
-    )
   },
   {
     id: 'actions',
