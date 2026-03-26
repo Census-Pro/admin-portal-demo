@@ -59,6 +59,15 @@ export const columns: ColumnDef<CmsPage>[] = [
     }
   },
   {
+    accessorKey: 'published_by_name',
+    header: 'Published By',
+    cell: ({ row }) => (
+      <div className="text-sm font-medium">
+        {row.original.published_by_name || '-'}
+      </div>
+    )
+  },
+  {
     id: 'actions',
     header: 'Actions',
     cell: ({ row }) => <ActionCell data={row.original} />

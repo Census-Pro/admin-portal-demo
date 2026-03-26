@@ -60,6 +60,8 @@ export interface CmsPage {
   status: 'draft' | 'published';
   updated_by_id?: string;
   updated_by_name?: string;
+  published_by_id?: string;
+  published_by_name?: string;
   order?: number;
   createdAt?: string;
   updatedAt?: string;
@@ -601,8 +603,16 @@ export async function createCmsPage(data: Omit<CmsPage, 'id'>) {
         data.featured_image_id && data.featured_image_id !== 'none'
           ? data.featured_image_id
           : null
-      // updated_by_id and updated_by_name removed - not allowed in CreateDto
     };
+
+    // If status is published on creation, record who published it
+    if (data.status === 'published') {
+      const session = await auth();
+      cleanedData.published_by_id =
+        session?.user?.id || session?.user?.sessionId || undefined;
+      cleanedData.published_by_name =
+        session?.user?.fullName || session?.user?.name || 'Admin User';
+    }
 
     const response = await fetch(url, {
       method: 'POST',
@@ -685,6 +695,14 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
       session?.user?.id || session?.user?.sessionId || undefined;
     cleanedData.updated_by_name =
       session?.user?.fullName || session?.user?.name || 'Admin User';
+
+    // If status is becoming published, record who published it
+    if (data.status === 'published') {
+      cleanedData.published_by_id =
+        session?.user?.id || session?.user?.sessionId || undefined;
+      cleanedData.published_by_name =
+        session?.user?.fullName || session?.user?.name || 'Admin User';
+    }
 
     // Handle optional foreign keys properly
     if (data.cms_navigation_id !== undefined) {
@@ -803,13 +821,24 @@ export async function toggleCmsPageStatus(
     const url = `${COMMON_SERVICE_URL}/cm-content/${id}`;
     const newStatus = currentStatus === 'published' ? 'draft' : 'published';
 
+    const statusData: any = { status: newStatus };
+
+    // If status is becoming published, record who published it
+    if (newStatus === 'published') {
+      const session = await auth();
+      statusData.published_by_id =
+        session?.user?.id || session?.user?.sessionId || undefined;
+      statusData.published_by_name =
+        session?.user?.fullName || session?.user?.name || 'Admin User';
+    }
+
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
         ...headers,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ status: newStatus })
+      body: JSON.stringify(statusData)
     });
 
     if (!response.ok) {
