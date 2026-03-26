@@ -468,6 +468,7 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
     <div className="w-full space-y-4">
       <ScrollArea className="bg-table h-[calc(80vh-220px)] rounded-md border md:h-[calc(90dvh-240px)]">
         <DndContext
+          id="sortable-data-table-dnd"
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragStart={handleDragStart}
