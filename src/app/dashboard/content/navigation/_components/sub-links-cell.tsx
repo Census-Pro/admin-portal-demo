@@ -121,27 +121,37 @@ export function SubLinksCell({ data }: SubLinksCellProps) {
         onOpenChange={setDeletePageOpen}
         onConfirm={onConfirmDeletePage}
         isLoading={loading}
-        title="Delete Sub-Link"
+        title="Delete Content Page"
         description="Are you sure you want to delete this content page? This action cannot be undone."
       />
 
       <div className="flex items-center justify-center gap-2">
         {count > 0 ? (
-          <Badge variant="outline" className="text-xs">
-            {count} {count === 1 ? 'page' : 'pages'}
-          </Badge>
+          <>
+            <Badge variant="outline" className="text-xs">
+              {count} {count === 1 ? 'page' : 'pages'}
+            </Badge>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSubLinksOpen(true)}
+              className="h-7 px-2 text-xs"
+            >
+              <IconList className="mr-1 h-3 w-3" />
+              Manage
+            </Button>
+          </>
         ) : (
-          <span className="text-muted-foreground text-xs">None</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handleAddSubLink(data.id)}
+            className="h-7 border-dashed px-2 text-xs"
+          >
+            <IconList className="mr-1 h-3 w-3" />
+            Add Page
+          </Button>
         )}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setSubLinksOpen(true)}
-          className="h-7 px-2 text-xs"
-        >
-          <IconList className="mr-1 h-3 w-3" />
-          Manage
-        </Button>
       </div>
     </>
   );

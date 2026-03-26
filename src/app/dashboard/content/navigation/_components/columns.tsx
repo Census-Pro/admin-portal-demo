@@ -7,6 +7,7 @@ import { NavigationItem } from '@/actions/common/cms-actions';
 import { ICON_LIST, IconName } from '@/components/ui/icon-picker';
 import { ActionCell } from './action-cell';
 import { IconList, IconPlus } from '@tabler/icons-react';
+import { SubLinksCell } from './sub-links-cell';
 import Link from 'next/link';
 
 export function createColumns(
@@ -69,6 +70,12 @@ export function createColumns(
           </div>
         );
       },
+      size: 180
+    },
+    {
+      accessorKey: 'contentPages',
+      header: 'Direct Pages',
+      cell: ({ row }) => <SubLinksCell data={row.original} />,
       size: 180
     },
     {

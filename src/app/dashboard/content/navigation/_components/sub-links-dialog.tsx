@@ -54,7 +54,7 @@ export function SubLinksDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <IconExternalLink className="h-5 w-5" />
-            Sub-Links for "{navigationItem.label}"
+            Content Pages for "{navigationItem.label}"
           </DialogTitle>
           <DialogDescription>
             Manage content pages that appear as dropdown items under this
@@ -65,12 +65,11 @@ export function SubLinksDialog({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground text-sm">
-              {subLinks.length}{' '}
-              {subLinks.length === 1 ? 'sub-link' : 'sub-links'}
+              {subLinks.length} {subLinks.length === 1 ? 'page' : 'pages'}
             </p>
             <Button onClick={() => onAddSubLink(navigationItem.id)} size="sm">
               <Icons.add className="mr-2 h-4 w-4" />
-              Add Sub-Link
+              Add Page
             </Button>
           </div>
 
@@ -78,11 +77,9 @@ export function SubLinksDialog({
             {subLinks.length === 0 ? (
               <div className="flex h-[200px] flex-col items-center justify-center rounded-lg border border-dashed">
                 <IconExternalLink className="text-muted-foreground mb-2 h-10 w-10" />
-                <p className="text-muted-foreground text-sm">
-                  No sub-links yet
-                </p>
+                <p className="text-muted-foreground text-sm">No pages yet</p>
                 <p className="text-muted-foreground mt-1 text-xs">
-                  Click "Add Sub-Link" to create content pages
+                  Click "Add Page" to create content for this link
                 </p>
               </div>
             ) : (
@@ -90,48 +87,58 @@ export function SubLinksDialog({
                 {subLinks.map((page) => (
                   <div
                     key={page.id}
-                    className="hover:bg-accent/50 flex items-center justify-between rounded-lg border p-4"
+                    className="hover:bg-accent/50 group flex items-start justify-between rounded-lg border p-4 transition-colors"
                   >
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-xs font-medium">
-                          #{page.order || 0}
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex min-w-0 flex-wrap items-center gap-2">
+                        <span className="bg-muted text-muted-foreground flex h-5 w-5 shrink-0 items-center justify-center rounded text-[10px] font-bold">
+                          {page.order || 0}
                         </span>
-                        <h4 className="font-medium">{page.title}</h4>
+                        <h4 className="max-w-full min-w-0 truncate font-semibold sm:max-w-md">
+                          {page.title}
+                        </h4>
                         <Badge
                           variant={
                             page.status === 'published'
                               ? 'default'
                               : 'secondary'
                           }
-                          className="text-xs"
+                          className="h-4 shrink-0 px-1.5 text-[10px] tracking-wider uppercase"
                         >
                           {page.status}
                         </Badge>
                       </div>
-                      <p className="text-muted-foreground text-xs">
-                        Slug: /{page.slug}
-                      </p>
+                      <div className="text-muted-foreground flex min-w-0 items-center gap-1 font-mono text-[10px]">
+                        <span className="shrink-0">Slug:</span>
+                        <span className="min-w-0 truncate">/{page.slug}</span>
+                      </div>
                       {page.body && (
-                        <p className="text-muted-foreground line-clamp-2 text-xs">
-                          {page.body.replace(/<[^>]*>/g, '').substring(0, 150)}
+                        <p className="text-muted-foreground border-muted mt-1 line-clamp-1 overflow-hidden border-l-2 pl-2 text-xs break-all italic">
+                          {page.body
+                            .replace(/<[^>]*>/g, '') // remove HTML tags
+                            .replace(/\s+/g, ' ') // replace multiple spaces/newlines with single space
+                            .trim()
+                            .substring(0, 100)}
                           ...
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="ml-4 flex shrink-0 items-center gap-1">
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-8 w-8"
                         onClick={() => onEditSubLink(page)}
+                        title="Edit Page"
                       >
                         <IconEdit className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="text-destructive hover:bg-destructive/10 hover:text-destructive h-8 w-8"
                         onClick={() => onDeleteSubLink(page.id)}
-                        className="text-destructive hover:text-destructive"
+                        title="Delete Page"
                       >
                         <IconTrash className="h-4 w-4" />
                       </Button>
