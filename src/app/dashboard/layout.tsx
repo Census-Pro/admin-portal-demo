@@ -35,7 +35,16 @@ export default async function DashboardLayout({
         <InfobarProvider defaultOpen={false}>
           <SessionMonitor />
           <AppSidebar />
-          <SidebarInset>
+          <SidebarInset
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(255,255,255,0.97), rgba(255,255,255,0.97)), url('/bg4.png')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              backgroundAttachment: 'fixed'
+            }}
+          >
             <Header />
             {/* page main content */}
             {children}
