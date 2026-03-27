@@ -35,6 +35,7 @@ import {
 } from '@/actions/common/cms-actions';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { FileUploadSelector } from '@/components/ui/file-upload-selector';
 
 interface QuickLinkDialogProps {
   open: boolean;
@@ -68,7 +69,6 @@ export function QuickLinkDialog({
   const [contentPages, setContentPages] = useState<CmsPage[]>([]);
   const [loadingPages, setLoadingPages] = useState(false);
   const [mediaFiles, setMediaFiles] = useState<MediaItem[]>([]);
-  const [loadingMediaFiles, setLoadingMediaFiles] = useState(false);
   const [linkType, setLinkType] = useState<
     'url' | 'content_page' | 'media_file'
   >('url');
@@ -78,7 +78,6 @@ export function QuickLinkDialog({
     const fetchData = async () => {
       setLoadingCategories(true);
       setLoadingPages(true);
-      setLoadingMediaFiles(true);
       try {
         const [categoriesResult, pagesResult, mediaFilesResult] =
           await Promise.all([
@@ -104,7 +103,6 @@ export function QuickLinkDialog({
       } finally {
         setLoadingCategories(false);
         setLoadingPages(false);
-        setLoadingMediaFiles(false);
       }
     };
 
@@ -368,34 +366,30 @@ export function QuickLinkDialog({
           {/* Media File Selector - shown when linkType is 'media_file' */}
           {linkType === 'media_file' && (
             <div className="space-y-2">
-              <Label htmlFor="media_file">
-                Media File <span className="text-red-500">*</span>
-              </Label>
-              <Select
+              <FileUploadSelector
                 value={formData.media_file_id}
-                onValueChange={(value) =>
+                onChange={(value) =>
                   setFormData({ ...formData, media_file_id: value })
                 }
-                disabled={loadingMediaFiles}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a media file" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mediaFiles.map((file) => (
-                    <SelectItem key={file.id} value={file.id}>
-                      {file.file_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {loadingMediaFiles && (
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Loading media files...
-                </p>
-              )}
+                mediaItems={mediaFiles}
+                label="Downloadable File"
+                accept={{
+                  'application/pdf': ['.pdf'],
+                  'application/msword': ['.doc'],
+                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                    ['.docx'],
+                  'application/vnd.ms-excel': ['.xls'],
+                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+                    ['.xlsx'],
+                  'text/plain': ['.txt'],
+                  'image/*': ['.jpg', '.jpeg', '.png', '.gif']
+                }}
+                maxSize={1024 * 1024 * 10} // 10MB
+                placeholder="Select a file or upload new document"
+                uploadCategory="forms"
+              />
               <p className="text-muted-foreground mt-1 text-xs">
-                Select a file for users to download (PDFs, documents, etc.)
+                Select a file for users to download or upload a new one
               </p>
             </div>
           )}

@@ -36,8 +36,8 @@ export function QuickLinksTable({ data, addButton }: QuickLinksTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
           <DataTableSearch
             searchKey="quick links"
             searchQuery={searchQuery}

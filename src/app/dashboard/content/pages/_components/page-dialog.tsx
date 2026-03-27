@@ -24,6 +24,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { RichTextEditor } from '@/components/ui/rich-text-editor';
 import '@/components/ui/rich-text-editor.css';
+import { MediaUploadSelector } from '@/components/ui/media-upload-selector';
 import {
   CmsPage,
   NavigationItem,
@@ -332,58 +333,20 @@ export function PageDialog({
                 </div>
                 <Separator />
 
-                <div className="space-y-2">
-                  <Label className="text-xs font-medium">Select Image</Label>
-                  <Select
-                    value={formData.featured_image_id || 'none'}
-                    onValueChange={(val) =>
-                      setFormData({
-                        ...formData,
-                        featured_image_id: val === 'none' ? undefined : val
-                      })
-                    }
-                  >
-                    <SelectTrigger className="h-9">
-                      <SelectValue placeholder="Select from media library" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      {mediaItems.map((item) => (
-                        <SelectItem key={item.id} value={item.id}>
-                          {item.file_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {formData.featured_image_id &&
-                    formData.featured_image_id !== 'none' &&
-                    mediaItems.find((m) => m.id === formData.featured_image_id)
-                      ?.url && (
-                      <div className="overflow-hidden rounded-lg border">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={
-                            mediaItems.find(
-                              (m) => m.id === formData.featured_image_id
-                            )!.url
-                          }
-                          alt="Featured image preview"
-                          className="aspect-video w-full object-cover"
-                        />
-                        <p className="text-muted-foreground truncate px-2 py-1 text-[11px]">
-                          {
-                            mediaItems.find(
-                              (m) => m.id === formData.featured_image_id
-                            )?.file_name
-                          }
-                        </p>
-                      </div>
-                    )}
-                  <p className="text-muted-foreground text-[11px]">
-                    Select from your media library
-                  </p>
-                </div>
+                <MediaUploadSelector
+                  value={formData.featured_image_id}
+                  onChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      featured_image_id: value
+                    })
+                  }
+                  mediaItems={mediaItems}
+                  accept={{ 'image/*': [] }}
+                  maxSize={1024 * 1024 * 5} // 5MB
+                  placeholder="Select from media library or upload new image"
+                  uploadCategory="media"
+                />
               </div>
             </div>
           </ScrollArea>
