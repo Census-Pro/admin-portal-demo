@@ -52,7 +52,6 @@ export function QuickLinkDialog({
     description: '',
     url: '',
     content_page_id: '',
-    type: 'external',
     category_id: '',
     order: 0,
     is_active: true,
@@ -109,7 +108,6 @@ export function QuickLinkDialog({
         description: quickLink.description || '',
         url: quickLink.url || '',
         content_page_id: quickLink.content_page_id || '',
-        type: quickLink.type || 'external',
         category_id: quickLink.category_id || '',
         order: quickLink.order || 0,
         is_active: quickLink.is_active ?? true,
@@ -123,7 +121,6 @@ export function QuickLinkDialog({
         description: '',
         url: '',
         content_page_id: '',
-        type: 'external',
         category_id: '',
         order: 0,
         is_active: true,
@@ -329,55 +326,33 @@ export function QuickLinkDialog({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
-              <Select
-                value={formData.type}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, type: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="external">External Link</SelectItem>
-                  <SelectItem value="google_form">Google Form</SelectItem>
-                  <SelectItem value="download">Download</SelectItem>
-                  <SelectItem value="internal">Internal Link</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="category">
-                Category <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={formData.category_id}
-                onValueChange={(value) =>
-                  setFormData({ ...formData, category_id: value })
-                }
-                disabled={loadingCategories}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {loadingCategories && (
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Loading categories...
-                </p>
-              )}
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="category">
+              Category <span className="text-red-500">*</span>
+            </Label>
+            <Select
+              value={formData.category_id}
+              onValueChange={(value) =>
+                setFormData({ ...formData, category_id: value })
+              }
+              disabled={loadingCategories}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {loadingCategories && (
+              <p className="text-muted-foreground mt-1 text-xs">
+                Loading categories...
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
