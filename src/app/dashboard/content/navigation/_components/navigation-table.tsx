@@ -9,6 +9,9 @@ import {
 import { SortableDataTable } from '@/components/ui/table/sortable-data-table';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { DataTableResetFilter } from '@/components/ui/table/data-table-reset-filter';
+import { DataTableSearch } from '@/components/ui/table/data-table-search';
+import { useNavigationTableFilters } from './use-navigation-table-filters';
 
 interface NavigationTableProps {
   data: NavigationItem[];
@@ -18,9 +21,30 @@ export function NavigationTable({ data }: NavigationTableProps) {
   const router = useRouter();
   const [items, setItems] = useState(data);
 
+  const {
+    isAnyFilterActive,
+    resetFilters,
+    searchQuery,
+    setPage,
+    setSearchQuery
+  } = useNavigationTableFilters();
+
   useEffect(() => {
     setItems(data);
   }, [data]);
+
+  // Filter data based on search query
+  const filteredData = useMemo(() => {
+    if (!searchQuery) return items;
+
+    const query = searchQuery.toLowerCase();
+    return items.filter(
+      (item) =>
+        item.label?.toLowerCase().includes(query) ||
+        item.url?.toLowerCase().includes(query) ||
+        item.status?.toLowerCase().includes(query)
+    );
+  }, [items, searchQuery]);
 
   // Optimistic status update — mutates only the changed row, no re-sort
   const handleStatusChange = (id: string, newStatus: 'active' | 'inactive') => {
@@ -61,11 +85,25 @@ export function NavigationTable({ data }: NavigationTableProps) {
   };
 
   return (
-    <SortableDataTable
-      columns={columns}
-      data={items}
-      totalItems={items.length}
-      onReorder={handleReorder}
-    />
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-4">
+        <DataTableSearch
+          searchKey="navigation"
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          setPage={setPage}
+        />
+        <DataTableResetFilter
+          isFilterActive={isAnyFilterActive}
+          onReset={resetFilters}
+        />
+      </div>
+      <SortableDataTable
+        columns={columns}
+        data={filteredData}
+        totalItems={filteredData.length}
+        onReorder={handleReorder}
+      />
+    </div>
   );
 }

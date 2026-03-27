@@ -9,7 +9,11 @@ export const metadata = {
   title: 'Dashboard: Navigation Links'
 };
 
-export default async function NavigationPage() {
+export default async function NavigationPage({
+  searchParams
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   return (
     <PageContainer
       pageTitle="Navigation Links (NavLinks)"
