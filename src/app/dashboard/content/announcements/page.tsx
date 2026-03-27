@@ -5,10 +5,8 @@ import {
   getAnnouncementCategories
 } from '@/actions/common/cms-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
-import { AddAnnouncementButton } from './_components/add-announcement-button';
 import { AnnouncementsTable } from './_components/announcements-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AddCategoryButton } from '../categories/_components/add-category-button';
 import { CategoriesTable } from '../categories/_components/categories-table';
 
 export const metadata = {
@@ -18,7 +16,7 @@ export const metadata = {
 export default async function AnnouncementsPage({
   searchParams
 }: {
-  searchParams: Promise<{ tab?: string }>;
+  searchParams: Promise<{ tab?: string; q?: string }>;
 }) {
   const { tab } = await searchParams;
   const defaultTab = tab === 'categories' ? 'categories' : 'notices';
@@ -27,21 +25,14 @@ export default async function AnnouncementsPage({
       pageTitle="Public Notices"
       pageDescription="Manage notices and the categories used to organise them."
     >
-      <Tabs defaultValue={defaultTab} className="space-y-4">
+      <Tabs defaultValue={defaultTab} className="space-y-2">
         <TabsList>
           <TabsTrigger value="notices">Notices</TabsTrigger>
           <TabsTrigger value="categories">Notice Categories</TabsTrigger>
         </TabsList>
 
         {/* ── Notices tab ── */}
-        <TabsContent value="notices" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-muted-foreground text-sm">
-              Manage public notices. You can create, edit, and publish
-              announcements here.
-            </p>
-            <AddAnnouncementButton />
-          </div>
+        <TabsContent value="notices" className="space-y-2">
           <Suspense
             fallback={<DataTableSkeleton columnCount={5} rowCount={10} />}
           >
@@ -50,14 +41,7 @@ export default async function AnnouncementsPage({
         </TabsContent>
 
         {/* ── Categories tab ── */}
-        <TabsContent value="categories" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-muted-foreground text-sm">
-              Categories help group and filter public notices. Create a category
-              before adding notices.
-            </p>
-            <AddCategoryButton />
-          </div>
+        <TabsContent value="categories" className="space-y-2">
           <Suspense
             fallback={<DataTableSkeleton columnCount={5} rowCount={6} />}
           >
