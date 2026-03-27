@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconPower } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
 import { DeleteConfirmationDialog } from '@/components/dialogs/delete-confirmation-dialog';
 import { AnnouncementDialog } from './announcement-dialog';
 import {
@@ -90,28 +88,21 @@ export function ActionCell({ data }: ActionCellProps) {
         description="Are you sure you want to delete this notice? This action cannot be undone."
       />
       <div className="flex items-center gap-3">
-        {/* Visible Active/Inactive toggle */}
-        <div className="flex items-center gap-1.5">
-          <Switch
-            id={`status-${data.id}`}
-            checked={data.status === 'active'}
-            onCheckedChange={handleToggleStatus}
-            className="scale-90"
-            aria-label={
-              data.status === 'active' ? 'Deactivate notice' : 'Activate notice'
-            }
-          />
-          <Label
-            htmlFor={`status-${data.id}`}
-            className={`cursor-pointer text-xs font-medium ${
+        {/* Status Toggle Button (Power Button) */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleToggleStatus}
+          title={data.status === 'active' ? 'Power Off' : 'Power On'}
+        >
+          <IconPower
+            className={`h-4 w-4 ${
               data.status === 'active'
                 ? 'text-green-600 dark:text-green-400'
                 : 'text-muted-foreground'
             }`}
-          >
-            {data.status === 'active' ? 'Active' : 'Inactive'}
-          </Label>
-        </div>
+          />
+        </Button>
 
         <Button
           variant="ghost"

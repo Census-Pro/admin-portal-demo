@@ -32,6 +32,10 @@ export function SubLinksCell({ data }: SubLinksCellProps) {
   const [loading, setLoading] = useState(false);
 
   const count = data.contentPages?.length || 0;
+  const subLinksCount = data.subLinks?.length || 0;
+
+  // Hide direct pages if navigation has sub-links AND multiple content pages
+  const shouldHideDirectPages = subLinksCount > 0 && count > 1;
 
   const handleAddSubLink = (navigationId: string) => {
     setPreSelectedNavId(navigationId);
@@ -126,7 +130,11 @@ export function SubLinksCell({ data }: SubLinksCellProps) {
       />
 
       <div className="flex items-center justify-center gap-2">
-        {count > 0 ? (
+        {shouldHideDirectPages ? (
+          <div className="text-muted-foreground text-xs italic">
+            Has sub-links
+          </div>
+        ) : count > 0 ? (
           <>
             <Badge variant="outline" className="text-xs">
               {count} {count === 1 ? 'page' : 'pages'}
