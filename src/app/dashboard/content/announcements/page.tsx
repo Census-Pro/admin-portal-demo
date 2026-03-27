@@ -43,7 +43,7 @@ export default async function AnnouncementsPage({
             <AddAnnouncementButton />
           </div>
           <Suspense
-            fallback={<DataTableSkeleton columnCount={6} rowCount={10} />}
+            fallback={<DataTableSkeleton columnCount={5} rowCount={10} />}
           >
             <AnnouncementsDataWrapper />
           </Suspense>

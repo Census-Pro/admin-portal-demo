@@ -129,30 +129,10 @@ export const columns: ColumnDef<Announcement>[] = [
     accessorKey: 'headline',
     header: 'Headline',
     cell: ({ row }) => (
-      <div className="max-w-[400px] truncate font-medium">
+      <div className="max-w-[200px] truncate font-medium">
         {row.original.headline}
       </div>
     )
-  },
-  {
-    accessorKey: 'message',
-    header: 'Message',
-    cell: ({ row }) => {
-      const message = row.original.message || '-';
-      const plainText =
-        typeof message === 'string'
-          ? message
-              .replace(/<[^>]*>/g, '')
-              .replace(/\s+/g, ' ')
-              .trim()
-          : message;
-
-      return (
-        <div className="max-w-[300px] truncate text-sm text-gray-700 dark:text-gray-300">
-          {plainText || '-'}
-        </div>
-      );
-    }
   },
   {
     accessorKey: 'category',
