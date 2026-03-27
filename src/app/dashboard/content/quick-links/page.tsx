@@ -5,37 +5,34 @@ import {
   getQuickLinkCategories
 } from '@/actions/common/cms-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
-import { AddQuickLinkButton } from './_components/add-link-button';
 import { QuickLinksTable } from './_components/quick-links-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AddCategoryButton } from '../quick-link-categories/_components/add-category-button';
 import { CategoriesTable } from '../quick-link-categories/_components/categories-table';
 
 export const metadata = {
   title: 'Dashboard: Quick Links'
 };
 
-export default async function QuickLinksPage() {
+export default async function QuickLinksPage({
+  searchParams
+}: {
+  searchParams: Promise<{ tab?: string; q?: string }>;
+}) {
+  const { tab } = await searchParams;
+  const defaultTab = tab === 'categories' ? 'categories' : 'links';
   return (
     <PageContainer
       pageTitle="Quick Links"
       pageDescription="Manage sidebar links, downloads, and external resources — and their categories."
     >
-      <Tabs defaultValue="links" className="space-y-4">
+      <Tabs defaultValue={defaultTab} className="space-y-2">
         <TabsList>
           <TabsTrigger value="links">Quick Links</TabsTrigger>
           <TabsTrigger value="categories">Link Categories</TabsTrigger>
         </TabsList>
 
         {/* ── Quick Links tab ── */}
-        <TabsContent value="links" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-muted-foreground text-sm">
-              Manage individual quick links, external resources, and sidebar
-              links.
-            </p>
-            <AddQuickLinkButton />
-          </div>
+        <TabsContent value="links" className="space-y-2">
           <Suspense
             fallback={<DataTableSkeleton columnCount={6} rowCount={10} />}
           >
@@ -44,14 +41,7 @@ export default async function QuickLinksPage() {
         </TabsContent>
 
         {/* ── Categories tab ── */}
-        <TabsContent value="categories" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-muted-foreground text-sm">
-              Categories organise quick links into groups. Create a category
-              before adding links.
-            </p>
-            <AddCategoryButton />
-          </div>
+        <TabsContent value="categories" className="space-y-2">
           <Suspense
             fallback={<DataTableSkeleton columnCount={6} rowCount={6} />}
           >
