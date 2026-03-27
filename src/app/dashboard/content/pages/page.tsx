@@ -9,7 +9,11 @@ export const metadata = {
   title: 'Dashboard: Content Pages'
 };
 
-export default async function ContentPage() {
+export default async function ContentPage({
+  searchParams
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   return (
     <PageContainer
       pageTitle="Content Pages"
