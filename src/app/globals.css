@@ -9,6 +9,7 @@
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
+  --bg-overlay: rgba(255, 255, 255, 0.97); /* Light mode overlay */
   --table: oklch(1 0 0); /* solid white — blocks background image */
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -45,6 +46,12 @@
 
 .dark {
   --background: oklch(0.145 0 0);
+  --bg-overlay: rgba(
+    20,
+    20,
+    20,
+    0.3
+  ); /* Dark mode overlay - very transparent to show bg pattern */
   --table: oklch(0.205 0 0); /* solid dark surface — blocks background image */
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

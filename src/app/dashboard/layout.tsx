@@ -36,9 +36,9 @@ export default async function DashboardLayout({
           <SessionMonitor />
           <AppSidebar />
           <SidebarInset
+            className="bg-background"
             style={{
-              backgroundImage:
-                "linear-gradient(rgba(255,255,255,0.97), rgba(255,255,255,0.97)), url('/bg4.png')",
+              backgroundImage: `linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('/bg4.png')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
