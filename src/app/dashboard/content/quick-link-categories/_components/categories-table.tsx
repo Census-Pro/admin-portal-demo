@@ -9,9 +9,10 @@ import { useQuickLinkCategoriesTableFilters } from './use-quick-link-categories-
 
 interface CategoriesTableProps {
   data: QuickLinkCategory[];
+  addButton?: React.ReactNode;
 }
 
-export function CategoriesTable({ data }: CategoriesTableProps) {
+export function CategoriesTable({ data, addButton }: CategoriesTableProps) {
   const {
     isAnyFilterActive,
     resetFilters,
@@ -35,17 +36,20 @@ export function CategoriesTable({ data }: CategoriesTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
-        <DataTableSearch
-          searchKey="categories"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          setPage={setPage}
-        />
-        <DataTableResetFilter
-          isFilterActive={isAnyFilterActive}
-          onReset={resetFilters}
-        />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <DataTableSearch
+            searchKey="categories"
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setPage={setPage}
+          />
+          <DataTableResetFilter
+            isFilterActive={isAnyFilterActive}
+            onReset={resetFilters}
+          />
+        </div>
+        {addButton}
       </div>
       <DataTable
         columns={columns}

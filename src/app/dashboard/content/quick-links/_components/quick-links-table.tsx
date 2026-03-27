@@ -9,9 +9,10 @@ import { useQuickLinksTableFilters } from './use-quick-links-table-filters';
 
 interface QuickLinksTableProps {
   data: QuickLink[];
+  addButton?: React.ReactNode;
 }
 
-export function QuickLinksTable({ data }: QuickLinksTableProps) {
+export function QuickLinksTable({ data, addButton }: QuickLinksTableProps) {
   const {
     isAnyFilterActive,
     resetFilters,
@@ -35,17 +36,20 @@ export function QuickLinksTable({ data }: QuickLinksTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
-        <DataTableSearch
-          searchKey="quick links"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          setPage={setPage}
-        />
-        <DataTableResetFilter
-          isFilterActive={isAnyFilterActive}
-          onReset={resetFilters}
-        />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <DataTableSearch
+            searchKey="quick links"
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setPage={setPage}
+          />
+          <DataTableResetFilter
+            isFilterActive={isAnyFilterActive}
+            onReset={resetFilters}
+          />
+        </div>
+        {addButton}
       </div>
       <DataTable
         columns={columns}

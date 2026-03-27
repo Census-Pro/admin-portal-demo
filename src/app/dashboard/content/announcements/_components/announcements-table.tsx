@@ -9,9 +9,13 @@ import { useAnnouncementsTableFilters } from './use-announcements-table-filters'
 
 interface AnnouncementsTableProps {
   data: Announcement[];
+  addButton?: React.ReactNode;
 }
 
-export function AnnouncementsTable({ data }: AnnouncementsTableProps) {
+export function AnnouncementsTable({
+  data,
+  addButton
+}: AnnouncementsTableProps) {
   const {
     isAnyFilterActive,
     resetFilters,
@@ -36,17 +40,20 @@ export function AnnouncementsTable({ data }: AnnouncementsTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-4">
-        <DataTableSearch
-          searchKey="notices"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          setPage={setPage}
-        />
-        <DataTableResetFilter
-          isFilterActive={isAnyFilterActive}
-          onReset={resetFilters}
-        />
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          <DataTableSearch
+            searchKey="notices"
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setPage={setPage}
+          />
+          <DataTableResetFilter
+            isFilterActive={isAnyFilterActive}
+            onReset={resetFilters}
+          />
+        </div>
+        {addButton}
       </div>
       <DataTable
         columns={columns}

@@ -17,12 +17,8 @@ export function AddQuickLinkButton() {
 
   return (
     <>
-      <Button
-        size="lg"
-        className="bg-primary hover:bg-primary/90 rounded-xl px-8 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0"
-        onClick={() => setShowAddModal(true)}
-      >
-        <Icons.add className="mr-2 h-5 w-5" />
+      <Button onClick={() => setShowAddModal(true)}>
+        <Icons.add className="mr-2 h-4 w-4" />
         Add Quick Link
       </Button>
       <QuickLinkDialog

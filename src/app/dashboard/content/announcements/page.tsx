@@ -8,6 +8,8 @@ import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { AnnouncementsTable } from './_components/announcements-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CategoriesTable } from '../categories/_components/categories-table';
+import { AddAnnouncementButton } from './_components/add-announcement-button';
+import { AddCategoryButton } from '../categories/_components/add-category-button';
 
 export const metadata = {
   title: 'Dashboard: Public Notices'
@@ -36,7 +38,7 @@ export default async function AnnouncementsPage({
           <Suspense
             fallback={<DataTableSkeleton columnCount={5} rowCount={10} />}
           >
-            <AnnouncementsDataWrapper />
+            <AnnouncementsDataWrapper addButton={<AddAnnouncementButton />} />
           </Suspense>
         </TabsContent>
 
@@ -45,7 +47,7 @@ export default async function AnnouncementsPage({
           <Suspense
             fallback={<DataTableSkeleton columnCount={5} rowCount={6} />}
           >
-            <CategoriesDataWrapper />
+            <CategoriesDataWrapper addButton={<AddCategoryButton />} />
           </Suspense>
         </TabsContent>
       </Tabs>
@@ -53,7 +55,11 @@ export default async function AnnouncementsPage({
   );
 }
 
-async function AnnouncementsDataWrapper() {
+async function AnnouncementsDataWrapper({
+  addButton
+}: {
+  addButton?: React.ReactNode;
+}) {
   const result = await getAnnouncements();
 
   if (!result.success) {
@@ -65,10 +71,14 @@ async function AnnouncementsDataWrapper() {
   }
 
   const announcements = result.data || [];
-  return <AnnouncementsTable data={announcements} />;
+  return <AnnouncementsTable data={announcements} addButton={addButton} />;
 }
 
-async function CategoriesDataWrapper() {
+async function CategoriesDataWrapper({
+  addButton
+}: {
+  addButton?: React.ReactNode;
+}) {
   const result = await getAnnouncementCategories();
 
   if (!result.success) {
@@ -80,5 +90,5 @@ async function CategoriesDataWrapper() {
   }
 
   const categories = result.data || [];
-  return <CategoriesTable data={categories} />;
+  return <CategoriesTable data={categories} addButton={addButton} />;
 }

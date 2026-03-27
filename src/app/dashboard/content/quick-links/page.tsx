@@ -8,6 +8,8 @@ import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { QuickLinksTable } from './_components/quick-links-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CategoriesTable } from '../quick-link-categories/_components/categories-table';
+import { AddQuickLinkButton } from './_components/add-link-button';
+import { AddCategoryButton } from '../quick-link-categories/_components/add-category-button';
 
 export const metadata = {
   title: 'Dashboard: Quick Links'
@@ -36,7 +38,7 @@ export default async function QuickLinksPage({
           <Suspense
             fallback={<DataTableSkeleton columnCount={6} rowCount={10} />}
           >
-            <QuickLinksDataWrapper />
+            <QuickLinksDataWrapper addButton={<AddQuickLinkButton />} />
           </Suspense>
         </TabsContent>
 
@@ -45,7 +47,7 @@ export default async function QuickLinksPage({
           <Suspense
             fallback={<DataTableSkeleton columnCount={6} rowCount={6} />}
           >
-            <QLCategoriesDataWrapper />
+            <QLCategoriesDataWrapper addButton={<AddCategoryButton />} />
           </Suspense>
         </TabsContent>
       </Tabs>
@@ -53,7 +55,11 @@ export default async function QuickLinksPage({
   );
 }
 
-async function QuickLinksDataWrapper() {
+async function QuickLinksDataWrapper({
+  addButton
+}: {
+  addButton?: React.ReactNode;
+}) {
   const result = await getQuickLinks();
 
   if (!result.success) {
@@ -65,10 +71,14 @@ async function QuickLinksDataWrapper() {
   }
 
   const links = result.data || [];
-  return <QuickLinksTable data={links} />;
+  return <QuickLinksTable data={links} addButton={addButton} />;
 }
 
-async function QLCategoriesDataWrapper() {
+async function QLCategoriesDataWrapper({
+  addButton
+}: {
+  addButton?: React.ReactNode;
+}) {
   const result = await getQuickLinkCategories();
 
   if (!result.success) {
@@ -80,5 +90,5 @@ async function QLCategoriesDataWrapper() {
   }
 
   const categories = result.data || [];
-  return <CategoriesTable data={categories} />;
+  return <CategoriesTable data={categories} addButton={addButton} />;
 }
