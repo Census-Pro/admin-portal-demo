@@ -138,6 +138,8 @@ export interface QuickLink {
   url?: string;
   content_page_id?: string;
   contentPage?: CmsPage;
+  media_file_id?: string;
+  mediaFile?: MediaItem;
   category_id?: string;
   category?: QuickLinkCategory;
   type: string;

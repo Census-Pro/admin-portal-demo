@@ -26,10 +26,12 @@ import {
   QuickLink,
   QuickLinkCategory,
   CmsPage,
+  MediaItem,
   createQuickLink,
   updateQuickLink,
   getActiveQuickLinkCategories,
-  getCmsPages
+  getCmsPages,
+  getMediaItems
 } from '@/actions/common/cms-actions';
 import { IconPicker } from '@/components/ui/icon-picker';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -52,6 +54,7 @@ export function QuickLinkDialog({
     description: '',
     url: '',
     content_page_id: '',
+    media_file_id: '',
     category_id: '',
     order: 0,
     is_active: true,
@@ -64,18 +67,25 @@ export function QuickLinkDialog({
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [contentPages, setContentPages] = useState<CmsPage[]>([]);
   const [loadingPages, setLoadingPages] = useState(false);
-  const [linkType, setLinkType] = useState<'url' | 'content_page'>('url');
+  const [mediaFiles, setMediaFiles] = useState<MediaItem[]>([]);
+  const [loadingMediaFiles, setLoadingMediaFiles] = useState(false);
+  const [linkType, setLinkType] = useState<
+    'url' | 'content_page' | 'media_file'
+  >('url');
 
   // Fetch categories and pages on mount
   useEffect(() => {
     const fetchData = async () => {
       setLoadingCategories(true);
       setLoadingPages(true);
+      setLoadingMediaFiles(true);
       try {
-        const [categoriesResult, pagesResult] = await Promise.all([
-          getActiveQuickLinkCategories(),
-          getCmsPages()
-        ]);
+        const [categoriesResult, pagesResult, mediaFilesResult] =
+          await Promise.all([
+            getActiveQuickLinkCategories(),
+            getCmsPages(),
+            getMediaItems()
+          ]);
 
         if (categoriesResult.success && categoriesResult.data) {
           setCategories(categoriesResult.data);
@@ -84,12 +94,17 @@ export function QuickLinkDialog({
         if (pagesResult.success && pagesResult.data) {
           setContentPages(pagesResult.data);
         }
+
+        if (mediaFilesResult.success && mediaFilesResult.data) {
+          setMediaFiles(mediaFilesResult.data);
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
         toast.error('Failed to load data');
       } finally {
         setLoadingCategories(false);
         setLoadingPages(false);
+        setLoadingMediaFiles(false);
       }
     };
 
@@ -101,13 +116,22 @@ export function QuickLinkDialog({
   useEffect(() => {
     if (quickLink) {
       const hasContentPage = !!quickLink.content_page_id;
-      setLinkType(hasContentPage ? 'content_page' : 'url');
+      const hasMediaFile = !!quickLink.media_file_id;
+
+      if (hasContentPage) {
+        setLinkType('content_page');
+      } else if (hasMediaFile) {
+        setLinkType('media_file');
+      } else {
+        setLinkType('url');
+      }
 
       setFormData({
         title: quickLink.title || '',
         description: quickLink.description || '',
         url: quickLink.url || '',
         content_page_id: quickLink.content_page_id || '',
+        media_file_id: quickLink.media_file_id || '',
         category_id: quickLink.category_id || '',
         order: quickLink.order || 0,
         is_active: quickLink.is_active ?? true,
@@ -121,6 +145,7 @@ export function QuickLinkDialog({
         description: '',
         url: '',
         content_page_id: '',
+        media_file_id: '',
         category_id: '',
         order: 0,
         is_active: true,
@@ -139,20 +164,32 @@ export function QuickLinkDialog({
       const dataToSave = { ...formData };
 
       if (linkType === 'url') {
-        // If using URL, remove content_page_id (don't send empty string)
+        // If using URL, remove content_page_id and media_file_id (don't send empty strings)
         delete dataToSave.content_page_id;
+        delete dataToSave.media_file_id;
         // Ensure URL is not empty
         if (!dataToSave.url || dataToSave.url.trim() === '') {
           toast.error('Please enter a URL', { duration: 5000 });
           setLoading(false);
           return;
         }
-      } else {
-        // If using content page, set url to empty string (database has NOT NULL constraint)
+      } else if (linkType === 'content_page') {
+        // If using content page, set url and media_file_id to empty string
         dataToSave.url = '';
+        delete dataToSave.media_file_id;
         // Ensure content_page_id is selected
         if (!dataToSave.content_page_id || dataToSave.content_page_id === '') {
           toast.error('Please select a content page', { duration: 5000 });
+          setLoading(false);
+          return;
+        }
+      } else {
+        // If using media file, set url and content_page_id to empty string
+        dataToSave.url = '';
+        delete dataToSave.content_page_id;
+        // Ensure media_file_id is selected
+        if (!dataToSave.media_file_id || dataToSave.media_file_id === '') {
+          toast.error('Please select a media file', { duration: 5000 });
           setLoading(false);
           return;
         }
@@ -224,13 +261,19 @@ export function QuickLinkDialog({
             </Label>
             <RadioGroup
               value={linkType}
-              onValueChange={(value: 'url' | 'content_page') => {
+              onValueChange={(value: 'url' | 'content_page' | 'media_file') => {
                 setLinkType(value);
-                // Clear the opposite field
+                // Clear the other fields
                 if (value === 'url') {
-                  setFormData({ ...formData, content_page_id: '' });
+                  setFormData({
+                    ...formData,
+                    content_page_id: '',
+                    media_file_id: ''
+                  });
+                } else if (value === 'content_page') {
+                  setFormData({ ...formData, url: '', media_file_id: '' });
                 } else {
-                  setFormData({ ...formData, url: '' });
+                  setFormData({ ...formData, url: '', content_page_id: '' });
                 }
               }}
               className="flex gap-4"
@@ -251,6 +294,15 @@ export function QuickLinkDialog({
                   className="cursor-pointer font-normal"
                 >
                   Content Page
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="media_file" id="media_file_type" />
+                <Label
+                  htmlFor="media_file_type"
+                  className="cursor-pointer font-normal"
+                >
+                  Downloadable File
                 </Label>
               </div>
             </RadioGroup>
@@ -309,6 +361,41 @@ export function QuickLinkDialog({
               )}
               <p className="text-muted-foreground mt-1 text-xs">
                 Link to an existing content page from your CMS
+              </p>
+            </div>
+          )}
+
+          {/* Media File Selector - shown when linkType is 'media_file' */}
+          {linkType === 'media_file' && (
+            <div className="space-y-2">
+              <Label htmlFor="media_file">
+                Media File <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={formData.media_file_id}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, media_file_id: value })
+                }
+                disabled={loadingMediaFiles}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a media file" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mediaFiles.map((file) => (
+                    <SelectItem key={file.id} value={file.id}>
+                      {file.file_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {loadingMediaFiles && (
+                <p className="text-muted-foreground mt-1 text-xs">
+                  Loading media files...
+                </p>
+              )}
+              <p className="text-muted-foreground mt-1 text-xs">
+                Select a file for users to download (PDFs, documents, etc.)
               </p>
             </div>
           )}

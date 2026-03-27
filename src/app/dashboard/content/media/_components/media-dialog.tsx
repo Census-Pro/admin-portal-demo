@@ -34,7 +34,14 @@ const ALLOWED_IMAGE_TYPES = [
   'image/svg+xml',
   'image/webp'
 ];
-const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES];
+const ALLOWED_DOCUMENT_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+];
+const ALLOWED_FILE_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_DOCUMENT_TYPES];
 
 export function MediaDialog({
   open,
@@ -82,7 +89,8 @@ export function MediaDialog({
           `File: ${file.name}\n` +
           `Type: ${file.type || 'Unknown'}\n\n` +
           `Allowed types:\n` +
-          `• Images: JPG, PNG, GIF, SVG, WebP`
+          `• Images: JPG, PNG, GIF, SVG, WebP\n` +
+          `• Documents: PDF, DOC, DOCX, XLS, XLSX`
       );
       e.target.value = ''; // Reset file input
       return;
@@ -210,7 +218,7 @@ export function MediaDialog({
                   required
                   className="sr-only"
                   onChange={handleFileChange}
-                  accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/svg+xml,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 />
                 <div className="pointer-events-none text-center">
                   {selectedFile ? (
@@ -227,7 +235,10 @@ export function MediaDialog({
                         Click to upload or drag and drop
                       </p>
                       <p className="text-muted-foreground mt-1 text-xs">
-                        JPG, PNG, GIF, SVG, WebP (max {MAX_FILE_SIZE_MB}MB)
+                        Images: JPG, PNG, GIF, SVG, WebP
+                        <br />
+                        Documents: PDF, DOC, DOCX, XLS, XLSX (max{' '}
+                        {MAX_FILE_SIZE_MB}MB)
                       </p>
                     </>
                   )}
