@@ -392,30 +392,12 @@ export const navItems: NavItem[] = [
     subject: 'Content',
     items: [
       {
-        title: 'PUBLICATION',
-        url: '#',
-        isHeader: true,
-        subject: 'Publication',
-        access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ANNOUNCEMENTS]
-        }
-      },
-      {
         title: 'Public Notices',
         url: '/dashboard/content/announcements',
         shortcut: ['a', 'n'],
         subject: 'Publication',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_ANNOUNCEMENTS]
-        }
-      },
-      {
-        title: 'CMS ASSETS',
-        url: '#',
-        isHeader: true,
-        subject: 'CMS Assets',
-        access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CMS]
         }
       },
       {
@@ -428,30 +410,12 @@ export const navItems: NavItem[] = [
         }
       },
       {
-        title: 'Media Library',
-        url: '/dashboard/content/media',
-        shortcut: ['m', 'l'],
-        subject: 'CMS Assets',
-        access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MEDIA_LIBRARY]
-        }
-      },
-      {
         title: 'Navigation',
         url: '/dashboard/content/navigation',
         shortcut: ['n', 'v'],
         subject: 'CMS Assets',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_NAVIGATION]
-        }
-      },
-      {
-        title: 'QUICK LINKS',
-        url: '#',
-        isHeader: true,
-        subject: 'Quick Links',
-        access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
         }
       },
       {
