@@ -31,17 +31,9 @@ const getTypeIcon = (type?: string | null) => {
   }
 };
 
-export const columns: ColumnDef<QuickLink>[] = [
-  {
-    accessorKey: 'order',
-    header: 'Order',
-    cell: ({ row }) => (
-      <div className="w-12 text-center font-medium">
-        {row.getValue('order')}
-      </div>
-    ),
-    size: 60
-  },
+export const createColumns = (
+  handleStatusChange?: (id: string, newStatus: boolean) => void
+): ColumnDef<QuickLink>[] => [
   {
     accessorKey: 'title',
     header: 'Title',

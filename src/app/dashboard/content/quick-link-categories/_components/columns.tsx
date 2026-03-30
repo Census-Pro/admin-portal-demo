@@ -5,17 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { QuickLinkCategory } from '@/actions/common/cms-actions';
 import { ActionCell } from './cell-action';
 
-export const columns: ColumnDef<QuickLinkCategory>[] = [
-  {
-    accessorKey: 'order',
-    header: 'Order',
-    cell: ({ row }) => (
-      <div className="w-12 text-center font-medium">
-        {row.getValue('order')}
-      </div>
-    ),
-    size: 60
-  },
+export const createColumns = (
+  handleStatusChange?: (id: string, newStatus: boolean) => void
+): ColumnDef<QuickLinkCategory>[] => [
   {
     accessorKey: 'name',
     header: 'Name',
