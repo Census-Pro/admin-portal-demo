@@ -182,6 +182,7 @@ export const VIEW_HOH_CHANGE = 'read:hoh-change' as const;
 export const CREATE_HOH_CHANGE = 'create:hoh-change' as const;
 export const EDIT_HOH_CHANGE = 'update:hoh-change' as const;
 export const DELETE_HOH_CHANGE = 'delete:hoh-change' as const;
+export const MANAGE_HOH_CHANGE_REASON = 'manage:hoh-change-reason' as const;
 
 // ============================================================================
 // COUNTRY PERMISSIONS
@@ -515,6 +516,7 @@ export type Permission =
   | typeof EDIT_HOH_CHANGE
   | typeof DELETE_HOH_CHANGE
   | typeof MANAGE_HOH_CHANGE
+  | typeof MANAGE_HOH_CHANGE_REASON
   | typeof VIEW_COUNTRIES
   | typeof CREATE_COUNTRIES
   | typeof EDIT_COUNTRIES

@@ -179,6 +179,15 @@ export const navItems: NavItem[] = [
             PERMS.MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES
           ]
         }
+      },
+      {
+        title: 'HOH Change Reason',
+        url: '/dashboard/hoh-change-reason',
+        shortcut: ['h', 'r'],
+        subject: 'HOH Change Reason',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_HOH_CHANGE_REASON]
+        }
       }
     ]
     // Parent access is automatic - shows if user has access to ANY child item
