@@ -5,16 +5,9 @@ import { Badge } from '@/components/ui/badge';
 import { OfficeCategory } from '@/actions/common/cms-actions';
 import { ActionCell } from './cell-action';
 
-export const columns: ColumnDef<OfficeCategory>[] = [
-  {
-    accessorKey: 'order',
-    header: 'Order',
-    cell: ({ row }) => (
-      <div className="w-12 text-center font-medium">
-        {row.getValue('order')}
-      </div>
-    )
-  },
+export const createColumns = (
+  handleStatusChange?: (id: string, newStatus: boolean) => void
+): ColumnDef<OfficeCategory>[] => [
   {
     accessorKey: 'name',
     header: 'Name',

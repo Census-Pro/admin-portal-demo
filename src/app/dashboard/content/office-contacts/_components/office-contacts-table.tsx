@@ -1,10 +1,16 @@
 'use client';
 
-import { DataTable } from '@/components/ui/table/data-table';
+import { useState, useEffect, useMemo } from 'react';
+import { createColumns } from './columns';
+import {
+  OfficeContact,
+  updateOfficeContact
+} from '@/actions/common/cms-actions';
+import { SortableDataTable } from '@/components/ui/table/sortable-data-table';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 import { DataTableResetFilter } from '@/components/ui/table/data-table-reset-filter';
 import { DataTableSearch } from '@/components/ui/table/data-table-search';
-import { columns } from './columns';
-import { OfficeContact } from '@/actions/common/cms-actions';
 import { useOfficeContactsTableFilters } from './use-office-contacts-table-filters';
 
 interface OfficeContactsTableProps {
@@ -16,6 +22,9 @@ export function OfficeContactsTable({
   data,
   addButton
 }: OfficeContactsTableProps) {
+  const router = useRouter();
+  const [items, setItems] = useState(data);
+
   const {
     isAnyFilterActive,
     resetFilters,
@@ -24,26 +33,76 @@ export function OfficeContactsTable({
     setSearchQuery
   } = useOfficeContactsTableFilters();
 
+  useEffect(() => {
+    // Sort data by order when it changes
+    const sortedData = [...data].sort(
+      (a, b) => (a.order || 0) - (b.order || 0)
+    );
+    setItems(sortedData);
+  }, [data]);
+
   // Filter data based on search query
-  const filteredData = data.filter((item) => {
-    if (!searchQuery) return true;
+  const filteredData = useMemo(() => {
+    if (!searchQuery) return items;
 
     const query = searchQuery.toLowerCase();
-    return (
-      item.name?.toLowerCase().includes(query) ||
-      item.place?.toLowerCase().includes(query) ||
-      item.contact?.toLowerCase().includes(query) ||
-      item.email?.toLowerCase().includes(query) ||
-      item.category?.name?.toLowerCase().includes(query)
+    return items.filter(
+      (item) =>
+        item.name?.toLowerCase().includes(query) ||
+        item.place?.toLowerCase().includes(query) ||
+        item.contact?.toLowerCase().includes(query) ||
+        item.email?.toLowerCase().includes(query) ||
+        item.category?.name?.toLowerCase().includes(query)
     );
-  });
+  }, [items, searchQuery]);
+
+  // Optimistic status update — mutates only the changed row, no re-sort
+  const handleStatusChange = (id: string, newStatus: boolean) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, isActive: newStatus } : item
+      )
+    );
+  };
+
+  const columns = useMemo(() => createColumns(handleStatusChange), []);
+
+  const handleReorder = async (newOrder: OfficeContact[]) => {
+    const oldItems = [...items];
+    setItems(newOrder);
+
+    try {
+      const updates = newOrder.map((item, index) =>
+        updateOfficeContact(item.id, { order: index })
+      );
+
+      const results = await Promise.all(updates);
+      const hasError = results.some((r) => !r.success);
+
+      if (hasError) {
+        console.error(
+          '[handleReorder] Some office contact order updates failed'
+        );
+        toast.error('Failed to update some office contact orders');
+        setItems(oldItems);
+      } else {
+        toast.success('Office contact order updated successfully');
+        // Use router.refresh() instead of full page reload
+        router.refresh();
+      }
+    } catch (error) {
+      console.error('[handleReorder] Exception:', error);
+      toast.error('Error updating office contact order');
+      setItems(oldItems);
+    }
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex min-w-0 flex-1 items-center gap-4">
           <DataTableSearch
-            searchKey="office contacts"
+            searchKey="office-contacts"
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             setPage={setPage}
@@ -55,10 +114,11 @@ export function OfficeContactsTable({
         </div>
         {addButton}
       </div>
-      <DataTable
+      <SortableDataTable
         columns={columns}
         data={filteredData}
         totalItems={filteredData.length}
+        onReorder={handleReorder}
       />
     </div>
   );

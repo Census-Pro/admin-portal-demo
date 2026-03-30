@@ -15,16 +15,9 @@ import { toast } from 'sonner';
 import { ActionCell } from './cell-action';
 import Link from 'next/link';
 
-export const columns: ColumnDef<OfficeContact>[] = [
-  {
-    accessorKey: 'order',
-    header: 'Order',
-    cell: ({ row }) => (
-      <div className="w-12 text-center font-medium">
-        {row.getValue('order')}
-      </div>
-    )
-  },
+export const createColumns = (
+  handleStatusChange?: (id: string, newStatus: boolean) => void
+): ColumnDef<OfficeContact>[] => [
   {
     accessorKey: 'name',
     header: 'Name',
