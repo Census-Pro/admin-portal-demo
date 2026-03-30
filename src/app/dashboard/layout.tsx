@@ -3,7 +3,8 @@ import AppSidebar from '@/components/layout/app-sidebar';
 import Header from '@/components/layout/header';
 import { InfoSidebar } from '@/components/layout/info-sidebar';
 import { InfobarProvider } from '@/components/ui/infobar';
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { ThemedSidebarInset } from '@/components/layout/themed-sidebar-inset';
 import { SessionMonitor } from '@/components/session-monitor';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
@@ -35,21 +36,12 @@ export default async function DashboardLayout({
         <InfobarProvider defaultOpen={false}>
           <SessionMonitor />
           <AppSidebar />
-          <SidebarInset
-            className="bg-background"
-            style={{
-              backgroundImage: `linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('/bg4.png')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              backgroundAttachment: 'fixed'
-            }}
-          >
+          <ThemedSidebarInset className="bg-background">
             <Header />
             {/* page main content */}
             {children}
             {/* page main content ends */}
-          </SidebarInset>
+          </ThemedSidebarInset>
           <InfoSidebar side="right" />
         </InfobarProvider>
       </SidebarProvider>
