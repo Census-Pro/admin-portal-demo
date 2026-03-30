@@ -54,7 +54,7 @@ export const columns: ColumnDef<OfficeContact>[] = [
                 href={`mailto:${email}`}
                 className="text-blue-600 hover:text-blue-800 hover:underline"
               >
-                {email}
+                {email as string}
               </Link>
             </div>
           ) : (
@@ -95,21 +95,6 @@ export const columns: ColumnDef<OfficeContact>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => (
-      <ActionCell
-        row={row}
-        editUrl={`/dashboard/content/office-contacts/${row.original.id}`}
-        deleteAction={async () => {
-          // TODO: Implement delete functionality
-          toast.success('Delete functionality coming soon');
-        }}
-        copyAction={() => {
-          navigator.clipboard.writeText(
-            `${row.original.name} - ${row.original.contact}${row.original.email ? ' - ' + row.original.email : ''}`
-          );
-          toast.success('Contact information copied to clipboard');
-        }}
-      />
-    )
+    cell: ({ row }) => <ActionCell data={row.original} />
   }
 ];

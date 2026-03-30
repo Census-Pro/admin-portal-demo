@@ -13,11 +13,17 @@ export function useOfficeContactsTableFilters() {
 
   return {
     searchQuery,
-    setSearchQuery,
+    setSearchQuery: setSearchQuery as (
+      value: string | ((old: string) => string | null) | null,
+      options?: any
+    ) => void,
     isAnyFilterActive,
     setIsAnyFilterActive,
     page,
-    setPage,
+    setPage: setPage as (
+      value: number | ((old: number) => number | null) | null,
+      options?: any
+    ) => void,
     resetFilters
   };
 }

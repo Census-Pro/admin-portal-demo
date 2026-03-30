@@ -40,14 +40,6 @@ export const columns: ColumnDef<OfficeCategory>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => (
-      <ActionCell
-        row={row}
-        editUrl={`/dashboard/content/office-categories/${row.original.id}`}
-        deleteAction={async () => {
-          // TODO: Implement delete functionality
-        }}
-      />
-    )
+    cell: ({ row }) => <ActionCell data={row.original} />
   }
 ];

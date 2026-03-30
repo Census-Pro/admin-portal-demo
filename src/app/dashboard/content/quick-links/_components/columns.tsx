@@ -16,7 +16,7 @@ import { ICON_LIST, IconName } from '@/components/ui/icon-picker';
 import { ActionCell } from './cell-action';
 import Link from 'next/link';
 
-const getTypeIcon = (type: string) => {
+const getTypeIcon = (type?: string | null) => {
   switch (type) {
     case 'external':
       return <IconExternalLink className="h-4 w-4" />;

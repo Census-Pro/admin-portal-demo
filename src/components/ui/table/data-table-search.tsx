@@ -11,11 +11,11 @@ interface DataTableSearchProps {
   setSearchQuery: (
     value: string | ((old: string) => string | null) | null,
     options?: Options | undefined
-  ) => Promise<URLSearchParams>;
+  ) => Promise<URLSearchParams> | void | any;
   setPage: (
     value: number | ((old: number) => number | null) | null,
     options?: Options | undefined
-  ) => Promise<URLSearchParams>;
+  ) => Promise<URLSearchParams> | void | any;
 }
 
 export function DataTableSearch({
