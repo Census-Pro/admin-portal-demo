@@ -118,16 +118,6 @@ export const createColumns = (
   handleStatusChange?: (id: string, newStatus: boolean) => void
 ): ColumnDef<Announcement>[] => [
   {
-    accessorKey: 'order',
-    header: 'Order',
-    cell: ({ row }) => (
-      <div className="flex items-center">
-        <span className="font-mono text-sm">{row.original.order}</span>
-      </div>
-    ),
-    size: 60
-  },
-  {
     accessorKey: 'image_url',
     header: 'Image',
     cell: ({ row }) => (
@@ -161,7 +151,7 @@ export const createColumns = (
       const status = row.original.status;
       return (
         <Badge variant={status === 'active' ? 'default' : 'secondary'}>
-          {status.toUpperCase()}
+          {status === 'active' ? 'PUBLISHED' : 'DRAFT'}
         </Badge>
       );
     }

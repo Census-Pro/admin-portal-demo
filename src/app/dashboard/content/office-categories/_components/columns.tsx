@@ -34,7 +34,7 @@ export const createColumns = (
       const isActive = row.getValue('isActive');
       return (
         <Badge variant={isActive ? 'default' : 'secondary'}>
-          {isActive ? 'Active' : 'Inactive'}
+          {isActive ? 'ACTIVE' : 'INACTIVE'}
         </Badge>
       );
     }

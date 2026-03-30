@@ -59,7 +59,7 @@ export const createColumns = (
     header: 'Status',
     cell: ({ row }) => (
       <Badge variant={row.original.is_active ? 'default' : 'secondary'}>
-        {row.original.is_active ? 'Active' : 'Inactive'}
+        {row.original.is_active ? 'ACTIVE' : 'INACTIVE'}
       </Badge>
     )
   },
