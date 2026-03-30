@@ -7,6 +7,15 @@ import { ActionCell } from './cell-action';
 
 export const columns: ColumnDef<OfficeCategory>[] = [
   {
+    accessorKey: 'order',
+    header: 'Order',
+    cell: ({ row }) => (
+      <div className="w-12 text-center font-medium">
+        {row.getValue('order')}
+      </div>
+    )
+  },
+  {
     accessorKey: 'name',
     header: 'Name',
     cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>
