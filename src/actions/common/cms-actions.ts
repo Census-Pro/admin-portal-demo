@@ -1884,11 +1884,85 @@ export async function getOfficeCategories() {
     }
 
     const data = await response.json();
-    revalidatePath('/dashboard/content/office-categories');
     return { success: true, data };
   } catch (error) {
     console.error('[getOfficeCategories] Error:', error);
     return { success: false, error: 'Failed to fetch office categories' };
+  }
+}
+
+export async function getActiveOfficeCategories() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-categories/active`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: 'Failed to fetch active office categories'
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getActiveOfficeCategories] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch active office categories'
+    };
+  }
+}
+
+export async function getOfficeCategoryById(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-categories/${id}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to fetch office category' };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getOfficeCategoryById] Error:', error);
+    return { success: false, error: 'Failed to fetch office category' };
+  }
+}
+
+export async function getOfficeCategoryByName(name: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-categories/name/${encodeURIComponent(name)}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: 'Failed to fetch office category by name'
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getOfficeCategoryByName] Error:', error);
+    return { success: false, error: 'Failed to fetch office category by name' };
   }
 }
 
@@ -1931,7 +2005,7 @@ export async function updateOfficeCategory(
     const url = `${COMMON_SERVICE_URL}/office-categories/${id}`;
 
     const response = await fetch(url, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         ...headers
@@ -1951,6 +2025,39 @@ export async function updateOfficeCategory(
     return { success: true, message: 'Office category updated successfully' };
   } catch (error) {
     console.error('[updateOfficeCategory] Error:', error);
+    return { success: false, error: 'Failed to update office category' };
+  }
+}
+
+export async function putOfficeCategory(
+  id: string,
+  data: Partial<OfficeCategory>
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-categories/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update office category'
+      };
+    }
+
+    revalidatePath('/dashboard/content/office-categories');
+    return { success: true, message: 'Office category updated successfully' };
+  } catch (error) {
+    console.error('[putOfficeCategory] Error:', error);
     return { success: false, error: 'Failed to update office category' };
   }
 }
@@ -2022,11 +2129,113 @@ export async function getOfficeContacts() {
     }
 
     const data = await response.json();
-    revalidatePath('/dashboard/content/office-contacts');
     return { success: true, data };
   } catch (error) {
     console.error('[getOfficeContacts] Error:', error);
     return { success: false, error: 'Failed to fetch office contacts' };
+  }
+}
+
+export async function getActiveOfficeContacts() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts/active`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: 'Failed to fetch active office contacts'
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getActiveOfficeContacts] Error:', error);
+    return { success: false, error: 'Failed to fetch active office contacts' };
+  }
+}
+
+export async function getOfficeContactsByCategory(categoryId: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts/category/${categoryId}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: 'Failed to fetch office contacts by category'
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getOfficeContactsByCategory] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch office contacts by category'
+    };
+  }
+}
+
+export async function getActiveOfficeContactsByCategory(categoryId: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts/category/${categoryId}/active`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: 'Failed to fetch active office contacts by category'
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getActiveOfficeContactsByCategory] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch active office contacts by category'
+    };
+  }
+}
+
+export async function getOfficeContactById(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts/${id}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to fetch office contact' };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getOfficeContactById] Error:', error);
+    return { success: false, error: 'Failed to fetch office contact' };
   }
 }
 
@@ -2069,7 +2278,7 @@ export async function updateOfficeContact(
     const url = `${COMMON_SERVICE_URL}/office-contacts/${id}`;
 
     const response = await fetch(url, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         ...headers
@@ -2089,6 +2298,39 @@ export async function updateOfficeContact(
     return { success: true, message: 'Office contact updated successfully' };
   } catch (error) {
     console.error('[updateOfficeContact] Error:', error);
+    return { success: false, error: 'Failed to update office contact' };
+  }
+}
+
+export async function putOfficeContact(
+  id: string,
+  data: Partial<OfficeContact>
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update office contact'
+      };
+    }
+
+    revalidatePath('/dashboard/content/office-contacts');
+    return { success: true, message: 'Office contact updated successfully' };
+  } catch (error) {
+    console.error('[putOfficeContact] Error:', error);
     return { success: false, error: 'Failed to update office contact' };
   }
 }
