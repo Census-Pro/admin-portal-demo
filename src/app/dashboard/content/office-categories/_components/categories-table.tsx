@@ -1,0 +1,59 @@
+'use client';
+
+import { DataTable } from '@/components/ui/table/data-table';
+import { DataTableResetFilter } from '@/components/ui/table/data-table-reset-filter';
+import { DataTableSearch } from '@/components/ui/table/data-table-search';
+import { columns } from './columns';
+import { OfficeCategory } from '@/actions/common/cms-actions';
+import { useOfficeCategoriesTableFilters } from './use-office-categories-table-filters';
+
+interface CategoriesTableProps {
+  data: OfficeCategory[];
+  addButton?: React.ReactNode;
+}
+
+export function CategoriesTable({ data, addButton }: CategoriesTableProps) {
+  const {
+    isAnyFilterActive,
+    resetFilters,
+    searchQuery,
+    setPage,
+    setSearchQuery
+  } = useOfficeCategoriesTableFilters();
+
+  // Filter data based on search query
+  const filteredData = data.filter((item) => {
+    if (!searchQuery) return true;
+
+    const query = searchQuery.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(query) ||
+      item.description?.toLowerCase().includes(query)
+    );
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <DataTableSearch
+            searchKey="categories"
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setPage={setPage}
+          />
+          <DataTableResetFilter
+            isFilterActive={isAnyFilterActive}
+            onReset={resetFilters}
+          />
+        </div>
+        {addButton}
+      </div>
+      <DataTable
+        columns={columns}
+        data={filteredData}
+        totalItems={filteredData.length}
+      />
+    </div>
+  );
+}

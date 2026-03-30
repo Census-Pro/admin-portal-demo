@@ -426,6 +426,15 @@ export const navItems: NavItem[] = [
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
         }
+      },
+      {
+        title: 'Office Contacts',
+        url: '/dashboard/content/office-contacts',
+        shortcut: ['o', 'c'],
+        subject: 'Office Contacts',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CONTENT]
+        }
       }
     ]
     // Parent access is automatic - shows if user has access to ANY child item

@@ -136,19 +136,43 @@ export interface QuickLink {
   title: string;
   description?: string;
   url?: string;
+  type?: string;
+  icon?: string;
+  category_id?: string;
+  category?: QuickLinkCategory;
   content_page_id?: string;
   contentPage?: CmsPage;
   media_file_id?: string;
   mediaFile?: MediaItem;
-  category_id?: string;
-  category?: QuickLinkCategory;
-  type: string;
   order: number;
   is_active: boolean;
   opens_in_new_tab: boolean;
-  icon?: string;
-  created_at: string;
+  created_by_id?: string;
   created_by_name?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface OfficeCategory {
+  id: string;
+  name: string;
+  description?: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface OfficeContact {
+  id: string;
+  name: string;
+  place: string;
+  contact: string;
+  email?: string | undefined;
+  categoryId: string;
+  category?: OfficeCategory;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // ============================================================================
@@ -1838,5 +1862,281 @@ export async function deleteQuickLinkCategory(id: string) {
   } catch (error) {
     console.error('[deleteQuickLinkCategory] Error:', error);
     return { success: false, error: 'Failed to delete category' };
+  }
+}
+
+// ============================================================================
+// OFFICE CATEGORIES ACTIONS
+// ============================================================================
+
+export async function getOfficeCategories() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-categories`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to fetch office categories' };
+    }
+
+    const data = await response.json();
+    revalidatePath('/dashboard/content/office-categories');
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getOfficeCategories] Error:', error);
+    return { success: false, error: 'Failed to fetch office categories' };
+  }
+}
+
+export async function createOfficeCategory(data: Partial<OfficeCategory>) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-categories`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create office category'
+      };
+    }
+
+    revalidatePath('/dashboard/content/office-categories');
+    return { success: true, message: 'Office category created successfully' };
+  } catch (error) {
+    console.error('[createOfficeCategory] Error:', error);
+    return { success: false, error: 'Failed to create office category' };
+  }
+}
+
+export async function updateOfficeCategory(
+  id: string,
+  data: Partial<OfficeCategory>
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-categories/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update office category'
+      };
+    }
+
+    revalidatePath('/dashboard/content/office-categories');
+    return { success: true, message: 'Office category updated successfully' };
+  } catch (error) {
+    console.error('[updateOfficeCategory] Error:', error);
+    return { success: false, error: 'Failed to update office category' };
+  }
+}
+
+export async function deleteOfficeCategory(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-categories/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to delete office category'
+      };
+    }
+
+    revalidatePath('/dashboard/content/office-categories');
+    return { success: true, message: 'Office category deleted successfully' };
+  } catch (error) {
+    console.error('[deleteOfficeCategory] Error:', error);
+    return { success: false, error: 'Failed to delete office category' };
+  }
+}
+
+export async function toggleOfficeCategoryStatus(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-categories/${id}/toggle-active`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to update status' };
+    }
+
+    revalidatePath('/dashboard/content/office-categories');
+    return { success: true, message: 'Status updated successfully' };
+  } catch (error) {
+    console.error('[toggleOfficeCategoryStatus] Error:', error);
+    return { success: false, error: 'Failed to update status' };
+  }
+}
+
+// ============================================================================
+// OFFICE CONTACTS ACTIONS
+// ============================================================================
+
+export async function getOfficeContacts() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to fetch office contacts' };
+    }
+
+    const data = await response.json();
+    revalidatePath('/dashboard/content/office-contacts');
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getOfficeContacts] Error:', error);
+    return { success: false, error: 'Failed to fetch office contacts' };
+  }
+}
+
+export async function createOfficeContact(data: Partial<OfficeContact>) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts`;
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create office contact'
+      };
+    }
+
+    revalidatePath('/dashboard/content/office-contacts');
+    return { success: true, message: 'Office contact created successfully' };
+  } catch (error) {
+    console.error('[createOfficeContact] Error:', error);
+    return { success: false, error: 'Failed to create office contact' };
+  }
+}
+
+export async function updateOfficeContact(
+  id: string,
+  data: Partial<OfficeContact>
+) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts/${id}`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update office contact'
+      };
+    }
+
+    revalidatePath('/dashboard/content/office-contacts');
+    return { success: true, message: 'Office contact updated successfully' };
+  } catch (error) {
+    console.error('[updateOfficeContact] Error:', error);
+    return { success: false, error: 'Failed to update office contact' };
+  }
+}
+
+export async function deleteOfficeContact(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to delete office contact'
+      };
+    }
+
+    revalidatePath('/dashboard/content/office-contacts');
+    return { success: true, message: 'Office contact deleted successfully' };
+  } catch (error) {
+    console.error('[deleteOfficeContact] Error:', error);
+    return { success: false, error: 'Failed to delete office contact' };
+  }
+}
+
+export async function toggleOfficeContactStatus(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/office-contacts/${id}/toggle-active`;
+
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to update status' };
+    }
+
+    revalidatePath('/dashboard/content/office-contacts');
+    return { success: true, message: 'Status updated successfully' };
+  } catch (error) {
+    console.error('[toggleOfficeContactStatus] Error:', error);
+    return { success: false, error: 'Failed to update status' };
   }
 }
