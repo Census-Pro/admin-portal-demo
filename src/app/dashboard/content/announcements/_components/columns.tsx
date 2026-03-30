@@ -114,7 +114,19 @@ function ImagePreviewCell({ announcement }: { announcement: Announcement }) {
 
 import { ActionCell } from './cell-action';
 
-export const columns: ColumnDef<Announcement>[] = [
+export const createColumns = (
+  handleStatusChange?: (id: string, newStatus: boolean) => void
+): ColumnDef<Announcement>[] => [
+  {
+    accessorKey: 'order',
+    header: 'Order',
+    cell: ({ row }) => (
+      <div className="flex items-center">
+        <span className="font-mono text-sm">{row.original.order}</span>
+      </div>
+    ),
+    size: 60
+  },
   {
     accessorKey: 'image_url',
     header: 'Image',

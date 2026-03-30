@@ -33,6 +33,7 @@ export interface Announcement {
   status: 'active' | 'inactive';
   created_by_id?: string;
   created_by_name?: string;
+  order: number;
   createdAt?: string;
   updatedAt?: string;
 }

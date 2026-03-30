@@ -9,16 +9,9 @@ import { Badge } from '@/components/ui/badge';
 
 import { ActionCell } from './cell-action';
 
-export const columns: ColumnDef<AnnouncementCategory>[] = [
-  {
-    accessorKey: 'order',
-    header: 'Order',
-    cell: ({ row }) => (
-      <div className="flex items-center">
-        <span className="font-mono text-sm">{row.original.order}</span>
-      </div>
-    )
-  },
+export const createColumns = (
+  handleStatusChange?: (id: string, newStatus: boolean) => void
+): ColumnDef<AnnouncementCategory>[] => [
   {
     accessorKey: 'name',
     header: 'Name',
