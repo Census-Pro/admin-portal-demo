@@ -158,6 +158,7 @@ export interface OfficeCategory {
   name: string;
   description?: string;
   isActive: boolean;
+  order: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -171,6 +172,7 @@ export interface OfficeContact {
   categoryId: string;
   category?: OfficeCategory;
   isActive: boolean;
+  order: number;
   createdAt?: string;
   updatedAt?: string;
 }

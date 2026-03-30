@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import {
   OfficeCategory,
@@ -37,7 +38,8 @@ export function OfficeCategoryDialog({
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    isActive: true
+    isActive: true,
+    order: 0
   });
 
   useEffect(() => {
@@ -45,7 +47,8 @@ export function OfficeCategoryDialog({
       setFormData({
         name: category.name || '',
         description: category.description || '',
-        isActive: category.isActive ?? true
+        isActive: category.isActive ?? true,
+        order: category.order ?? 0
       });
     }
   }, [category]);
@@ -93,17 +96,39 @@ export function OfficeCategoryDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Category Name *</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) =>
-                setFormData((prev) => ({ ...prev, name: e.target.value }))
-              }
-              placeholder="Enter category name"
-              required
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Category Name *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, name: e.target.value }))
+                }
+                placeholder="Enter category name"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="order">Display Order</Label>
+              <Input
+                id="order"
+                type="number"
+                value={formData.order}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    order: e.target.value ? parseInt(e.target.value) : 0
+                  }))
+                }
+                placeholder="0"
+                min="0"
+              />
+              <p className="text-muted-foreground text-xs">
+                Lower numbers appear first
+              </p>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -122,15 +147,34 @@ export function OfficeCategoryDialog({
             />
           </div>
 
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="isActive"
-              checked={formData.isActive}
-              onCheckedChange={(checked) =>
-                setFormData((prev) => ({ ...prev, isActive: checked }))
-              }
-            />
-            <Label htmlFor="isActive">Active</Label>
+          <div className="grid gap-3">
+            <div className="flex items-center justify-between rounded-lg border p-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="isActive" className="text-sm font-medium">
+                  Active Status
+                </Label>
+                <p className="text-muted-foreground text-xs">
+                  {formData.isActive
+                    ? 'Category will be visible and active'
+                    : 'Category will be hidden and inactive'}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge
+                  variant={formData.isActive ? 'default' : 'secondary'}
+                  className="px-2 py-0 text-[10px]"
+                >
+                  {formData.isActive ? 'ACTIVE' : 'INACTIVE'}
+                </Badge>
+                <Switch
+                  id="isActive"
+                  checked={formData.isActive}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, isActive: checked }))
+                  }
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
