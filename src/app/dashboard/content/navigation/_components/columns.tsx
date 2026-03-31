@@ -22,9 +22,17 @@ export function createColumns(
         const Icon = iconName ? ICON_LIST[iconName] : null;
 
         return (
-          <div className="flex items-center gap-2">
-            {Icon && <Icon className="text-muted-foreground h-4 w-4" />}
-            <span className="font-medium">{row.original.label}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-primary bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg shadow-xs transition-transform hover:scale-110">
+              {Icon ? (
+                <Icon className="h-4 w-4" />
+              ) : (
+                <IconList className="h-4 w-4" />
+              )}
+            </span>
+            <span className="text-foreground font-medium tracking-tight">
+              {row.original.label}
+            </span>
           </div>
         );
       }
