@@ -1875,7 +1875,9 @@ export async function deleteQuickLinkCategory(id: string) {
 
 export async function getOfficeCategories() {
   try {
-    const headers = await instance();
+    const headers = {
+      'Content-Type': 'application/json'
+    };
     const url = `${COMMON_SERVICE_URL}/office-categories`;
 
     const response = await fetch(url, {
@@ -1884,6 +1886,7 @@ export async function getOfficeCategories() {
     });
 
     if (!response.ok) {
+      console.error('[getOfficeCategories] API Error:', response.statusText);
       return { success: false, error: 'Failed to fetch office categories' };
     }
 
@@ -2248,43 +2251,39 @@ export async function createOfficeContact(
   image?: File
 ) {
   try {
-    const headers = await instance();
+    const headers = {
+      // Don't set Content-Type for FormData - browser will set it with boundary
+    };
     const url = `${COMMON_SERVICE_URL}/office-contacts`;
 
-    let body: BodyInit;
+    // Always use FormData since backend expects multipart/form-data due to FileInterceptor
+    const formData = new FormData();
 
+    // Add all form fields except imageUrl
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== 'imageUrl' && value !== undefined && value !== null) {
+        console.log(`[createOfficeContact] Adding field: ${key} = ${value}`);
+        formData.append(key, value.toString());
+      }
+    });
+
+    // Add the image file if provided
     if (image) {
-      // Use FormData for file upload
-      const formData = new FormData();
-
-      // Add all form fields except imageUrl
-      Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'imageUrl' && value !== undefined && value !== null) {
-          formData.append(key, value.toString());
-        }
-      });
-
-      // Add the image file
+      console.log(`[createOfficeContact] Adding image: ${image.name}`);
       formData.append('image', image);
-
-      body = formData;
-      // Don't set Content-Type header when using FormData - browser sets it automatically with boundary
-    } else {
-      // Use JSON for regular form submission
-      body = JSON.stringify(data);
     }
+
+    console.log('[createOfficeContact] FormData entries:');
+    Array.from(formData.entries()).forEach(([key, value]) => {
+      console.log(`  ${key}: ${value}`);
+    });
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: image
-        ? {
-            ...headers
-          }
-        : {
-            'Content-Type': 'application/json',
-            ...headers
-          },
-      body
+      headers: {
+        ...headers
+      },
+      body: formData
     });
 
     if (!response.ok) {
@@ -2309,43 +2308,39 @@ export async function updateOfficeContact(
   image?: File
 ) {
   try {
-    const headers = await instance();
+    const headers = {
+      // Don't set Content-Type for FormData - browser will set it with boundary
+    };
     const url = `${COMMON_SERVICE_URL}/office-contacts/${id}`;
 
-    let body: BodyInit;
+    // Always use FormData since backend expects multipart/form-data due to FileInterceptor
+    const formData = new FormData();
 
+    // Add all form fields except imageUrl
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== 'imageUrl' && value !== undefined && value !== null) {
+        console.log(`[updateOfficeContact] Adding field: ${key} = ${value}`);
+        formData.append(key, value.toString());
+      }
+    });
+
+    // Add the image file if provided
     if (image) {
-      // Use FormData for file upload
-      const formData = new FormData();
-
-      // Add all form fields except imageUrl
-      Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'imageUrl' && value !== undefined && value !== null) {
-          formData.append(key, value.toString());
-        }
-      });
-
-      // Add the image file
+      console.log(`[updateOfficeContact] Adding image: ${image.name}`);
       formData.append('image', image);
-
-      body = formData;
-      // Don't set Content-Type header when using FormData - browser sets it automatically with boundary
-    } else {
-      // Use JSON for regular form submission
-      body = JSON.stringify(data);
     }
+
+    console.log('[updateOfficeContact] FormData entries:');
+    Array.from(formData.entries()).forEach(([key, value]) => {
+      console.log(`  ${key}: ${value}`);
+    });
 
     const response = await fetch(url, {
       method: 'PATCH',
-      headers: image
-        ? {
-            ...headers
-          }
-        : {
-            'Content-Type': 'application/json',
-            ...headers
-          },
-      body
+      headers: {
+        ...headers
+      },
+      body: formData
     });
 
     if (!response.ok) {
@@ -2369,16 +2364,33 @@ export async function putOfficeContact(
   data: Partial<OfficeContact>
 ) {
   try {
-    const headers = await instance();
+    const headers = {
+      // Don't set Content-Type for FormData - browser will set it with boundary
+    };
     const url = `${COMMON_SERVICE_URL}/office-contacts/${id}`;
+
+    // Use FormData since backend expects multipart/form-data due to FileInterceptor
+    const formData = new FormData();
+
+    // Add all form fields except imageUrl
+    Object.entries(data).forEach(([key, value]) => {
+      if (key !== 'imageUrl' && value !== undefined && value !== null) {
+        console.log(`[putOfficeContact] Adding field: ${key} = ${value}`);
+        formData.append(key, value.toString());
+      }
+    });
+
+    console.log('[putOfficeContact] FormData entries:');
+    Array.from(formData.entries()).forEach(([key, value]) => {
+      console.log(`  ${key}: ${value}`);
+    });
 
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         ...headers
       },
-      body: JSON.stringify(data)
+      body: formData
     });
 
     if (!response.ok) {
