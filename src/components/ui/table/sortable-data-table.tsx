@@ -26,6 +26,8 @@ import {
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
   PaginationState,
   useReactTable,
   Row
@@ -60,6 +62,11 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { IconGripVertical } from '@tabler/icons-react';
+import {
+  IconArrowsSort,
+  IconSortAscending,
+  IconSortDescending
+} from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { parseAsInteger, useQueryState } from 'nuqs';
 
@@ -190,6 +197,7 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
 }: SortableDataTableProps<TData, TValue>) {
   const [items, setItems] = React.useState(data);
   const [activeId, setActiveId] = React.useState<string | null>(null);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const [currentPage, setCurrentPage] = useQueryState(
     'page',
@@ -239,10 +247,15 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
     data: items,
     columns,
     pageCount,
-    state: { pagination: paginationState },
+    state: {
+      pagination: paginationState,
+      sorting
+    },
     onPaginationChange: handlePaginationChange,
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     manualPagination: true
   });
 
@@ -301,12 +314,25 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
                   : undefined
               }}
             >
-              {header.isPlaceholder
-                ? null
-                : flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
+              {header.isPlaceholder ? null : header.column.getCanSort() &&
+                typeof header.column.columnDef.header === 'string' ? (
+                <Button
+                  variant="ghost"
+                  onClick={header.column.getToggleSortingHandler()}
+                  className="-ml-3 h-8 gap-1 select-none"
+                >
+                  {header.column.columnDef.header}
+                  {header.column.getIsSorted() === 'asc' ? (
+                    <IconSortAscending className="h-4 w-4 shrink-0" />
+                  ) : header.column.getIsSorted() === 'desc' ? (
+                    <IconSortDescending className="h-4 w-4 shrink-0" />
+                  ) : (
+                    <IconArrowsSort className="h-4 w-4 shrink-0 opacity-50" />
                   )}
+                </Button>
+              ) : (
+                flexRender(header.column.columnDef.header, header.getContext())
+              )}
             </TableHead>
           ))}
         </TableRow>

@@ -1,17 +1,9 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import {
-  IconPhone,
-  IconMail,
-  IconMapPin,
-  IconBuilding,
-  IconCopy
-} from '@tabler/icons-react';
-import { Button } from '@/components/ui/button';
+import { IconPhone, IconMail } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
 import { OfficeContact } from '@/actions/common/cms-actions';
-import { toast } from 'sonner';
 import { ActionCell } from './cell-action';
 import Link from 'next/link';
 
@@ -21,11 +13,13 @@ export const createColumns = (
   {
     accessorKey: 'name',
     header: 'Name',
+    enableSorting: true,
     cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>
   },
   {
     accessorKey: 'place',
     header: 'Place',
+    enableSorting: true,
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue('place')}</div>
     )
@@ -33,6 +27,7 @@ export const createColumns = (
   {
     accessorKey: 'contact',
     header: 'Contact',
+    enableSorting: true,
     cell: ({ row }) => (
       <div className="font-medium">
         <div className="flex items-center gap-2">
@@ -45,6 +40,7 @@ export const createColumns = (
   {
     accessorKey: 'email',
     header: 'Email',
+    enableSorting: true,
     cell: ({ row }) => {
       const email = row.getValue('email');
       return (
@@ -69,6 +65,7 @@ export const createColumns = (
   {
     accessorKey: 'category',
     header: 'Category',
+    enableSorting: true,
     cell: ({ row }) => {
       const category = row.original.category;
       return (
@@ -85,6 +82,7 @@ export const createColumns = (
   {
     accessorKey: 'isActive',
     header: 'Status',
+    enableSorting: true,
     cell: ({ row }) => {
       const isActive = row.getValue('isActive');
       return (
@@ -97,6 +95,7 @@ export const createColumns = (
   {
     id: 'actions',
     header: 'Actions',
+    enableSorting: false,
     cell: ({ row }) => <ActionCell data={row.original} />
   }
 ];
