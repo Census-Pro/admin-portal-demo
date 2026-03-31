@@ -174,6 +174,7 @@ export interface OfficeContact {
   category?: OfficeCategory;
   isActive: boolean;
   order: number;
+  imageUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -2242,18 +2243,48 @@ export async function getOfficeContactById(id: string) {
   }
 }
 
-export async function createOfficeContact(data: Partial<OfficeContact>) {
+export async function createOfficeContact(
+  data: Partial<OfficeContact>,
+  image?: File
+) {
   try {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/office-contacts`;
 
+    let body: BodyInit;
+
+    if (image) {
+      // Use FormData for file upload
+      const formData = new FormData();
+
+      // Add all form fields except imageUrl
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== 'imageUrl' && value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
+      });
+
+      // Add the image file
+      formData.append('image', image);
+
+      body = formData;
+      // Don't set Content-Type header when using FormData - browser sets it automatically with boundary
+    } else {
+      // Use JSON for regular form submission
+      body = JSON.stringify(data);
+    }
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      },
-      body: JSON.stringify(data)
+      headers: image
+        ? {
+            ...headers
+          }
+        : {
+            'Content-Type': 'application/json',
+            ...headers
+          },
+      body
     });
 
     if (!response.ok) {
@@ -2274,19 +2305,47 @@ export async function createOfficeContact(data: Partial<OfficeContact>) {
 
 export async function updateOfficeContact(
   id: string,
-  data: Partial<OfficeContact>
+  data: Partial<OfficeContact>,
+  image?: File
 ) {
   try {
     const headers = await instance();
     const url = `${COMMON_SERVICE_URL}/office-contacts/${id}`;
 
+    let body: BodyInit;
+
+    if (image) {
+      // Use FormData for file upload
+      const formData = new FormData();
+
+      // Add all form fields except imageUrl
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== 'imageUrl' && value !== undefined && value !== null) {
+          formData.append(key, value.toString());
+        }
+      });
+
+      // Add the image file
+      formData.append('image', image);
+
+      body = formData;
+      // Don't set Content-Type header when using FormData - browser sets it automatically with boundary
+    } else {
+      // Use JSON for regular form submission
+      body = JSON.stringify(data);
+    }
+
     const response = await fetch(url, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      },
-      body: JSON.stringify(data)
+      headers: image
+        ? {
+            ...headers
+          }
+        : {
+            'Content-Type': 'application/json',
+            ...headers
+          },
+      body
     });
 
     if (!response.ok) {

@@ -1,15 +1,41 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconPhone, IconMail } from '@tabler/icons-react';
+import { IconPhone, IconMail, IconUser } from '@tabler/icons-react';
 import { Badge } from '@/components/ui/badge';
 import { OfficeContact } from '@/actions/common/cms-actions';
 import { ActionCell } from './cell-action';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const createColumns = (
   handleStatusChange?: (id: string, newStatus: boolean) => void
 ): ColumnDef<OfficeContact>[] => [
+  {
+    accessorKey: 'imageUrl',
+    header: 'Image',
+    enableSorting: false,
+    cell: ({ row }) => {
+      const imageUrl = row.getValue('imageUrl') as string;
+      return (
+        <div className="flex items-center">
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={`${row.getValue('name')} profile`}
+              width={40}
+              height={40}
+              className="rounded-full border object-cover"
+            />
+          ) : (
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-gray-200">
+              <IconUser className="h-5 w-5 text-gray-500" />
+            </div>
+          )}
+        </div>
+      );
+    }
+  },
   {
     accessorKey: 'name',
     header: 'Name',

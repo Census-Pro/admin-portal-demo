@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
@@ -53,6 +53,9 @@ export function OfficeContactDialog({
     isActive: true,
     order: 0
   });
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [categories, setCategories] = useState<OfficeCategory[]>([]);
 
@@ -80,8 +83,43 @@ export function OfficeContactDialog({
         isActive: officeContact.isActive ?? true,
         order: officeContact.order ?? 0
       });
+      setImagePreview(officeContact.imageUrl || '');
+      setSelectedImage(null);
+    } else {
+      setImagePreview('');
+      setSelectedImage(null);
     }
   }, [officeContact]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setImagePreview('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,8 +142,12 @@ export function OfficeContactDialog({
       };
 
       const result = officeContact
-        ? await updateOfficeContact(officeContact.id, submitData)
-        : await createOfficeContact(submitData);
+        ? await updateOfficeContact(
+            officeContact.id,
+            submitData,
+            selectedImage || undefined
+          )
+        : await createOfficeContact(submitData, selectedImage || undefined);
 
       if (result.success) {
         toast.success(result.message);
@@ -187,6 +229,48 @@ export function OfficeContactDialog({
                 }
                 placeholder="Enter email address"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="image">Profile Image</Label>
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    ref={fileInputRef}
+                    className="flex-1"
+                  />
+                  {imagePreview && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRemoveImage}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
+
+                {imagePreview && (
+                  <div className="mt-2">
+                    <Image
+                      src={imagePreview}
+                      alt="Preview"
+                      width={80}
+                      height={80}
+                      className="rounded-lg border object-cover"
+                    />
+                  </div>
+                )}
+
+                <p className="text-muted-foreground text-xs">
+                  Upload a profile image (JPG, PNG, GIF, WebP - Max 5MB)
+                </p>
+              </div>
             </div>
           </div>
 
