@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import { IconPicker } from '@/components/ui/icon-picker';
 import { toast } from 'sonner';
 import {
   QuickLinkCategory,
@@ -38,6 +39,7 @@ export function QuickLinkCategoryDialog({
     name_dzo: '',
     slug: '',
     description: '',
+    icon: '',
     order: 0,
     is_active: true
   });
@@ -51,6 +53,7 @@ export function QuickLinkCategoryDialog({
         name_dzo: category.name_dzo || '',
         slug: category.slug || '',
         description: category.description || '',
+        icon: category.icon || '',
         order: category.order || 0,
         is_active: category.is_active ?? true
       });
@@ -60,6 +63,7 @@ export function QuickLinkCategoryDialog({
         name_dzo: '',
         slug: '',
         description: '',
+        icon: '',
         order: 0,
         is_active: true
       });
@@ -176,6 +180,18 @@ export function QuickLinkCategoryDialog({
               placeholder="Brief description of this category"
               rows={3}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="icon">Icon</Label>
+            <IconPicker
+              value={formData.icon || ''}
+              onChange={(value) => setFormData({ ...formData, icon: value })}
+              placeholder="Select an icon for this category"
+            />
+            <p className="text-muted-foreground mt-1 text-xs">
+              Choose an icon to visually represent this category
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">

@@ -4,6 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { QuickLinkCategory } from '@/actions/common/cms-actions';
 import { ActionCell } from './cell-action';
+import { ICON_LIST, IconName } from '@/components/ui/icon-picker';
 
 export const createColumns = (
   handleStatusChange?: (id: string, newStatus: boolean) => void
@@ -11,18 +12,30 @@ export const createColumns = (
   {
     accessorKey: 'name',
     header: 'Name',
-    cell: ({ row }) => (
-      <div className="flex flex-col gap-1">
-        <span className="text-foreground font-medium">
-          {row.getValue('name')}
-        </span>
-        {row.original.name_dzo && (
-          <span className="text-muted-foreground text-sm">
-            {row.original.name_dzo}
-          </span>
-        )}
-      </div>
-    )
+    cell: ({ row }) => {
+      const iconName = row.original.icon as IconName;
+      const CustomIcon = iconName ? ICON_LIST[iconName] : null;
+
+      return (
+        <div className="flex items-center gap-3">
+          {CustomIcon && (
+            <span className="text-primary bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg shadow-xs transition-transform hover:scale-110">
+              <CustomIcon className="h-4 w-4" />
+            </span>
+          )}
+          <div className="flex flex-col gap-1">
+            <span className="text-foreground font-medium">
+              {row.getValue('name')}
+            </span>
+            {row.original.name_dzo && (
+              <span className="text-muted-foreground text-sm">
+                {row.original.name_dzo}
+              </span>
+            )}
+          </div>
+        </div>
+      );
+    }
   },
   {
     accessorKey: 'slug',

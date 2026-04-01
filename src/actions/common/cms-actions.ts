@@ -126,6 +126,7 @@ export interface QuickLinkCategory {
   name_dzo?: string;
   description?: string;
   slug: string;
+  icon?: string;
   is_active: boolean;
   order: number;
   created_at?: string;
