@@ -45,7 +45,6 @@ import {
   IconFilter,
   IconUpload,
   IconLock,
-  IconUnlock,
   IconEye,
   IconArrowRight,
   IconArrowLeft,
@@ -62,7 +61,7 @@ import {
   IconTrendingUp,
   IconBarChart2,
   IconPieChart,
-  IconZap,
+  IconDatabase,
   IconSun,
   IconMoon,
   IconLogout,
@@ -70,8 +69,7 @@ import {
   IconShield,
   IconAlertTriangle,
   IconRefresh,
-  IconRotateCcw,
-  IconDatabase
+  IconRotateCcw
 } from '@tabler/icons-react';
 import {
   Popover,
@@ -130,7 +128,6 @@ export const ICON_LIST = {
   minus: IconMinus,
   upload: IconUpload,
   lock: IconLock,
-  unlock: IconUnlock,
   eye: IconEye,
   copy: IconCopy,
   share: IconShare2,
@@ -169,8 +166,7 @@ export const ICON_LIST = {
   refresh: IconRefresh,
   rotate: IconRotateCcw,
   droplet: IconDroplet,
-  package: IconPackage,
-  zap: IconZap
+  package: IconPackage
 } as const;
 
 export type IconName = keyof typeof ICON_LIST;
