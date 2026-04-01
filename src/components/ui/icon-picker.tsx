@@ -69,7 +69,7 @@ import {
   IconShield,
   IconAlertTriangle,
   IconRefresh,
-  IconRotateCcw
+  IconRotate
 } from '@tabler/icons-react';
 import {
   Popover,
@@ -164,7 +164,7 @@ export const ICON_LIST = {
   shield: IconShield,
   'alert-triangle': IconAlertTriangle,
   refresh: IconRefresh,
-  rotate: IconRotateCcw,
+  rotate: IconRotate,
   droplet: IconDroplet,
   package: IconPackage
 } as const;
