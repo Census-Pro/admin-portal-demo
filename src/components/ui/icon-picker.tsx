@@ -55,17 +55,16 @@ import {
   IconChevronUp,
   IconMenu,
   IconCopy,
-  IconShare2,
+  IconShare,
   IconClock,
   IconActivity,
   IconTrendingUp,
-  IconBarChart2,
-  IconPieChart,
+  IconChartBar,
+  IconChartPie,
   IconDatabase,
   IconSun,
   IconMoon,
   IconLogout,
-  IconUserCircle,
   IconShield,
   IconAlertTriangle,
   IconRefresh,
@@ -130,7 +129,7 @@ export const ICON_LIST = {
   lock: IconLock,
   eye: IconEye,
   copy: IconCopy,
-  share: IconShare2,
+  share: IconShare,
 
   // Arrows & Navigation
   'arrow-right': IconArrowRight,
@@ -148,8 +147,8 @@ export const ICON_LIST = {
   dashboard: IconLayoutDashboard,
 
   // Data & Analytics
-  'bar-chart': IconBarChart2,
-  'pie-chart': IconPieChart,
+  'bar-chart': IconChartBar,
+  'pie-chart': IconChartPie,
   database: IconDatabase,
 
   // UI & System
@@ -160,7 +159,7 @@ export const ICON_LIST = {
   sun: IconSun,
   moon: IconMoon,
   logout: IconLogout,
-  'user-circle': IconUserCircle,
+  'user-circle': IconUser,
   shield: IconShield,
   'alert-triangle': IconAlertTriangle,
   refresh: IconRefresh,
