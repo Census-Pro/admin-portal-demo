@@ -6,10 +6,10 @@ import {
 } from '@/actions/common/cms-actions';
 import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 import { OfficeContactsTable } from './_components/office-contacts-table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CategoriesTable } from '../office-categories/_components/categories-table';
 import { AddOfficeContactButton } from './_components/add-contact-button';
 import { AddCategoryButton } from '../office-categories/_components/add-category-button';
+import { OfficeContactsTabs } from './_components/office-contacts-tabs';
 
 export const metadata = {
   title: 'Dashboard: Office Contacts'
@@ -27,30 +27,23 @@ export default async function OfficeContactsPage({
       pageTitle="Office Contacts"
       pageDescription="Manage office contact information and their categories."
     >
-      <Tabs defaultValue={defaultTab} className="space-y-2">
-        <TabsList>
-          <TabsTrigger value="contacts">Office Contacts</TabsTrigger>
-          <TabsTrigger value="categories">Contact Categories</TabsTrigger>
-        </TabsList>
-
-        {/* ── Office Contacts tab ── */}
-        <TabsContent value="contacts" className="space-y-2">
+      <OfficeContactsTabs
+        defaultValue={defaultTab}
+        contactsContent={
           <Suspense
             fallback={<DataTableSkeleton columnCount={6} rowCount={10} />}
           >
             <OfficeContactsDataWrapper addButton={<AddOfficeContactButton />} />
           </Suspense>
-        </TabsContent>
-
-        {/* ── Categories tab ── */}
-        <TabsContent value="categories" className="space-y-2">
+        }
+        categoriesContent={
           <Suspense
             fallback={<DataTableSkeleton columnCount={6} rowCount={6} />}
           >
             <CategoriesDataWrapper addButton={<AddCategoryButton />} />
           </Suspense>
-        </TabsContent>
-      </Tabs>
+        }
+      />
     </PageContainer>
   );
 }
