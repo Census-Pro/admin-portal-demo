@@ -251,6 +251,9 @@ export function SortableDataTable<TData extends { id: string }, TValue>({
       pagination: paginationState,
       sorting
     },
+    initialState: {
+      columnPinning: { right: ['actions'] }
+    },
     onPaginationChange: handlePaginationChange,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),

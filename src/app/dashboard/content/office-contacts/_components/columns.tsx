@@ -131,13 +131,16 @@ export const createColumns = (
         <ImagePreviewCell contact={row.original} />
       </div>
     ),
-    size: 80
+    size: 60
   },
   {
     accessorKey: 'name',
     header: 'Name',
     enableSorting: true,
-    cell: ({ row }) => <div className="font-medium">{row.getValue('name')}</div>
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue('name')}</div>
+    ),
+    size: 150
   },
   {
     accessorKey: 'place',
@@ -145,7 +148,8 @@ export const createColumns = (
     enableSorting: true,
     cell: ({ row }) => (
       <div className="font-medium">{row.getValue('place')}</div>
-    )
+    ),
+    size: 120
   },
   {
     accessorKey: 'contact',
@@ -158,7 +162,8 @@ export const createColumns = (
           {row.getValue('contact')}
         </div>
       </div>
-    )
+    ),
+    size: 140
   },
   {
     accessorKey: 'email',
@@ -183,7 +188,8 @@ export const createColumns = (
           )}
         </div>
       );
-    }
+    },
+    size: 180
   },
   {
     accessorKey: 'category',
@@ -200,7 +206,8 @@ export const createColumns = (
           )}
         </div>
       );
-    }
+    },
+    size: 120
   },
   {
     accessorKey: 'isActive',
@@ -213,12 +220,14 @@ export const createColumns = (
           {isActive ? 'ACTIVE' : 'INACTIVE'}
         </Badge>
       );
-    }
+    },
+    size: 100
   },
   {
     id: 'actions',
     header: 'Actions',
     enableSorting: false,
+    size: 100,
     cell: ({ row }) => <ActionCell data={row.original} />
   }
 ];
