@@ -35,7 +35,43 @@ import {
   IconInfoCircle,
   IconNews,
   IconLayoutDashboard,
-  IconChevronDown
+  IconChevronDown,
+  IconDroplet,
+  IconPackage,
+  IconTrash,
+  IconEdit,
+  IconPlus,
+  IconMinus,
+  IconFilter,
+  IconUpload,
+  IconLock,
+  IconUnlock,
+  IconEye,
+  IconArrowRight,
+  IconArrowLeft,
+  IconArrowUp,
+  IconArrowDown,
+  IconChevronLeft,
+  IconChevronRight,
+  IconChevronUp,
+  IconMenu,
+  IconCopy,
+  IconShare2,
+  IconClock,
+  IconActivity,
+  IconTrendingUp,
+  IconBarChart2,
+  IconPieChart,
+  IconZap,
+  IconSun,
+  IconMoon,
+  IconLogout,
+  IconUserCircle,
+  IconShield,
+  IconAlertTriangle,
+  IconRefresh,
+  IconRotateCcw,
+  IconDatabase
 } from '@tabler/icons-react';
 import {
   Popover,
@@ -48,39 +84,93 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Map of icon names to components
 export const ICON_LIST = {
+  // Links & Navigation
   link: IconLink,
   'external-link': IconExternalLink,
+  globe: IconGlobe,
+  home: IconHome,
+
+  // Files & Documents
   download: IconDownload,
+  'file-down': IconFile,
   'file-text': IconFileText,
   file: IconFile,
   photo: IconPhoto,
   book: IconBook,
-  map: IconMap,
-  users: IconUsers,
-  bell: IconBell,
+  books: IconBook,
+
+  // Communication
   mail: IconMail,
   phone: IconPhone,
-  globe: IconGlobe,
-  calendar: IconCalendar,
+  message: IconMessage,
+
+  // Organization & Location
+  map: IconMap,
+  users: IconUsers,
+  user: IconUser,
+  building: IconBuilding,
+
+  // Categories & Tags
+  tag: IconSquare,
+  bell: IconBell,
+
+  // Media & Entertainment
+  video: IconVideo,
+  music: IconMusic,
+  cloud: IconCloud,
+
+  // Actions & Tools
   settings: IconSettings,
   help: IconHelp,
+  search: IconSearch,
+  filter: IconFilter,
+  edit: IconEdit,
+  trash: IconTrash,
+  plus: IconPlus,
+  minus: IconMinus,
+  upload: IconUpload,
+  lock: IconLock,
+  unlock: IconUnlock,
+  eye: IconEye,
+  copy: IconCopy,
+  share: IconShare2,
+
+  // Arrows & Navigation
+  'arrow-right': IconArrowRight,
+  'arrow-left': IconArrowLeft,
+  'arrow-up': IconArrowUp,
+  'arrow-down': IconArrowDown,
+  chevron: IconChevronDown,
+
+  // Time & Status
+  clock: IconClock,
+  calendar: IconCalendar,
+  activity: IconActivity,
+  'trending-up': IconTrendingUp,
+  news: IconNews,
+  dashboard: IconLayoutDashboard,
+
+  // Data & Analytics
+  'bar-chart': IconBarChart2,
+  'pie-chart': IconPieChart,
+  database: IconDatabase,
+
+  // UI & System
   circle: IconCircle,
   square: IconSquare,
   star: IconStar,
   heart: IconHeart,
-  home: IconHome,
-  search: IconSearch,
-  user: IconUser,
-  message: IconMessage,
-  video: IconVideo,
-  music: IconMusic,
-  cloud: IconCloud,
-  check: IconCheck,
-  x: IconX,
-  building: IconBuilding,
-  info: IconInfoCircle,
-  news: IconNews,
-  dashboard: IconLayoutDashboard
+  sun: IconSun,
+  moon: IconMoon,
+  logout: IconLogout,
+  'user-circle': IconUserCircle,
+  shield: IconShield,
+  'alert-triangle': IconAlertTriangle,
+  refresh: IconRefresh,
+  rotate: IconRotateCcw,
+  droplet: IconDroplet,
+  package: IconPackage,
+  zap: IconZap
 } as const;
 
 export type IconName = keyof typeof ICON_LIST;
