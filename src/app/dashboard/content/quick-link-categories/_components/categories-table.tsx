@@ -61,7 +61,10 @@ export function CategoriesTable({ data, addButton }: CategoriesTableProps) {
     );
   };
 
-  const columns = useMemo(() => createColumns(handleStatusChange), []);
+  const columns = useMemo(
+    () => createColumns(handleStatusChange),
+    [handleStatusChange]
+  );
 
   const handleReorder = async (newOrder: QuickLinkCategory[]) => {
     const oldItems = [...items];

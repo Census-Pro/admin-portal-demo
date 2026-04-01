@@ -11,7 +11,6 @@ import {
   toggleQuickLinkCategoryStatus
 } from '@/actions/common/cms-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface ActionCellProps {
   data: QuickLinkCategory;
@@ -21,7 +20,6 @@ export function ActionCell({ data }: ActionCellProps) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const router = useRouter();
 
   const onConfirm = async () => {
     try {
@@ -30,7 +28,9 @@ export function ActionCell({ data }: ActionCellProps) {
       if (result.success) {
         toast.success(result.message);
         setDeleteOpen(false);
-        router.refresh();
+        // Dispatch custom event to trigger data refresh
+        const event = new CustomEvent('categoriesChanged');
+        window.dispatchEvent(event);
       } else {
         toast.error(result.error);
       }
@@ -46,7 +46,9 @@ export function ActionCell({ data }: ActionCellProps) {
       const result = await toggleQuickLinkCategoryStatus(data.id);
       if (result.success) {
         toast.success('Status updated successfully');
-        router.refresh();
+        // Dispatch custom event to trigger data refresh
+        const event = new CustomEvent('categoriesChanged');
+        window.dispatchEvent(event);
       } else {
         toast.error(result.error);
       }
@@ -63,7 +65,9 @@ export function ActionCell({ data }: ActionCellProps) {
         category={data}
         onSave={() => {
           setOpen(false);
-          router.refresh();
+          // Dispatch custom event to trigger data refresh
+          const event = new CustomEvent('categoriesChanged');
+          window.dispatchEvent(event);
         }}
       />
       <DeleteConfirmationDialog
