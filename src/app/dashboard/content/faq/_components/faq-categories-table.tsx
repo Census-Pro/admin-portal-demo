@@ -1,43 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable
-} from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from 'lucide-react';
-
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
-import { FaqCategoryDialog } from './faq-category-dialog';
-import { deleteFaqCategory, FaqCategory } from '@/actions/common/cms-actions';
+import { useState, useEffect, useMemo } from 'react';
+import { createFaqCategoryColumns } from './faq-category-columns';
+import { FaqCategory, updateFaqCategory } from '@/actions/common/cms-actions';
+import { SortableDataTable } from '@/components/ui/table/sortable-data-table';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+import { DataTableResetFilter } from '@/components/ui/table/data-table-reset-filter';
+import { DataTableSearch } from '@/components/ui/table/data-table-search';
+import { useFaqCategoriesTableFilters } from './use-faq-categories-table-filters';
 
 interface FaqCategoriesTableProps {
   data: FaqCategory[];
@@ -48,299 +19,107 @@ export function FaqCategoriesTable({
   data,
   addButton
 }: FaqCategoriesTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
-  const [editingCategory, setEditingCategory] = useState<FaqCategory | null>(
-    null
+  const router = useRouter();
+  const [items, setItems] = useState<FaqCategory[]>([]);
+
+  const {
+    isAnyFilterActive,
+    resetFilters,
+    searchQuery,
+    setPage,
+    setSearchQuery
+  } = useFaqCategoriesTableFilters();
+
+  useEffect(() => {
+    // Sort data by order when it changes
+    if (data && Array.isArray(data)) {
+      const sortedData = [...data].sort(
+        (a, b) => (a.order_index || 0) - (b.order_index || 0)
+      );
+      setItems(sortedData);
+    }
+  }, [data]);
+
+  // Filter data based on search query
+  const filteredData = useMemo(() => {
+    if (!searchQuery) return items;
+
+    const query = searchQuery.toLowerCase();
+    return items.filter(
+      (item) =>
+        item.name?.toLowerCase().includes(query) ||
+        item.slug?.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query) ||
+        item.status?.toLowerCase().includes(query)
+    );
+  }, [items, searchQuery]);
+
+  // Optimistic status update — mutates only the changed row, no re-sort
+  const handleStatusChange = (id: string, newStatus: boolean) => {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id
+          ? { ...item, status: newStatus ? 'active' : 'inactive' }
+          : item
+      )
+    );
+  };
+
+  const columns = useMemo(
+    () => createFaqCategoryColumns(handleStatusChange),
+    []
   );
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleEdit = (category: FaqCategory) => {
-    setEditingCategory(category);
-    setIsDialogOpen(true);
-  };
+  const handleReorder = async (newOrder: FaqCategory[]) => {
+    const oldItems = [...items];
+    setItems(newOrder);
 
-  const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this FAQ category?')) {
-      const result = await deleteFaqCategory(id);
-      if (result.success) {
-        window.location.reload();
+    try {
+      const updates = newOrder.map((item, index) =>
+        updateFaqCategory(item.id, { order_index: index })
+      );
+
+      const results = await Promise.all(updates);
+      const hasError = results.some((r) => !r.success);
+
+      if (hasError) {
+        console.error('[handleReorder] Some FAQ category order updates failed');
+        toast.error('Failed to update some FAQ category orders');
+        setItems(oldItems);
       } else {
-        alert(result.error || 'Failed to delete FAQ category');
+        toast.success('FAQ category order updated successfully');
+        // Use router.refresh() instead of full page reload
+        router.refresh();
       }
+    } catch (error) {
+      console.error('[handleReorder] Exception:', error);
+      toast.error('Error updating FAQ category order');
+      setItems(oldItems);
     }
   };
-
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-    setEditingCategory(null);
-  };
-
-  const columns: ColumnDef<FaqCategory>[] = [
-    {
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false
-    },
-    {
-      accessorKey: 'name',
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-          >
-            Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="font-medium">{row.getValue('name')}</div>
-      )
-    },
-    {
-      accessorKey: 'slug',
-      header: 'Slug',
-      cell: ({ row }) => (
-        <div className="text-muted-foreground text-sm">
-          {row.getValue('slug')}
-        </div>
-      )
-    },
-    {
-      accessorKey: 'description',
-      header: 'Description',
-      cell: ({ row }) => {
-        const description = row.getValue('description') as string;
-        return (
-          <div className="max-w-md truncate text-sm">
-            {description || 'No description'}
-          </div>
-        );
-      }
-    },
-    {
-      accessorKey: 'status',
-      header: 'Status',
-      cell: ({ row }) => {
-        const status = row.getValue('status') as string;
-        return (
-          <Badge variant={status === 'active' ? 'default' : 'secondary'}>
-            {status}
-          </Badge>
-        );
-      }
-    },
-    {
-      accessorKey: 'order_index',
-      header: 'Order',
-      cell: ({ row }) => (
-        <div className="text-center">{row.getValue('order_index')}</div>
-      )
-    },
-    {
-      accessorKey: 'created_by_name',
-      header: 'Created By',
-      cell: ({ row }) => (
-        <div className="text-muted-foreground text-sm">
-          {row.getValue('created_by_name')}
-        </div>
-      )
-    },
-    {
-      id: 'actions',
-      enableHiding: false,
-      cell: ({ row }) => {
-        const category = row.original;
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(category.id)}
-              >
-                Copy Category ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleEdit(category)}>
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => handleDelete(category.id)}
-                className="text-destructive"
-              >
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      }
-    }
-  ];
-
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection
-    }
-  });
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between py-4">
-        <div className="flex items-center space-x-2">
-          <Input
-            placeholder="Filter categories..."
-            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-            onChange={(event) =>
-              table.getColumn('name')?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <DataTableSearch
+            searchKey="FAQ categories"
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setPage={setPage}
+          />
+          <DataTableResetFilter
+            isFilterActive={isAnyFilterActive}
+            onReset={resetFilters}
           />
         </div>
-        <div className="flex items-center space-x-2">
-          {addButton}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto">
-                Columns <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        {addButton}
       </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-
-      <FaqCategoryDialog
-        isOpen={isDialogOpen}
-        onClose={handleDialogClose}
-        category={editingCategory}
+      <SortableDataTable
+        columns={columns}
+        data={filteredData}
+        totalItems={filteredData.length}
+        onReorder={handleReorder}
       />
     </div>
   );
