@@ -223,44 +223,40 @@ export function FaqCategoryDialog({
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem className="space-y-0">
-                  <div className="flex items-center justify-between rounded-lg border p-3">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm font-medium">
-                        Active Status
-                      </FormLabel>
-                      <p className="text-muted-foreground text-xs">
-                        {field.value === 'active'
-                          ? 'FAQ category will be visible and active'
-                          : 'FAQ category will be hidden and disabled'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={
-                          field.value === 'active' ? 'default' : 'secondary'
-                        }
-                        className="px-2 py-0 text-[10px]"
-                      >
-                        {field.value === 'active' ? 'ACTIVE' : 'INACTIVE'}
-                      </Badge>
-                      <Switch
-                        checked={field.value === 'active'}
-                        onCheckedChange={(checked) =>
-                          field.onChange(checked ? 'active' : 'inactive')
-                        }
-                      />
-                    </div>
-                  </div>
-                </FormItem>
-              )}
-            />
           </div>
+
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <div className="flex items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-sm font-medium">
+                    Active Status
+                  </FormLabel>
+                  <p className="text-muted-foreground text-xs">
+                    {field.value === 'active'
+                      ? 'FAQ category will be visible and active'
+                      : 'FAQ category will be hidden and disabled'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant={field.value === 'active' ? 'default' : 'secondary'}
+                    className="px-2 py-0 text-[10px]"
+                  >
+                    {field.value === 'active' ? 'ACTIVE' : 'INACTIVE'}
+                  </Badge>
+                  <Switch
+                    checked={field.value === 'active'}
+                    onCheckedChange={(checked) =>
+                      field.onChange(checked ? 'active' : 'inactive')
+                    }
+                  />
+                </div>
+              </div>
+            )}
+          />
 
           <div className="flex justify-end gap-2 border-t pt-4">
             <Button

@@ -111,6 +111,17 @@ function FaqsDataWrapper({ addButton }: { addButton?: React.ReactNode }) {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const handleFaqsChange = () => {
+      fetchData();
+    };
+
+    window.addEventListener('faqsChanged', handleFaqsChange);
+    return () => {
+      window.removeEventListener('faqsChanged', handleFaqsChange);
+    };
+  }, []);
+
   if (loading) {
     return <DataTableSkeleton columnCount={6} rowCount={10} />;
   }

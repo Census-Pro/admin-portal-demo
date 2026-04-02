@@ -2496,7 +2496,8 @@ export async function toggleOfficeContactStatus(id: string) {
 export async function getFaqs() {
   try {
     const headers = await instance();
-    const url = `${COMMON_SERVICE_URL}/faq`;
+    // Request all FAQs with a large limit to avoid pagination issues
+    const url = `${COMMON_SERVICE_URL}/faq?limit=1000&sortBy=order_index&sortOrder=ASC`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -2513,7 +2514,12 @@ export async function getFaqs() {
       };
     }
 
-    const data = await response.json();
+    const result = await response.json();
+
+    // Backend returns paginated response: { data: [...], meta: {...} }
+    // Extract the actual FAQ array from the data property
+    const data = result.data || result || [];
+
     return { success: true, data };
   } catch (error) {
     console.error('[getFaqs] Error:', error);
@@ -2580,6 +2586,34 @@ export async function createFaq(
   } catch (error) {
     console.error('[createFaq] Error:', error);
     return { success: false, error: 'Failed to create FAQ' };
+  }
+}
+
+export async function getFaq(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/faq/${id}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error('[getFaq] API Error:', response.statusText);
+      return {
+        success: false,
+        error: 'Failed to fetch FAQ',
+        data: null
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getFaq] Error:', error);
+    return { success: false, error: 'Failed to fetch FAQ', data: null };
   }
 }
 
@@ -2654,6 +2688,80 @@ export async function deleteFaq(id: string) {
   } catch (error) {
     console.error('[deleteFaq] Error:', error);
     return { success: false, error: 'Failed to delete FAQ' };
+  }
+}
+
+export async function reorderFaqs(faqIds: string[]) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/faq/reorder`;
+
+    console.log('[reorderFaqs] Reordering FAQs:', faqIds);
+    console.log(
+      '[reorderFaqs] FAQ IDs types:',
+      faqIds.map((id) => typeof id)
+    );
+    console.log(
+      '[reorderFaqs] FAQ IDs format check:',
+      faqIds.map((id) => ({
+        id,
+        isValidUUID:
+          /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+            id
+          )
+      }))
+    );
+
+    // Send as object with faq_ids property as expected by the DTO
+    const requestBody = { faq_ids: faqIds };
+    console.log(
+      '[reorderFaqs] Request body:',
+      JSON.stringify(requestBody, null, 2)
+    );
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    console.log('[reorderFaqs] Response status:', response.status);
+    console.log('[reorderFaqs] Response headers:', response.headers);
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to reorder FAQs';
+      let errorDetails = null;
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+        errorDetails = errorData;
+        console.log('[reorderFaqs] Error response:', errorData);
+      } catch (e) {
+        // Response might not be JSON
+        errorMessage = `Server returned ${response.status}: ${response.statusText}`;
+        console.log(
+          '[reorderFaqs] Non-JSON error response:',
+          response.statusText
+        );
+      }
+      console.error('[reorderFaqs] Error:', errorMessage, errorDetails);
+      return {
+        success: false,
+        error: errorMessage,
+        details: errorDetails
+      };
+    }
+
+    // Backend returns void, no need to parse response body
+    revalidatePath('/dashboard/content/faq');
+    console.log('[reorderFaqs] Success');
+    return { success: true, message: 'FAQs reordered successfully' };
+  } catch (error) {
+    console.error('[reorderFaqs] Exception:', error);
+    return { success: false, error: 'Failed to reorder FAQs' };
   }
 }
 

@@ -26,6 +26,8 @@ export function ActionCell({ data }: ActionCellProps) {
       if (result.success) {
         toast.success('FAQ deleted successfully');
         setDeleteOpen(false);
+        // Trigger data refresh
+        window.dispatchEvent(new CustomEvent('faqsChanged'));
         router.refresh();
       } else {
         toast.error(result.error);
@@ -45,6 +47,8 @@ export function ActionCell({ data }: ActionCellProps) {
         toast.success(
           `FAQ ${newStatus === 'active' ? 'activated' : 'deactivated'}`
         );
+        // Trigger data refresh
+        window.dispatchEvent(new CustomEvent('faqsChanged'));
         router.refresh();
       } else {
         toast.error(result.error);

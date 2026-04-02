@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { createColumns } from './columns';
-import { Faq, updateFaq } from '@/actions/common/cms-actions';
+import { Faq, reorderFaqs } from '@/actions/common/cms-actions';
 import { SortableDataTable } from '@/components/ui/table/sortable-data-table';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -65,24 +65,26 @@ export function FaqsTable({ data, addButton }: FaqsTableProps) {
   const columns = useMemo(() => createColumns(handleStatusChange), []);
 
   const handleReorder = async (newOrder: Faq[]) => {
+    console.log('[handleReorder] Starting reorder...');
+    console.log('[handleReorder] New order count:', newOrder.length);
+
     const oldItems = [...items];
     setItems(newOrder);
 
     try {
-      const updates = newOrder.map((item, index) =>
-        updateFaq(item.id, { order_index: index })
-      );
+      // Use bulk reorder API for better performance
+      const faqIds = newOrder.map((item) => item.id);
+      console.log('[handleReorder] FAQ IDs to reorder:', faqIds);
 
-      const results = await Promise.all(updates);
-      const hasError = results.some((r) => !r.success);
+      const result = await reorderFaqs(faqIds);
+      console.log('[handleReorder] Result:', result);
 
-      if (hasError) {
-        console.error('[handleReorder] Some FAQ order updates failed');
-        toast.error('Failed to update some FAQ orders');
+      if (!result.success) {
+        console.error('[handleReorder] FAQ order update failed:', result.error);
+        toast.error(result.error || 'Failed to update FAQ order');
         setItems(oldItems);
       } else {
         toast.success('FAQ order updated successfully');
-        // Use router.refresh() instead of full page reload
         router.refresh();
       }
     } catch (error) {
