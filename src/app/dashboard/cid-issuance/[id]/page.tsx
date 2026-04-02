@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   IconArrowLeft,
   IconUser,
@@ -19,7 +18,8 @@ import {
   IconUsers,
   IconCheck,
   IconX,
-  IconShieldCheck
+  IconShieldCheck,
+  IconScan
 } from '@tabler/icons-react';
 import { getStatusColor, getTypeColor } from '@/lib/status-utils';
 
@@ -41,6 +41,23 @@ const getApplicationDetails = (id: string) => {
   };
 
   const data = dummyData[id] || { status: 'SUBMITTED', name: 'Tshering Dorji' };
+
+  // Simulate biometric similarity scores based on application ID
+  const getBiometricSimilarity = (appId: string) => {
+    const idNum = parseInt(appId) || 1;
+    return {
+      fingerprint: Math.min(95, 80 + (idNum % 15)),
+      facial: Math.min(98, 85 + (idNum % 13)),
+      iris: Math.min(97, 88 + (idNum % 10)),
+      overall: Math.min(96, 84 + (idNum % 12)),
+      status:
+        idNum % 3 === 0
+          ? 'verified'
+          : idNum % 3 === 1
+            ? 'pending'
+            : 'match_found'
+    };
+  };
 
   return {
     id: id,
@@ -67,30 +84,13 @@ const getApplicationDetails = (id: string) => {
     present_address: 'Kabesa, Chang Gewog, Thimphu',
     permanent_address: 'Kabesa, Chang Gewog, Thimphu',
     remarks: 'First time CID application. All documents verified.',
+    biometric_similarity: getBiometricSimilarity(id),
     supporting_documents: [
-      {
-        name: 'Birth Certificate',
-        status: 'Uploaded',
-        url: '/samepleCeritificate.pdf',
-        type: 'pdf'
-      },
-      {
-        name: 'Census Certificate',
-        status: 'Uploaded',
-        url: '/sample_census_certificate.pdf',
-        type: 'pdf'
-      },
       {
         name: 'Passport Photo',
         status: 'Uploaded',
         url: '/sampleCid.png',
         type: 'image'
-      },
-      {
-        name: 'Parent CID Copies',
-        status: 'Uploaded',
-        url: '/sample_parent_cid_copies.pdf',
-        type: 'pdf'
       }
     ]
   };
@@ -104,8 +104,6 @@ export default function ApplicationDetailPage() {
   const application = getApplicationDetails(applicationId);
   const statusStyle = getStatusColor(application.status);
   const typeStyle = getTypeColor(application.application_type);
-
-  const [activeTab, setActiveTab] = useState('birth_certificate');
 
   const renderActionButtons = () => {
     switch (application.status) {
@@ -413,10 +411,57 @@ export default function ApplicationDetailPage() {
                       </div>
                     )}
                   </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-3 pt-4">{renderActionButtons()}</div>
                 </div>
+
+                <Separator />
+
+                {/* Biometric Similarities Section */}
+                <div className="space-y-3">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold">
+                    <IconScan className="h-4 w-4" />
+                    Biometric Similarities
+                  </h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Facial Recognition
+                      </Label>
+                      <div className="flex flex-1 items-center gap-3">
+                        <div className="flex-1">
+                          <div className="bg-muted h-1.5 overflow-hidden rounded-full">
+                            <div
+                              className="bg-primary h-full transition-all"
+                              style={{
+                                width: `${application.biometric_similarity?.facial}%`
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <p className="text-sm font-semibold tabular-nums">
+                          {application.biometric_similarity?.facial}%
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Confidence Level
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {(application.biometric_similarity?.facial || 0) >= 90
+                          ? 'High'
+                          : (application.biometric_similarity?.facial || 0) >=
+                              75
+                            ? 'Medium'
+                            : 'Low'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">{renderActionButtons()}</div>
               </CardContent>
             </Card>
           </div>
@@ -432,93 +477,20 @@ export default function ApplicationDetailPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Tabs
-                  value={activeTab}
-                  onValueChange={setActiveTab}
-                  className="w-full"
-                >
-                  <TabsList className="mb-4 grid w-full grid-cols-2 lg:grid-cols-4">
-                    <TabsTrigger value="birth_certificate" className="text-xs">
-                      Birth Certificate
-                    </TabsTrigger>
-                    <TabsTrigger value="census_certificate" className="text-xs">
-                      Census Certificate
-                    </TabsTrigger>
-                    <TabsTrigger value="passport_photo" className="text-xs">
-                      Passport Photo
-                    </TabsTrigger>
-                    <TabsTrigger value="parent_cid" className="text-xs">
-                      Parent CID Copies
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="birth_certificate" className="mt-0">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">Birth Certificate</p>
-                        <Badge variant="secondary">PDF</Badge>
-                      </div>
-                      <div className="border-muted overflow-hidden rounded-lg border">
-                        <iframe
-                          src="/samepleCeritificate.pdf"
-                          className="h-[600px] w-full"
-                          title="Birth Certificate"
-                        />
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="census_certificate" className="mt-0">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">
-                          Census Certificate
-                        </p>
-                        <Badge variant="secondary">PDF</Badge>
-                      </div>
-                      <div className="border-muted overflow-hidden rounded-lg border">
-                        <iframe
-                          src="/sample_census_certificate.pdf"
-                          className="h-[600px] w-full"
-                          title="Census Certificate"
-                        />
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="passport_photo" className="mt-0">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">Passport Photo</p>
-                        <Badge variant="secondary">IMAGE</Badge>
-                      </div>
-                      <div className="border-muted overflow-hidden rounded-lg border">
-                        <img
-                          src="/sampleCid.png"
-                          alt="Passport Photo"
-                          className="h-auto w-full object-contain"
-                          style={{ maxHeight: '600px' }}
-                        />
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="parent_cid" className="mt-0">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">Parent CID Copies</p>
-                        <Badge variant="secondary">PDF</Badge>
-                      </div>
-                      <div className="border-muted overflow-hidden rounded-lg border">
-                        <iframe
-                          src="/sample_parent_cid_copies.pdf"
-                          className="h-[600px] w-full"
-                          title="Parent CID Copies"
-                        />
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">Passport Photo</p>
+                    <Badge variant="secondary">IMAGE</Badge>
+                  </div>
+                  <div className="border-muted overflow-hidden rounded-lg border">
+                    <img
+                      src="/sampleCid.png"
+                      alt="Passport Photo"
+                      className="h-auto w-full object-contain"
+                      style={{ maxHeight: '600px' }}
+                    />
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
