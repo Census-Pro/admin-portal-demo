@@ -37,21 +37,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { FaqDialog } from './faq-dialog';
-import { deleteFaq } from '@/actions/common/cms-actions';
-
-interface Faq {
-  id: string;
-  question: string;
-  answer: string;
-  category?: {
-    id: string;
-    name: string;
-  };
-  order_index: number;
-  status: 'active' | 'inactive';
-  created_by_name: string;
-  created_at: string;
-}
+import { deleteFaq, Faq } from '@/actions/common/cms-actions';
 
 interface FaqsTableProps {
   data: Faq[];
