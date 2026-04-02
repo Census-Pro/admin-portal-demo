@@ -30,6 +30,7 @@ import {
   updateFaqCategory
 } from '@/actions/common/cms-actions';
 import { FaqCategory } from '@/actions/common/cms-actions';
+import { toast } from 'sonner';
 
 const faqCategorySchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -112,15 +113,20 @@ export function FaqCategoryDialog({
       }
 
       if (result.success) {
+        toast.success(
+          category
+            ? 'FAQ category updated successfully'
+            : 'FAQ category created successfully'
+        );
         // Trigger event to refresh categories table
         window.dispatchEvent(new Event('faqCategoriesChanged'));
         onClose();
       } else {
-        alert(result.error || 'Failed to save FAQ category');
+        toast.error(result.error || 'Failed to save FAQ category');
       }
     } catch (error) {
       console.error('Failed to save FAQ category:', error);
-      alert('Failed to save FAQ category');
+      toast.error('Failed to save FAQ category');
     } finally {
       setIsSubmitting(false);
     }

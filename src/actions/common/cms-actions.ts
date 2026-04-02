@@ -2664,7 +2664,8 @@ export async function deleteFaq(id: string) {
 export async function getFaqCategories() {
   try {
     const headers = await instance();
-    const url = `${COMMON_SERVICE_URL}/faq-categories`;
+    // Fetch with pagination - get up to 1000 categories
+    const url = `${COMMON_SERVICE_URL}/faq-categories?limit=1000&page=1`;
 
     const response = await fetch(url, {
       method: 'GET',
@@ -2681,8 +2682,9 @@ export async function getFaqCategories() {
       };
     }
 
-    const data = await response.json();
-    return { success: true, data };
+    const result = await response.json();
+    // Extract data array from paginated response
+    return { success: true, data: result.data || [] };
   } catch (error) {
     console.error('[getFaqCategories] Error:', error);
     return {
@@ -2766,10 +2768,16 @@ export async function createFaqCategory(
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorMessage = 'Failed to create FAQ category';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        errorMessage = response.statusText || errorMessage;
+      }
       return {
         success: false,
-        error: errorData.message || 'Failed to create FAQ category'
+        error: errorMessage
       };
     }
 
