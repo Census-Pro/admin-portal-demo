@@ -35,8 +35,8 @@ const faqCategorySchema = z.object({
   name: z.string().min(1, 'Name is required'),
   slug: z.string().min(1, 'Slug is required'),
   description: z.string().optional(),
-  order_index: z.number().min(0).default(0),
-  status: z.enum(['active', 'inactive']).default('active')
+  order_index: z.number().min(0),
+  status: z.enum(['active', 'inactive'])
 });
 
 type FaqCategoryFormData = z.infer<typeof faqCategorySchema>;
