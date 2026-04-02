@@ -180,6 +180,37 @@ export interface OfficeContact {
   updatedAt?: string;
 }
 
+export interface FaqCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  order_index: number;
+  status: 'active' | 'inactive';
+  created_by_id: string;
+  created_by_name: string;
+  updated_by_id?: string;
+  updated_by_name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Faq {
+  id: string;
+  question: string;
+  answer: string;
+  category_id?: string;
+  category?: FaqCategory;
+  order_index: number;
+  status: 'active' | 'inactive';
+  created_by_id: string;
+  created_by_name: string;
+  updated_by_id?: string;
+  updated_by_name?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // ============================================================================
 // ANNOUNCEMENTS ACTIONS
 // ============================================================================
@@ -2455,5 +2486,380 @@ export async function toggleOfficeContactStatus(id: string) {
   } catch (error) {
     console.error('[toggleOfficeContactStatus] Error:', error);
     return { success: false, error: 'Failed to update status' };
+  }
+}
+
+// ============================================================================
+// FAQ ACTIONS
+// ============================================================================
+
+export async function getFaqs() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/faq`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error('[getFaqs] API Error:', response.statusText);
+      return {
+        success: false,
+        error: 'Failed to fetch FAQs',
+        data: []
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getFaqs] Error:', error);
+    return { success: false, error: 'Failed to fetch FAQs', data: [] };
+  }
+}
+
+export async function createFaq(
+  data: Omit<
+    Faq,
+    'id' | 'created_by_id' | 'created_by_name' | 'createdAt' | 'updatedAt'
+  >
+) {
+  try {
+    const headers = await instance();
+    const session = await auth();
+    const url = `${COMMON_SERVICE_URL}/faq`;
+
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      return {
+        success: false,
+        error: 'User not authenticated'
+      };
+    }
+
+    const cleanedData = {
+      question: data.question,
+      answer: data.answer,
+      category_id: data.category_id || null,
+      order_index: data.order_index || 0,
+      status: data.status || 'active',
+      created_by_id: currentUser.id,
+      created_by_name:
+        currentUser.fullName || currentUser.cidNo || 'Unknown User'
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cleanedData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create FAQ'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/faq');
+
+    return {
+      success: true,
+      message: 'FAQ created successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createFaq] Error:', error);
+    return { success: false, error: 'Failed to create FAQ' };
+  }
+}
+
+export async function updateFaq(id: string, data: Partial<Faq>) {
+  try {
+    const headers = await instance();
+    const session = await auth();
+    const url = `${COMMON_SERVICE_URL}/faq/${id}`;
+
+    const cleanedData: any = {};
+
+    if (data.question !== undefined) cleanedData.question = data.question;
+    if (data.answer !== undefined) cleanedData.answer = data.answer;
+    if (data.category_id !== undefined)
+      cleanedData.category_id = data.category_id;
+    if (data.order_index !== undefined)
+      cleanedData.order_index = data.order_index;
+    if (data.status !== undefined) cleanedData.status = data.status;
+
+    cleanedData.updated_by_id =
+      session?.user?.id || session?.user?.sessionId || undefined;
+    cleanedData.updated_by_name =
+      session?.user?.fullName || session?.user?.name || 'Admin User';
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cleanedData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update FAQ'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/faq');
+
+    return {
+      success: true,
+      message: 'FAQ updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateFaq] Error:', error);
+    return { success: false, error: 'Failed to update FAQ' };
+  }
+}
+
+export async function deleteFaq(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/faq/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to delete FAQ' };
+    }
+
+    revalidatePath('/dashboard/content/faq');
+    return { success: true, message: 'FAQ deleted successfully' };
+  } catch (error) {
+    console.error('[deleteFaq] Error:', error);
+    return { success: false, error: 'Failed to delete FAQ' };
+  }
+}
+
+// ============================================================================
+// FAQ CATEGORIES ACTIONS
+// ============================================================================
+
+export async function getFaqCategories() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/faq-categories`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error('[getFaqCategories] API Error:', response.statusText);
+      return {
+        success: false,
+        error: 'Failed to fetch FAQ categories',
+        data: []
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getFaqCategories] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch FAQ categories',
+      data: []
+    };
+  }
+}
+
+export async function getActiveFaqCategories() {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/faq-categories/active`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      console.error('[getActiveFaqCategories] API Error:', response.statusText);
+      return {
+        success: false,
+        error: 'Failed to fetch active FAQ categories',
+        data: []
+      };
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('[getActiveFaqCategories] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to fetch active FAQ categories',
+      data: []
+    };
+  }
+}
+
+export async function createFaqCategory(
+  data: Omit<
+    FaqCategory,
+    'id' | 'created_by_id' | 'created_by_name' | 'createdAt' | 'updatedAt'
+  >
+) {
+  try {
+    const headers = await instance();
+    const session = await auth();
+    const url = `${COMMON_SERVICE_URL}/faq-categories`;
+
+    const currentUser = session?.user;
+
+    if (!currentUser) {
+      return {
+        success: false,
+        error: 'User not authenticated'
+      };
+    }
+
+    const cleanedData = {
+      name: data.name,
+      slug: data.slug,
+      description: data.description || null,
+      order_index: data.order_index || 0,
+      status: data.status || 'active',
+      created_by_id: currentUser.id,
+      created_by_name:
+        currentUser.fullName || currentUser.cidNo || 'Unknown User'
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cleanedData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to create FAQ category'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/faq');
+
+    return {
+      success: true,
+      message: 'FAQ category created successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[createFaqCategory] Error:', error);
+    return { success: false, error: 'Failed to create FAQ category' };
+  }
+}
+
+export async function updateFaqCategory(
+  id: string,
+  data: Partial<FaqCategory>
+) {
+  try {
+    const headers = await instance();
+    const session = await auth();
+    const url = `${COMMON_SERVICE_URL}/faq-categories/${id}`;
+
+    const cleanedData: any = {};
+
+    if (data.name !== undefined) cleanedData.name = data.name;
+    if (data.slug !== undefined) cleanedData.slug = data.slug;
+    if (data.description !== undefined)
+      cleanedData.description = data.description;
+    if (data.order_index !== undefined)
+      cleanedData.order_index = data.order_index;
+    if (data.status !== undefined) cleanedData.status = data.status;
+
+    cleanedData.updated_by_id =
+      session?.user?.id || session?.user?.sessionId || undefined;
+    cleanedData.updated_by_name =
+      session?.user?.fullName || session?.user?.name || 'Admin User';
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cleanedData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        success: false,
+        error: errorData.message || 'Failed to update FAQ category'
+      };
+    }
+
+    const result = await response.json();
+    revalidatePath('/dashboard/content/faq');
+
+    return {
+      success: true,
+      message: 'FAQ category updated successfully',
+      data: result
+    };
+  } catch (error) {
+    console.error('[updateFaqCategory] Error:', error);
+    return { success: false, error: 'Failed to update FAQ category' };
+  }
+}
+
+export async function deleteFaqCategory(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${COMMON_SERVICE_URL}/faq-categories/${id}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers
+    });
+
+    if (!response.ok) {
+      return { success: false, error: 'Failed to delete FAQ category' };
+    }
+
+    revalidatePath('/dashboard/content/faq');
+    return { success: true, message: 'FAQ category deleted successfully' };
+  } catch (error) {
+    console.error('[deleteFaqCategory] Error:', error);
+    return { success: false, error: 'Failed to delete FAQ category' };
   }
 }
