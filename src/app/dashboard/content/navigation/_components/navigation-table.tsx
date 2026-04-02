@@ -15,9 +15,10 @@ import { useNavigationTableFilters } from './use-navigation-table-filters';
 
 interface NavigationTableProps {
   data: NavigationItem[];
+  addButton?: React.ReactNode;
 }
 
-export function NavigationTable({ data }: NavigationTableProps) {
+export function NavigationTable({ data, addButton }: NavigationTableProps) {
   const router = useRouter();
   const [items, setItems] = useState(data);
 
@@ -87,16 +88,19 @@ export function NavigationTable({ data }: NavigationTableProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-4">
-        <DataTableSearch
-          searchKey="navigation"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          setPage={setPage}
-        />
-        <DataTableResetFilter
-          isFilterActive={isAnyFilterActive}
-          onReset={resetFilters}
-        />
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <DataTableSearch
+            searchKey="navigation"
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setPage={setPage}
+          />
+          <DataTableResetFilter
+            isFilterActive={isAnyFilterActive}
+            onReset={resetFilters}
+          />
+        </div>
+        {addButton}
       </div>
       <SortableDataTable
         columns={columns}

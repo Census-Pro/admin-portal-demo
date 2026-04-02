@@ -9,9 +9,10 @@ import { usePagesTableFilters } from './use-pages-table-filters';
 
 interface PagesTableProps {
   data: CmsPage[];
+  addButton?: React.ReactNode;
 }
 
-export function PagesTable({ data }: PagesTableProps) {
+export function PagesTable({ data, addButton }: PagesTableProps) {
   const {
     isAnyFilterActive,
     resetFilters,
@@ -39,16 +40,19 @@ export function PagesTable({ data }: PagesTableProps) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-4">
-        <DataTableSearch
-          searchKey="pages"
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          setPage={setPage}
-        />
-        <DataTableResetFilter
-          isFilterActive={isAnyFilterActive}
-          onReset={resetFilters}
-        />
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <DataTableSearch
+            searchKey="pages"
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            setPage={setPage}
+          />
+          <DataTableResetFilter
+            isFilterActive={isAnyFilterActive}
+            onReset={resetFilters}
+          />
+        </div>
+        {addButton}
       </div>
       <DataTable
         columns={columns}

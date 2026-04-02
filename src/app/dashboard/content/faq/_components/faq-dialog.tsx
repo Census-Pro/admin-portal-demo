@@ -8,7 +8,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
@@ -24,6 +23,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 import {
   Select,
   SelectContent,
@@ -123,13 +124,16 @@ export function FaqDialog({ isOpen, onClose, faq }: FaqDialogProps) {
       }
 
       if (result.success) {
+        toast.success(
+          faq ? 'FAQ updated successfully' : 'FAQ created successfully'
+        );
         window.location.reload();
       } else {
-        alert(result.error || 'Failed to save FAQ');
+        toast.error(result.error || 'Failed to save FAQ');
       }
     } catch (error) {
       console.error('Failed to save FAQ:', error);
-      alert('Failed to save FAQ');
+      toast.error('Failed to save FAQ');
     } finally {
       setIsSubmitting(false);
     }
@@ -198,7 +202,6 @@ export function FaqDialog({ isOpen, onClose, faq }: FaqDialogProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">No Category</SelectItem>
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}
@@ -211,68 +214,79 @@ export function FaqDialog({ isOpen, onClose, faq }: FaqDialogProps) {
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="order_index"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Order</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
+            <FormField
+              control={form.control}
+              name="order_index"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Order</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value) || 0)
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>Display order (0 = first)</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem className="space-y-0">
+                  <div className="flex items-center justify-between rounded-lg border p-3">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm font-medium">
+                        Active Status
+                      </FormLabel>
+                      <p className="text-muted-foreground text-xs">
+                        {field.value === 'active'
+                          ? 'FAQ will be visible and active'
+                          : 'FAQ will be hidden and disabled'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          field.value === 'active' ? 'default' : 'secondary'
+                        }
+                        className="px-2 py-0 text-[10px]"
+                      >
+                        {field.value === 'active' ? 'ACTIVE' : 'INACTIVE'}
+                      </Badge>
+                      <Switch
+                        checked={field.value === 'active'}
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked ? 'active' : 'inactive')
                         }
                       />
-                    </FormControl>
-                    <FormDescription>Display order (0 = first)</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    </div>
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
 
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col items-start space-y-2">
-                    <FormLabel>Status</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          checked={field.value === 'active'}
-                          onCheckedChange={(checked) =>
-                            field.onChange(checked ? 'active' : 'inactive')
-                          }
-                        />
-                        <span className="text-muted-foreground text-sm">
-                          {field.value === 'active' ? 'Active' : 'Inactive'}
-                        </span>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : faq ? 'Update' : 'Create'}
-              </Button>
-            </DialogFooter>
+          <div className="flex justify-end gap-2 border-t pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : faq ? 'Update' : 'Create'}
+            </Button>
           </div>
         </Form>
       </DialogContent>

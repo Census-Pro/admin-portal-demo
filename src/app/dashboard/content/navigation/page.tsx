@@ -18,7 +18,6 @@ export default async function NavigationPage({
     <PageContainer
       pageTitle="Navigation Links (NavLinks)"
       pageDescription="Manage main navigation menu items. Each nav item can have sub-links (content pages) as dropdowns."
-      pageHeaderAction={<AddNavigationButton />}
     >
       <div className="space-y-4">
         <Suspense
@@ -44,5 +43,5 @@ async function NavigationDataWrapper() {
 
   const items = result.data || [];
 
-  return <NavigationTable data={items} />;
+  return <NavigationTable data={items} addButton={<AddNavigationButton />} />;
 }

@@ -45,6 +45,30 @@ export const createFaqCategoryColumns = (
     }
   },
   {
+    accessorKey: 'created_by_name',
+    header: 'Created By',
+    cell: ({ row }) => {
+      const createdBy = row.getValue('created_by_name') as string;
+      return (
+        <span className="text-muted-foreground text-sm">
+          {createdBy || '—'}
+        </span>
+      );
+    }
+  },
+  {
+    accessorKey: 'updated_by_name',
+    header: 'Updated By',
+    cell: ({ row }) => {
+      const updatedBy = row.getValue('updated_by_name') as string;
+      return (
+        <span className="text-muted-foreground text-sm">
+          {updatedBy || '—'}
+        </span>
+      );
+    }
+  },
+  {
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {

@@ -8,7 +8,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
@@ -25,6 +24,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import {
   createFaqCategory,
   updateFaqCategory
@@ -201,68 +201,79 @@ export function FaqCategoryDialog({
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="order_index"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Order</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="0"
-                        placeholder="0"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value) || 0)
+            <FormField
+              control={form.control}
+              name="order_index"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Order</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value) || 0)
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>Display order (0 = first)</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem className="space-y-0">
+                  <div className="flex items-center justify-between rounded-lg border p-3">
+                    <div className="space-y-0.5">
+                      <FormLabel className="text-sm font-medium">
+                        Active Status
+                      </FormLabel>
+                      <p className="text-muted-foreground text-xs">
+                        {field.value === 'active'
+                          ? 'FAQ category will be visible and active'
+                          : 'FAQ category will be hidden and disabled'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          field.value === 'active' ? 'default' : 'secondary'
+                        }
+                        className="px-2 py-0 text-[10px]"
+                      >
+                        {field.value === 'active' ? 'ACTIVE' : 'INACTIVE'}
+                      </Badge>
+                      <Switch
+                        checked={field.value === 'active'}
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked ? 'active' : 'inactive')
                         }
                       />
-                    </FormControl>
-                    <FormDescription>Display order (0 = first)</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    </div>
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
 
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col items-start space-y-2">
-                    <FormLabel>Status</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          checked={field.value === 'active'}
-                          onCheckedChange={(checked) =>
-                            field.onChange(checked ? 'active' : 'inactive')
-                          }
-                        />
-                        <span className="text-muted-foreground text-sm">
-                          {field.value === 'active' ? 'Active' : 'Inactive'}
-                        </span>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : category ? 'Update' : 'Create'}
-              </Button>
-            </DialogFooter>
+          <div className="flex justify-end gap-2 border-t pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Saving...' : category ? 'Update' : 'Create'}
+            </Button>
           </div>
         </Form>
       </DialogContent>

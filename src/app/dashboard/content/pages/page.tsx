@@ -18,7 +18,6 @@ export default async function ContentPage({
     <PageContainer
       pageTitle="Content Pages"
       pageDescription="Manage content pages for the portal."
-      pageHeaderAction={<AddPageButton />}
     >
       <div className="space-y-4">
         <Suspense
@@ -44,5 +43,5 @@ async function PagesDataWrapper() {
 
   const pages = result.data || [];
 
-  return <PagesTable data={pages} />;
+  return <PagesTable data={pages} addButton={<AddPageButton />} />;
 }
