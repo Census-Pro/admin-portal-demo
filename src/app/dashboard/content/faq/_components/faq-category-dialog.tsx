@@ -140,8 +140,8 @@ export function FaqCategoryDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <Form form={form} onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -257,7 +257,7 @@ export function FaqCategoryDialog({
                 {isSubmitting ? 'Saving...' : category ? 'Update' : 'Create'}
               </Button>
             </DialogFooter>
-          </form>
+          </div>
         </Form>
       </DialogContent>
     </Dialog>

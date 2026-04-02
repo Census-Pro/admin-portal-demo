@@ -55,7 +55,7 @@ function ImagePreviewCell({ contact }: { contact: OfficeContact }) {
           aria-label={`Preview office contact image for ${contact.name}`}
           className="bg-muted group focus-visible:ring-ring relative flex h-12 w-12 cursor-zoom-in items-center justify-center overflow-hidden rounded border transition-all hover:scale-105 hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/no-noninteractive-element-interactions */}
           <img
             src={imageUrl}
             alt={
@@ -88,6 +88,7 @@ function ImagePreviewCell({ contact }: { contact: OfficeContact }) {
       >
         <div className="flex flex-col">
           <div className="bg-muted flex items-center justify-center border-b p-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={imageUrl}
               alt={

@@ -37,8 +37,8 @@ const subLinkSchema = z.object({
   label: z.string().min(1, 'Label is required').max(255),
   description: z.string().optional().or(z.literal('')),
   icon: z.string().optional().or(z.literal('')),
-  order: z.coerce.number().min(0).default(0),
-  status: z.enum(['active', 'inactive']).default('active')
+  order: z.coerce.number().min(0),
+  status: z.enum(['active', 'inactive'])
 });
 
 type SubLinkFormData = z.infer<typeof subLinkSchema>;

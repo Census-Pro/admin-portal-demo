@@ -43,8 +43,8 @@ const faqSchema = z.object({
   question: z.string().min(1, 'Question is required'),
   answer: z.string().min(1, 'Answer is required'),
   category_id: z.string().optional(),
-  order_index: z.number().min(0).default(0),
-  status: z.enum(['active', 'inactive']).default('active')
+  order_index: z.number().min(0),
+  status: z.enum(['active', 'inactive'])
 });
 
 type FaqFormData = z.infer<typeof faqSchema>;
@@ -147,8 +147,8 @@ export function FaqDialog({ isOpen, onClose, faq }: FaqDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <Form form={form} onSubmit={form.handleSubmit(onSubmit)}>
+          <div className="space-y-4">
             <FormField
               control={form.control}
               name="question"
@@ -273,7 +273,7 @@ export function FaqDialog({ isOpen, onClose, faq }: FaqDialogProps) {
                 {isSubmitting ? 'Saving...' : faq ? 'Update' : 'Create'}
               </Button>
             </DialogFooter>
-          </form>
+          </div>
         </Form>
       </DialogContent>
     </Dialog>
