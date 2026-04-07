@@ -99,7 +99,7 @@ export function useFilteredNavItems(items: NavItem[]) {
 
   // Filter items synchronously (all client-side)
   const filteredItems = useMemo(() => {
-    if (status === 'loading' || !session) {
+    if (status === 'loading') {
       return [];
     }
 
@@ -129,10 +129,18 @@ export function useFilteredNavItems(items: NavItem[]) {
         if (item.items && item.items.length > 0) {
           // Helper: subject-first logic for child items
           const checkChildAccess = (childItem: NavItem): boolean => {
+            // If no session, only show items with empty permissions (public items)
+            if (!session) {
+              return (
+                !childItem.access?.permissions ||
+                childItem.access.permissions.length === 0
+              );
+            }
+
             if (childItem.subject) {
               const subjectAccess = hasSubjectAccess(childItem.subject);
               if (subjectAccess) return true;
-              // Subject check failed — fall back to explicit permission check
+              // Subject check failed - fall back to explicit permission check
             }
             return checkItemAccess(childItem.access);
           };
@@ -180,9 +188,16 @@ export function useFilteredNavItems(items: NavItem[]) {
           return false;
         }
 
-        // SUPER_ADMIN bypass — sees everything
+        // SUPER_ADMIN bypass - sees everything
         if (user?.roleType === 'SUPER_ADMIN') {
           return true;
+        }
+
+        // If no session, only show items with empty permissions (public items)
+        if (!session) {
+          return (
+            !item.access?.permissions || item.access.permissions.length === 0
+          );
         }
 
         // For parent items (originally had children): show only if there are accessible non-header children
@@ -197,7 +212,7 @@ export function useFilteredNavItems(items: NavItem[]) {
         if (item.subject) {
           const subjectAccess = hasSubjectAccess(item.subject);
           if (subjectAccess) return true;
-          // Subject check failed — fall back to explicit permission check
+          // Subject check failed - fall back to explicit permission check
         }
 
         return checkItemAccess(item.access);

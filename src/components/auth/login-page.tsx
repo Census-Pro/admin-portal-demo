@@ -186,6 +186,14 @@ export function LoginPage() {
           <p className="text-muted-foreground text-xs">
             Restricted Access. Authorized Personnel Only.
           </p>
+          <div className="mt-4">
+            <a
+              href="/faq"
+              className="text-primary hover:text-primary/80 text-xs font-medium transition-colors"
+            >
+              Need Help? Visit FAQ
+            </a>
+          </div>
         </div>
       </div>
     </div>
