@@ -8,7 +8,8 @@ import { PageDialog } from '@/app/dashboard/content/pages/_components/page-dialo
 import {
   CmsPage,
   deleteCmsPage,
-  updateCmsPage
+  updateCmsPage,
+  checkPageNavigationLinks
 } from '@/actions/common/cms-actions';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -27,6 +28,29 @@ export function ActionCell({ data, onStatusChange }: ActionCellProps) {
   const onDelete = async () => {
     setLoading(true);
     try {
+      // First check if the page is linked to navigation
+      const linkCheck = await checkPageNavigationLinks(data.id);
+
+      if (
+        linkCheck.success &&
+        (linkCheck.isLinkedToNavigation || linkCheck.isLinkedToSubLink)
+      ) {
+        let message = 'This content page is linked to ';
+        if (linkCheck.isLinkedToNavigation && linkCheck.isLinkedToSubLink) {
+          message += 'both navigation menu and sub-navigation menu';
+        } else if (linkCheck.isLinkedToNavigation) {
+          message += 'a navigation menu';
+        } else {
+          message += 'a sub-navigation menu';
+        }
+        message +=
+          ' and cannot be deleted. Please remove it from navigation first.';
+
+        toast.error(message);
+        setDeleteOpen(false);
+        return;
+      }
+
       const result = await deleteCmsPage(data.id);
       if (result.success) {
         toast.success(result.message);

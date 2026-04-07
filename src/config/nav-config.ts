@@ -384,14 +384,28 @@ export const navItems: NavItem[] = [
   },
   {
     title: 'HOH Change',
-    url: '/dashboard/hoh-change',
+    url: '#',
     icon: 'userPen',
     isActive: false,
-    items: [],
-    subject: 'HOH Change',
-    access: {
-      permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_HOH_CHANGE]
-    }
+    items: [
+      {
+        title: 'Approve',
+        url: '/dashboard/hoh-change/approve',
+        subject: 'HOH Change Approve',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_HOH_CHANGE]
+        }
+      },
+      {
+        title: 'My Approve List',
+        url: '/dashboard/hoh-change/approve-list',
+        subject: 'HOH Change Approve',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_HOH_CHANGE]
+        }
+      }
+    ]
+    // Parent access is automatic - shows if user has access to ANY workflow permission
   },
   {
     title: 'Content',

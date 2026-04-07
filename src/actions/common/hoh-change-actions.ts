@@ -94,6 +94,56 @@ export async function getHohChanges(filters: any = {}) {
   }
 }
 
+export async function getHohApproveList(filters: any = {}) {
+  try {
+    const headers = await instance();
+    const queryParams = new URLSearchParams();
+    if (filters.dzongkhag) queryParams.append('dzongkhag', filters.dzongkhag);
+    if (filters.gewog) queryParams.append('gewog', filters.gewog);
+    if (filters.chiwog) queryParams.append('chiwog', filters.chiwog);
+    if (filters.village) queryParams.append('village', filters.village);
+    if (filters.page) queryParams.append('page', filters.page.toString());
+    if (filters.limit) queryParams.append('limit', filters.limit.toString());
+
+    const url = `${AMENDMENT_API_URL}/hoh-changes/approve-list?${queryParams.toString()}`;
+
+    console.log('[getHohApproveList] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch HOH change applications for approval';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+      return { success: false, error: errorMessage, data: [], total_count: 0 };
+    }
+
+    const result = await response.json();
+    return {
+      success: true,
+      data: result.data || [],
+      total_count: result.total_count || 0
+    };
+  } catch (error) {
+    console.error('[getHohApproveList] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      total_count: 0
+    };
+  }
+}
+
 export async function getHohChangeByApplicationNo(applicationNo: string) {
   try {
     const headers = await instance();

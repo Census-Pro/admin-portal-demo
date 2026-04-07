@@ -857,6 +857,83 @@ export async function updateCmsPage(id: string, data: Partial<CmsPage>) {
   }
 }
 
+export async function checkPageNavigationLinks(pageId: string) {
+  try {
+    // Get all navigation items and check if any reference this page
+    const navResult = await getNavigationItems();
+    if (!navResult.success) {
+      return {
+        success: false,
+        error: 'Failed to check navigation links',
+        isLinkedToNavigation: false,
+        isLinkedToSubLink: false
+      };
+    }
+
+    const navigationItems = navResult.data || [];
+    let isLinkedToNavigation = false;
+    let isLinkedToSubLink = false;
+    let navigationInfo = null;
+
+    // Check main navigation items
+    for (const navItem of navigationItems) {
+      // Check if this page is linked directly to navigation (legacy)
+      if (navItem.contentPages) {
+        const linkedPage = navItem.contentPages.find(
+          (page: CmsPage) => page.id === pageId
+        );
+        if (linkedPage) {
+          isLinkedToNavigation = true;
+          navigationInfo = {
+            type: 'navigation',
+            label: navItem.label,
+            id: navItem.id
+          };
+          break;
+        }
+      }
+
+      // Check sub-links
+      if (navItem.subLinks) {
+        for (const subLink of navItem.subLinks) {
+          if (subLink.contentPages) {
+            const linkedPage = subLink.contentPages.find(
+              (page: CmsPage) => page.id === pageId
+            );
+            if (linkedPage) {
+              isLinkedToSubLink = true;
+              navigationInfo = {
+                type: 'sublink',
+                label: subLink.label,
+                parentLabel: navItem.label,
+                id: subLink.id,
+                parentId: navItem.id
+              };
+              break;
+            }
+          }
+        }
+        if (isLinkedToSubLink) break;
+      }
+    }
+
+    return {
+      success: true,
+      isLinkedToNavigation,
+      isLinkedToSubLink,
+      navigationInfo
+    };
+  } catch (error) {
+    console.error('[checkPageNavigationLinks] Error:', error);
+    return {
+      success: false,
+      error: 'Failed to check navigation links',
+      isLinkedToNavigation: false,
+      isLinkedToSubLink: false
+    };
+  }
+}
+
 export async function deleteCmsPage(id: string) {
   try {
     const headers = await instance();
@@ -868,7 +945,38 @@ export async function deleteCmsPage(id: string) {
     });
 
     if (!response.ok) {
-      return { success: false, error: 'Failed to delete page' };
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[deleteCmsPage] Error response:', errorData);
+
+      // Handle specific foreign key constraint errors
+      let errorMessage = errorData.message || 'Failed to delete page';
+
+      if (
+        errorMessage.includes('foreign key constraint') ||
+        errorMessage.includes('violates foreign key') ||
+        errorMessage.includes('is still referenced') ||
+        errorMessage.includes('cannot be deleted') ||
+        errorMessage.includes('is being referenced')
+      ) {
+        if (
+          errorMessage.includes('cms_navigation_id') ||
+          errorMessage.includes('navigation')
+        ) {
+          errorMessage =
+            'This content page is linked to a navigation menu and cannot be deleted. Please remove it from navigation first.';
+        } else if (
+          errorMessage.includes('cm_sub_link_id') ||
+          errorMessage.includes('sub-link')
+        ) {
+          errorMessage =
+            'This content page is linked to a sub-navigation menu and cannot be deleted. Please remove it from sub-navigation first.';
+        } else {
+          errorMessage =
+            'This content page is being referenced by other items and cannot be deleted. Please check its usage and try again.';
+        }
+      }
+
+      return { success: false, error: errorMessage };
     }
 
     revalidatePath('/dashboard/content/pages');
