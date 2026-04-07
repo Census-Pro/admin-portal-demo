@@ -50,8 +50,8 @@
     20,
     20,
     20,
-    0.3
-  ); /* Dark mode overlay - very transparent to show bg pattern */
+    0.1
+  ); /* Dark mode overlay - very light to show bg pattern clearly */
   --table: oklch(0.205 0 0); /* solid dark surface — blocks background image */
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

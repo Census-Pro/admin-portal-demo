@@ -227,30 +227,6 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: [
       {
-        title: 'Endorse',
-        url: '/dashboard/birth-registration/endorse',
-        subject: 'Birth Registration Endorse',
-        access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
-            PERMS.MANAGE_BIRTH_REGISTRATION
-          ]
-        }
-      },
-      {
-        title: 'Endorse List',
-        url: '/dashboard/birth-registration/endorsed-list',
-        subject: 'Birth Registration Endorse',
-        access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
-            PERMS.MANAGE_BIRTH_REGISTRATION
-          ]
-        }
-      },
-      {
         title: 'Verify',
         url: '/dashboard/birth-registration/verify',
         subject: 'Birth Registration Verify',
@@ -262,18 +238,42 @@ export const navItems: NavItem[] = [
           ]
         }
       },
+      // {
+      //   title: 'Verify List',
+      //   url: '/dashboard/birth-registration/verify-list',
+      //   subject: 'Birth Registration Verify',
+      //   access: {
+      //     permissions: [
+      //       PERMS.MANAGE_ALL,
+      //       PERMS.MANAGE_BIRTH_REGISTRATION_VERIFY,
+      //       PERMS.MANAGE_BIRTH_REGISTRATION
+      //     ]
+      //   }
+      // },
       {
-        title: 'Verify List',
-        url: '/dashboard/birth-registration/verify-list',
-        subject: 'Birth Registration Verify',
+        title: 'Endorse',
+        url: '/dashboard/birth-registration/endorse',
+        subject: 'Birth Registration Endorse',
         access: {
           permissions: [
             PERMS.MANAGE_ALL,
-            PERMS.MANAGE_BIRTH_REGISTRATION_VERIFY,
+            PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
             PERMS.MANAGE_BIRTH_REGISTRATION
           ]
         }
       },
+      // {
+      //   title: 'Endorse List',
+      //   url: '/dashboard/birth-registration/endorsed-list',
+      //   subject: 'Birth Registration Endorse',
+      //   access: {
+      //     permissions: [
+      //       PERMS.MANAGE_ALL,
+      //       PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
+      //       PERMS.MANAGE_BIRTH_REGISTRATION
+      //     ]
+      //   }
+      // },
       {
         title: 'Approve',
         url: '/dashboard/birth-registration/approve',
@@ -287,7 +287,7 @@ export const navItems: NavItem[] = [
         }
       },
       {
-        title: 'Approve List',
+        title: 'My Approve List',
         url: '/dashboard/birth-registration/approve-list',
         subject: 'Birth Registration Approve',
         access: {
@@ -308,30 +308,6 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: [
       {
-        title: 'Endorse',
-        url: '/dashboard/death-registration/endorse',
-        subject: 'Death Registration Endorse',
-        access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
-            PERMS.MANAGE_DEATH_REGISTRATION
-          ]
-        }
-      },
-      {
-        title: 'Endorse List',
-        url: '/dashboard/death-registration/endorse-list',
-        subject: 'Death Registration Endorse',
-        access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
-            PERMS.MANAGE_DEATH_REGISTRATION
-          ]
-        }
-      },
-      {
         title: 'Verify',
         url: '/dashboard/death-registration/verify',
         subject: 'Death Registration Verify',
@@ -343,18 +319,42 @@ export const navItems: NavItem[] = [
           ]
         }
       },
+      // {
+      //   title: 'Verify List',
+      //   url: '/dashboard/death-registration/verify-list',
+      //   subject: 'Death Registration Verify',
+      //   access: {
+      //     permissions: [
+      //       PERMS.MANAGE_ALL,
+      //       PERMS.MANAGE_DEATH_REGISTRATION_VERIFY,
+      //       PERMS.MANAGE_DEATH_REGISTRATION
+      //     ]
+      //   }
+      // },
       {
-        title: 'Verify List',
-        url: '/dashboard/death-registration/verify-list',
-        subject: 'Death Registration Verify',
+        title: 'Endorse',
+        url: '/dashboard/death-registration/endorse',
+        subject: 'Death Registration Endorse',
         access: {
           permissions: [
             PERMS.MANAGE_ALL,
-            PERMS.MANAGE_DEATH_REGISTRATION_VERIFY,
+            PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
             PERMS.MANAGE_DEATH_REGISTRATION
           ]
         }
       },
+      // {
+      //   title: 'Endorse List',
+      //   url: '/dashboard/death-registration/endorse-list',
+      //   subject: 'Death Registration Endorse',
+      //   access: {
+      //     permissions: [
+      //       PERMS.MANAGE_ALL,
+      //       PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
+      //       PERMS.MANAGE_DEATH_REGISTRATION
+      //     ]
+      //   }
+      // },
       {
         title: 'Approve',
         url: '/dashboard/death-registration/approve',
@@ -368,7 +368,7 @@ export const navItems: NavItem[] = [
         }
       },
       {
-        title: 'Approve List',
+        title: 'My Approve List',
         url: '/dashboard/death-registration/approve-list',
         subject: 'Death Registration Approve',
         access: {

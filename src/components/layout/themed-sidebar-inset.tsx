@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { useTheme } from 'next-themes';
 import { SidebarInset } from '@/components/ui/sidebar';
 
 interface ThemedSidebarInsetProps {
@@ -13,17 +12,7 @@ export function ThemedSidebarInset({
   children,
   className
 }: ThemedSidebarInsetProps) {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const backgroundImage =
-    mounted && resolvedTheme === 'dark'
-      ? `linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('/darkmodeBg.png')`
-      : `linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('/lightmodeBg.png')`;
+  const backgroundImage = `linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('/lightmodeBg.png')`;
 
   return (
     <SidebarInset
