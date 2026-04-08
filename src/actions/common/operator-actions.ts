@@ -3,8 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 
-const API_URL =
-  process.env.AUTH_SERVICE || process.env.API_URL || 'http://localhost:5001';
+const API_URL = process.env.COMMON_SERVICE || 'http://localhost:5003';
 
 export async function getOperators({
   page,
@@ -18,13 +17,15 @@ export async function getOperators({
   try {
     const headers = await instance();
 
-    // Build query params
+    // Build query params - backend expects 'take' not 'limit', and 'cidNo' not 'search'
     const params = new URLSearchParams();
     if (page) params.append('page', page.toString());
-    if (limit) params.append('limit', limit.toString());
-    if (search) params.append('search', search);
+    if (limit) params.append('take', limit.toString());
+    if (search) params.append('cidNo', search);
 
     const url = `${API_URL}/operators${params.toString() ? `?${params.toString()}` : ''}`;
+
+    console.log('[getOperators] URL:', url);
 
     const response = await fetch(url, {
       method: 'GET',
@@ -37,6 +38,7 @@ export async function getOperators({
 
       try {
         const error = await response.json();
+        console.error('[getOperators] Error response:', error);
         errorMessage = error.message || error.error || errorMessage;
       } catch {
         errorMessage = `${response.status}: ${response.statusText}`;
@@ -48,6 +50,8 @@ export async function getOperators({
       } else if (response.status === 403) {
         errorMessage =
           "You don't have permission to view operators. Please contact your administrator.";
+      } else if (response.status === 401) {
+        errorMessage = 'Unauthorized. Please log in again.';
       }
 
       return {
@@ -59,6 +63,7 @@ export async function getOperators({
     }
 
     const result = await response.json();
+    console.log('[getOperators] Success response:', result);
 
     // Handle different response formats
     const data = result.data || result.items || result || [];
@@ -74,7 +79,12 @@ export async function getOperators({
       totalItems
     };
   } catch (error) {
-    console.error('getOperators error:', error);
+    console.error('[getOperators] Unexpected error:', error);
+    console.error('[getOperators] Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : undefined
+    });
     return {
       success: false,
       error:
