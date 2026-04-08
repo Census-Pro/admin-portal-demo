@@ -17,10 +17,22 @@ function ImagePreviewCell({ contact }: { contact: OfficeContact }) {
   const transformImageUrl = (url: string | undefined): string | undefined => {
     if (!url) return undefined;
 
+    // If it's already a proxy URL, return as-is
+    if (
+      url.includes('localhost:5003/media') ||
+      url.includes('127.0.0.1:5003/media')
+    ) {
+      return url;
+    }
+
     // If it's a direct MinIO URL, convert to proxy URL
     // Example: http://localhost:9000/census-media/office-contacts/file.jpg
     // Convert to: http://localhost:5003/media/office-contacts/file.jpg
-    if (url.includes('localhost:9000') || url.includes('census-media')) {
+    if (
+      url.includes('localhost:9000') ||
+      url.includes('127.0.0.1:9000') ||
+      url.includes('census-media')
+    ) {
       const parts = url.split('/');
       const categoryIndex = parts.findIndex((p) => p === 'office-contacts');
       if (categoryIndex !== -1) {

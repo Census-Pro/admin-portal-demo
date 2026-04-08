@@ -57,7 +57,19 @@ const baseConfig: NextConfig = {
       },
       {
         protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '9000',
+        pathname: '/**'
+      },
+      {
+        protocol: 'http',
         hostname: 'localhost',
+        port: '5003',
+        pathname: '/**'
+      },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
         port: '5003',
         pathname: '/**'
       }

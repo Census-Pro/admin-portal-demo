@@ -72,6 +72,46 @@ export function OfficeContactDialog({
     }
   }, [open]);
 
+  // Transform MinIO URLs to proxy URLs
+  const transformImageUrl = (url: string | undefined): string | undefined => {
+    if (!url) return undefined;
+
+    console.log('[transformImageUrl] Input URL:', url);
+
+    // If it's already a proxy URL, return as-is
+    if (
+      url.includes('localhost:5003/media') ||
+      url.includes('127.0.0.1:5003/media')
+    ) {
+      console.log('[transformImageUrl] Already proxy URL, returning as-is');
+      return url;
+    }
+
+    // If it's a direct MinIO URL, convert to proxy URL
+    // Example: http://localhost:9000/census-media/office-contacts/file.jpg
+    // Convert to: http://localhost:5003/media/office-contacts/file.jpg
+    if (
+      url.includes('localhost:9000') ||
+      url.includes('127.0.0.1:9000') ||
+      url.includes('census-media')
+    ) {
+      const parts = url.split('/');
+      const categoryIndex = parts.findIndex((p) => p === 'office-contacts');
+      if (categoryIndex !== -1) {
+        const category = parts[categoryIndex];
+        const filename = parts.slice(categoryIndex + 1).join('/');
+        const transformedUrl = `http://localhost:5003/media/${category}/${filename}`;
+        console.log('[transformImageUrl] Transformed to:', transformedUrl);
+        return transformedUrl;
+      }
+    }
+
+    console.log(
+      '[transformImageUrl] No transformation needed, returning original'
+    );
+    return url;
+  };
+
   useEffect(() => {
     if (officeContact) {
       setFormData({
@@ -83,7 +123,10 @@ export function OfficeContactDialog({
         isActive: officeContact.isActive ?? true,
         order: officeContact.order ?? 0
       });
-      setImagePreview(officeContact.imageUrl || '');
+      const transformedUrl = transformImageUrl(officeContact.imageUrl);
+      console.log('[Edit Modal] Original imageUrl:', officeContact.imageUrl);
+      console.log('[Edit Modal] Transformed imageUrl:', transformedUrl);
+      setImagePreview(transformedUrl || '');
       setSelectedImage(null);
     } else {
       setImagePreview('');
@@ -268,6 +311,14 @@ export function OfficeContactDialog({
                       width={80}
                       height={80}
                       className="rounded-lg border object-cover"
+                      unoptimized={imagePreview.includes('localhost')}
+                      onError={(e) => {
+                        console.error(
+                          '[Image Preview] Failed to load:',
+                          imagePreview
+                        );
+                        console.error('[Image Preview] Error:', e);
+                      }}
                     />
                   </div>
                 )}
