@@ -3,17 +3,6 @@ import * as PERMS from './permissions';
 
 export const navItems: NavItem[] = [
   {
-    title: 'FAQ',
-    url: '/faq',
-    icon: 'help',
-    isActive: false,
-    items: [],
-    subject: 'FAQ',
-    access: {
-      permissions: [] // Public page - no permissions required
-    }
-  },
-  {
     title: 'Dashboard',
     url: '/dashboard/overview',
     icon: 'dashboard',
