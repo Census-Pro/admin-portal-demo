@@ -326,6 +326,16 @@ export const MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES =
   'manage:relationship-certificate-purposes' as const;
 
 // ============================================================================
+// OPERATOR PERMISSIONS
+// ============================================================================
+
+export const VIEW_OPERATORS = 'read:operators' as const;
+export const CREATE_OPERATORS = 'create:operators' as const;
+export const EDIT_OPERATORS = 'update:operators' as const;
+export const DELETE_OPERATORS = 'delete:operators' as const;
+export const MANAGE_OPERATORS = 'manage:operators' as const;
+
+// ============================================================================
 // CMS PERMISSIONS
 // ============================================================================
 
@@ -581,8 +591,12 @@ export type Permission =
   | typeof CREATE_RELATIONSHIP_CERTIFICATE_PURPOSES
   | typeof EDIT_RELATIONSHIP_CERTIFICATE_PURPOSES
   | typeof DELETE_RELATIONSHIP_CERTIFICATE_PURPOSES
-  | typeof DELETE_RELATIONSHIP_CERTIFICATE_PURPOSES
   | typeof MANAGE_RELATIONSHIP_CERTIFICATE_PURPOSES
+  | typeof VIEW_OPERATORS
+  | typeof CREATE_OPERATORS
+  | typeof EDIT_OPERATORS
+  | typeof DELETE_OPERATORS
+  | typeof MANAGE_OPERATORS
   | typeof VIEW_ANNOUNCEMENTS
   | typeof CREATE_ANNOUNCEMENTS
   | typeof EDIT_ANNOUNCEMENTS
