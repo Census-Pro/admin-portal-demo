@@ -5,7 +5,6 @@ import { createColumns } from './columns';
 import { QuickLink, updateQuickLink } from '@/actions/common/cms-actions';
 import { SortableDataTable } from '@/components/ui/table/sortable-data-table';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { DataTableResetFilter } from '@/components/ui/table/data-table-reset-filter';
 import { DataTableSearch } from '@/components/ui/table/data-table-search';
 import { useQuickLinksTableFilters } from './use-quick-links-table-filters';
@@ -16,7 +15,6 @@ interface QuickLinksTableProps {
 }
 
 export function QuickLinksTable({ data, addButton }: QuickLinksTableProps) {
-  const router = useRouter();
   const [items, setItems] = useState(data);
 
   const {
@@ -78,8 +76,7 @@ export function QuickLinksTable({ data, addButton }: QuickLinksTableProps) {
         setItems(oldItems);
       } else {
         toast.success('Quick link order updated successfully');
-        // Use router.refresh() instead of full page reload
-        router.refresh();
+        window.dispatchEvent(new Event('quickLinksChanged'));
       }
     } catch (error) {
       console.error('[handleReorder] Exception:', error);

@@ -11,7 +11,6 @@ import {
   toggleQuickLinkStatus
 } from '@/actions/common/cms-actions';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 
 interface ActionCellProps {
   data: QuickLink;
@@ -21,7 +20,6 @@ export function ActionCell({ data }: ActionCellProps) {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const router = useRouter();
 
   const onConfirm = async () => {
     try {
@@ -30,7 +28,7 @@ export function ActionCell({ data }: ActionCellProps) {
       if (result.success) {
         toast.success(result.message);
         setDeleteOpen(false);
-        router.refresh();
+        window.dispatchEvent(new Event('quickLinksChanged'));
       } else {
         toast.error(result.error);
       }
@@ -48,7 +46,7 @@ export function ActionCell({ data }: ActionCellProps) {
         toast.success(
           `Quick link ${!data.is_active ? 'activated' : 'deactivated'}`
         );
-        router.refresh();
+        window.dispatchEvent(new Event('quickLinksChanged'));
       } else {
         toast.error(result.error);
       }
@@ -65,7 +63,7 @@ export function ActionCell({ data }: ActionCellProps) {
         quickLink={data}
         onSave={() => {
           setOpen(false);
-          router.refresh();
+          window.dispatchEvent(new Event('quickLinksChanged'));
         }}
       />
       <DeleteConfirmationDialog

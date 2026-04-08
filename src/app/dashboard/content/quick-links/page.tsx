@@ -114,6 +114,17 @@ function QuickLinksDataWrapper({ addButton }: { addButton?: React.ReactNode }) {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const handleQuickLinksChange = () => {
+      fetchData();
+    };
+
+    window.addEventListener('quickLinksChanged', handleQuickLinksChange);
+    return () => {
+      window.removeEventListener('quickLinksChanged', handleQuickLinksChange);
+    };
+  }, []);
+
   if (loading) {
     return <DataTableSkeleton columnCount={6} rowCount={10} />;
   }

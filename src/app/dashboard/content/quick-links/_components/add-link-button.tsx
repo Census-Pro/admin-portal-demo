@@ -4,15 +4,12 @@ import { useState } from 'react';
 import { Icons } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { QuickLinkDialog } from './quick-link-dialog';
-import { useRouter } from 'next/navigation';
-
 export function AddQuickLinkButton() {
   const [showAddModal, setShowAddModal] = useState(false);
-  const router = useRouter();
 
   const handleSave = () => {
     setShowAddModal(false);
-    router.refresh();
+    window.dispatchEvent(new Event('quickLinksChanged'));
   };
 
   return (
