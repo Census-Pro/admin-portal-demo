@@ -40,7 +40,7 @@ export async function getMajorThromdes({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/major-thromdes?page=${page}&take=${limit}`;
+  let url = `${API_URL}/major-thromdes/search/query?page=${page}&take=${limit}`;
   try {
     // Search
     if (search) {
@@ -85,7 +85,7 @@ export async function getMajorThromdes({
 
 export async function getAllMajorThromdes() {
   try {
-    const response = await fetch(`${API_URL}/major-thromdes/all`, {
+    const response = await fetch(`${API_URL}/major-thromdes`, {
       headers: await instance(),
       cache: 'no-store'
     });
@@ -100,6 +100,57 @@ export async function getAllMajorThromdes() {
     return response.json();
   } catch (error) {
     console.error('Error fetching major thromdes:', error);
+  }
+}
+
+export async function getMajorThromdeById(id: string) {
+  try {
+    const response = await fetch(`${API_URL}/major-thromdes/${id}`, {
+      headers: await instance(),
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      return {
+        error: true,
+        message: `Failed to fetch major thromde: ${response.statusText}`
+      };
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching major thromde:', error);
+    return {
+      error: true,
+      message: 'Failed to fetch major thromde'
+    };
+  }
+}
+
+export async function getMajorThromdeByName(thromdeName: string) {
+  try {
+    const response = await fetch(
+      `${API_URL}/major-thromdes/search/name/${encodeURIComponent(thromdeName)}`,
+      {
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      return {
+        error: true,
+        message: `Failed to fetch major thromde: ${response.statusText}`
+      };
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching major thromde by name:', error);
+    return {
+      error: true,
+      message: 'Failed to fetch major thromde'
+    };
   }
 }
 
@@ -118,28 +169,34 @@ export async function deleteMajorThromde(id?: string) {
     }
 
     revalidatePath('/dashboard/major-thromdes');
+    return { error: false, message: 'Major thromde deleted successfully' };
   } catch (error) {
     console.error('Error deleting major thromde:', error);
-    return null;
+    return { error: true, message: 'Failed to delete major thromde' };
   }
 }
 
 export async function updateMajorThromde(id: string, data: any) {
-  const response = await fetch(`${API_URL}/major-thromdes/${id}`, {
-    method: 'PATCH',
-    headers: await instance(),
-    body: JSON.stringify(data)
-  });
+  try {
+    const response = await fetch(`${API_URL}/major-thromdes/${id}`, {
+      method: 'PATCH',
+      headers: await instance(),
+      body: JSON.stringify(data)
+    });
 
-  const res = await response.json();
+    const res = await response.json();
 
-  if (!response.ok || res?.error) {
-    const errorMessage =
-      (res?.error as ApiErrorResponse)?.message ||
-      'Failed to update major thromde';
-    return { error: true, message: errorMessage };
+    if (!response.ok || res?.error) {
+      const errorMessage =
+        (res?.error as ApiErrorResponse)?.message ||
+        'Failed to update major thromde';
+      return { error: true, message: errorMessage };
+    }
+
+    revalidatePath('/dashboard/major-thromdes');
+    return res;
+  } catch (error) {
+    console.error('Error updating major thromde:', error);
+    return { error: true, message: 'Failed to update major thromde' };
   }
-
-  revalidatePath('/dashboard/major-thromdes');
-  return res;
 }
