@@ -124,6 +124,15 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Minor Thromdes',
+        url: '/dashboard/minor-thromdes',
+        shortcut: ['m', 'n'],
+        subject: 'Minor Thromdes',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MINOR_THROMDES]
+        }
+      },
+      {
         title: 'Genders',
         url: '/dashboard/genders',
         shortcut: ['g', 'n'],

@@ -255,6 +255,16 @@ export const DELETE_MAJOR_THROMDES = 'delete:major-thromdes' as const;
 export const MANAGE_MAJOR_THROMDES = 'manage:major-thromdes' as const;
 
 // ============================================================================
+// MINOR THROMDE PERMISSIONS
+// ============================================================================
+
+export const VIEW_MINOR_THROMDES = 'read:minor-thromdes' as const;
+export const CREATE_MINOR_THROMDES = 'create:minor-thromdes' as const;
+export const EDIT_MINOR_THROMDES = 'update:minor-thromdes' as const;
+export const DELETE_MINOR_THROMDES = 'delete:minor-thromdes' as const;
+export const MANAGE_MINOR_THROMDES = 'manage:minor-thromdes' as const;
+
+// ============================================================================
 // GENDER PERMISSIONS
 // ============================================================================
 
@@ -572,6 +582,11 @@ export type Permission =
   | typeof EDIT_MAJOR_THROMDES
   | typeof DELETE_MAJOR_THROMDES
   | typeof MANAGE_MAJOR_THROMDES
+  | typeof VIEW_MINOR_THROMDES
+  | typeof CREATE_MINOR_THROMDES
+  | typeof EDIT_MINOR_THROMDES
+  | typeof DELETE_MINOR_THROMDES
+  | typeof MANAGE_MINOR_THROMDES
   | typeof VIEW_GENDERS
   | typeof CREATE_GENDERS
   | typeof EDIT_GENDERS
