@@ -4,9 +4,16 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { IconPlus } from '@tabler/icons-react';
 import { AddCidApplicationReasonModal } from './add-cid-application-reason-modal';
+import { useRouter } from 'next/navigation';
 
 export function AddCidApplicationReasonButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
+  const handleSuccess = () => {
+    setIsOpen(false);
+    router.refresh();
+  };
 
   return (
     <>
@@ -17,6 +24,7 @@ export function AddCidApplicationReasonButton() {
       <AddCidApplicationReasonModal
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
+        onSuccess={handleSuccess}
       />
     </>
   );

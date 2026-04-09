@@ -41,19 +41,34 @@ export async function getCidApplicationReasons({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/cid-application-reasons?page=${page}&take=${limit}`;
   try {
-    // Search
-    if (search) {
-      url += `&q=${search}`;
-    }
-
-    const response = await fetch(url, {
+    console.log('Fetching all CID application reasons from /all endpoint');
+    const response = await fetch(`${API_URL}/cid-application-reasons/all`, {
       headers: await instance(),
       cache: 'no-store'
     });
 
+    console.log('Response status:', response.status);
+
     if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = await response.text();
+      }
+      console.error(
+        'Response not OK:',
+        response.status,
+        response.statusText,
+        errorData
+      );
+
+      // Log the specific validation messages if available
+      if (errorData?.message && Array.isArray(errorData.message)) {
+        console.error('Validation errors:', errorData.message);
+      }
+
       return {
         page: 0,
         limit: 0,
@@ -63,14 +78,20 @@ export async function getCidApplicationReasons({
     }
 
     const data = await response.json();
+    console.log('API Response data:', data);
 
-    const cidApplicationReasons = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // For /all endpoint, data might be directly an array or in data.data
+    const cidApplicationReasons = Array.isArray(data) ? data : data.data || [];
+
+    console.log('Parsed data:', {
+      totalCidApplicationReasons: cidApplicationReasons.length,
+      cidApplicationReasons
+    });
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalCidApplicationReasons: meta.itemCount,
+      page: 1,
+      limit: cidApplicationReasons.length,
+      totalCidApplicationReasons: cidApplicationReasons.length,
       cidApplicationReasons
     };
   } catch (error) {

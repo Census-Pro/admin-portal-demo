@@ -14,6 +14,7 @@ import { deleteCidApplicationReason } from '@/actions/common/cid-application-rea
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { AddCidApplicationReasonModal } from './add-cid-application-reason-modal';
+import { useRouter } from 'next/navigation';
 
 interface CidApplicationReason {
   id: string;
@@ -65,6 +66,7 @@ function ActionsCell({ reason }: { reason: CidApplicationReason }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const router = useRouter();
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -78,6 +80,7 @@ function ActionsCell({ reason }: { reason: CidApplicationReason }) {
       if (!result || !result.error) {
         toast.success('CID application reason deleted successfully');
         setDeleteDialogOpen(false);
+        router.refresh();
       } else {
         toast.error(
           result.message || 'Failed to delete CID application reason'
@@ -89,6 +92,11 @@ function ActionsCell({ reason }: { reason: CidApplicationReason }) {
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleEditSuccess = () => {
+    setIsEditOpen(false);
+    router.refresh();
   };
 
   return (
@@ -105,6 +113,7 @@ function ActionsCell({ reason }: { reason: CidApplicationReason }) {
       <AddCidApplicationReasonModal
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
+        onSuccess={handleEditSuccess}
         initialData={reason}
       />
 
