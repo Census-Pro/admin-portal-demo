@@ -133,6 +133,15 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'CID Application Reasons',
+        url: '/dashboard/cid-application-reasons',
+        shortcut: ['c', 'r'],
+        subject: 'CID Application Reasons',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CID_APPLICATION_REASONS]
+        }
+      },
+      {
         title: 'Genders',
         url: '/dashboard/genders',
         shortcut: ['g', 'n'],

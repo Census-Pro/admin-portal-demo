@@ -265,6 +265,21 @@ export const DELETE_MINOR_THROMDES = 'delete:minor-thromdes' as const;
 export const MANAGE_MINOR_THROMDES = 'manage:minor-thromdes' as const;
 
 // ============================================================================
+// CID APPLICATION REASON PERMISSIONS
+// ============================================================================
+
+export const VIEW_CID_APPLICATION_REASONS =
+  'read:cid-application-reasons' as const;
+export const CREATE_CID_APPLICATION_REASONS =
+  'create:cid-application-reasons' as const;
+export const EDIT_CID_APPLICATION_REASONS =
+  'update:cid-application-reasons' as const;
+export const DELETE_CID_APPLICATION_REASONS =
+  'delete:cid-application-reasons' as const;
+export const MANAGE_CID_APPLICATION_REASONS =
+  'manage:cid-application-reasons' as const;
+
+// ============================================================================
 // GENDER PERMISSIONS
 // ============================================================================
 
@@ -587,6 +602,11 @@ export type Permission =
   | typeof EDIT_MINOR_THROMDES
   | typeof DELETE_MINOR_THROMDES
   | typeof MANAGE_MINOR_THROMDES
+  | typeof VIEW_CID_APPLICATION_REASONS
+  | typeof CREATE_CID_APPLICATION_REASONS
+  | typeof EDIT_CID_APPLICATION_REASONS
+  | typeof DELETE_CID_APPLICATION_REASONS
+  | typeof MANAGE_CID_APPLICATION_REASONS
   | typeof VIEW_GENDERS
   | typeof CREATE_GENDERS
   | typeof EDIT_GENDERS
