@@ -8,18 +8,35 @@ const API_URL = process.env.COMMON_SERVICE;
 
 export async function createMinorThromde(formData: any) {
   try {
+    console.log('Creating minor thromde with payload:', formData);
+    console.log('API URL:', `${API_URL}/minor-thromdes`);
+
     const response = await fetch(`${API_URL}/minor-thromdes`, {
       method: 'POST',
       body: JSON.stringify(formData),
       headers: await instance()
     });
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      console.error('Failed to parse response:', parseError);
+      return {
+        error: true,
+        message: `Server error (Status: ${response.status}). Failed to parse response.`
+      };
+    }
+
+    console.log('API Response:', { status: response.status, data });
 
     if (!response.ok || data.error) {
       const errorMessage =
         (data?.error as ApiErrorResponse)?.message ||
-        'Failed to add minor thromde';
+        data?.message ||
+        (Array.isArray(data?.message) ? data.message.join(', ') : '') ||
+        `Failed to add minor thromde (Status: ${response.status})`;
+      console.error('API Error Details:', { status: response.status, data });
       return { error: true, message: errorMessage };
     }
 
@@ -27,7 +44,7 @@ export async function createMinorThromde(formData: any) {
     return data;
   } catch (error) {
     console.error('Error creating minor thromde:', error);
-    return { error: true, message: 'Failed to add minor thromde' };
+    return { error: true, message: `Failed to add minor thromde: ${error}` };
   }
 }
 
@@ -40,7 +57,7 @@ export async function getMinorThromdes({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/minor-thromdes/search/query?page=${page}&take=${limit}`;
+  let url = `${API_URL}/minor-thromdes?page=${page}&take=${limit}`;
   try {
     // Search
     if (search) {
@@ -85,7 +102,7 @@ export async function getMinorThromdes({
 
 export async function getAllMinorThromdes() {
   try {
-    const response = await fetch(`${API_URL}/minor-thromdes`, {
+    const response = await fetch(`${API_URL}/minor-thromdes/all`, {
       headers: await instance(),
       cache: 'no-store'
     });
@@ -127,10 +144,10 @@ export async function getMinorThromdeById(id: string) {
   }
 }
 
-export async function getMinorThromdeByName(thromdeName: string) {
+export async function getDzongkhagByThromdeName(thromdeName: string) {
   try {
     const response = await fetch(
-      `${API_URL}/minor-thromdes/search/name/${encodeURIComponent(thromdeName)}`,
+      `${API_URL}/minor-thromdes/dzongkhag/${encodeURIComponent(thromdeName)}`,
       {
         headers: await instance(),
         cache: 'no-store'
@@ -140,16 +157,16 @@ export async function getMinorThromdeByName(thromdeName: string) {
     if (!response.ok) {
       return {
         error: true,
-        message: `Failed to fetch minor thromde: ${response.statusText}`
+        message: `Failed to fetch dzongkhag: ${response.statusText}`
       };
     }
 
     return response.json();
   } catch (error) {
-    console.error('Error fetching minor thromde by name:', error);
+    console.error('Error fetching dzongkhag by thromde name:', error);
     return {
       error: true,
-      message: 'Failed to fetch minor thromde'
+      message: 'Failed to fetch dzongkhag'
     };
   }
 }

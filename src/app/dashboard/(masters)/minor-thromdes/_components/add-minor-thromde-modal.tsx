@@ -95,10 +95,21 @@ export function AddMinorThromdeModal({
     setIsLoading(true);
 
     try {
+      // Find the selected dzongkhag to get its name
+      const selectedDzongkhag = dzongkhags.find((d) => d.id === dzongkhagId);
+
+      if (!selectedDzongkhag) {
+        toast.error('Please select a dzongkhag');
+        setIsLoading(false);
+        return;
+      }
+
       const payload = {
         thromdeName,
-        dzongkhagId
+        dzongkhagName: selectedDzongkhag.name
       };
+
+      console.log('Submitting minor thromde payload:', payload);
 
       let result;
       if (initialData) {
