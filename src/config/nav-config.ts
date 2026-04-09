@@ -115,6 +115,15 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Major Thromdes',
+        url: '/dashboard/major-thromdes',
+        shortcut: ['m', 't'],
+        subject: 'Major Thromdes',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MAJOR_THROMDES]
+        }
+      },
+      {
         title: 'Genders',
         url: '/dashboard/genders',
         shortcut: ['g', 'n'],

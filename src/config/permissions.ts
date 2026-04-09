@@ -245,6 +245,16 @@ export const DELETE_CITIES = 'delete:cities' as const;
 export const MANAGE_CITIES = 'manage:cities' as const;
 
 // ============================================================================
+// MAJOR THROMDE PERMISSIONS
+// ============================================================================
+
+export const VIEW_MAJOR_THROMDES = 'read:major-thromdes' as const;
+export const CREATE_MAJOR_THROMDES = 'create:major-thromdes' as const;
+export const EDIT_MAJOR_THROMDES = 'update:major-thromdes' as const;
+export const DELETE_MAJOR_THROMDES = 'delete:major-thromdes' as const;
+export const MANAGE_MAJOR_THROMDES = 'manage:major-thromdes' as const;
+
+// ============================================================================
 // GENDER PERMISSIONS
 // ============================================================================
 
@@ -557,6 +567,11 @@ export type Permission =
   | typeof EDIT_CITIES
   | typeof DELETE_CITIES
   | typeof MANAGE_CITIES
+  | typeof VIEW_MAJOR_THROMDES
+  | typeof CREATE_MAJOR_THROMDES
+  | typeof EDIT_MAJOR_THROMDES
+  | typeof DELETE_MAJOR_THROMDES
+  | typeof MANAGE_MAJOR_THROMDES
   | typeof VIEW_GENDERS
   | typeof CREATE_GENDERS
   | typeof EDIT_GENDERS
