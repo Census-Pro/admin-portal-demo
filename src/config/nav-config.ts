@@ -142,6 +142,15 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Payment Service Types',
+        url: '/dashboard/payment-service-types',
+        shortcut: ['p', 's'],
+        subject: 'Payment Service Types',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_PAYMENT_SERVICE_TYPES]
+        }
+      },
+      {
         title: 'Genders',
         url: '/dashboard/genders',
         shortcut: ['g', 'n'],

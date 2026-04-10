@@ -280,6 +280,20 @@ export const MANAGE_CID_APPLICATION_REASONS =
   'manage:cid-application-reasons' as const;
 
 // ============================================================================
+// PAYMENT SERVICE TYPE PERMISSIONS
+// ============================================================================
+
+export const VIEW_PAYMENT_SERVICE_TYPES = 'read:payment-service-types' as const;
+export const CREATE_PAYMENT_SERVICE_TYPES =
+  'create:payment-service-types' as const;
+export const EDIT_PAYMENT_SERVICE_TYPES =
+  'update:payment-service-types' as const;
+export const DELETE_PAYMENT_SERVICE_TYPES =
+  'delete:payment-service-types' as const;
+export const MANAGE_PAYMENT_SERVICE_TYPES =
+  'manage:payment-service-types' as const;
+
+// ============================================================================
 // GENDER PERMISSIONS
 // ============================================================================
 
