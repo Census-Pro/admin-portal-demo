@@ -5,6 +5,7 @@ import { columns } from './columns';
 
 interface FineType {
   id: string;
+  fine_type: string;
   name: string;
   service_code: string;
   currency: string;
