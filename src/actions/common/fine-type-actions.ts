@@ -8,6 +8,7 @@ const API_URL = process.env.COMMON_SERVICE;
 
 export async function createFineType(formData: any) {
   try {
+    console.log('Creating fine type with data:', formData);
     const response = await fetch(`${API_URL}/fine-types`, {
       method: 'POST',
       body: JSON.stringify(formData),
@@ -15,12 +16,18 @@ export async function createFineType(formData: any) {
     });
 
     const data = await response.json();
+    console.log('Create fine type response:', {
+      status: response.status,
+      data
+    });
 
     if (!response.ok || data.error) {
       const errorMessage =
         (data?.error as ApiErrorResponse)?.message ||
         data?.message ||
+        (Array.isArray(data?.message) ? data.message.join(', ') : null) ||
         'Failed to add fine type';
+      console.error('Error creating fine type:', errorMessage, data);
       return { error: true, message: errorMessage };
     }
 
@@ -33,8 +40,8 @@ export async function createFineType(formData: any) {
 }
 
 export async function getFineTypes({
-  page = 1,
-  limit = 10,
+  page,
+  limit,
   search
 }: {
   page?: number;
@@ -42,17 +49,8 @@ export async function getFineTypes({
   search?: string;
 } = {}) {
   try {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString()
-    });
-
-    if (search) {
-      params.append('search', search);
-    }
-
-    console.log('Fetching fine types with pagination');
-    const response = await fetch(`${API_URL}/fine-types?${params.toString()}`, {
+    console.log('Fetching all fine types from /all endpoint');
+    const response = await fetch(`${API_URL}/fine-types/all`, {
       headers: await instance(),
       cache: 'no-store'
     });
@@ -88,20 +86,18 @@ export async function getFineTypes({
     const data = await response.json();
     console.log('API Response data:', data);
 
-    const fineTypes = data.data || data.fineTypes || [];
-    const total = data.total || data.totalFineTypes || fineTypes.length;
+    // For /all endpoint, data might be directly an array or in data.data
+    const fineTypes = Array.isArray(data) ? data : data.data || [];
 
     console.log('Parsed data:', {
-      totalFineTypes: total,
-      page: data.page || page,
-      limit: data.limit || limit,
+      totalFineTypes: fineTypes.length,
       fineTypes
     });
 
     return {
-      page: data.page || page,
-      limit: data.limit || limit,
-      totalFineTypes: total,
+      page: 1,
+      limit: fineTypes.length,
+      totalFineTypes: fineTypes.length,
       fineTypes
     };
   } catch (error) {

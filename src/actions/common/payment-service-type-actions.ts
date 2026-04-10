@@ -33,8 +33,8 @@ export async function createPaymentServiceType(formData: any) {
 }
 
 export async function getPaymentServiceTypes({
-  page = 1,
-  limit = 10,
+  page,
+  limit,
   search
 }: {
   page?: number;
@@ -42,23 +42,11 @@ export async function getPaymentServiceTypes({
   search?: string;
 } = {}) {
   try {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString()
+    console.log('Fetching all payment service types from /all endpoint');
+    const response = await fetch(`${API_URL}/payment-service-types/all`, {
+      headers: await instance(),
+      cache: 'no-store'
     });
-
-    if (search) {
-      params.append('search', search);
-    }
-
-    console.log('Fetching payment service types with pagination');
-    const response = await fetch(
-      `${API_URL}/payment-service-types?${params.toString()}`,
-      {
-        headers: await instance(),
-        cache: 'no-store'
-      }
-    );
 
     console.log('Response status:', response.status);
 
@@ -91,22 +79,18 @@ export async function getPaymentServiceTypes({
     const data = await response.json();
     console.log('API Response data:', data);
 
-    // Handle paginated response structure
-    const paymentServiceTypes = data.data || data.paymentServiceTypes || [];
-    const total =
-      data.total || data.totalPaymentServiceTypes || paymentServiceTypes.length;
+    // For /all endpoint, data might be directly an array or in data.data
+    const paymentServiceTypes = Array.isArray(data) ? data : data.data || [];
 
     console.log('Parsed data:', {
-      totalPaymentServiceTypes: total,
-      page: data.page || page,
-      limit: data.limit || limit,
+      totalPaymentServiceTypes: paymentServiceTypes.length,
       paymentServiceTypes
     });
 
     return {
-      page: data.page || page,
-      limit: data.limit || limit,
-      totalPaymentServiceTypes: total,
+      page: 1,
+      limit: paymentServiceTypes.length,
+      totalPaymentServiceTypes: paymentServiceTypes.length,
       paymentServiceTypes
     };
   } catch (error) {

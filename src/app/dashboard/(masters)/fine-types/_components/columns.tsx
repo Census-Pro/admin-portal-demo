@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 
 interface FineType {
   id: string;
+  fine_type: string;
   name: string;
   service_code: string;
   currency: string;

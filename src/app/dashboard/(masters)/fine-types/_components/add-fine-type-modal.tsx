@@ -30,6 +30,7 @@ interface AddFineTypeModalProps {
   onSuccess?: () => void;
   initialData?: {
     id: string;
+    fine_type?: string;
     name: string;
     service_code: string;
     currency: string;
@@ -45,6 +46,7 @@ export function AddFineTypeModal({
 }: AddFineTypeModalProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
+    fine_type: initialData?.fine_type || 'cid renewal',
     name: initialData?.name || '',
     service_code: initialData?.service_code || '',
     currency: initialData?.currency || 'BTN',
@@ -54,6 +56,7 @@ export function AddFineTypeModal({
   useEffect(() => {
     if (initialData) {
       setFormData({
+        fine_type: initialData.fine_type || 'cid renewal',
         name: initialData.name,
         service_code: initialData.service_code,
         currency: initialData.currency,
@@ -61,6 +64,7 @@ export function AddFineTypeModal({
       });
     } else {
       setFormData({
+        fine_type: 'cid renewal',
         name: '',
         service_code: '',
         currency: 'BTN',
@@ -83,8 +87,12 @@ export function AddFineTypeModal({
 
     try {
       let result;
+      // Include fine_type in submission
       const submitData = {
-        ...formData,
+        fine_type: formData.fine_type,
+        name: formData.name,
+        service_code: formData.service_code,
+        currency: formData.currency,
         fine_value: fineValueNumber
       };
 
@@ -101,6 +109,7 @@ export function AddFineTypeModal({
         onSuccess?.();
         onClose();
         setFormData({
+          fine_type: 'cid renewal',
           name: '',
           service_code: '',
           currency: 'BTN',
@@ -134,6 +143,23 @@ export function AddFineTypeModal({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid gap-2">
+            <Label htmlFor="fine_type">Fine Type *</Label>
+            <Select
+              value={formData.fine_type}
+              onValueChange={(value) =>
+                setFormData({ ...formData, fine_type: value })
+              }
+            >
+              <SelectTrigger id="fine_type">
+                <SelectValue placeholder="Select fine type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cid renewal">CID Renewal</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid gap-2">
             <Label htmlFor="name">Fine Name *</Label>
             <Input
