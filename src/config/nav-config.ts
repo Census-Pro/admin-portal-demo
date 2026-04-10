@@ -151,6 +151,15 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'Fine Types',
+        url: '/dashboard/fine-types',
+        shortcut: ['f', 't'],
+        subject: 'Fine Types',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_FINE_TYPES]
+        }
+      },
+      {
         title: 'Genders',
         url: '/dashboard/genders',
         shortcut: ['g', 'n'],

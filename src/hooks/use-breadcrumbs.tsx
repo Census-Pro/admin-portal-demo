@@ -47,6 +47,11 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
     { title: 'Masters', link: '#' },
     { title: 'Payment Service Types', link: '/dashboard/payment-service-types' }
   ],
+  '/dashboard/fine-types': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'Masters', link: '#' },
+    { title: 'Fine Types', link: '/dashboard/fine-types' }
+  ],
   '/dashboard/dzongkhag': [
     { title: 'Dashboard', link: '/dashboard' },
     { title: 'Masters', link: '#' },

@@ -294,6 +294,16 @@ export const MANAGE_PAYMENT_SERVICE_TYPES =
   'manage:payment-service-types' as const;
 
 // ============================================================================
+// FINE TYPE PERMISSIONS
+// ============================================================================
+
+export const VIEW_FINE_TYPES = 'read:fine-types' as const;
+export const CREATE_FINE_TYPES = 'create:fine-types' as const;
+export const EDIT_FINE_TYPES = 'update:fine-types' as const;
+export const DELETE_FINE_TYPES = 'delete:fine-types' as const;
+export const MANAGE_FINE_TYPES = 'manage:fine-types' as const;
+
+// ============================================================================
 // GENDER PERMISSIONS
 // ============================================================================
 
