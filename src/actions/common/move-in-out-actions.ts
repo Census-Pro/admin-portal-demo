@@ -189,13 +189,17 @@ export async function getMoveInOutById(id: string) {
 export async function approveMoveInOut(id: string) {
   try {
     const headers = await instance();
-    const url = `${N_R_M_SERVICE}/move-in-out/${id}/approve`;
+    const url = `${N_R_M_SERVICE}/move-in-out/${id}/update-status`;
 
     console.log('[approveMoveInOut] Approving at:', url);
 
     const response = await fetch(url, {
       method: 'PATCH',
-      headers,
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status: 'APPROVED' }),
       cache: 'no-store'
     });
 
