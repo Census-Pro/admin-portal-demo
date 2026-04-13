@@ -476,20 +476,30 @@ export const navItems: NavItem[] = [
         }
       },
       {
-        title: 'Receiving - Endorse',
-        url: '/dashboard/move-in-out/receiving/endorse',
-        subject: 'Move In Out Receiving Endorse',
+        title: 'Receiving',
+        url: '#',
+        subject: 'Move In Out Receiving',
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MOVE_IN_OUT]
-        }
-      },
-      {
-        title: 'Receiving - Approve',
-        url: '/dashboard/move-in-out/receiving/approve',
-        subject: 'Move In Out Receiving Approve',
-        access: {
-          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MOVE_IN_OUT]
-        }
+        },
+        items: [
+          {
+            title: 'Endorse',
+            url: '/dashboard/move-in-out/receiving/endorse',
+            subject: 'Move In Out Receiving Endorse',
+            access: {
+              permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MOVE_IN_OUT]
+            }
+          },
+          {
+            title: 'Approve',
+            url: '/dashboard/move-in-out/receiving/approve',
+            subject: 'Move In Out Receiving Approve',
+            access: {
+              permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MOVE_IN_OUT]
+            }
+          }
+        ]
       }
     ]
     // Parent access is automatic - shows if user has access to ANY child item
