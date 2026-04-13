@@ -97,15 +97,7 @@ export async function getHohChanges(filters: any = {}) {
 export async function getHohApproveList(filters: any = {}) {
   try {
     const headers = await instance();
-    const queryParams = new URLSearchParams();
-    if (filters.dzongkhag) queryParams.append('dzongkhag', filters.dzongkhag);
-    if (filters.gewog) queryParams.append('gewog', filters.gewog);
-    if (filters.chiwog) queryParams.append('chiwog', filters.chiwog);
-    if (filters.village) queryParams.append('village', filters.village);
-    if (filters.page) queryParams.append('page', filters.page.toString());
-    if (filters.limit) queryParams.append('limit', filters.limit.toString());
-
-    const url = `${AMENDMENT_API_URL}/hoh-changes/approve-list?${queryParams.toString()}`;
+    const url = `${AMENDMENT_API_URL}/hoh-changes/submitted`;
 
     console.log('[getHohApproveList] Fetching from:', url);
 
