@@ -1,5 +1,5 @@
 import PageContainer from '@/components/layout/page-container';
-import { columns } from '../../relieving/_components/relieving-columns';
+import { columns } from './_components/approve-columns';
 import { MoveInOutReceivingApproveTable } from './_components/move-in-out-receiving-approve-table';
 
 export const metadata = { title: 'Move In/Out - Receiving - Approve' };

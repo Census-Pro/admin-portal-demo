@@ -287,10 +287,10 @@ export async function getEndorsedReceivingMoveInOutApplications() {
       throw new Error('No user session found');
     }
 
-    // Get gewog_id from user's office location to fetch dzongkhag_id
-    const gewogId = session.user.officeLocationId;
+    // Use office location ID directly as dzongkhag_id
+    const dzongkhagId = session.user.officeLocationId;
 
-    if (!gewogId) {
+    if (!dzongkhagId) {
       return {
         success: false,
         error: 'No office location found for user',
@@ -301,39 +301,7 @@ export async function getEndorsedReceivingMoveInOutApplications() {
 
     const headers = await instance();
 
-    // First, fetch gewog to get dzongkhag_id
-    const COMMON_SERVICE =
-      process.env.COMMON_SERVICE || 'http://localhost:5001';
-    const gewogUrl = `${COMMON_SERVICE}/gewogs/${gewogId}`;
-
-    const gewogResponse = await fetch(gewogUrl, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!gewogResponse.ok) {
-      return {
-        success: false,
-        error: 'Failed to fetch gewog details',
-        data: [],
-        total_count: 0
-      };
-    }
-
-    const gewogData = await gewogResponse.json();
-    const dzongkhagId = gewogData.dzongkhag_id;
-
-    if (!dzongkhagId) {
-      return {
-        success: false,
-        error: 'No dzongkhag found for user gewog',
-        data: [],
-        total_count: 0
-      };
-    }
-
-    // Now fetch endorsed applications by dzongkhag
+    // Fetch endorsed applications by dzongkhag
     const url = `${N_R_M_SERVICE}/move-in-out/status/endorsed/receiving-dzongkhag/${dzongkhagId}`;
 
     console.log(
