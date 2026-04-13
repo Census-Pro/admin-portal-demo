@@ -128,3 +128,158 @@ export async function getSubmittedMoveInOutApplications() {
     };
   }
 }
+
+export async function getMoveInOutById(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${N_R_M_SERVICE}/move-in-out/${id}`;
+
+    console.log('[getMoveInOutById] Fetching from:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to fetch move-in-out application';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[getMoveInOutById] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage,
+        data: null
+      };
+    }
+
+    const result = await response.json();
+    console.log('[getMoveInOutById] Fetched successfully');
+
+    return {
+      success: true,
+      data: result
+    };
+  } catch (error) {
+    console.error('[getMoveInOutById] Unexpected error:', error);
+    const isConnRefused =
+      error instanceof Error &&
+      (error.message.includes('ECONNREFUSED') ||
+        error.message.includes('fetch failed'));
+
+    return {
+      success: false,
+      error: isConnRefused
+        ? `N_R_M service is unreachable at ${N_R_M_SERVICE}. Make sure it is running.`
+        : error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred',
+      data: null
+    };
+  }
+}
+
+export async function approveMoveInOut(id: string) {
+  try {
+    const headers = await instance();
+    const url = `${N_R_M_SERVICE}/move-in-out/${id}/approve`;
+
+    console.log('[approveMoveInOut] Approving at:', url);
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers,
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to approve move-in-out application';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[approveMoveInOut] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
+
+    const result = await response.json();
+    console.log('[approveMoveInOut] Approved successfully');
+
+    return {
+      success: true,
+      data: result
+    };
+  } catch (error) {
+    console.error('[approveMoveInOut] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}
+
+export async function rejectMoveInOut(id: string, remarks: string) {
+  try {
+    const headers = await instance();
+    const url = `${N_R_M_SERVICE}/move-in-out/${id}/reject`;
+
+    console.log('[rejectMoveInOut] Rejecting at:', url);
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ remarks }),
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      let errorMessage = 'Failed to reject move-in-out application';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorData.error || errorMessage;
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
+      }
+
+      console.error('[rejectMoveInOut] API Error:', errorMessage);
+
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
+
+    const result = await response.json();
+    console.log('[rejectMoveInOut] Rejected successfully');
+
+    return {
+      success: true,
+      data: result
+    };
+  } catch (error) {
+    console.error('[rejectMoveInOut] Unexpected error:', error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred'
+    };
+  }
+}
