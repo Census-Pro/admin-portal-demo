@@ -15,7 +15,7 @@ export default function BirthRegistrationEndorsePage() {
     >
       <div className="space-y-4">
         <EndorseSearchBar />
-        <BirthApplicationsTable status="SUBMITTED" columns={columns} />
+        <BirthApplicationsTable status="ENDORSED" columns={columns} />
       </div>
     </PageContainer>
   );

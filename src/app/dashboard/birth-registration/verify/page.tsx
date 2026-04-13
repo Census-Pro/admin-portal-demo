@@ -15,7 +15,7 @@ export default function BirthRegistrationVerifyPage() {
     >
       <div className="space-y-4">
         <VerifySearchBar />
-        <BirthApplicationsTable status="ENDORSED" columns={columns} />
+        <BirthApplicationsTable status="SUBMITTED" columns={columns} />
       </div>
     </PageContainer>
   );
