@@ -2,7 +2,7 @@ import PageContainer from '@/components/layout/page-container';
 import { columns } from './_components/verify-columns';
 import { VerifySearchBar } from './_components/search-bar';
 import { DeathApplicationsTable } from '../_components/death-applications-table';
-import { getEndorsedDeathApplications } from '@/actions/common/death-registration-actions';
+import { getSubmittedDeathApplications } from '@/actions/common/death-registration-actions';
 
 export const metadata = {
   title: 'Death Registration - Verify'
@@ -18,7 +18,7 @@ export default function DeathRegistrationVerifyPage() {
         <VerifySearchBar />
         <DeathApplicationsTable
           columns={columns}
-          fetchFn={getEndorsedDeathApplications}
+          fetchFn={getSubmittedDeathApplications}
         />
       </div>
     </PageContainer>
