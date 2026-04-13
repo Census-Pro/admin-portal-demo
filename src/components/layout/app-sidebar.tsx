@@ -180,25 +180,56 @@ export default function AppSidebar() {
                                   </CollapsibleTrigger>
                                   <CollapsibleContent>
                                     <SidebarMenuSub className="ml-3 border-l-0">
-                                      {subItem.items?.map((nestedItem) => {
-                                        const isNestedActive =
-                                          pathname === nestedItem.url;
-                                        return (
-                                          <SidebarMenuSubItem
-                                            key={nestedItem.title}
-                                          >
-                                            <SidebarMenuSubButton
-                                              asChild
-                                              isActive={isNestedActive}
-                                              className="hover:bg-primary/10 transition-colors duration-200"
+                                      {subItem.items?.map(
+                                        (nestedItem, nestedIndex) => {
+                                          const isNestedActive =
+                                            pathname === nestedItem.url;
+                                          const isNestedLast =
+                                            nestedIndex ===
+                                            subItem.items!.length - 1;
+                                          return (
+                                            <SidebarMenuSubItem
+                                              key={nestedItem.title}
+                                              className="relative"
                                             >
-                                              <Link href={nestedItem.url}>
-                                                <span>{nestedItem.title}</span>
-                                              </Link>
-                                            </SidebarMenuSubButton>
-                                          </SidebarMenuSubItem>
-                                        );
-                                      })}
+                                              <svg
+                                                className={cn(
+                                                  'absolute inset-y-0 -left-[12px] h-full w-4 transition-colors duration-300',
+                                                  isNestedActive
+                                                    ? 'text-primary'
+                                                    : 'text-primary/30'
+                                                )}
+                                                viewBox="0 0 16 32"
+                                                preserveAspectRatio="none"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                              >
+                                                <path
+                                                  d={
+                                                    isNestedLast
+                                                      ? 'M1 0 V16 H14'
+                                                      : 'M1 0 V32 M1 16 H14'
+                                                  }
+                                                  stroke="currentColor"
+                                                  strokeWidth="2.5"
+                                                  vectorEffect="non-scaling-stroke"
+                                                />
+                                              </svg>
+                                              <SidebarMenuSubButton
+                                                asChild
+                                                isActive={isNestedActive}
+                                                className="hover:bg-primary/10 ml-3 transition-colors duration-200"
+                                              >
+                                                <Link href={nestedItem.url}>
+                                                  <span>
+                                                    {nestedItem.title}
+                                                  </span>
+                                                </Link>
+                                              </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                          );
+                                        }
+                                      )}
                                     </SidebarMenuSub>
                                   </CollapsibleContent>
                                 </SidebarMenuSubItem>
