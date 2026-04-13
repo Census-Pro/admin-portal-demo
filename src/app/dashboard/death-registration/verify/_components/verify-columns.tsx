@@ -3,14 +3,10 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { IconEye, IconUserCheck } from '@tabler/icons-react';
+import { IconEye } from '@tabler/icons-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { toast } from 'sonner';
 import { getStatusColor } from '@/lib/status-utils';
-import { assignDeathTask } from '@/actions/common/death-registration-actions';
 
 export type DeathRegistrationVerify = {
   id: string;
@@ -28,28 +24,6 @@ function ActionsCell({
 }: {
   registration: DeathRegistrationVerify;
 }) {
-  const router = useRouter();
-  const [isAssigning, setIsAssigning] = useState(false);
-  const [isAssigned, setIsAssigned] = useState(false);
-
-  const handleAssignToMe = async () => {
-    setIsAssigning(true);
-    try {
-      const result = await assignDeathTask(registration.id);
-      if (result.success) {
-        setIsAssigned(true);
-        toast.success('Task assigned to you successfully');
-        setTimeout(() => router.refresh(), 1000);
-      } else {
-        toast.error(result.error || 'Failed to assign task');
-      }
-    } catch {
-      toast.error('An unexpected error occurred');
-    } finally {
-      setIsAssigning(false);
-    }
-  };
-
   return (
     <div className="flex items-center gap-2">
       <Link href={`/dashboard/death-registration/verify/${registration.id}`}>
@@ -57,20 +31,6 @@ function ActionsCell({
           <IconEye className="h-4 w-4" />
         </Button>
       </Link>
-      <Button
-        variant="outline"
-        size="sm"
-        className="h-8 gap-1.5 border-teal-600 bg-teal-600 text-xs text-white hover:border-teal-700 hover:bg-teal-700 hover:text-white"
-        onClick={handleAssignToMe}
-        disabled={isAssigning || isAssigned}
-      >
-        <IconUserCheck className="h-3.5 w-3.5" />
-        {isAssigning
-          ? 'Assigning...'
-          : isAssigned
-            ? 'Assigned'
-            : 'Assign to me'}
-      </Button>
     </div>
   );
 }
