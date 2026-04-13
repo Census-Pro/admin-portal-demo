@@ -532,28 +532,139 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: [
       {
-        title: 'Approve',
-        url: '/dashboard/cid-issuance/approve',
-        subject: 'CID Issuance Approve',
-        access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_CID_ISSUANCE_APPROVE,
-            PERMS.MANAGE_CID_ISSUANCE
-          ]
-        }
+        title: 'Fresh',
+        url: '#',
+        icon: 'add',
+        isActive: true,
+        subject: 'CID Issuance Fresh',
+        items: [
+          {
+            title: 'Assessment',
+            url: '/dashboard/cid-issuance/fresh/assessment',
+            subject: 'CID Issuance Fresh Assessment',
+            access: {
+              permissions: [
+                PERMS.MANAGE_ALL,
+                PERMS.MANAGE_CID_ISSUANCE_FRESH_ASSESSMENT,
+                PERMS.MANAGE_CID_ISSUANCE
+              ]
+            }
+          },
+          {
+            title: 'Payment',
+            url: '/dashboard/cid-issuance/fresh/payment',
+            subject: 'CID Issuance Fresh Payment',
+            access: {
+              permissions: [
+                PERMS.MANAGE_ALL,
+                PERMS.MANAGE_CID_ISSUANCE_FRESH_PAYMENT,
+                PERMS.MANAGE_CID_ISSUANCE
+              ]
+            }
+          },
+          {
+            title: 'Approval',
+            url: '/dashboard/cid-issuance/fresh/approval',
+            subject: 'CID Issuance Fresh Approval',
+            access: {
+              permissions: [
+                PERMS.MANAGE_ALL,
+                PERMS.MANAGE_CID_ISSUANCE_FRESH_APPROVAL,
+                PERMS.MANAGE_CID_ISSUANCE
+              ]
+            }
+          }
+        ]
       },
       {
-        title: 'Print CID',
-        url: '/dashboard/cid-issuance/print',
-        subject: 'CID Issuance Print',
-        access: {
-          permissions: [
-            PERMS.MANAGE_ALL,
-            PERMS.MANAGE_CID_ISSUANCE_PRINT,
-            PERMS.MANAGE_CID_ISSUANCE
-          ]
-        }
+        title: 'Renewal',
+        url: '#',
+        icon: 'edit',
+        isActive: true,
+        subject: 'CID Issuance Renewal',
+        items: [
+          {
+            title: 'Assessment',
+            url: '/dashboard/cid-issuance/renewal/assessment',
+            subject: 'CID Issuance Renewal Assessment',
+            access: {
+              permissions: [
+                PERMS.MANAGE_ALL,
+                PERMS.MANAGE_CID_ISSUANCE_RENEWAL_ASSESSMENT,
+                PERMS.MANAGE_CID_ISSUANCE
+              ]
+            }
+          },
+          {
+            title: 'Payment',
+            url: '/dashboard/cid-issuance/renewal/payment',
+            subject: 'CID Issuance Renewal Payment',
+            access: {
+              permissions: [
+                PERMS.MANAGE_ALL,
+                PERMS.MANAGE_CID_ISSUANCE_RENEWAL_PAYMENT,
+                PERMS.MANAGE_CID_ISSUANCE
+              ]
+            }
+          },
+          {
+            title: 'Approval',
+            url: '/dashboard/cid-issuance/renewal/approval',
+            subject: 'CID Issuance Renewal Approval',
+            access: {
+              permissions: [
+                PERMS.MANAGE_ALL,
+                PERMS.MANAGE_CID_ISSUANCE_RENEWAL_APPROVAL,
+                PERMS.MANAGE_CID_ISSUANCE
+              ]
+            }
+          }
+        ]
+      },
+      {
+        title: 'Replacement',
+        url: '#',
+        icon: 'settings',
+        isActive: true,
+        subject: 'CID Issuance Replacement',
+        items: [
+          {
+            title: 'Assessment',
+            url: '/dashboard/cid-issuance/replacement/assessment',
+            subject: 'CID Issuance Replacement Assessment',
+            access: {
+              permissions: [
+                PERMS.MANAGE_ALL,
+                PERMS.MANAGE_CID_ISSUANCE_REPLACEMENT_ASSESSMENT,
+                PERMS.MANAGE_CID_ISSUANCE
+              ]
+            }
+          },
+          {
+            title: 'Payment',
+            url: '/dashboard/cid-issuance/replacement/payment',
+            subject: 'CID Issuance Replacement Payment',
+            access: {
+              permissions: [
+                PERMS.MANAGE_ALL,
+                PERMS.MANAGE_CID_ISSUANCE_REPLACEMENT_PAYMENT,
+                PERMS.MANAGE_CID_ISSUANCE
+              ]
+            }
+          },
+          {
+            title: 'Approval',
+            url: '/dashboard/cid-issuance/replacement/approval',
+            subject: 'CID Issuance Replacement Approval',
+            access: {
+              permissions: [
+                PERMS.MANAGE_ALL,
+                PERMS.MANAGE_CID_ISSUANCE_REPLACEMENT_APPROVAL,
+                PERMS.MANAGE_CID_ISSUANCE
+              ]
+            }
+          }
+        ]
       }
     ]
     // Parent access is automatic - shows if user has access to ANY workflow permission

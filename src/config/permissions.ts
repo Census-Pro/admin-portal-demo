@@ -78,6 +78,30 @@ export const MANAGE_CID_ISSUANCE_APPROVE =
   'manage:cid-issuance-approve' as const;
 export const MANAGE_CID_ISSUANCE_PRINT = 'manage:cid-issuance-print' as const;
 
+// Fresh CID Issuance permissions
+export const MANAGE_CID_ISSUANCE_FRESH_ASSESSMENT =
+  'manage:cid-issuance-fresh-assessment' as const;
+export const MANAGE_CID_ISSUANCE_FRESH_PAYMENT =
+  'manage:cid-issuance-fresh-payment' as const;
+export const MANAGE_CID_ISSUANCE_FRESH_APPROVAL =
+  'manage:cid-issuance-fresh-approval' as const;
+
+// Renewal CID Issuance permissions
+export const MANAGE_CID_ISSUANCE_RENEWAL_ASSESSMENT =
+  'manage:cid-issuance-renewal-assessment' as const;
+export const MANAGE_CID_ISSUANCE_RENEWAL_PAYMENT =
+  'manage:cid-issuance-renewal-payment' as const;
+export const MANAGE_CID_ISSUANCE_RENEWAL_APPROVAL =
+  'manage:cid-issuance-renewal-approval' as const;
+
+// Replacement CID Issuance permissions
+export const MANAGE_CID_ISSUANCE_REPLACEMENT_ASSESSMENT =
+  'manage:cid-issuance-replacement-assessment' as const;
+export const MANAGE_CID_ISSUANCE_REPLACEMENT_PAYMENT =
+  'manage:cid-issuance-replacement-payment' as const;
+export const MANAGE_CID_ISSUANCE_REPLACEMENT_APPROVAL =
+  'manage:cid-issuance-replacement-approval' as const;
+
 // General CID issuance permission (grants access to all workflow steps)
 export const MANAGE_CID_ISSUANCE = 'manage:cid-issuance' as const;
 
@@ -547,6 +571,15 @@ export type Permission =
   | typeof VERIFY_CID_ISSUANCE
   | typeof APPROVE_CID_ISSUANCE
   | typeof MANAGE_CID_ISSUANCE
+  | typeof MANAGE_CID_ISSUANCE_FRESH_ASSESSMENT
+  | typeof MANAGE_CID_ISSUANCE_FRESH_PAYMENT
+  | typeof MANAGE_CID_ISSUANCE_FRESH_APPROVAL
+  | typeof MANAGE_CID_ISSUANCE_RENEWAL_ASSESSMENT
+  | typeof MANAGE_CID_ISSUANCE_RENEWAL_PAYMENT
+  | typeof MANAGE_CID_ISSUANCE_RENEWAL_APPROVAL
+  | typeof MANAGE_CID_ISSUANCE_REPLACEMENT_ASSESSMENT
+  | typeof MANAGE_CID_ISSUANCE_REPLACEMENT_PAYMENT
+  | typeof MANAGE_CID_ISSUANCE_REPLACEMENT_APPROVAL
   | typeof VIEW_MOVE_IN_OUT
   | typeof CREATE_MOVE_IN_OUT
   | typeof EDIT_MOVE_IN_OUT
