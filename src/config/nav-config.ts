@@ -462,6 +462,56 @@ export const navItems: NavItem[] = [
     // Parent access is automatic - shows if user has access to ANY workflow permission
   },
   {
+    title: 'Move In Move Out',
+    url: '#',
+    icon: 'arrowsRightLeft',
+    isActive: false,
+    items: [
+      {
+        title: 'Relieving',
+        url: '/dashboard/move-in-out/relieving',
+        subject: 'Move In Out Relieving',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MOVE_IN_OUT]
+        }
+      },
+      {
+        title: 'Receiving',
+        url: '#',
+        icon: 'inbox',
+        isActive: true,
+        subject: 'Move In Out Receiving',
+        items: [
+          {
+            title: 'Endorse',
+            url: '/dashboard/move-in-out/receiving/endorse',
+            subject: 'Move In Out Receiving Endorse',
+            access: {
+              permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MOVE_IN_OUT]
+            }
+          },
+          {
+            title: 'Approve',
+            url: '/dashboard/move-in-out/receiving/approve',
+            subject: 'Move In Out Receiving Approve',
+            access: {
+              permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MOVE_IN_OUT]
+            }
+          },
+          {
+            title: 'My Approve List',
+            url: '/dashboard/move-in-out/receiving/approve-list',
+            subject: 'Move In Out Receiving Approve',
+            access: {
+              permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_MOVE_IN_OUT]
+            }
+          }
+        ]
+      }
+    ]
+    // Parent access is automatic - shows if user has access to ANY child item
+  },
+  {
     title: 'Content',
     url: '/dashboard/content',
     icon: 'page',

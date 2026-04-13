@@ -1,6 +1,7 @@
 import {
   IconAlertTriangle,
   IconArrowRight,
+  IconArrowsRightLeft,
   IconCheck,
   IconChevronLeft,
   IconChevronRight,
@@ -43,7 +44,8 @@ import {
   IconUsersGroup,
   IconCertificate,
   IconGrave2,
-  IconEdit
+  IconEdit,
+  IconInbox
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -72,6 +74,7 @@ export const Icons = {
   warning: IconAlertTriangle,
   user: IconUser,
   arrowRight: IconArrowRight,
+  arrowsRightLeft: IconArrowsRightLeft,
   help: IconHelpCircle,
   pizza: IconPizza,
   sun: IconSun,
@@ -94,5 +97,6 @@ export const Icons = {
   family: IconUsersGroup,
   certificate: IconCertificate,
   grave: IconGrave2,
-  edit: IconEdit
+  edit: IconEdit,
+  inbox: IconInbox
 };
