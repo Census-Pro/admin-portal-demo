@@ -64,6 +64,26 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
   '/dashboard/birth-registration': [
     { title: 'Dashboard', link: '/dashboard' },
     { title: 'Birth Registration', link: '/dashboard/birth-registration' }
+  ],
+  '/dashboard/birth-registration/verify': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'Birth Registration', link: '/dashboard/birth-registration' },
+    { title: 'Verify', link: '/dashboard/birth-registration/verify' }
+  ],
+  '/dashboard/birth-registration/endorse': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'Birth Registration', link: '/dashboard/birth-registration' },
+    { title: 'Endorse', link: '/dashboard/birth-registration/endorse' }
+  ],
+  '/dashboard/death-registration/verify': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'Death Registration', link: '/dashboard/death-registration' },
+    { title: 'Verify', link: '/dashboard/death-registration/verify' }
+  ],
+  '/dashboard/death-registration/endorse': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'Death Registration', link: '/dashboard/death-registration' },
+    { title: 'Endorse', link: '/dashboard/death-registration/endorse' }
   ]
   // Add more custom mappings as needed
 };
@@ -110,6 +130,18 @@ export function useBreadcrumbs() {
           }
         ];
       }
+    }
+
+    // Handle birth registration verify routes with UUIDs
+    if (
+      pathname.startsWith('/dashboard/birth-registration/verify/') &&
+      pathname.split('/').length === 5
+    ) {
+      return [
+        { title: 'Dashboard', link: '/dashboard' },
+        { title: 'Birth Registration', link: '/dashboard/birth-registration' },
+        { title: 'Verify Details', link: pathname }
+      ];
     }
 
     // Handle birth registration endorse routes with UUIDs

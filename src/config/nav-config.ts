@@ -293,13 +293,13 @@ export const navItems: NavItem[] = [
         }
       },
       // {
-      //   title: 'Verify List',
-      //   url: '/dashboard/birth-registration/verify-list',
-      //   subject: 'Birth Registration Verify',
+      //   title: 'Endorse List',
+      //   url: '/dashboard/birth-registration/endorsed-list',
+      //   subject: 'Birth Registration Endorse',
       //   access: {
       //     permissions: [
       //       PERMS.MANAGE_ALL,
-      //       PERMS.MANAGE_BIRTH_REGISTRATION_VERIFY,
+      //       PERMS.MANAGE_BIRTH_REGISTRATION_ENDORSE,
       //       PERMS.MANAGE_BIRTH_REGISTRATION
       //     ]
       //   }
@@ -374,13 +374,13 @@ export const navItems: NavItem[] = [
         }
       },
       // {
-      //   title: 'Verify List',
-      //   url: '/dashboard/death-registration/verify-list',
-      //   subject: 'Death Registration Verify',
+      //   title: 'Endorse List',
+      //   url: '/dashboard/death-registration/endorse-list',
+      //   subject: 'Death Registration Endorse',
       //   access: {
       //     permissions: [
       //       PERMS.MANAGE_ALL,
-      //       PERMS.MANAGE_DEATH_REGISTRATION_VERIFY,
+      //       PERMS.MANAGE_DEATH_REGISTRATION_ENDORSE,
       //       PERMS.MANAGE_DEATH_REGISTRATION
       //     ]
       //   }

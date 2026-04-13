@@ -5,14 +5,14 @@ import { DeathApplicationsTable } from '../_components/death-applications-table'
 import { getSubmittedDeathApplications } from '@/actions/common/death-registration-actions';
 
 export const metadata = {
-  title: 'Death Registration - Endorse'
+  title: 'Death Registration - Verify'
 };
 
 export default function DeathRegistrationEndorsePage() {
   return (
     <PageContainer
-      pageTitle="Death Registration - Endorse"
-      pageDescription="Review and endorse death registration applications pending endorsement"
+      pageTitle="Death Registration - Verify"
+      pageDescription="Review and verify death registration applications pending verification"
     >
       <div className="space-y-4">
         <EndorseSearchBar />

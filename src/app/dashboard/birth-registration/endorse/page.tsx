@@ -4,14 +4,14 @@ import { EndorseSearchBar } from './_components/search-bar';
 import { BirthApplicationsTable } from '../_components/birth-applications-table';
 
 export const metadata = {
-  title: 'Birth Registration - Endorse'
+  title: 'Birth Registration - Verify'
 };
 
 export default function BirthRegistrationEndorsePage() {
   return (
     <PageContainer
-      pageTitle="Birth Registration - Endorse"
-      pageDescription="Review and endorse birth registration applications pending endorsement"
+      pageTitle="Birth Registration - Verify"
+      pageDescription="Review and verify birth registration applications pending verification"
     >
       <div className="space-y-4">
         <EndorseSearchBar />

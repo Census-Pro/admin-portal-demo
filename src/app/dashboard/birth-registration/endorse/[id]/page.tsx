@@ -10,7 +10,7 @@ import { getChiwogById } from '@/actions/common/chiwog-actions';
 import { getVillageById } from '@/actions/common/village-actions';
 
 export const metadata = {
-  title: 'Birth Registration - Endorse Details'
+  title: 'Birth Registration - Verify Details'
 };
 
 interface EndorseDetailPageProps {
@@ -30,7 +30,7 @@ export default async function EndorseDetailPage({
     <Link href="/dashboard/birth-registration/endorse">
       <Button variant="outline">
         <IconArrowLeft className="mr-2 h-4 w-4" />
-        Back to Endorsement List
+        Back to Verify List
       </Button>
     </Link>
   );
@@ -38,7 +38,7 @@ export default async function EndorseDetailPage({
   if (!result.success || !result.data) {
     return (
       <PageContainer
-        pageTitle="Birth Registration - Endorse Details"
+        pageTitle="Birth Registration - Verify Details"
         pageDescription="Unable to load application"
         pageHeaderAction={backButton}
       >
@@ -76,7 +76,7 @@ export default async function EndorseDetailPage({
 
   return (
     <PageContainer
-      pageTitle="Birth Registration - Endorse Details"
+      pageTitle="Birth Registration - Verify Details"
       pageDescription={`Reviewing birth registration application #${id}`}
       pageHeaderAction={backButton}
     >

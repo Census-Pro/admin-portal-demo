@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { IconArrowLeft } from '@tabler/icons-react';
 
 export const metadata = {
-  title: 'Death Registration - Endorse Details'
+  title: 'Death Registration - Verify Details'
 };
 
 interface EndorseDetailPageProps {
@@ -21,13 +21,13 @@ export default async function EndorseDetailPage({
 
   return (
     <PageContainer
-      pageTitle="Death Registration - Endorse Details"
+      pageTitle="Death Registration - Verify Details"
       pageDescription={`Reviewing death registration application #${id}`}
       pageHeaderAction={
         <Link href="/dashboard/death-registration/endorse">
           <Button variant="outline">
             <IconArrowLeft className="mr-2 h-4 w-4" />
-            Back to Endorsement List
+            Back to Verify List
           </Button>
         </Link>
       }
