@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { AddPaymentServiceTypeModal } from './add-payment-service-type-modal';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
+import { formatPaymentType } from '@/lib/utils/payment-type-formatter';
 
 interface PaymentServiceType {
   id: string;
@@ -46,12 +47,13 @@ export const columns: ColumnDef<PaymentServiceType>[] = [
     ),
     cell: ({ row }) => {
       const type = row.original;
+      const formattedType = formatPaymentType(type.payment_type);
       return (
         <div className="flex items-center gap-3">
           <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {type.payment_type.charAt(0).toUpperCase()}
+            {formattedType.charAt(0).toUpperCase()}
           </div>
-          <div className="font-medium">{type.payment_type}</div>
+          <div className="font-medium">{formattedType}</div>
         </div>
       );
     }
@@ -134,6 +136,7 @@ function ActionsCell({ type }: { type: PaymentServiceType }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const router = useRouter();
+  const formattedType = formatPaymentType(type.payment_type);
 
   const handleDeleteClick = () => {
     setDeleteDialogOpen(true);
@@ -191,7 +194,7 @@ function ActionsCell({ type }: { type: PaymentServiceType }) {
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
         title="Delete Payment Service Type"
-        description={`Are you sure you want to delete "${type.payment_type}"? This action cannot be undone.`}
+        description={`Are you sure you want to delete "${formattedType}"? This action cannot be undone.`}
       />
 
       <AddPaymentServiceTypeModal
