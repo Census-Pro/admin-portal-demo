@@ -130,6 +130,22 @@ export const MANAGE_NATIONALITY_CERTIFICATE =
   'manage:nationality-certificate' as const;
 
 // ============================================================================
+// RELATION CERTIFICATE PERMISSIONS
+// ============================================================================
+
+// Workflow-specific permissions
+export const MANAGE_RELATION_CERTIFICATE_ASSESSMENT =
+  'manage:relation-certificate-assessment' as const;
+export const MANAGE_RELATION_CERTIFICATE_PAYMENT =
+  'manage:relation-certificate-payment' as const;
+export const MANAGE_RELATION_CERTIFICATE_APPROVAL =
+  'manage:relation-certificate-approval' as const;
+
+// General relation certificate permission (grants access to all workflow steps)
+export const MANAGE_RELATION_CERTIFICATE =
+  'manage:relation-certificate' as const;
+
+// ============================================================================
 // MOVE IN/OUT PERMISSIONS
 // ============================================================================
 

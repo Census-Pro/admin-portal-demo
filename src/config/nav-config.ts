@@ -758,5 +758,51 @@ export const navItems: NavItem[] = [
       }
     ]
     // Parent access is automatic - shows if user has access to ANY workflow permission
+  },
+  {
+    title: 'Relation Certificate',
+    url: '#',
+    icon: 'teams',
+    isActive: false,
+    subject: 'Relation Certificate',
+    items: [
+      {
+        title: 'Assessment',
+        url: '/dashboard/relation-certificate/assessment',
+        subject: 'Relation Certificate Assessment',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_RELATION_CERTIFICATE_ASSESSMENT,
+            PERMS.MANAGE_RELATION_CERTIFICATE
+          ]
+        }
+      },
+      {
+        title: 'Payment',
+        url: '/dashboard/relation-certificate/payment',
+        subject: 'Relation Certificate Payment',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_RELATION_CERTIFICATE_PAYMENT,
+            PERMS.MANAGE_RELATION_CERTIFICATE
+          ]
+        }
+      },
+      {
+        title: 'Approval',
+        url: '/dashboard/relation-certificate/approval',
+        subject: 'Relation Certificate Approval',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_RELATION_CERTIFICATE_APPROVAL,
+            PERMS.MANAGE_RELATION_CERTIFICATE
+          ]
+        }
+      }
+    ]
+    // Parent access is automatic - shows if user has access to ANY workflow permission
   }
 ];
