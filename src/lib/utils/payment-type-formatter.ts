@@ -8,7 +8,9 @@ export function formatPaymentType(paymentType: string): string {
   const paymentTypeMap: Record<string, string> = {
     'new cid application': 'New Cid Application',
     'cid renewal': 'Cid Renewal',
-    'cid replacement': 'Cid Replacement'
+    'cid replacement': 'Cid Replacement',
+    'relationship application': 'Relationship Application',
+    'nationality certificate': 'Nationality Certificate'
   };
 
   return paymentTypeMap[paymentType.toLowerCase()] || paymentType;
