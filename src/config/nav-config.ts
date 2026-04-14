@@ -712,5 +712,51 @@ export const navItems: NavItem[] = [
       }
     ]
     // Parent access is automatic - shows if user has access to ANY workflow permission
+  },
+  {
+    title: 'Nationality Certificate',
+    url: '#',
+    icon: 'certificate',
+    isActive: false,
+    subject: 'Nationality Certificate',
+    items: [
+      {
+        title: 'Assessment',
+        url: '/dashboard/nationality-certificate/assessment',
+        subject: 'Nationality Certificate Assessment',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_NATIONALITY_CERTIFICATE_ASSESSMENT,
+            PERMS.MANAGE_NATIONALITY_CERTIFICATE
+          ]
+        }
+      },
+      {
+        title: 'Payment',
+        url: '/dashboard/nationality-certificate/payment',
+        subject: 'Nationality Certificate Payment',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_NATIONALITY_CERTIFICATE_PAYMENT,
+            PERMS.MANAGE_NATIONALITY_CERTIFICATE
+          ]
+        }
+      },
+      {
+        title: 'Approval',
+        url: '/dashboard/nationality-certificate/approval',
+        subject: 'Nationality Certificate Approval',
+        access: {
+          permissions: [
+            PERMS.MANAGE_ALL,
+            PERMS.MANAGE_NATIONALITY_CERTIFICATE_APPROVAL,
+            PERMS.MANAGE_NATIONALITY_CERTIFICATE
+          ]
+        }
+      }
+    ]
+    // Parent access is automatic - shows if user has access to ANY workflow permission
   }
 ];

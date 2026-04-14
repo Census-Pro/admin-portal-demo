@@ -114,6 +114,22 @@ export const VERIFY_CID_ISSUANCE = 'verify:cid-issuance' as const;
 export const APPROVE_CID_ISSUANCE = 'approve:cid-issuance' as const;
 
 // ============================================================================
+// NATIONALITY CERTIFICATE APPLICATIONS PERMISSIONS
+// ============================================================================
+
+// Workflow-specific permissions
+export const MANAGE_NATIONALITY_CERTIFICATE_ASSESSMENT =
+  'manage:nationality-certificate-assessment' as const;
+export const MANAGE_NATIONALITY_CERTIFICATE_PAYMENT =
+  'manage:nationality-certificate-payment' as const;
+export const MANAGE_NATIONALITY_CERTIFICATE_APPROVAL =
+  'manage:nationality-certificate-approval' as const;
+
+// General nationality certificate permission (grants access to all workflow steps)
+export const MANAGE_NATIONALITY_CERTIFICATE =
+  'manage:nationality-certificate' as const;
+
+// ============================================================================
 // MOVE IN/OUT PERMISSIONS
 // ============================================================================
 
