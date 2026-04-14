@@ -573,6 +573,7 @@ export const navItems: NavItem[] = [
     url: '#',
     icon: 'idCard',
     isActive: false,
+    subject: 'CID Issuance',
     items: [
       {
         title: 'Fresh',

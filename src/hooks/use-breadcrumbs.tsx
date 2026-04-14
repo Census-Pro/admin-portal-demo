@@ -84,6 +84,63 @@ const routeMapping: Record<string, BreadcrumbItem[]> = {
     { title: 'Dashboard', link: '/dashboard' },
     { title: 'Death Registration', link: '/dashboard/death-registration' },
     { title: 'Endorse', link: '/dashboard/death-registration/endorse' }
+  ],
+  '/dashboard/cid-issuance/fresh/assessment': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'CID Issuance', link: '/dashboard/cid-issuance' },
+    { title: 'Fresh', link: '/dashboard/cid-issuance/fresh' },
+    { title: 'Assessment', link: '/dashboard/cid-issuance/fresh/assessment' }
+  ],
+  '/dashboard/cid-issuance/fresh/payment': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'CID Issuance', link: '/dashboard/cid-issuance' },
+    { title: 'Fresh', link: '/dashboard/cid-issuance/fresh' },
+    { title: 'Payment', link: '/dashboard/cid-issuance/fresh/payment' }
+  ],
+  '/dashboard/cid-issuance/fresh/approval': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'CID Issuance', link: '/dashboard/cid-issuance' },
+    { title: 'Fresh', link: '/dashboard/cid-issuance/fresh' },
+    { title: 'Approval', link: '/dashboard/cid-issuance/fresh/approval' }
+  ],
+  '/dashboard/cid-issuance/renewal/assessment': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'CID Issuance', link: '/dashboard/cid-issuance' },
+    { title: 'Renewal', link: '/dashboard/cid-issuance/renewal' },
+    { title: 'Assessment', link: '/dashboard/cid-issuance/renewal/assessment' }
+  ],
+  '/dashboard/cid-issuance/renewal/payment': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'CID Issuance', link: '/dashboard/cid-issuance' },
+    { title: 'Renewal', link: '/dashboard/cid-issuance/renewal' },
+    { title: 'Payment', link: '/dashboard/cid-issuance/renewal/payment' }
+  ],
+  '/dashboard/cid-issuance/renewal/approval': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'CID Issuance', link: '/dashboard/cid-issuance' },
+    { title: 'Renewal', link: '/dashboard/cid-issuance/renewal' },
+    { title: 'Approval', link: '/dashboard/cid-issuance/renewal/approval' }
+  ],
+  '/dashboard/cid-issuance/replacement/assessment': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'CID Issuance', link: '/dashboard/cid-issuance' },
+    { title: 'Replacement', link: '/dashboard/cid-issuance/replacement' },
+    {
+      title: 'Assessment',
+      link: '/dashboard/cid-issuance/replacement/assessment'
+    }
+  ],
+  '/dashboard/cid-issuance/replacement/payment': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'CID Issuance', link: '/dashboard/cid-issuance' },
+    { title: 'Replacement', link: '/dashboard/cid-issuance/replacement' },
+    { title: 'Payment', link: '/dashboard/cid-issuance/replacement/payment' }
+  ],
+  '/dashboard/cid-issuance/replacement/approval': [
+    { title: 'Dashboard', link: '/dashboard' },
+    { title: 'CID Issuance', link: '/dashboard/cid-issuance' },
+    { title: 'Replacement', link: '/dashboard/cid-issuance/replacement' },
+    { title: 'Approval', link: '/dashboard/cid-issuance/replacement/approval' }
   ]
   // Add more custom mappings as needed
 };
