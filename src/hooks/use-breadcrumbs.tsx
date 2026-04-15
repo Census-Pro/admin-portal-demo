@@ -218,14 +218,17 @@ export function useBreadcrumbs() {
     return segments.map((segment, index) => {
       const path = `/${segments.slice(0, index + 1).join('/')}`;
 
+      // Check if segment looks like an application number (e.g., HOH-2026-000001, REL-2026-000001)
+      const isApplicationNumber = /^[A-Z]+-\d{4}-\d+$/i.test(segment);
+
       // Check if segment looks like a UUID and format it nicely
       const isUuid =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
           segment
         );
 
-      if (isUuid) {
-        // For UUID segments, try to determine context from previous segment
+      if (isUuid || isApplicationNumber) {
+        // For UUID/Application Number segments, try to determine context from previous segment
         const previousSegment = segments[index - 1];
         let contextTitle = 'Details';
 
@@ -234,8 +237,7 @@ export function useBreadcrumbs() {
           contextTitle = 'Employee Details';
         else if (previousSegment === 'product')
           contextTitle = 'Product Details';
-        else if (previousSegment === 'hoh-change')
-          contextTitle = 'Application Details';
+        else if (previousSegment === 'hoh-change') contextTitle = 'Details';
 
         return {
           title: contextTitle,
