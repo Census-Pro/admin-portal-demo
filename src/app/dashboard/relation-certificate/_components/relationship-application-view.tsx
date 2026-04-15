@@ -37,7 +37,10 @@ import {
   IconPhone
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
-import { getRelationshipApplicationById } from '@/actions/issuance/relationship-application-actions';
+import {
+  getRelationshipApplicationById,
+  assessRelationshipApplication
+} from '@/actions/issuance/relationship-application-actions';
 import { format } from 'date-fns';
 
 interface RelationshipApplicationData {
@@ -110,14 +113,13 @@ export function RelationshipApplicationView({
     setIsAssessing(true);
     try {
       if (!data?.id) return;
-      // TODO: Implement assess/approve API call
-      // const result = await assessRelationshipApplication(data.id);
-      // if (result.success) {
-      toast.success('Application assessed successfully!');
-      router.push('/dashboard/relation-certificate/assessment');
-      // } else {
-      //   toast.error(result.error || 'Failed to assess application');
-      // }
+      const result = await assessRelationshipApplication(data.id);
+      if (result.success) {
+        toast.success('Application assessed successfully!');
+        router.push('/dashboard/relation-certificate/assessment');
+      } else {
+        toast.error(result.message || 'Failed to assess application');
+      }
     } catch {
       toast.error('An unexpected error occurred while assessing');
     } finally {

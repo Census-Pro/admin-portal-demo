@@ -122,3 +122,56 @@ export async function getRelationshipApplicationById(id: string) {
     };
   }
 }
+
+/**
+ * Assess a relationship application (SUBMITTED → ASSESSED)
+ * @param id - The application ID
+ */
+export async function assessRelationshipApplication(id: string) {
+  try {
+    const response = await fetch(
+      `${API_URL}/relationship-application/${id}/assess-relationship-application`,
+      {
+        method: 'PATCH',
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = await response.text();
+      }
+      console.error(
+        'Failed to assess relationship application:',
+        response.status,
+        response.statusText,
+        errorData
+      );
+
+      return {
+        success: false,
+        error: true,
+        message:
+          errorData?.message || 'Failed to assess relationship application'
+      };
+    }
+
+    const data = await response.json();
+    return {
+      success: true,
+      error: false,
+      data: data.data || data
+    };
+  } catch (error) {
+    console.error('Error assessing relationship application:', error);
+    return {
+      success: false,
+      error: true,
+      message: 'Failed to assess relationship application'
+    };
+  }
+}
