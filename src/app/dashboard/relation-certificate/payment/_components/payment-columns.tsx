@@ -114,17 +114,6 @@ export const paymentColumns: ColumnDef<RelationshipApplicationPayment>[] = [
     }
   },
   {
-    accessorKey: 'fee.amount',
-    header: 'Fee Amount',
-    cell: ({ row }) => {
-      const fee = row.original.fee;
-      if (fee && fee.amount !== undefined) {
-        return <div className="font-medium">Nu. {fee.amount.toFixed(2)}</div>;
-      }
-      return <span className="text-muted-foreground">-</span>;
-    }
-  },
-  {
     accessorKey: 'fee.status',
     header: 'Payment Status',
     cell: ({ row }) => {
@@ -144,17 +133,6 @@ export const paymentColumns: ColumnDef<RelationshipApplicationPayment>[] = [
             {fee.status}
           </Badge>
         );
-      }
-      return <span className="text-muted-foreground">-</span>;
-    }
-  },
-  {
-    accessorKey: 'fee.transaction_no',
-    header: 'Transaction No.',
-    cell: ({ row }) => {
-      const fee = row.original.fee;
-      if (fee && fee.transaction_no) {
-        return <div className="font-mono text-sm">{fee.transaction_no}</div>;
       }
       return <span className="text-muted-foreground">-</span>;
     }

@@ -6,8 +6,8 @@ const API_URL = process.env.ISSUANCE_SERVICE || 'http://localhost:5010';
 
 export interface NationalityApplication {
   id: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   application_no: string;
   applicant_cid_no: string;
   applicant_contact_no: string;

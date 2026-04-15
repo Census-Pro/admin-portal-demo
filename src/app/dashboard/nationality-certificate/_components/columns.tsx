@@ -10,8 +10,8 @@ import { getStatusColor } from '@/lib/status-utils';
 
 export interface NationalityApplication {
   id: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   application_no: string;
   applicant_cid_no: string;
   applicant_contact_no: string;
@@ -67,9 +67,21 @@ export const columns: ColumnDef<NationalityApplication>[] = [
     header: 'Applicant Type',
     cell: ({ row }) => {
       const type = row.getValue('applicant_is') as string;
-      return (
-        <Badge variant="outline">{type?.replace(/_/g, ' ') || 'N/A'}</Badge>
-      );
+      const formattedType = type?.replace(/_/g, ' ') || 'N/A';
+
+      // Add specific color for PARENT type
+      if (type === 'PARENT') {
+        return (
+          <Badge
+            variant="default"
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            {formattedType}
+          </Badge>
+        );
+      }
+
+      return <Badge variant="outline">{formattedType}</Badge>;
     }
   },
   {
@@ -117,10 +129,10 @@ export const columns: ColumnDef<NationalityApplication>[] = [
     }
   },
   {
-    accessorKey: 'createdAt',
+    accessorKey: 'created_at',
     header: 'Submitted Date',
     cell: ({ row }) => {
-      const date = row.getValue('createdAt') as string;
+      const date = row.getValue('created_at') as string;
       if (!date) return '-';
       try {
         return format(new Date(date), 'MMM dd, yyyy');

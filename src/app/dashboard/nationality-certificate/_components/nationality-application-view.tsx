@@ -205,9 +205,18 @@ export function NationalityApplicationView({
                 <Label className="text-muted-foreground text-xs font-medium uppercase">
                   Applicant Type
                 </Label>
-                <Badge variant="outline">
-                  {data.applicant_is?.replace(/_/g, ' ') || 'N/A'}
-                </Badge>
+                {data.applicant_is === 'PARENT' ? (
+                  <Badge
+                    variant="default"
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    {data.applicant_is?.replace(/_/g, ' ') || 'N/A'}
+                  </Badge>
+                ) : (
+                  <Badge variant="outline">
+                    {data.applicant_is?.replace(/_/g, ' ') || 'N/A'}
+                  </Badge>
+                )}
               </div>
               <div className="space-y-1">
                 <Label className="text-muted-foreground text-xs font-medium uppercase">
