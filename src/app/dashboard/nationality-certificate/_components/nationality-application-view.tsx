@@ -39,7 +39,8 @@ import {
 import { getStatusColor } from '@/lib/status-utils';
 import {
   getNationalityApplicationById,
-  assessNationalityApplication
+  assessNationalityApplication,
+  rejectNationalityApplication
 } from '@/actions/issuance/nationality-application-actions';
 import { format } from 'date-fns';
 
@@ -143,15 +144,14 @@ export function NationalityApplicationView({
     }
     setIsRejecting(true);
     try {
-      // TODO: Implement reject API call
-      // const result = await rejectNationalityApplication(data.id, remarks);
-      // if (result.success) {
-      setRejectDialogOpen(false);
-      toast.success('Application rejected');
-      router.push('/dashboard/nationality-certificate/assessment');
-      // } else {
-      //   toast.error(result.error || 'Failed to reject application');
-      // }
+      const result = await rejectNationalityApplication(data.id, remarks);
+      if (result.success) {
+        setRejectDialogOpen(false);
+        toast.success('Application rejected successfully!');
+        router.push('/dashboard/nationality-certificate/assessment');
+      } else {
+        toast.error(result.message || 'Failed to reject application');
+      }
     } catch {
       toast.error('An unexpected error occurred while rejecting');
     } finally {

@@ -120,16 +120,24 @@ export async function getNationalityApplicationById(id: string) {
 }
 
 /**
- * Assess a nationality application (SUBMITTED → ASSESSED)
+ * Update nationality application status
  * @param id - The application ID
+ * @param status - The new application status (SUBMITTED, ASSESSED, APPROVED, REJECTED)
  */
-export async function assessNationalityApplication(id: string) {
+export async function updateNationalityApplicationStatus(
+  id: string,
+  status: string
+) {
   try {
     const response = await fetch(
-      `${API_URL}/nationality-applications/${id}/assess-nationality-certificate`,
+      `${API_URL}/nationality-applications/${id}/update-status`,
       {
         method: 'PATCH',
-        headers: await instance(),
+        headers: {
+          ...(await instance()),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ application_status: status }),
         cache: 'no-store'
       }
     );
@@ -142,7 +150,7 @@ export async function assessNationalityApplication(id: string) {
         errorData = await response.text();
       }
       console.error(
-        'Failed to assess nationality application:',
+        'Failed to update nationality application status:',
         response.status,
         response.statusText,
         errorData
@@ -151,7 +159,7 @@ export async function assessNationalityApplication(id: string) {
       return {
         success: false,
         error: true,
-        message: `Failed to assess application: ${response.statusText}`
+        message: `Failed to update application status: ${response.statusText}`
       };
     }
 
@@ -162,11 +170,79 @@ export async function assessNationalityApplication(id: string) {
       data
     };
   } catch (error) {
-    console.error('Error assessing nationality application:', error);
+    console.error('Error updating nationality application status:', error);
     return {
       success: false,
       error: true,
-      message: 'Failed to assess application'
+      message: 'Failed to update application status'
+    };
+  }
+}
+
+/**
+ * Assess a nationality application (SUBMITTED → ASSESSED)
+ * @param id - The application ID
+ */
+export async function assessNationalityApplication(id: string) {
+  return updateNationalityApplicationStatus(id, 'ASSESSED');
+}
+
+/**
+ * Reject a nationality application
+ * @param id - The application ID
+ * @param remarks - Rejection remarks
+ */
+export async function rejectNationalityApplication(
+  id: string,
+  remarks: string
+) {
+  try {
+    const response = await fetch(
+      `${API_URL}/nationality-applications/${id}/reject`,
+      {
+        method: 'PATCH',
+        headers: {
+          ...(await instance()),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ rejected_remarks: remarks }),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = await response.text();
+      }
+      console.error(
+        'Failed to reject nationality application:',
+        response.status,
+        response.statusText,
+        errorData
+      );
+
+      return {
+        success: false,
+        error: true,
+        message: `Failed to reject application: ${response.statusText}`
+      };
+    }
+
+    const data = await response.json();
+    return {
+      success: true,
+      error: false,
+      data
+    };
+  } catch (error) {
+    console.error('Error rejecting nationality application:', error);
+    return {
+      success: false,
+      error: true,
+      message: 'Failed to reject application'
     };
   }
 }
