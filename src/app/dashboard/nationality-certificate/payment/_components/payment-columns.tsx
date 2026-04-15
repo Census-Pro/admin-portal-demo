@@ -110,12 +110,13 @@ export const paymentColumns: ColumnDef<NationalityApplicationPayment>[] = [
       if (fee && fee.status) {
         return (
           <Badge
-            variant={
+            variant="outline"
+            className={
               fee.status === 'PAID'
-                ? 'default'
+                ? 'border-green-600 bg-green-600 text-white'
                 : fee.status === 'PENDING'
-                  ? 'secondary'
-                  : 'destructive'
+                  ? 'border-yellow-600 bg-yellow-600 text-white'
+                  : 'border-red-600 bg-red-600 text-white'
             }
           >
             {fee.status}
