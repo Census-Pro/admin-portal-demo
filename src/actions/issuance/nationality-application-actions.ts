@@ -120,6 +120,72 @@ export async function getNationalityApplicationById(id: string) {
 }
 
 /**
+ * Get assessed nationality applications with pending payment
+ * @returns Applications with ASSESSED status and pending payment
+ */
+export async function getAssessedPendingPaymentNationalityApplications() {
+  try {
+    console.log('Fetching assessed applications with pending payment');
+
+    const response = await fetch(
+      `${API_URL}/nationality-applications/assessed/pending-payment`,
+      {
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = await response.text();
+      }
+      console.error(
+        'Failed to fetch assessed pending payment applications:',
+        response.status,
+        response.statusText,
+        errorData
+      );
+
+      return {
+        applications: [],
+        total: 0,
+        error: true,
+        message: `Failed to fetch applications: ${response.statusText}`
+      };
+    }
+
+    const data = await response.json();
+    console.log('Assessed Pending Payment Applications Response:', data);
+
+    // Handle different response structures
+    const applications = Array.isArray(data)
+      ? data
+      : data.data || data.applications || [];
+    const total = data.total || data.count || applications.length;
+
+    return {
+      applications,
+      total,
+      error: false
+    };
+  } catch (error) {
+    console.error(
+      'Error fetching assessed pending payment applications:',
+      error
+    );
+    return {
+      applications: [],
+      total: 0,
+      error: true,
+      message: 'Failed to fetch applications'
+    };
+  }
+}
+
+/**
  * Update nationality application status
  * @param id - The application ID
  * @param status - The new application status (SUBMITTED, ASSESSED, APPROVED, REJECTED)
@@ -184,7 +250,51 @@ export async function updateNationalityApplicationStatus(
  * @param id - The application ID
  */
 export async function assessNationalityApplication(id: string) {
-  return updateNationalityApplicationStatus(id, 'ASSESSED');
+  try {
+    const response = await fetch(
+      `${API_URL}/nationality-applications/${id}/assess-nationality-certificate`,
+      {
+        method: 'PATCH',
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = await response.text();
+      }
+      console.error(
+        'Failed to assess nationality application:',
+        response.status,
+        response.statusText,
+        errorData
+      );
+
+      return {
+        success: false,
+        error: true,
+        message: `Failed to assess application: ${response.statusText}`
+      };
+    }
+
+    const data = await response.json();
+    return {
+      success: true,
+      error: false,
+      data
+    };
+  } catch (error) {
+    console.error('Error assessing nationality application:', error);
+    return {
+      success: false,
+      error: true,
+      message: 'Failed to assess application'
+    };
+  }
 }
 
 /**
