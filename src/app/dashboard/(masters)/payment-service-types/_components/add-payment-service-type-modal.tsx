@@ -158,6 +158,12 @@ export function AddPaymentServiceTypeModal({
                 </SelectItem>
                 <SelectItem value="cid renewal">CID Renewal</SelectItem>
                 <SelectItem value="cid replacement">CID Replacement</SelectItem>
+                <SelectItem value="relationship application">
+                  Relationship Application
+                </SelectItem>
+                <SelectItem value="nationality certificate">
+                  Nationality Certificate
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
