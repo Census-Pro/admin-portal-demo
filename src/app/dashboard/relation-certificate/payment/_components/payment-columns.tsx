@@ -51,7 +51,9 @@ function ActionsCell({
         variant="ghost"
         size="icon"
         onClick={() =>
-          router.push(`/dashboard/relation-certificate/${application.id}`)
+          router.push(
+            `/dashboard/relation-certificate/${application.id}?from=payment`
+          )
         }
       >
         <IconEye className="h-4 w-4" />
@@ -130,12 +132,13 @@ export const paymentColumns: ColumnDef<RelationshipApplicationPayment>[] = [
       if (fee && fee.status) {
         return (
           <Badge
-            variant={
+            variant="outline"
+            className={
               fee.status === 'PAID'
-                ? 'default'
+                ? 'border-green-600 bg-green-600 text-white'
                 : fee.status === 'PENDING'
-                  ? 'secondary'
-                  : 'destructive'
+                  ? 'border-yellow-600 bg-yellow-600 text-white'
+                  : 'border-red-600 bg-red-600 text-white'
             }
           >
             {fee.status}

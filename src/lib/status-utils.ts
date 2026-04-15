@@ -42,6 +42,14 @@ export const getStatusColor = (status: string) => {
     };
   }
 
+  // Assessed -> Orange
+  if (s === 'assessed') {
+    return {
+      variant: 'outline' as const,
+      className: 'border-orange-600 bg-orange-600 text-white'
+    };
+  }
+
   // Approved -> Indigo (Final State - Distinct from Verified)
   if (s === 'approved') {
     return {
