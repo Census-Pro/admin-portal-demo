@@ -27,6 +27,15 @@ export interface RelationshipApplicationPayment {
     updatedAt: string;
     name: string;
   };
+  fee?: {
+    id: string;
+    application_no: string;
+    amount: number;
+    status: string;
+    transaction_no: string | null;
+    contact_no: string;
+    payment_service_type_id: string;
+  };
 }
 
 function ActionsCell({
@@ -103,6 +112,51 @@ export const paymentColumns: ColumnDef<RelationshipApplicationPayment>[] = [
     }
   },
   {
+    accessorKey: 'fee.amount',
+    header: 'Fee Amount',
+    cell: ({ row }) => {
+      const fee = row.original.fee;
+      if (fee && fee.amount !== undefined) {
+        return <div className="font-medium">Nu. {fee.amount.toFixed(2)}</div>;
+      }
+      return <span className="text-muted-foreground">-</span>;
+    }
+  },
+  {
+    accessorKey: 'fee.status',
+    header: 'Payment Status',
+    cell: ({ row }) => {
+      const fee = row.original.fee;
+      if (fee && fee.status) {
+        return (
+          <Badge
+            variant={
+              fee.status === 'PAID'
+                ? 'default'
+                : fee.status === 'PENDING'
+                  ? 'secondary'
+                  : 'destructive'
+            }
+          >
+            {fee.status}
+          </Badge>
+        );
+      }
+      return <span className="text-muted-foreground">-</span>;
+    }
+  },
+  {
+    accessorKey: 'fee.transaction_no',
+    header: 'Transaction No.',
+    cell: ({ row }) => {
+      const fee = row.original.fee;
+      if (fee && fee.transaction_no) {
+        return <div className="font-mono text-sm">{fee.transaction_no}</div>;
+      }
+      return <span className="text-muted-foreground">-</span>;
+    }
+  },
+  {
     accessorKey: 'createdAt',
     header: 'Applied On',
     cell: ({ row }) => {
@@ -115,7 +169,7 @@ export const paymentColumns: ColumnDef<RelationshipApplicationPayment>[] = [
   },
   {
     accessorKey: 'application_status',
-    header: 'Status',
+    header: 'Application Status',
     cell: ({ row }) => {
       const status = row.getValue('application_status') as string;
       return (

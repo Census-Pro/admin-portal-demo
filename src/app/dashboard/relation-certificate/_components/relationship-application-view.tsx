@@ -63,6 +63,15 @@ interface RelationshipApplicationData {
     updatedAt: string;
     name: string;
   };
+  fee?: {
+    id: string;
+    application_no: string;
+    amount: number;
+    status: string;
+    transaction_no: string | null;
+    contact_no: string;
+    payment_service_type_id: string;
+  };
 }
 
 interface RelationshipApplicationViewProps {
@@ -405,6 +414,67 @@ export function RelationshipApplicationView({
             </div>
           </CardContent>
         </Card>
+
+        {/* Payment Details Card */}
+        {data.fee && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <IconFileText className="text-primary h-4 w-4" />
+                Payment Details
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm">
+              <div className="space-y-1">
+                <span className="text-muted-foreground text-xs uppercase">
+                  Fee Amount
+                </span>
+                <p className="font-semibold">
+                  Nu. {data.fee.amount.toFixed(2)}
+                </p>
+              </div>
+              <Separator />
+              <div className="space-y-1">
+                <span className="text-muted-foreground text-xs uppercase">
+                  Payment Status
+                </span>
+                <div>
+                  <Badge
+                    variant={
+                      data.fee.status === 'PAID'
+                        ? 'default'
+                        : data.fee.status === 'PENDING'
+                          ? 'secondary'
+                          : 'destructive'
+                    }
+                  >
+                    {data.fee.status}
+                  </Badge>
+                </div>
+              </div>
+              {data.fee.transaction_no && (
+                <>
+                  <Separator />
+                  <div className="space-y-1">
+                    <span className="text-muted-foreground text-xs uppercase">
+                      Transaction No.
+                    </span>
+                    <p className="font-mono text-xs font-medium">
+                      {data.fee.transaction_no}
+                    </p>
+                  </div>
+                </>
+              )}
+              <Separator />
+              <div className="space-y-1">
+                <span className="text-muted-foreground text-xs uppercase">
+                  Contact No.
+                </span>
+                <p className="font-medium">{data.fee.contact_no}</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Application Timeline - Can be added when timeline data is available */}
         {/* <Card>
