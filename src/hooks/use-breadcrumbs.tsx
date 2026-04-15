@@ -238,6 +238,10 @@ export function useBreadcrumbs() {
         else if (previousSegment === 'product')
           contextTitle = 'Product Details';
         else if (previousSegment === 'hoh-change') contextTitle = 'Details';
+        else if (previousSegment === 'nationality-certificate')
+          contextTitle = 'Details';
+        else if (previousSegment === 'relation-certificate')
+          contextTitle = 'Details';
 
         return {
           title: contextTitle,
