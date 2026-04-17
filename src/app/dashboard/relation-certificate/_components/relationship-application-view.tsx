@@ -444,8 +444,13 @@ export function RelationshipApplicationView({
                       data.fee.status === 'PAID'
                         ? 'default'
                         : data.fee.status === 'PENDING'
-                          ? 'secondary'
+                          ? 'outline'
                           : 'destructive'
+                    }
+                    className={
+                      data.fee.status === 'PENDING'
+                        ? 'border-yellow-600 bg-yellow-600 text-white'
+                        : ''
                     }
                   >
                     {data.fee.status}
