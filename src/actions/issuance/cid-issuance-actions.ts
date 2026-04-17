@@ -157,3 +157,71 @@ export async function getAllCIDApplications() {
     };
   }
 }
+
+/**
+ * Get all SUBMITTED CID applications filtered by payment type
+ * @param paymentType - The payment type enum (FRESH, RENEWAL, or REPLACEMENT)
+ * @returns Submitted applications for the given payment type
+ */
+export async function getSubmittedApplicationsByPaymentType(
+  paymentType: 'FRESH' | 'RENEWAL' | 'REPLACEMENT'
+) {
+  try {
+    console.log(
+      `Fetching SUBMITTED CID applications for payment type: ${paymentType}`
+    );
+
+    const response = await fetch(
+      `${API_URL}/cid-issuance/applications/submitted?payment_type=${paymentType}`,
+      {
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = await response.text();
+      }
+      console.error(
+        'Failed to fetch SUBMITTED applications:',
+        response.status,
+        response.statusText,
+        errorData
+      );
+
+      return {
+        applications: [],
+        total: 0,
+        error: true,
+        message: `Failed to fetch SUBMITTED applications: ${response.statusText}`
+      };
+    }
+
+    const data = await response.json();
+    console.log('SUBMITTED Applications Response:', data);
+
+    // Handle different response structures
+    const applications = Array.isArray(data)
+      ? data
+      : data.data || data.applications || [];
+    const total = data.total || data.count || applications.length;
+
+    return {
+      applications,
+      total,
+      error: false
+    };
+  } catch (error) {
+    console.error('Error fetching SUBMITTED applications:', error);
+    return {
+      applications: [],
+      total: 0,
+      error: true,
+      message: 'Failed to fetch SUBMITTED applications'
+    };
+  }
+}
