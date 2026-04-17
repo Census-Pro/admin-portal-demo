@@ -1,8 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
 import { DataTable } from '@/components/ui/table/data-table';
-import { columns } from '../../_components/columns';
-import { getAllPaymentServiceTypes } from '@/actions/common/payment-service-type-actions';
-import { getCIDApplicationsByPaymentType } from '@/actions/issuance/cid-issuance-actions';
+import { assessmentColumns } from '../../_components/assessment-columns';
+import { getSubmittedApplicationsByPaymentType } from '@/actions/issuance/cid-issuance-actions';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { IconInfoCircle } from '@tabler/icons-react';
 
@@ -11,41 +10,18 @@ export const metadata = {
 };
 
 export default async function RenewalAssessmentPage() {
-  const paymentTypesResult = await getAllPaymentServiceTypes();
-
   let applications = [];
   let errorMessage = '';
 
-  if (paymentTypesResult?.error) {
+  // Fetch SUBMITTED applications for RENEWAL payment type
+  const applicationsResult =
+    await getSubmittedApplicationsByPaymentType('RENEWAL');
+
+  if (applicationsResult.error) {
     errorMessage =
-      paymentTypesResult.message || 'Failed to load payment service types';
+      applicationsResult.message || 'Failed to load SUBMITTED applications';
   } else {
-    const paymentTypes = Array.isArray(paymentTypesResult)
-      ? paymentTypesResult
-      : paymentTypesResult?.data || [];
-
-    const renewalPaymentType = paymentTypes.find((type: any) => {
-      const name = type.name?.toLowerCase() || '';
-      return (
-        name.includes('renew') || name === 'cid renewal' || name === 'cid renew'
-      );
-    });
-
-    if (renewalPaymentType) {
-      const applicationsResult = await getCIDApplicationsByPaymentType(
-        renewalPaymentType.id
-      );
-
-      if (applicationsResult.error) {
-        errorMessage =
-          applicationsResult.message || 'Failed to load applications';
-      } else {
-        applications = applicationsResult.applications || [];
-      }
-    } else {
-      errorMessage =
-        'Payment service type for CID Renewal not found. Please configure payment service types first.';
-    }
+    applications = applicationsResult.applications || [];
   }
 
   return (
@@ -62,7 +38,7 @@ export default async function RenewalAssessmentPage() {
         )}
 
         <DataTable
-          columns={columns}
+          columns={assessmentColumns}
           data={applications}
           totalItems={applications.length}
         />
