@@ -91,19 +91,35 @@ export async function getCIDApplicationsByPaymentType(paymentTypeId: string) {
  */
 export async function getCIDApplicationById(id: string) {
   try {
+    console.log(`Fetching CID application by ID: ${id}`);
+    console.log(`API URL: ${API_URL}/cid-issuance/applications/${id}`);
+
     const response = await fetch(`${API_URL}/cid-issuance/applications/${id}`, {
       headers: await instance(),
       cache: 'no-store'
     });
 
+    console.log(`Response status: ${response.status} ${response.statusText}`);
+
     if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+        console.error('Error response data:', errorData);
+      } catch (e) {
+        errorData = await response.text();
+        console.error('Error response text:', errorData);
+      }
+
       return {
         error: true,
-        message: `Failed to fetch CID application: ${response.statusText}`
+        message: `Failed to fetch CID application: ${response.statusText}${errorData ? ` - ${JSON.stringify(errorData)}` : ''}`
       };
     }
 
     const data = await response.json();
+    console.log('CID Application data:', data);
+
     return {
       application: data.data || data,
       error: false
@@ -112,7 +128,7 @@ export async function getCIDApplicationById(id: string) {
     console.error('Error fetching CID application:', error);
     return {
       error: true,
-      message: 'Failed to fetch CID application'
+      message: `Failed to fetch CID application: ${error instanceof Error ? error.message : 'Unknown error'}`
     };
   }
 }
