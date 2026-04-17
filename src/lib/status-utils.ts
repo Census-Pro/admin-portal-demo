@@ -26,7 +26,7 @@ export const getStatusColor = (status: string) => {
     };
   }
 
-  // In Review / Processing -> Amber
+  // In Review / Processing -> Yellow (matching relation certificate payment page)
   if (
     [
       'in_review',
@@ -38,7 +38,7 @@ export const getStatusColor = (status: string) => {
   ) {
     return {
       variant: 'outline' as const,
-      className: 'border-amber-500 bg-amber-500 text-white'
+      className: 'border-yellow-600 bg-yellow-600 text-white'
     };
   }
 

@@ -201,10 +201,14 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
                             application.parent_approval === 'APPROVED'
                               ? 'default'
                               : application.parent_approval === 'PENDING'
-                                ? 'secondary'
+                                ? 'outline'
                                 : 'destructive'
                           }
-                          className="uppercase"
+                          className={`uppercase ${
+                            application.parent_approval === 'PENDING'
+                              ? 'border-yellow-600 bg-yellow-600 text-white'
+                              : ''
+                          }`}
                         >
                           {application.parent_approval}
                         </Badge>

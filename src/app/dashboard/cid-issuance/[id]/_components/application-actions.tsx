@@ -6,6 +6,17 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { assessFreshCidApplication } from '@/actions/issuance/cid-issuance-actions';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 
 interface ApplicationActionsProps {
   application: {
@@ -73,15 +84,39 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
       case 'SUBMITTED':
         return (
           <>
-            <Button
-              variant="default"
-              className="flex-1 bg-green-600 hover:bg-green-700"
-              onClick={handleAssess}
-              disabled={isLoading}
-            >
-              <IconCheck className="mr-2 h-4 w-4" />
-              Assess
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="default"
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  disabled={isLoading}
+                >
+                  <IconCheck className="mr-2 h-4 w-4" />
+                  {isLoading ? 'Assessing...' : 'Assess'}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirm Assessment</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to assess and approve this
+                    relationship certificate application for{' '}
+                    {application.application_no}?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleAssess}
+                    className="bg-green-600 hover:bg-green-700"
+                    disabled={isLoading}
+                  >
+                    <IconCheck className="mr-2 h-4 w-4" />
+                    Yes, Assess
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button
               variant="destructive"
               className="flex-1"

@@ -107,11 +107,16 @@ export const assessmentColumns: ColumnDef<CIDApplicationResponse>[] = [
         approval === 'APPROVED'
           ? 'default'
           : approval === 'PENDING'
-            ? 'secondary'
+            ? 'outline'
             : 'destructive';
 
+      const className =
+        approval === 'PENDING'
+          ? 'border-yellow-600 bg-yellow-600 text-white'
+          : '';
+
       return (
-        <Badge variant={variant} className="uppercase">
+        <Badge variant={variant} className={`uppercase ${className}`}>
           {approval}
         </Badge>
       );
