@@ -19,6 +19,7 @@ import { getCIDApplicationById } from '@/actions/issuance/cid-issuance-actions';
 import { format } from 'date-fns';
 import { BackButton } from '@/components/ui/back-button';
 import { ApplicationActions } from './_components/application-actions';
+import { ApplicationPhoto } from './_components/application-photo';
 
 interface PageProps {
   params: Promise<{
@@ -60,6 +61,29 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
     .join(' ');
 
   const statusStyle = getStatusColor(application.status);
+
+  // Construct proxy URL for photo (similar to announcements)
+  // MinIO URLs need to be proxied through the backend to avoid CORS issues
+  const getPhotoUrl = (photoUrl: string | undefined) => {
+    if (!photoUrl) return null;
+
+    // If it's already a full URL, return as is
+    if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
+      return photoUrl;
+    }
+
+    // Use issuance service proxy URL
+    // Format: http://localhost:5010/media/{objectName}
+    // Example: issuance-service/cid-photos/2026/file.png
+    // Becomes: http://localhost:5010/media/issuance-service/cid-photos/2026/file.png
+    const issuanceServiceUrl =
+      process.env.ISSUANCE_SERVICE || 'http://localhost:5010';
+    const proxyUrl = `${issuanceServiceUrl}/media/${photoUrl}`;
+
+    return proxyUrl;
+  };
+
+  const photoUrl = getPhotoUrl(application.photo_url);
 
   return (
     <PageContainer
@@ -261,29 +285,10 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {application.photo_url ? (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">Applicant Photo</p>
-                        <Badge variant="secondary">IMAGE</Badge>
-                      </div>
-                      <div className="border-muted overflow-hidden rounded-lg border">
-                        <img
-                          src={application.photo_url}
-                          alt="Applicant Photo"
-                          className="h-auto w-full object-contain"
-                          style={{ maxHeight: '600px' }}
-                        />
-                      </div>
-                    </>
-                  ) : (
-                    <Alert>
-                      <IconInfoCircle className="h-4 w-4" />
-                      <AlertDescription>
-                        No photo uploaded for this application.
-                      </AlertDescription>
-                    </Alert>
-                  )}
+                  <ApplicationPhoto
+                    photoUrl={photoUrl}
+                    originalPhotoUrl={application.photo_url}
+                  />
                 </div>
               </CardContent>
             </Card>
