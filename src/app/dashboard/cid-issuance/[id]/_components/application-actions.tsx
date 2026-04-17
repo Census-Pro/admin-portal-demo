@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { IconCheck, IconX } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { assessFreshCidApplication } from '@/actions/issuance/cid-issuance-actions';
+import { toast } from 'sonner';
 
 interface ApplicationActionsProps {
   application: {
@@ -20,12 +22,19 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
   const handleAssess = async () => {
     setIsLoading(true);
     try {
-      // TODO: Implement assess API call
-      console.log('Assessing application:', application.id);
-      // await assessApplication(application.id);
-      router.refresh();
+      const result = await assessFreshCidApplication(application.id);
+
+      if (result.success) {
+        toast.success(result.message || 'Application assessed successfully');
+        router.refresh();
+      } else {
+        toast.error(result.message || 'Failed to assess application');
+      }
     } catch (error) {
       console.error('Error assessing application:', error);
+      toast.error(
+        'An unexpected error occurred while assessing the application'
+      );
     } finally {
       setIsLoading(false);
     }

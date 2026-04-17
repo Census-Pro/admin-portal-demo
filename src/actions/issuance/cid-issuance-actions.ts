@@ -241,3 +241,58 @@ export async function getSubmittedApplicationsByPaymentType(
     };
   }
 }
+
+/**
+ * Assess a fresh CID application (changes status from SUBMITTED to ASSESSED)
+ * @param id - The application ID
+ * @returns Success status and message
+ */
+export async function assessFreshCidApplication(id: string) {
+  try {
+    console.log(`Assessing fresh CID application with ID: ${id}`);
+
+    const response = await fetch(
+      `${API_URL}/cid-issuance/applications/${id}/assess-fresh-cid`,
+      {
+        method: 'PATCH',
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
+
+    console.log(
+      `Assess response status: ${response.status} ${response.statusText}`
+    );
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+        console.error('Error response data:', errorData);
+      } catch (e) {
+        errorData = await response.text();
+        console.error('Error response text:', errorData);
+      }
+
+      return {
+        success: false,
+        message: `Failed to assess application: ${response.statusText}${errorData ? ` - ${JSON.stringify(errorData)}` : ''}`
+      };
+    }
+
+    const data = await response.json();
+    console.log('Assess application response:', data);
+
+    return {
+      success: true,
+      message: 'Application assessed successfully',
+      data: data.data || data
+    };
+  } catch (error) {
+    console.error('Error assessing fresh CID application:', error);
+    return {
+      success: false,
+      message: `Failed to assess application: ${error instanceof Error ? error.message : 'Unknown error'}`
+    };
+  }
+}
