@@ -5,12 +5,19 @@ import { instance } from '../instance';
 
 const API_URL = process.env.N_R_M_SERVICE || 'http://localhost:5009';
 
+interface ResettlementData {
+  id: string;
+  cidNo: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Transform API response from snake_case to camelCase
-function transformResettlementData(item: any) {
+function transformResettlementData(item: any): ResettlementData | null {
   if (!item) return null;
   return {
     id: item.id,
-    cidNo: item.cid_no,
+    cidNo: item.cid_no || '',
     createdAt: item.createdAt,
     updatedAt: item.updatedAt
   };
@@ -85,8 +92,10 @@ export async function getResettlements({
       (Array.isArray(data) ? data.length : 0);
 
     // Transform snake_case to camelCase
-    const transformedData = Array.isArray(data)
-      ? data.map(transformResettlementData).filter(Boolean)
+    const transformedData: ResettlementData[] = Array.isArray(data)
+      ? data
+          .map(transformResettlementData)
+          .filter((item): item is ResettlementData => item !== null)
       : [];
 
     return {
@@ -143,8 +152,10 @@ export async function getAllResettlements() {
     const data = result.data || result || [];
 
     // Transform snake_case to camelCase
-    const transformedData = Array.isArray(data)
-      ? data.map(transformResettlementData).filter(Boolean)
+    const transformedData: ResettlementData[] = Array.isArray(data)
+      ? data
+          .map(transformResettlementData)
+          .filter((item): item is ResettlementData => item !== null)
       : [];
 
     return {
