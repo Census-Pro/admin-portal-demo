@@ -38,7 +38,7 @@ export function ResettlementSearchBar() {
     <div className="flex items-center gap-2">
       <div className="relative max-w-sm flex-1">
         <Input
-          placeholder="Search by name..."
+          placeholder="Search by CID number..."
           value={searchParams.q}
           onChange={(e) => handleSearch(e.target.value)}
           className={cn('pr-4', isLoading && 'animate-pulse')}

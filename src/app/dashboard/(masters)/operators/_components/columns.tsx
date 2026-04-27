@@ -124,7 +124,12 @@ function ActionsCell({
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="icon" onClick={handleEditClick}>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleEditClick}
+        className="text-muted-foreground hover:text-foreground"
+      >
         <IconEdit className="h-4 w-4" />
       </Button>
 
@@ -132,7 +137,7 @@ function ActionsCell({
         variant="ghost"
         size="icon"
         onClick={handleDeleteClick}
-        className="hover:bg-red-50 hover:text-red-600"
+        className="text-destructive hover:text-destructive"
       >
         <IconTrash className="h-4 w-4" />
       </Button>

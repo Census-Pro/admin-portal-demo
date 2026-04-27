@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
   createResettlement,
-  checkNameExists
+  checkCidExists
 } from '@/actions/common/resettlement-actions';
 import { toast } from 'sonner';
 import {
@@ -30,25 +30,25 @@ export function AddResettlementModal({
   onSuccess
 }: AddResettlementModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCheckingName, setIsCheckingName] = useState(false);
-  const [name, setName] = useState('');
+  const [isCheckingCid, setIsCheckingCid] = useState(false);
+  const [cidNo, setCidNo] = useState('');
   const [error, setError] = useState('');
 
-  const handleNameBlur = async () => {
-    if (name && name.trim().length > 0) {
-      setIsCheckingName(true);
-      const result = await checkNameExists(name);
-      setIsCheckingName(false);
+  const handleCidBlur = async () => {
+    if (cidNo && cidNo.length === 11) {
+      setIsCheckingCid(true);
+      const result = await checkCidExists(cidNo);
+      setIsCheckingCid(false);
 
       if (result.exists) {
-        setError('This resettlement name already exists');
+        setError('This CID number is already registered in resettlement');
       }
     }
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setName(value);
+  const handleCidChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 11);
+    setCidNo(value);
     setError('');
   };
 
@@ -56,26 +56,26 @@ export function AddResettlementModal({
     e.preventDefault();
     setError('');
 
-    if (!name || name.trim().length === 0) {
-      setError('Resettlement name is required');
+    if (!cidNo || cidNo.length !== 11) {
+      setError('CID number must be exactly 11 digits');
       return;
     }
 
     setIsSubmitting(true);
 
-    // Double-check name existence before submitting
-    const checkResult = await checkNameExists(name);
+    // Double-check CID existence before submitting
+    const checkResult = await checkCidExists(cidNo);
     if (checkResult.exists) {
-      setError('This resettlement name already exists');
+      setError('This CID number is already registered in resettlement');
       setIsSubmitting(false);
       return;
     }
 
-    const result = await createResettlement({ name: name.trim() });
+    const result = await createResettlement({ cid_no: cidNo });
 
     if (result.success) {
       toast.success(result.message || 'Resettlement created successfully');
-      setName('');
+      setCidNo('');
       setError('');
       onSuccess?.();
     } else {
@@ -91,29 +91,31 @@ export function AddResettlementModal({
         <DialogHeader>
           <DialogTitle>Add New Resettlement</DialogTitle>
           <DialogDescription>
-            Create a new resettlement by entering the name.
+            Create a new resettlement by entering their CID number.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-2">
-            <Label htmlFor="name">Resettlement Name *</Label>
+            <Label htmlFor="cidNo">CID Number *</Label>
             <div className="relative">
               <Input
-                id="name"
-                placeholder="Enter resettlement name"
-                value={name}
-                onChange={handleNameChange}
-                onBlur={handleNameBlur}
+                id="cidNo"
+                placeholder="Enter 11-digit CID number"
+                value={cidNo}
+                onChange={handleCidChange}
+                onBlur={handleCidBlur}
                 disabled={isSubmitting}
+                maxLength={11}
+                className="font-mono"
               />
-              {isCheckingName && (
+              {isCheckingCid && (
                 <IconLoader2 className="text-muted-foreground absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 animate-spin" />
               )}
             </div>
             {error && <p className="text-destructive text-sm">{error}</p>}
             <p className="text-muted-foreground text-xs">
-              Enter a unique resettlement name
+              Enter a valid 11-digit CID number
             </p>
           </div>
 
@@ -126,7 +128,7 @@ export function AddResettlementModal({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || isCheckingName}>
+            <Button type="submit" disabled={isSubmitting || isCheckingCid}>
               {isSubmitting && (
                 <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
               )}

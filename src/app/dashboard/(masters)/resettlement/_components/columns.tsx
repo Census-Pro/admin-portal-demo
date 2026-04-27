@@ -17,7 +17,7 @@ import { EditResettlementModal } from './edit-resettlement-modal';
 
 interface Resettlement {
   id: string;
-  name: string;
+  cidNo: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -26,14 +26,14 @@ export const columns = (
   onDataChange?: () => void
 ): ColumnDef<Resettlement>[] => [
   {
-    accessorKey: 'name',
+    accessorKey: 'cidNo',
     header: ({ column }) => (
       <Button
         variant="ghost"
         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         className="-ml-3 h-8 gap-1"
       >
-        Resettlement Name
+        CID Number
         {column.getIsSorted() === 'asc' ? (
           <IconSortAscending className="h-4 w-4" />
         ) : column.getIsSorted() === 'desc' ? (
@@ -47,11 +47,13 @@ export const columns = (
       const resettlement = row.original;
       return (
         <div className="flex items-center gap-3">
-          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium uppercase">
-            {resettlement.name.charAt(0)}
+          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+            {resettlement.cidNo?.charAt(0) || '?'}
           </div>
           <div>
-            <div className="font-medium">{resettlement.name}</div>
+            <div className="font-mono font-medium">
+              {resettlement.cidNo || '-'}
+            </div>
           </div>
         </div>
       );
@@ -128,7 +130,12 @@ function ActionsCell({
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="ghost" size="icon" onClick={handleEditClick}>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={handleEditClick}
+        className="text-muted-foreground hover:text-foreground"
+      >
         <IconEdit className="h-4 w-4" />
       </Button>
 
@@ -136,7 +143,7 @@ function ActionsCell({
         variant="ghost"
         size="icon"
         onClick={handleDeleteClick}
-        className="hover:bg-red-50 hover:text-red-600"
+        className="text-destructive hover:text-destructive"
       >
         <IconTrash className="h-4 w-4" />
       </Button>
@@ -147,7 +154,7 @@ function ActionsCell({
         onConfirm={handleConfirmDelete}
         isLoading={isDeleting}
         title="Delete Resettlement"
-        description={`Are you sure you want to delete resettlement "${resettlement.name}"? This action cannot be undone.`}
+        description={`Are you sure you want to delete resettlement with CID ${resettlement.cidNo}? This action cannot be undone.`}
       />
 
       <EditResettlementModal

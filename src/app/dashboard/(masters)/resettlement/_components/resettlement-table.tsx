@@ -10,7 +10,7 @@ import { useSessionExpired } from '@/hooks/use-session-expired';
 
 interface Resettlement {
   id: string;
-  name: string;
+  cidNo: string;
   createdAt?: string;
   updatedAt?: string;
 }

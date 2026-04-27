@@ -3,7 +3,18 @@
 import { revalidatePath } from 'next/cache';
 import { instance } from '../instance';
 
-const API_URL = process.env.COMMON_SERVICE || 'http://localhost:5003';
+const API_URL = process.env.N_R_M_SERVICE || 'http://localhost:5009';
+
+// Transform API response from snake_case to camelCase
+function transformResettlementData(item: any) {
+  if (!item) return null;
+  return {
+    id: item.id,
+    cidNo: item.cid_no,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt
+  };
+}
 
 export async function getResettlements({
   page,
@@ -17,11 +28,11 @@ export async function getResettlements({
   try {
     const headers = await instance();
 
-    // Build query params - backend expects 'take' not 'limit'
+    // Build query params - backend expects 'take' not 'limit', and 'cidNo' not 'search'
     const params = new URLSearchParams();
     if (page) params.append('page', page.toString());
     if (limit) params.append('take', limit.toString());
-    if (search) params.append('search', search);
+    if (search) params.append('cidNo', search);
 
     const url = `${API_URL}/resettlement${params.toString() ? `?${params.toString()}` : ''}`;
 
@@ -73,9 +84,14 @@ export async function getResettlements({
       result.total ||
       (Array.isArray(data) ? data.length : 0);
 
+    // Transform snake_case to camelCase
+    const transformedData = Array.isArray(data)
+      ? data.map(transformResettlementData).filter(Boolean)
+      : [];
+
     return {
       success: true,
-      data: Array.isArray(data) ? data : [],
+      data: transformedData,
       totalItems
     };
   } catch (error) {
@@ -124,10 +140,16 @@ export async function getAllResettlements() {
     }
 
     const result = await response.json();
+    const data = result.data || result || [];
+
+    // Transform snake_case to camelCase
+    const transformedData = Array.isArray(data)
+      ? data.map(transformResettlementData).filter(Boolean)
+      : [];
 
     return {
       success: true,
-      data: result.data || result || []
+      data: transformedData
     };
   } catch (error) {
     console.error('getAllResettlements error:', error);
@@ -167,10 +189,11 @@ export async function getResettlementById(id: string) {
     }
 
     const result = await response.json();
+    const data = result.data || result;
 
     return {
       success: true,
-      data: result.data || result
+      data: transformResettlementData(data)
     };
   } catch (error) {
     console.error('getResettlementById error:', error);
@@ -183,17 +206,14 @@ export async function getResettlementById(id: string) {
   }
 }
 
-export async function checkNameExists(name: string) {
+export async function checkCidExists(cidNo: string) {
   try {
     const headers = await instance();
-    const response = await fetch(
-      `${API_URL}/resettlement/check/${encodeURIComponent(name)}`,
-      {
-        method: 'GET',
-        headers,
-        cache: 'no-store'
-      }
-    );
+    const response = await fetch(`${API_URL}/resettlement/check/${cidNo}`, {
+      method: 'GET',
+      headers,
+      cache: 'no-store'
+    });
 
     if (!response.ok) {
       return {
@@ -218,7 +238,7 @@ export async function checkNameExists(name: string) {
   }
 }
 
-export async function createResettlement(data: { name: string }) {
+export async function createResettlement(data: { cid_no: string }) {
   try {
     const headers = await instance();
 
@@ -267,7 +287,10 @@ export async function createResettlement(data: { name: string }) {
   }
 }
 
-export async function updateResettlement(data: { id: string; name?: string }) {
+export async function updateResettlement(data: {
+  id: string;
+  cid_no?: string;
+}) {
   try {
     const { id, ...updateData } = data;
     const headers = await instance();
