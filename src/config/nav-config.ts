@@ -242,6 +242,15 @@ export const navItems: NavItem[] = [
         access: {
           permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_OPERATORS]
         }
+      },
+      {
+        title: 'Resettlement',
+        url: '/dashboard/resettlement',
+        shortcut: ['r', 's'],
+        subject: 'Resettlement',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_RESETTLEMENT]
+        }
       }
     ]
     // Parent access is automatic - shows if user has access to ANY child item

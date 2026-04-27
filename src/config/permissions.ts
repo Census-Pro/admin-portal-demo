@@ -451,6 +451,16 @@ export const DELETE_OPERATORS = 'delete:operators' as const;
 export const MANAGE_OPERATORS = 'manage:operators' as const;
 
 // ============================================================================
+// RESETTLEMENT PERMISSIONS
+// ============================================================================
+
+export const VIEW_RESETTLEMENT = 'read:resettlement' as const;
+export const CREATE_RESETTLEMENT = 'create:resettlement' as const;
+export const EDIT_RESETTLEMENT = 'update:resettlement' as const;
+export const DELETE_RESETTLEMENT = 'delete:resettlement' as const;
+export const MANAGE_RESETTLEMENT = 'manage:resettlement' as const;
+
+// ============================================================================
 // CMS PERMISSIONS
 // ============================================================================
 
@@ -736,6 +746,11 @@ export type Permission =
   | typeof EDIT_OPERATORS
   | typeof DELETE_OPERATORS
   | typeof MANAGE_OPERATORS
+  | typeof VIEW_RESETTLEMENT
+  | typeof CREATE_RESETTLEMENT
+  | typeof EDIT_RESETTLEMENT
+  | typeof DELETE_RESETTLEMENT
+  | typeof MANAGE_RESETTLEMENT
   | typeof VIEW_ANNOUNCEMENTS
   | typeof CREATE_ANNOUNCEMENTS
   | typeof EDIT_ANNOUNCEMENTS
