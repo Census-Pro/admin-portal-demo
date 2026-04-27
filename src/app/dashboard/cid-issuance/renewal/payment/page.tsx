@@ -1,8 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
 import { DataTable } from '@/components/ui/table/data-table';
 import { columns } from '../../_components/columns';
-import { getAllPaymentServiceTypes } from '@/actions/common/payment-service-type-actions';
-import { getCIDApplicationsByPaymentType } from '@/actions/issuance/cid-issuance-actions';
+import { getAssessedApplicationsByPaymentType } from '@/actions/issuance/cid-issuance-actions';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { IconInfoCircle } from '@tabler/icons-react';
 
@@ -11,41 +10,16 @@ export const metadata = {
 };
 
 export default async function RenewalPaymentPage() {
-  const paymentTypesResult = await getAllPaymentServiceTypes();
+  const applicationsResult =
+    await getAssessedApplicationsByPaymentType('RENEWAL');
 
   let applications = [];
   let errorMessage = '';
 
-  if (paymentTypesResult?.error) {
-    errorMessage =
-      paymentTypesResult.message || 'Failed to load payment service types';
+  if (applicationsResult.error) {
+    errorMessage = applicationsResult.message || 'Failed to load applications';
   } else {
-    const paymentTypes = Array.isArray(paymentTypesResult)
-      ? paymentTypesResult
-      : paymentTypesResult?.data || [];
-
-    const renewalPaymentType = paymentTypes.find((type: any) => {
-      const name = type.name?.toLowerCase() || '';
-      return (
-        name.includes('renew') || name === 'cid renewal' || name === 'cid renew'
-      );
-    });
-
-    if (renewalPaymentType) {
-      const applicationsResult = await getCIDApplicationsByPaymentType(
-        renewalPaymentType.id
-      );
-
-      if (applicationsResult.error) {
-        errorMessage =
-          applicationsResult.message || 'Failed to load applications';
-      } else {
-        applications = applicationsResult.applications || [];
-      }
-    } else {
-      errorMessage =
-        'Payment service type for CID Renewal not found. Please configure payment service types first.';
-    }
+    applications = applicationsResult.applications || [];
   }
 
   return (
