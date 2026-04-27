@@ -6,21 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { getStatusColor, getTypeColor } from '@/lib/status-utils';
+import { getStatusColor } from '@/lib/status-utils';
 
 export interface CIDApplication {
   id: string;
-  applicant_name: string;
-  applicant_cid?: string;
-  date_of_birth: string;
-  gender: string;
-  dzongkhag: string;
-  gewog: string;
-  application_type: 'NEW' | 'RENEWAL' | 'REPLACEMENT' | 'UPDATE';
+  application_no?: string;
+  applicant_cid_no?: string;
+  applicant_contact_no?: string;
+  cid_no?: string;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
+  parent_cid_no?: string;
+  parent_contact_no?: string;
+  date_of_birth?: string;
   status: string;
-  created_at?: string;
-  phone_number?: string;
-  email?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  payment_type_id?: string;
+  parent_approval?: string;
+  reasons_id?: string;
+  photo_url?: string;
+  place_of_collection?: string;
 }
 
 function ActionsCell({ application }: { application: CIDApplication }) {
@@ -42,20 +49,51 @@ function ActionsCell({ application }: { application: CIDApplication }) {
 
 export const columns: ColumnDef<CIDApplication>[] = [
   {
-    accessorKey: 'applicant_name',
-    header: 'Applicant Name',
+    accessorKey: 'application_no',
+    header: 'Application No',
     cell: ({ row }) => {
       return (
-        <div className="font-medium">{row.getValue('applicant_name')}</div>
+        <div className="font-medium">
+          {row.getValue('application_no') || 'N/A'}
+        </div>
       );
     }
   },
   {
-    accessorKey: 'applicant_cid',
+    accessorKey: 'first_name',
+    header: 'Applicant Name',
+    cell: ({ row }) => {
+      const firstName = row.getValue('first_name') as string;
+      const middleName = row.original.middle_name;
+      const lastName = row.original.last_name;
+      const fullName = [firstName, middleName, lastName]
+        .filter(Boolean)
+        .join(' ');
+      return <div className="font-medium">{fullName || 'N/A'}</div>;
+    }
+  },
+  {
+    accessorKey: 'applicant_cid_no',
+    header: 'Applicant CID',
+    cell: ({ row }) => {
+      const cid = row.getValue('applicant_cid_no') as string;
+      return <div className="font-mono">{cid || 'N/A'}</div>;
+    }
+  },
+  {
+    accessorKey: 'cid_no',
     header: 'CID Number',
     cell: ({ row }) => {
-      const cid = row.getValue('applicant_cid') as string;
+      const cid = row.getValue('cid_no') as string;
       return <div className="font-mono">{cid || 'N/A'}</div>;
+    }
+  },
+  {
+    accessorKey: 'applicant_contact_no',
+    header: 'Contact No',
+    cell: ({ row }) => {
+      const contact = row.getValue('applicant_contact_no') as string;
+      return <div>{contact || 'N/A'}</div>;
     }
   },
   {
@@ -63,6 +101,7 @@ export const columns: ColumnDef<CIDApplication>[] = [
     header: 'Date of Birth',
     cell: ({ row }) => {
       const date = row.getValue('date_of_birth') as string;
+      if (!date) return '-';
       try {
         return format(new Date(date), 'MMM dd, yyyy');
       } catch {
@@ -71,42 +110,24 @@ export const columns: ColumnDef<CIDApplication>[] = [
     }
   },
   {
-    accessorKey: 'gender',
-    header: 'Gender',
+    accessorKey: 'parent_approval',
+    header: 'Parent Approval',
     cell: ({ row }) => {
-      return <div>{row.getValue('gender')}</div>;
-    }
-  },
-  {
-    accessorKey: 'dzongkhag',
-    header: 'Dzongkhag',
-    cell: ({ row }) => {
-      return (
-        <div className="max-w-[150px] truncate">
-          {row.getValue('dzongkhag')}
-        </div>
-      );
-    }
-  },
-  {
-    accessorKey: 'application_type',
-    header: 'Type',
-    cell: ({ row }) => {
-      const type = row.getValue('application_type') as string;
-      const { variant, className } = getTypeColor(type);
-
+      const approval = row.getValue('parent_approval') as string;
+      if (!approval) return '-';
+      const { variant, className } = getStatusColor(approval);
       return (
         <Badge variant={variant} className={`whitespace-nowrap ${className}`}>
-          {type}
+          {approval}
         </Badge>
       );
     }
   },
   {
-    accessorKey: 'created_at',
+    accessorKey: 'createdAt',
     header: 'Submitted Date',
     cell: ({ row }) => {
-      const date = row.getValue('created_at') as string;
+      const date = row.getValue('createdAt') as string;
       if (!date) return '-';
       try {
         return format(new Date(date), 'MMM dd, yyyy');

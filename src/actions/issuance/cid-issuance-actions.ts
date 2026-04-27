@@ -243,6 +243,82 @@ export async function getSubmittedApplicationsByPaymentType(
 }
 
 /**
+ * Get all ASSESSED CID applications filtered by payment type
+ * @param paymentType - The payment type enum (FRESH, RENEWAL, or REPLACEMENT)
+ * @param feeStatus - Optional fee status filter (PAID or UNPAID)
+ * @returns Assessed applications for the given payment type
+ */
+export async function getAssessedApplicationsByPaymentType(
+  paymentType: 'FRESH' | 'RENEWAL' | 'REPLACEMENT',
+  feeStatus?: 'PAID' | 'UNPAID'
+) {
+  try {
+    console.log(
+      `Fetching ASSESSED CID applications for payment type: ${paymentType}${feeStatus ? `, fee status: ${feeStatus}` : ''}`
+    );
+
+    const queryParams = new URLSearchParams();
+    queryParams.append('payment_type', paymentType);
+    if (feeStatus) {
+      queryParams.append('fee_status', feeStatus);
+    }
+
+    const response = await fetch(
+      `${API_URL}/cid-issuance/applications/assessed?${queryParams.toString()}`,
+      {
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = await response.text();
+      }
+      console.error(
+        'Failed to fetch ASSESSED applications:',
+        response.status,
+        response.statusText,
+        errorData
+      );
+
+      return {
+        applications: [],
+        total: 0,
+        error: true,
+        message: `Failed to fetch ASSESSED applications: ${response.statusText}`
+      };
+    }
+
+    const data = await response.json();
+    console.log('ASSESSED Applications Response:', data);
+
+    // Handle different response structures
+    const applications = Array.isArray(data)
+      ? data
+      : data.data || data.applications || [];
+    const total = data.total || data.count || applications.length;
+
+    return {
+      applications,
+      total,
+      error: false
+    };
+  } catch (error) {
+    console.error('Error fetching ASSESSED applications:', error);
+    return {
+      applications: [],
+      total: 0,
+      error: true,
+      message: 'Failed to fetch ASSESSED applications'
+    };
+  }
+}
+
+/**
  * Assess a fresh CID application (changes status from SUBMITTED to ASSESSED)
  * @param id - The application ID
  * @returns Success status and message
