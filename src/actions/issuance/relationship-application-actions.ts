@@ -187,6 +187,68 @@ export async function getAssessedPendingPaymentApplications() {
 }
 
 /**
+ * Get assessed relationship applications with paid payment
+ * @returns Applications with ASSESSED status and paid payment
+ */
+export async function getAssessedPaidPaymentApplications() {
+  try {
+    console.log('Fetching assessed applications with paid payment');
+
+    const response = await fetch(
+      `${API_URL}/relationship-application/assessed/paid-payment`,
+      {
+        headers: await instance(),
+        cache: 'no-store'
+      }
+    );
+
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = await response.text();
+      }
+      console.error(
+        'Failed to fetch assessed paid payment applications:',
+        response.status,
+        response.statusText,
+        errorData
+      );
+
+      return {
+        applications: [],
+        total: 0,
+        error: true,
+        message: `Failed to fetch assessed applications: ${response.statusText}`
+      };
+    }
+
+    const data = await response.json();
+    console.log('Assessed Paid Payment Applications Response:', data);
+
+    const applications = Array.isArray(data)
+      ? data
+      : data.data || data.applications || [];
+    const total = data.total || data.count || applications.length;
+
+    return {
+      applications,
+      total,
+      error: false
+    };
+  } catch (error) {
+    console.error('Error fetching assessed paid payment applications:', error);
+    return {
+      applications: [],
+      total: 0,
+      error: true,
+      message: 'Failed to fetch assessed applications'
+    };
+  }
+}
+
+/**
  * Assess a relationship application (SUBMITTED → ASSESSED)
  * @param id - The application ID
  */
