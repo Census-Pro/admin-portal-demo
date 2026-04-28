@@ -244,6 +244,15 @@ export const navItems: NavItem[] = [
         }
       },
       {
+        title: 'CID Collection Points',
+        url: '/dashboard/cid-collection-points',
+        shortcut: ['c', 'c'],
+        subject: 'CID Collection Points',
+        access: {
+          permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CID_COLLECTION_POINTS]
+        }
+      },
+      {
         title: 'Resettlement',
         url: '/dashboard/resettlement',
         shortcut: ['r', 's'],

@@ -451,6 +451,20 @@ export const DELETE_OPERATORS = 'delete:operators' as const;
 export const MANAGE_OPERATORS = 'manage:operators' as const;
 
 // ============================================================================
+// CID COLLECTION POINTS PERMISSIONS
+// ============================================================================
+
+export const VIEW_CID_COLLECTION_POINTS = 'read:cid-collection-points' as const;
+export const CREATE_CID_COLLECTION_POINTS =
+  'create:cid-collection-points' as const;
+export const EDIT_CID_COLLECTION_POINTS =
+  'update:cid-collection-points' as const;
+export const DELETE_CID_COLLECTION_POINTS =
+  'delete:cid-collection-points' as const;
+export const MANAGE_CID_COLLECTION_POINTS =
+  'manage:cid-collection-points' as const;
+
+// ============================================================================
 // RESETTLEMENT PERMISSIONS
 // ============================================================================
 
@@ -746,6 +760,11 @@ export type Permission =
   | typeof EDIT_OPERATORS
   | typeof DELETE_OPERATORS
   | typeof MANAGE_OPERATORS
+  | typeof VIEW_CID_COLLECTION_POINTS
+  | typeof CREATE_CID_COLLECTION_POINTS
+  | typeof EDIT_CID_COLLECTION_POINTS
+  | typeof DELETE_CID_COLLECTION_POINTS
+  | typeof MANAGE_CID_COLLECTION_POINTS
   | typeof VIEW_RESETTLEMENT
   | typeof CREATE_RESETTLEMENT
   | typeof EDIT_RESETTLEMENT
