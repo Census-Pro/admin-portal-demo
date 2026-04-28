@@ -104,9 +104,6 @@ export function CidCollectionPointsTable({
         columns={columns(onDataChange)}
         data={data}
         totalItems={totalItems}
-        isLoading={isLoading}
-        emptyMessage="No CID collection points found"
-        emptyDescription="Get started by adding your first CID collection point."
       />
       <SessionExpiredDialog />
     </>
