@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 export interface NationalityApplicationPayment {
   id: string;
   createdAt: string;
+  created_at?: string;
   updatedAt: string;
   application_no: string;
   applicant_cid_no: string;
@@ -81,7 +82,11 @@ export const paymentColumns: ColumnDef<NationalityApplicationPayment>[] = [
     header: 'Applicant Type',
     cell: ({ row }) => {
       const type = row.getValue('applicant_is') as string;
-      return (
+      return type === 'PARENT' ? (
+        <Badge className="bg-purple-600 text-white hover:bg-purple-700">
+          {type?.replace(/_/g, ' ') || 'N/A'}
+        </Badge>
+      ) : (
         <Badge variant="outline">{type?.replace(/_/g, ' ') || 'N/A'}</Badge>
       );
     }
@@ -127,13 +132,16 @@ export const paymentColumns: ColumnDef<NationalityApplicationPayment>[] = [
     }
   },
   {
-    accessorKey: 'createdAt',
+    accessorKey: 'created_at',
     header: 'Applied On',
     cell: ({ row }) => {
       try {
-        return format(new Date(row.getValue('createdAt')), 'MMM dd, yyyy');
+        return format(
+          new Date(row.original.created_at ?? row.original.createdAt),
+          'MMM dd, yyyy'
+        );
       } catch {
-        return row.getValue('createdAt');
+        return '-';
       }
     }
   },
