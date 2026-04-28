@@ -75,3 +75,13 @@ export async function getDashboardStats() {
     };
   }
 }
+
+export interface ServiceStats {
+  name: string;
+  shortName: string;
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+  href: string;
+}

@@ -1,9 +1,63 @@
 import PageContainer from '@/components/layout/page-container';
 import { getDashboardStats } from '@/actions/dashboard/stats-actions';
+import type { ServiceStats } from '@/actions/dashboard/stats-actions';
 import { DashboardClient } from './_components/dashboard-client';
 import { auth } from '@/auth';
 import { redirect } from 'next/navigation';
 import { checkPermission } from '@/lib/permission-check';
+
+const DUMMY_ANALYTICS_SERVICES: ServiceStats[] = [
+  {
+    name: 'CID Issuance',
+    shortName: 'CID',
+    total: 128,
+    pending: 34,
+    approved: 81,
+    rejected: 13,
+    href: '/dashboard/cid-issuance'
+  },
+  {
+    name: 'Birth Registration',
+    shortName: 'Birth',
+    total: 74,
+    pending: 18,
+    approved: 52,
+    rejected: 4,
+    href: '/dashboard/birth-registration'
+  },
+  {
+    name: 'HOH Change',
+    shortName: 'HOH',
+    total: 45,
+    pending: 12,
+    approved: 29,
+    rejected: 4,
+    href: '/dashboard/hoh-change'
+  },
+  {
+    name: 'Nationality Certificate',
+    shortName: 'Nationality',
+    total: 31,
+    pending: 9,
+    approved: 20,
+    rejected: 2,
+    href: '/dashboard/nationality-certificate'
+  },
+  {
+    name: 'Relation Certificate',
+    shortName: 'Relation',
+    total: 22,
+    pending: 5,
+    approved: 16,
+    rejected: 1,
+    href: '/dashboard/relation-certificate'
+  }
+];
+
+const DUMMY_TOTAL_PENDING = DUMMY_ANALYTICS_SERVICES.reduce(
+  (sum, s) => sum + s.pending,
+  0
+);
 
 export default async function OverviewPage() {
   const session = await auth();
@@ -62,7 +116,12 @@ export default async function OverviewPage() {
       pageTitle="Welcome back 👋"
       pageDescription="Here's an overview of your admin portal"
     >
-      <DashboardClient stats={dashboardStats} error={statsResult.error} />
+      <DashboardClient
+        stats={dashboardStats}
+        error={statsResult.error}
+        analyticsServices={DUMMY_ANALYTICS_SERVICES}
+        analyticsTotalPending={DUMMY_TOTAL_PENDING}
+      />
     </PageContainer>
   );
 }

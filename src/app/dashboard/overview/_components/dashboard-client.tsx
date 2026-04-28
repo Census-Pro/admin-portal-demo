@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { AlertCircle, Users, Shield, Lock, Activity } from 'lucide-react';
 import Link from 'next/link';
+import { AnalyticsSection } from './analytics-section';
+import type { ServiceStats } from '@/actions/dashboard/stats-actions';
 
 interface DashboardStat {
   label: string;
@@ -19,6 +21,8 @@ interface DashboardStat {
 interface DashboardClientProps {
   stats: DashboardStat[];
   error?: string;
+  analyticsServices?: ServiceStats[];
+  analyticsTotalPending?: number;
 }
 
 // Map icon names to icon components
@@ -29,7 +33,12 @@ const iconMap = {
   activity: Activity
 };
 
-export function DashboardClient({ stats, error }: DashboardClientProps) {
+export function DashboardClient({
+  stats,
+  error,
+  analyticsServices,
+  analyticsTotalPending
+}: DashboardClientProps) {
   if (error) {
     return (
       <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-6 text-center">
@@ -105,13 +114,20 @@ export function DashboardClient({ stats, error }: DashboardClientProps) {
         })}
       </div>
 
-      <Card className="flex h-64 items-center justify-center border-dashed">
-        <CardContent>
-          <p className="text-muted-foreground text-center font-medium">
-            Analytics & Power BI Widgets coming soon
-          </p>
-        </CardContent>
-      </Card>
+      {analyticsServices && analyticsServices.length > 0 ? (
+        <AnalyticsSection
+          services={analyticsServices}
+          totalPending={analyticsTotalPending ?? 0}
+        />
+      ) : (
+        <Card className="flex h-32 items-center justify-center border-dashed">
+          <CardContent>
+            <p className="text-muted-foreground text-center text-sm">
+              Loading service analytics...
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </motion.div>
   );
 }
