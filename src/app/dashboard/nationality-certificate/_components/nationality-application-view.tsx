@@ -28,13 +28,16 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   IconUser,
   IconUsers,
   IconFileText,
   IconCheck,
   IconX,
-  IconPhone
+  IconPhone,
+  IconBell,
+  IconCash
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
 import {
@@ -73,10 +76,19 @@ interface NationalityApplicationData {
 
 interface NationalityApplicationViewProps {
   applicationId: string;
+  from?: string;
+}
+
+interface ManualPaymentForm {
+  totalAmount: number;
+  transactionNo: string;
+  transactionDate: string;
+  remarks: string;
 }
 
 export function NationalityApplicationView({
-  applicationId
+  applicationId,
+  from
 }: NationalityApplicationViewProps) {
   const router = useRouter();
   const [data, setData] = useState<NationalityApplicationData | null>(null);
@@ -86,6 +98,17 @@ export function NationalityApplicationView({
   const [remarks, setRemarks] = useState('');
   const [isAssessing, setIsAssessing] = useState(false);
   const [isRejecting, setIsRejecting] = useState(false);
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
+  const [isManualPaymentLoading, setIsManualPaymentLoading] = useState(false);
+  const [manualPaymentOpen, setManualPaymentOpen] = useState(false);
+  const [manualPaymentForm, setManualPaymentForm] = useState<ManualPaymentForm>(
+    {
+      totalAmount: 0,
+      transactionNo: '',
+      transactionDate: '',
+      remarks: ''
+    }
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -156,6 +179,39 @@ export function NationalityApplicationView({
       toast.error('An unexpected error occurred while rejecting');
     } finally {
       setIsRejecting(false);
+    }
+  };
+
+  const handleSendPaymentNotification = async () => {
+    setIsSendingNotification(true);
+    try {
+      // TODO: Implement send payment notification API call
+      toast.success('Payment notification sent successfully');
+    } catch {
+      toast.error('Failed to send payment notification');
+    } finally {
+      setIsSendingNotification(false);
+    }
+  };
+
+  const handleManualPaymentSubmit = async () => {
+    if (!manualPaymentForm.transactionNo.trim()) {
+      toast.error('Please provide a transaction number');
+      return;
+    }
+    if (!manualPaymentForm.transactionDate) {
+      toast.error('Please provide a transaction date');
+      return;
+    }
+    setIsManualPaymentLoading(true);
+    try {
+      // TODO: Implement manual payment API call
+      toast.success('Manual payment processed successfully');
+      setManualPaymentOpen(false);
+    } catch {
+      toast.error('Failed to process manual payment');
+    } finally {
+      setIsManualPaymentLoading(false);
     }
   };
 
@@ -338,91 +394,218 @@ export function NationalityApplicationView({
 
         {/* Action Buttons Section */}
         <div className="flex gap-4 pt-4">
-          {/* Assess Button */}
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
+          {from === 'payment' ? (
+            <>
+              <Button
+                variant="default"
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                onClick={handleSendPaymentNotification}
+                disabled={isSendingNotification || isManualPaymentLoading}
+              >
+                <IconBell className="mr-2 h-4 w-4" />
+                {isSendingNotification
+                  ? 'Sending...'
+                  : 'Send Payment Notification'}
+              </Button>
+              <Button
+                variant="default"
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                onClick={() => {
+                  setManualPaymentForm((f) => ({
+                    ...f,
+                    totalAmount: data.fee?.amount ?? 0
+                  }));
+                  setManualPaymentOpen(true);
+                }}
+                disabled={isSendingNotification || isManualPaymentLoading}
+              >
+                <IconCash className="mr-2 h-4 w-4" />
+                Manual Payment
+              </Button>
+
+              <Dialog
+                open={manualPaymentOpen}
+                onOpenChange={setManualPaymentOpen}
+              >
+                <DialogContent className="sm:max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Manual Payment</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid gap-4 py-4">
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="totalAmount">
+                        Total Amount <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="totalAmount"
+                        type="number"
+                        value={manualPaymentForm.totalAmount}
+                        readOnly
+                        className="bg-muted cursor-not-allowed"
+                      />
+                    </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="transactionNo">
+                        Transaction No <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="transactionNo"
+                        type="text"
+                        value={manualPaymentForm.transactionNo}
+                        onChange={(e) =>
+                          setManualPaymentForm((f) => ({
+                            ...f,
+                            transactionNo: e.target.value
+                          }))
+                        }
+                        placeholder="Enter transaction number"
+                      />
+                    </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="transactionDate">
+                        Transaction Date <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="transactionDate"
+                        type="date"
+                        value={manualPaymentForm.transactionDate}
+                        onChange={(e) =>
+                          setManualPaymentForm((f) => ({
+                            ...f,
+                            transactionDate: e.target.value
+                          }))
+                        }
+                      />
+                    </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor="paymentRemarks">Remarks</Label>
+                      <Textarea
+                        id="paymentRemarks"
+                        value={manualPaymentForm.remarks}
+                        onChange={(e) =>
+                          setManualPaymentForm((f) => ({
+                            ...f,
+                            remarks: e.target.value
+                          }))
+                        }
+                        placeholder="Enter remarks (optional)"
+                        rows={3}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setManualPaymentOpen(false)}
+                      disabled={isManualPaymentLoading}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleManualPaymentSubmit}
+                      disabled={isManualPaymentLoading}
+                    >
+                      {isManualPaymentLoading
+                        ? 'Processing...'
+                        : 'Submit Payment'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </>
+          ) : (
+            <>
+              {/* Assess Button */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    disabled={isAssessing || isRejecting}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    <IconCheck className="mr-2 h-4 w-4" />
+                    {isAssessing ? 'Assessing...' : 'Assess'}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Assessment</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to assess and approve this
+                      nationality certificate application (CID:{' '}
+                      {data.applicant_cid_no})?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleAssess}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <IconCheck className="mr-2 h-4 w-4" />
+                      Yes, Assess
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              {/* Reject Button */}
               <Button
                 disabled={isAssessing || isRejecting}
-                className="flex-1 bg-green-600 hover:bg-green-700"
+                variant="destructive"
+                className="flex-1"
+                onClick={() => {
+                  setRemarks('');
+                  setRejectDialogOpen(true);
+                }}
               >
-                <IconCheck className="mr-2 h-4 w-4" />
-                {isAssessing ? 'Assessing...' : 'Assess'}
+                <IconX className="mr-2 h-4 w-4" />
+                {isRejecting ? 'Rejecting...' : 'Reject'}
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Assessment</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Are you sure you want to assess and approve this nationality
-                  certificate application (CID: {data.applicant_cid_no})?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleAssess}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  <IconCheck className="mr-2 h-4 w-4" />
-                  Yes, Assess
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
 
-          {/* Reject Button */}
-          <Button
-            disabled={isAssessing || isRejecting}
-            variant="destructive"
-            className="flex-1"
-            onClick={() => {
-              setRemarks('');
-              setRejectDialogOpen(true);
-            }}
-          >
-            <IconX className="mr-2 h-4 w-4" />
-            {isRejecting ? 'Rejecting...' : 'Reject'}
-          </Button>
-
-          <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Reject Application</DialogTitle>
-                <DialogDescription>
-                  Please provide a reason for rejecting this application.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="remarks">Rejection Remarks</Label>
-                  <Textarea
-                    id="remarks"
-                    placeholder="Enter reason for rejection..."
-                    value={remarks}
-                    onChange={(e) => setRemarks(e.target.value)}
-                    rows={4}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setRejectDialogOpen(false)}
-                  disabled={isRejecting}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleReject}
-                  disabled={isRejecting}
-                >
-                  <IconX className="mr-2 h-4 w-4" />
-                  {isRejecting ? 'Rejecting...' : 'Reject Application'}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              <Dialog
+                open={rejectDialogOpen}
+                onOpenChange={setRejectDialogOpen}
+              >
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Reject Application</DialogTitle>
+                    <DialogDescription>
+                      Please provide a reason for rejecting this application.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="remarks">Rejection Remarks</Label>
+                      <Textarea
+                        id="remarks"
+                        placeholder="Enter reason for rejection..."
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setRejectDialogOpen(false)}
+                      disabled={isRejecting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleReject}
+                      disabled={isRejecting}
+                    >
+                      <IconX className="mr-2 h-4 w-4" />
+                      {isRejecting ? 'Rejecting...' : 'Reject Application'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
         </div>
       </div>
 

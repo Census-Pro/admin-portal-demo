@@ -53,7 +53,7 @@ export default async function NationalityApplicationDetailPage({
         </Link>
       }
     >
-      <NationalityApplicationView applicationId={id} />
+      <NationalityApplicationView applicationId={id} from={from} />
     </PageContainer>
   );
 }

@@ -53,7 +53,7 @@ export default async function RelationshipApplicationDetailPage({
         </Link>
       }
     >
-      <RelationshipApplicationView applicationId={id} />
+      <RelationshipApplicationView applicationId={id} from={from} />
     </PageContainer>
   );
 }
