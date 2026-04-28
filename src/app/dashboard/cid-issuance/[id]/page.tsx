@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 import { BackButton } from '@/components/ui/back-button';
 import { ApplicationActions } from './_components/application-actions';
 import { ApplicationPhoto } from './_components/application-photo';
+import { PhotoComparison } from './_components/photo-comparison';
 import { DUMMY_CID_APPLICATION } from '../_dummy-data';
 
 interface PageProps {
@@ -287,7 +288,7 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
           {/* Right Column - 60% (3 columns) */}
           <div className="lg:col-span-3">
             {/* Supporting Documents */}
-            <Card className="h-full">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <IconFileText className="h-5 w-5" />
@@ -296,10 +297,18 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <ApplicationPhoto
-                    photoUrl={photoUrl}
-                    originalPhotoUrl={application.photo_url}
-                  />
+                  {id === DUMMY_CID_APPLICATION.id ? (
+                    <PhotoComparison
+                      censusPhotoUrl={DUMMY_CID_APPLICATION.census_photo_url}
+                      uploadedPhotoUrl={DUMMY_CID_APPLICATION.photo_url!}
+                      matchScore={DUMMY_CID_APPLICATION.face_match_score}
+                    />
+                  ) : (
+                    <ApplicationPhoto
+                      photoUrl={photoUrl}
+                      originalPhotoUrl={application.photo_url}
+                    />
+                  )}
                 </div>
               </CardContent>
             </Card>
