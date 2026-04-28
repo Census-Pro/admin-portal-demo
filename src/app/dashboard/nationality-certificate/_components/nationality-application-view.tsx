@@ -46,6 +46,7 @@ import {
   rejectNationalityApplication
 } from '@/actions/issuance/nationality-application-actions';
 import { format } from 'date-fns';
+import { NationalityCertificatePreview } from './nationality-certificate-preview';
 
 const DUMMY_DATA_MAP: Record<string, NationalityApplicationData> = {
   'dummy-1': {
@@ -269,555 +270,594 @@ export function NationalityApplicationView({
     );
   }
 
-  return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      {/* Main Content - Left Column */}
-      <div className="space-y-6 lg:col-span-2">
-        {/* Applicant Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <IconUser className="text-primary h-5 w-5" />
-              Applicant Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-8">
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs font-medium uppercase">
-                  Applicant CID
-                </Label>
-                <p className="font-mono text-sm font-semibold">
-                  {data.applicant_cid_no || 'N/A'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs font-medium uppercase">
-                  Applicant Type
-                </Label>
-                {data.applicant_is === 'PARENT' ? (
-                  <Badge
-                    variant="default"
-                    className="bg-purple-600 hover:bg-purple-700"
-                  >
-                    {data.applicant_is?.replace(/_/g, ' ') || 'N/A'}
-                  </Badge>
-                ) : (
-                  <Badge variant="outline">
-                    {data.applicant_is?.replace(/_/g, ' ') || 'N/A'}
-                  </Badge>
-                )}
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs font-medium uppercase">
-                  Contact Number
-                </Label>
-                <p className="flex items-center gap-2 text-sm font-medium">
-                  <IconPhone className="h-4 w-4" />
-                  {data.applicant_contact_no || 'N/A'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs font-medium uppercase">
-                  Parent Approval
-                </Label>
-                <Badge
-                  variant={
-                    data.parent_approval === 'APPROVED'
-                      ? 'default'
-                      : data.parent_approval === 'PENDING'
-                        ? 'secondary'
-                        : 'destructive'
-                  }
-                >
-                  {data.parent_approval || 'N/A'}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+  const certData = {
+    refNo: `DHA(DCRC-17)${new Date().getFullYear()}/${data.application_no}`,
+    date: format(new Date(), 'dd-MM-yyyy'),
+    name: data.minor_name ?? data.applicant_cid_no,
+    cidNo: data.minor_cid ?? '',
+    dob: data.dob ? format(new Date(data.dob), 'dd/MM/yyyy') : '',
+    sex: 'Male',
+    dzongkhag: 'Thimphu',
+    gewog: 'Chang',
+    village: 'Dechenphu',
+    householdNo: '120100001',
+    houseNo: 'W-1-23',
+    thramNo: '201',
+    fatherName: 'Dorji Wangchuk',
+    fatherCid: '11601000123',
+    motherName: 'Kinley Wangmo',
+    motherCid: '11601000456',
+    presentAddress: 'Thimphu/Chang/Dechenphu',
+    photoUrl: data.half_photo
+  };
 
-        {/* Minor Information (if applicable) */}
-        {(data.minor_cid || data.minor_name) && (
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Main Content - Left Column */}
+        <div className="space-y-6 lg:col-span-2">
+          {/* Applicant Information */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <IconUsers className="text-primary h-5 w-5" />
-                Minor Information
+                <IconUser className="text-primary h-5 w-5" />
+                Applicant Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-8">
-                {data.minor_name && (
-                  <div className="space-y-1">
-                    <Label className="text-muted-foreground text-xs font-medium uppercase">
-                      Minor Name
-                    </Label>
-                    <p className="text-sm font-semibold uppercase">
-                      {data.minor_name}
-                    </p>
-                  </div>
-                )}
-                {data.minor_cid && (
-                  <div className="space-y-1">
-                    <Label className="text-muted-foreground text-xs font-medium uppercase">
-                      Minor CID
-                    </Label>
-                    <p className="font-mono text-sm font-semibold">
-                      {data.minor_cid}
-                    </p>
-                  </div>
-                )}
-                {data.dob && (
-                  <div className="space-y-1">
-                    <Label className="text-muted-foreground text-xs font-medium uppercase">
-                      Date of Birth
-                    </Label>
-                    <p className="text-sm font-semibold">
-                      {format(new Date(data.dob), 'MMM dd, yyyy')}
-                    </p>
-                  </div>
-                )}
+                <div className="space-y-1">
+                  <Label className="text-muted-foreground text-xs font-medium uppercase">
+                    Applicant CID
+                  </Label>
+                  <p className="font-mono text-sm font-semibold">
+                    {data.applicant_cid_no || 'N/A'}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-muted-foreground text-xs font-medium uppercase">
+                    Applicant Type
+                  </Label>
+                  {data.applicant_is === 'PARENT' ? (
+                    <Badge
+                      variant="default"
+                      className="bg-purple-600 hover:bg-purple-700"
+                    >
+                      {data.applicant_is?.replace(/_/g, ' ') || 'N/A'}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline">
+                      {data.applicant_is?.replace(/_/g, ' ') || 'N/A'}
+                    </Badge>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-muted-foreground text-xs font-medium uppercase">
+                    Contact Number
+                  </Label>
+                  <p className="flex items-center gap-2 text-sm font-medium">
+                    <IconPhone className="h-4 w-4" />
+                    {data.applicant_contact_no || 'N/A'}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-muted-foreground text-xs font-medium uppercase">
+                    Parent Approval
+                  </Label>
+                  <Badge
+                    variant={
+                      data.parent_approval === 'APPROVED'
+                        ? 'default'
+                        : data.parent_approval === 'PENDING'
+                          ? 'secondary'
+                          : 'destructive'
+                    }
+                  >
+                    {data.parent_approval || 'N/A'}
+                  </Badge>
+                </div>
               </div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Application Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <IconFileText className="text-primary h-5 w-5" />
-              Application Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Application No</span>
-              <span className="font-mono font-semibold">
-                {data.application_no || 'N/A'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Applied Date</span>
-              <span className="font-semibold">
-                {data.createdAt
-                  ? format(new Date(data.createdAt), 'MMM dd, yyyy')
-                  : 'N/A'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Last Updated</span>
-              <span className="font-semibold">
-                {data.updatedAt
-                  ? format(new Date(data.updatedAt), 'MMM dd, yyyy')
-                  : 'N/A'}
-              </span>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <Label className="text-muted-foreground text-xs font-medium uppercase">
-                Status
-              </Label>
-              <Badge variant={variant} className={statusClassName}>
-                {data.application_status}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Action Buttons Section */}
-        <div className="flex gap-4 pt-4">
-          {from === 'approval' ? (
-            <>
-              {/* Approve Button */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button className="flex-1 bg-green-600 hover:bg-green-700">
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    Approve
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to approve this nationality
-                      certificate application (CID: {data.applicant_cid_no})?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      className="bg-green-600 hover:bg-green-700"
-                      onClick={() =>
-                        toast.info('Approval action not yet implemented')
-                      }
-                    >
-                      <IconCheck className="mr-2 h-4 w-4" />
-                      Yes, Approve
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-
-              {/* Reject Button */}
-              <Button
-                variant="destructive"
-                className="flex-1"
-                onClick={() => {
-                  setRemarks('');
-                  setRejectDialogOpen(true);
-                }}
-              >
-                <IconX className="mr-2 h-4 w-4" />
-                Reject
-              </Button>
-
-              <Dialog
-                open={rejectDialogOpen}
-                onOpenChange={setRejectDialogOpen}
-              >
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Reject Application</DialogTitle>
-                    <DialogDescription>
-                      Please provide a reason for rejecting this application.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="remarks">Rejection Remarks</Label>
-                      <Textarea
-                        id="remarks"
-                        placeholder="Enter reason for rejection..."
-                        value={remarks}
-                        onChange={(e) => setRemarks(e.target.value)}
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setRejectDialogOpen(false)}
-                      disabled={isRejecting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={handleReject}
-                      disabled={isRejecting}
-                    >
-                      <IconX className="mr-2 h-4 w-4" />
-                      {isRejecting ? 'Rejecting...' : 'Reject Application'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </>
-          ) : from === 'payment' ? (
-            <>
-              <Button
-                variant="default"
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
-                onClick={handleSendPaymentNotification}
-                disabled={isSendingNotification || isManualPaymentLoading}
-              >
-                <IconBell className="mr-2 h-4 w-4" />
-                {isSendingNotification
-                  ? 'Sending...'
-                  : 'Send Payment Notification'}
-              </Button>
-              <Button
-                variant="default"
-                className="flex-1 bg-green-600 hover:bg-green-700"
-                onClick={() => {
-                  setManualPaymentForm((f) => ({
-                    ...f,
-                    totalAmount: data.fee?.amount ?? 0
-                  }));
-                  setManualPaymentOpen(true);
-                }}
-                disabled={isSendingNotification || isManualPaymentLoading}
-              >
-                <IconCash className="mr-2 h-4 w-4" />
-                Manual Payment
-              </Button>
-
-              <Dialog
-                open={manualPaymentOpen}
-                onOpenChange={setManualPaymentOpen}
-              >
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Manual Payment</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-1.5">
-                      <Label htmlFor="totalAmount">
-                        Total Amount <span className="text-red-500">*</span>
+          {/* Minor Information (if applicable) */}
+          {(data.minor_cid || data.minor_name) && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <IconUsers className="text-primary h-5 w-5" />
+                  Minor Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-8">
+                  {data.minor_name && (
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs font-medium uppercase">
+                        Minor Name
                       </Label>
-                      <Input
-                        id="totalAmount"
-                        type="number"
-                        value={manualPaymentForm.totalAmount}
-                        readOnly
-                        className="bg-muted cursor-not-allowed"
-                      />
+                      <p className="text-sm font-semibold uppercase">
+                        {data.minor_name}
+                      </p>
                     </div>
-                    <div className="grid gap-1.5">
-                      <Label htmlFor="transactionNo">
-                        Transaction No <span className="text-red-500">*</span>
+                  )}
+                  {data.minor_cid && (
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs font-medium uppercase">
+                        Minor CID
                       </Label>
-                      <Input
-                        id="transactionNo"
-                        type="text"
-                        value={manualPaymentForm.transactionNo}
-                        onChange={(e) =>
-                          setManualPaymentForm((f) => ({
-                            ...f,
-                            transactionNo: e.target.value
-                          }))
-                        }
-                        placeholder="Enter transaction number"
-                      />
+                      <p className="font-mono text-sm font-semibold">
+                        {data.minor_cid}
+                      </p>
                     </div>
-                    <div className="grid gap-1.5">
-                      <Label htmlFor="transactionDate">
-                        Transaction Date <span className="text-red-500">*</span>
+                  )}
+                  {data.dob && (
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs font-medium uppercase">
+                        Date of Birth
                       </Label>
-                      <Input
-                        id="transactionDate"
-                        type="date"
-                        value={manualPaymentForm.transactionDate}
-                        onChange={(e) =>
-                          setManualPaymentForm((f) => ({
-                            ...f,
-                            transactionDate: e.target.value
-                          }))
-                        }
-                      />
+                      <p className="text-sm font-semibold">
+                        {format(new Date(data.dob), 'MMM dd, yyyy')}
+                      </p>
                     </div>
-                    <div className="grid gap-1.5">
-                      <Label htmlFor="paymentRemarks">Remarks</Label>
-                      <Textarea
-                        id="paymentRemarks"
-                        value={manualPaymentForm.remarks}
-                        onChange={(e) =>
-                          setManualPaymentForm((f) => ({
-                            ...f,
-                            remarks: e.target.value
-                          }))
-                        }
-                        placeholder="Enter remarks (optional)"
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setManualPaymentOpen(false)}
-                      disabled={isManualPaymentLoading}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleManualPaymentSubmit}
-                      disabled={isManualPaymentLoading}
-                    >
-                      {isManualPaymentLoading
-                        ? 'Processing...'
-                        : 'Submit Payment'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </>
-          ) : (
-            <>
-              {/* Assess Button */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    disabled={isAssessing || isRejecting}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    {isAssessing ? 'Assessing...' : 'Assess'}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Confirm Assessment</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to assess and approve this
-                      nationality certificate application (CID:{' '}
-                      {data.applicant_cid_no})?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleAssess}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      <IconCheck className="mr-2 h-4 w-4" />
-                      Yes, Assess
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-
-              {/* Reject Button */}
-              <Button
-                disabled={isAssessing || isRejecting}
-                variant="destructive"
-                className="flex-1"
-                onClick={() => {
-                  setRemarks('');
-                  setRejectDialogOpen(true);
-                }}
-              >
-                <IconX className="mr-2 h-4 w-4" />
-                {isRejecting ? 'Rejecting...' : 'Reject'}
-              </Button>
-
-              <Dialog
-                open={rejectDialogOpen}
-                onOpenChange={setRejectDialogOpen}
-              >
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Reject Application</DialogTitle>
-                    <DialogDescription>
-                      Please provide a reason for rejecting this application.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="remarks">Rejection Remarks</Label>
-                      <Textarea
-                        id="remarks"
-                        placeholder="Enter reason for rejection..."
-                        value={remarks}
-                        onChange={(e) => setRemarks(e.target.value)}
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setRejectDialogOpen(false)}
-                      disabled={isRejecting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={handleReject}
-                      disabled={isRejecting}
-                    >
-                      <IconX className="mr-2 h-4 w-4" />
-                      {isRejecting ? 'Rejecting...' : 'Reject Application'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           )}
+
+          {/* Application Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <IconFileText className="text-primary h-5 w-5" />
+                Application Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Application No</span>
+                <span className="font-mono font-semibold">
+                  {data.application_no || 'N/A'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Applied Date</span>
+                <span className="font-semibold">
+                  {data.createdAt
+                    ? format(new Date(data.createdAt), 'MMM dd, yyyy')
+                    : 'N/A'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Last Updated</span>
+                <span className="font-semibold">
+                  {data.updatedAt
+                    ? format(new Date(data.updatedAt), 'MMM dd, yyyy')
+                    : 'N/A'}
+                </span>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <Label className="text-muted-foreground text-xs font-medium uppercase">
+                  Status
+                </Label>
+                <Badge variant={variant} className={statusClassName}>
+                  {data.application_status}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Action Buttons Section */}
+          <div className="flex gap-4 pt-4">
+            {from === 'approval' ? (
+              <>
+                {/* Approve Button */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                      <IconCheck className="mr-2 h-4 w-4" />
+                      Approve
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to approve this nationality
+                        certificate application (CID: {data.applicant_cid_no})?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() =>
+                          toast.info('Approval action not yet implemented')
+                        }
+                      >
+                        <IconCheck className="mr-2 h-4 w-4" />
+                        Yes, Approve
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
+                {/* Reject Button */}
+                <Button
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => {
+                    setRemarks('');
+                    setRejectDialogOpen(true);
+                  }}
+                >
+                  <IconX className="mr-2 h-4 w-4" />
+                  Reject
+                </Button>
+
+                <Dialog
+                  open={rejectDialogOpen}
+                  onOpenChange={setRejectDialogOpen}
+                >
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Reject Application</DialogTitle>
+                      <DialogDescription>
+                        Please provide a reason for rejecting this application.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="remarks">Rejection Remarks</Label>
+                        <Textarea
+                          id="remarks"
+                          placeholder="Enter reason for rejection..."
+                          value={remarks}
+                          onChange={(e) => setRemarks(e.target.value)}
+                          rows={4}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setRejectDialogOpen(false)}
+                        disabled={isRejecting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleReject}
+                        disabled={isRejecting}
+                      >
+                        <IconX className="mr-2 h-4 w-4" />
+                        {isRejecting ? 'Rejecting...' : 'Reject Application'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
+            ) : from === 'payment' ? (
+              <>
+                <Button
+                  variant="default"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  onClick={handleSendPaymentNotification}
+                  disabled={isSendingNotification || isManualPaymentLoading}
+                >
+                  <IconBell className="mr-2 h-4 w-4" />
+                  {isSendingNotification
+                    ? 'Sending...'
+                    : 'Send Payment Notification'}
+                </Button>
+                <Button
+                  variant="default"
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={() => {
+                    setManualPaymentForm((f) => ({
+                      ...f,
+                      totalAmount: data.fee?.amount ?? 0
+                    }));
+                    setManualPaymentOpen(true);
+                  }}
+                  disabled={isSendingNotification || isManualPaymentLoading}
+                >
+                  <IconCash className="mr-2 h-4 w-4" />
+                  Manual Payment
+                </Button>
+
+                <Dialog
+                  open={manualPaymentOpen}
+                  onOpenChange={setManualPaymentOpen}
+                >
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Manual Payment</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-1.5">
+                        <Label htmlFor="totalAmount">
+                          Total Amount <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="totalAmount"
+                          type="number"
+                          value={manualPaymentForm.totalAmount}
+                          readOnly
+                          className="bg-muted cursor-not-allowed"
+                        />
+                      </div>
+                      <div className="grid gap-1.5">
+                        <Label htmlFor="transactionNo">
+                          Transaction No <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="transactionNo"
+                          type="text"
+                          value={manualPaymentForm.transactionNo}
+                          onChange={(e) =>
+                            setManualPaymentForm((f) => ({
+                              ...f,
+                              transactionNo: e.target.value
+                            }))
+                          }
+                          placeholder="Enter transaction number"
+                        />
+                      </div>
+                      <div className="grid gap-1.5">
+                        <Label htmlFor="transactionDate">
+                          Transaction Date{' '}
+                          <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="transactionDate"
+                          type="date"
+                          value={manualPaymentForm.transactionDate}
+                          onChange={(e) =>
+                            setManualPaymentForm((f) => ({
+                              ...f,
+                              transactionDate: e.target.value
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-1.5">
+                        <Label htmlFor="paymentRemarks">Remarks</Label>
+                        <Textarea
+                          id="paymentRemarks"
+                          value={manualPaymentForm.remarks}
+                          onChange={(e) =>
+                            setManualPaymentForm((f) => ({
+                              ...f,
+                              remarks: e.target.value
+                            }))
+                          }
+                          placeholder="Enter remarks (optional)"
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setManualPaymentOpen(false)}
+                        disabled={isManualPaymentLoading}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleManualPaymentSubmit}
+                        disabled={isManualPaymentLoading}
+                      >
+                        {isManualPaymentLoading
+                          ? 'Processing...'
+                          : 'Submit Payment'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
+            ) : (
+              <>
+                {/* Assess Button */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      disabled={isAssessing || isRejecting}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      <IconCheck className="mr-2 h-4 w-4" />
+                      {isAssessing ? 'Assessing...' : 'Assess'}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Assessment</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to assess and approve this
+                        nationality certificate application (CID:{' '}
+                        {data.applicant_cid_no})?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleAssess}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <IconCheck className="mr-2 h-4 w-4" />
+                        Yes, Assess
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
+                {/* Reject Button */}
+                <Button
+                  disabled={isAssessing || isRejecting}
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => {
+                    setRemarks('');
+                    setRejectDialogOpen(true);
+                  }}
+                >
+                  <IconX className="mr-2 h-4 w-4" />
+                  {isRejecting ? 'Rejecting...' : 'Reject'}
+                </Button>
+
+                <Dialog
+                  open={rejectDialogOpen}
+                  onOpenChange={setRejectDialogOpen}
+                >
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Reject Application</DialogTitle>
+                      <DialogDescription>
+                        Please provide a reason for rejecting this application.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="remarks">Rejection Remarks</Label>
+                        <Textarea
+                          id="remarks"
+                          placeholder="Enter reason for rejection..."
+                          value={remarks}
+                          onChange={(e) => setRemarks(e.target.value)}
+                          rows={4}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setRejectDialogOpen(false)}
+                        disabled={isRejecting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleReject}
+                        disabled={isRejecting}
+                      >
+                        <IconX className="mr-2 h-4 w-4" />
+                        {isRejecting ? 'Rejecting...' : 'Reject Application'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Sidebar - Right Column */}
-      <div className="space-y-6">
-        {/* Application Details Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <IconFileText className="text-primary h-4 w-4" />
-              Application Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="space-y-1">
-              <span className="text-muted-foreground text-xs uppercase">
-                Application Type
-              </span>
-              <p className="font-medium">Nationality Certificate</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Payment Details Card */}
-        {data.fee && (
+        {/* Sidebar - Right Column */}
+        <div className="space-y-6">
+          {/* Application Details Card */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <IconFileText className="text-primary h-4 w-4" />
-                Payment Details
+                Application Details
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="space-y-1">
                 <span className="text-muted-foreground text-xs uppercase">
-                  Fee Amount
+                  Application Type
                 </span>
-                <p className="font-semibold">
-                  Nu. {data.fee.amount.toFixed(2)}
-                </p>
-              </div>
-              <Separator />
-              <div className="space-y-1">
-                <span className="text-muted-foreground text-xs uppercase">
-                  Payment Status
-                </span>
-                <div>
-                  <Badge
-                    variant={
-                      data.fee.status === 'PAID'
-                        ? 'default'
-                        : data.fee.status === 'PENDING'
-                          ? 'outline'
-                          : 'destructive'
-                    }
-                    className={
-                      data.fee.status === 'PENDING'
-                        ? 'border-yellow-600 bg-yellow-600 text-white'
-                        : ''
-                    }
-                  >
-                    {data.fee.status}
-                  </Badge>
-                </div>
-              </div>
-              {data.fee.transaction_no && (
-                <>
-                  <Separator />
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground text-xs uppercase">
-                      Transaction No.
-                    </span>
-                    <p className="font-mono text-xs font-medium">
-                      {data.fee.transaction_no}
-                    </p>
-                  </div>
-                </>
-              )}
-              <Separator />
-              <div className="space-y-1">
-                <span className="text-muted-foreground text-xs uppercase">
-                  Contact No.
-                </span>
-                <p className="font-medium">{data.fee.contact_no}</p>
+                <p className="font-medium">Nationality Certificate</p>
               </div>
             </CardContent>
           </Card>
-        )}
+
+          {/* Payment Details Card */}
+          {data.fee && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <IconFileText className="text-primary h-4 w-4" />
+                  Payment Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="space-y-1">
+                  <span className="text-muted-foreground text-xs uppercase">
+                    Fee Amount
+                  </span>
+                  <p className="font-semibold">
+                    Nu. {data.fee.amount.toFixed(2)}
+                  </p>
+                </div>
+                <Separator />
+                <div className="space-y-1">
+                  <span className="text-muted-foreground text-xs uppercase">
+                    Payment Status
+                  </span>
+                  <div>
+                    <Badge
+                      variant={
+                        data.fee.status === 'PAID'
+                          ? 'default'
+                          : data.fee.status === 'PENDING'
+                            ? 'outline'
+                            : 'destructive'
+                      }
+                      className={
+                        data.fee.status === 'PENDING'
+                          ? 'border-yellow-600 bg-yellow-600 text-white'
+                          : ''
+                      }
+                    >
+                      {data.fee.status}
+                    </Badge>
+                  </div>
+                </div>
+                {data.fee.transaction_no && (
+                  <>
+                    <Separator />
+                    <div className="space-y-1">
+                      <span className="text-muted-foreground text-xs uppercase">
+                        Transaction No.
+                      </span>
+                      <p className="font-mono text-xs font-medium">
+                        {data.fee.transaction_no}
+                      </p>
+                    </div>
+                  </>
+                )}
+                <Separator />
+                <div className="space-y-1">
+                  <span className="text-muted-foreground text-xs uppercase">
+                    Contact No.
+                  </span>
+                  <p className="font-medium">{data.fee.contact_no}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
+
+      {/* Certificate Preview - shown below buttons on approval page */}
+      {from === 'approval' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IconFileText className="text-primary h-5 w-5" />
+              Certificate Preview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <NationalityCertificatePreview data={certData} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
