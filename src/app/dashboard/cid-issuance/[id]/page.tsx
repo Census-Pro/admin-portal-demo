@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 import { BackButton } from '@/components/ui/back-button';
 import { ApplicationActions } from './_components/application-actions';
 import { ApplicationPhoto } from './_components/application-photo';
+import { DUMMY_CID_APPLICATION } from '../_dummy-data';
 
 interface PageProps {
   params: Promise<{
@@ -30,26 +31,32 @@ interface PageProps {
 export default async function ApplicationDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  // Fetch application from API
-  const result = await getCIDApplicationById(id);
+  let application: typeof DUMMY_CID_APPLICATION;
 
-  if (result.error || !result.application) {
-    return (
-      <PageContainer
-        pageTitle="Application Not Found"
-        pageDescription="The requested CID application could not be found."
-      >
-        <Alert variant="destructive">
-          <IconInfoCircle className="h-4 w-4" />
-          <AlertDescription>
-            {result.message || 'Application not found'}
-          </AlertDescription>
-        </Alert>
-      </PageContainer>
-    );
+  if (id === DUMMY_CID_APPLICATION.id) {
+    application = DUMMY_CID_APPLICATION;
+  } else {
+    // Fetch application from API
+    const result = await getCIDApplicationById(id);
+
+    if (result.error || !result.application) {
+      return (
+        <PageContainer
+          pageTitle="Application Not Found"
+          pageDescription="The requested CID application could not be found."
+        >
+          <Alert variant="destructive">
+            <IconInfoCircle className="h-4 w-4" />
+            <AlertDescription>
+              {result.message || 'Application not found'}
+            </AlertDescription>
+          </Alert>
+        </PageContainer>
+      );
+    }
+
+    application = result.application;
   }
-
-  const application = result.application;
 
   // Combine name fields
   const fullName = [

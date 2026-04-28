@@ -4,6 +4,7 @@ import { assessmentColumns } from '../../_components/assessment-columns';
 import { getSubmittedApplicationsByPaymentType } from '@/actions/issuance/cid-issuance-actions';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { IconInfoCircle } from '@tabler/icons-react';
+import { DUMMY_CID_APPLICATION } from '../../_dummy-data';
 
 export const metadata = {
   title: 'Dashboard: Fresh CID - Assessment'
@@ -23,6 +24,9 @@ export default async function FreshAssessmentPage() {
   } else {
     applications = applicationsResult.applications || [];
   }
+
+  // Pin dummy entry at the top
+  applications = [DUMMY_CID_APPLICATION, ...applications];
 
   return (
     <PageContainer
