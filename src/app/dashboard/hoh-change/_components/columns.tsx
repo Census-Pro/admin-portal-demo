@@ -62,18 +62,6 @@ export const columns: ColumnDef<HohChange>[] = [
     header: 'Household No.'
   },
   {
-    accessorKey: 'firstName',
-    header: 'New HOH Name',
-    cell: ({ row }) => {
-      const first = row.original.firstName;
-      const middle = row.original.middleName
-        ? ` ${row.original.middleName}`
-        : '';
-      const last = row.original.lastName ? ` ${row.original.lastName}` : '';
-      return `${first}${middle}${last}`;
-    }
-  },
-  {
     accessorKey: 'createdAt',
     header: 'Date',
     cell: ({ row }) => {
