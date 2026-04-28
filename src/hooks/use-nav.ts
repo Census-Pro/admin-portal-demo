@@ -120,109 +120,130 @@ export function useFilteredNavItems(items: NavItem[]) {
       });
     };
 
-    const filtered = items
-      .map((item) => {
-        const wasParent = Array.isArray(item.items) && item.items.length > 0;
+    // Recursive function to filter navigation items at any depth
+    const filterNavItems = (navItems: NavItem[]): NavItem[] => {
+      return navItems
+        .map((item) => {
+          const wasParent = Array.isArray(item.items) && item.items.length > 0;
 
-        // First, filter child items if they exist
-        let filteredChildren: NavItem[] = [];
-        if (item.items && item.items.length > 0) {
-          // Helper: subject-first logic for child items
-          const checkChildAccess = (childItem: NavItem): boolean => {
-            // If no session, only show items with empty permissions (public items)
-            if (!session) {
-              return (
-                !childItem.access?.permissions ||
-                childItem.access.permissions.length === 0
+          // First, recursively filter child items if they exist
+          let filteredChildren: NavItem[] = [];
+          if (item.items && item.items.length > 0) {
+            // Helper: subject-first logic for child items
+            const checkChildAccess = (childItem: NavItem): boolean => {
+              // If no session, only show items with empty permissions (public items)
+              if (!session) {
+                return (
+                  !childItem.access?.permissions ||
+                  childItem.access.permissions.length === 0
+                );
+              }
+
+              if (childItem.subject) {
+                const subjectAccess = hasSubjectAccess(childItem.subject);
+                if (subjectAccess) return true;
+                // Subject check failed - fall back to explicit permission check
+              }
+              return checkItemAccess(childItem.access);
+            };
+
+            // Recursively filter children first (important for nested menus)
+            const recursivelyFilteredChildren = filterNavItems(item.items);
+
+            // Determine accessible non-header children from recursively filtered results
+            const accessibleNonHeaderChildren =
+              recursivelyFilteredChildren.filter((childItem) => {
+                if (childItem.isHeader) return false;
+
+                // If child is a parent, check if it has accessible children
+                if (childItem.items && childItem.items.length > 0) {
+                  return true; // Already filtered recursively, trust the result
+                }
+
+                // If child is a leaf, check access
+                return checkChildAccess(childItem);
+              });
+
+            // Only keep children (including headers) if there are accessible non-header children
+            if (accessibleNonHeaderChildren.length > 0) {
+              const accessibleTitles = new Set(
+                accessibleNonHeaderChildren.map((c) => c.title)
+              );
+
+              filteredChildren = recursivelyFilteredChildren.filter(
+                (childItem, idx, arr) => {
+                  if (childItem.isHeader) {
+                    // Only keep header if there's at least one accessible non-header item
+                    // between this header and the next header
+                    const nextHeaderIdx = arr.findIndex(
+                      (c, i) => i > idx && c.isHeader
+                    );
+                    const end =
+                      nextHeaderIdx === -1 ? arr.length : nextHeaderIdx;
+                    return arr
+                      .slice(idx + 1, end)
+                      .some(
+                        (c) => !c.isHeader && accessibleTitles.has(c.title)
+                      );
+                  }
+                  return accessibleTitles.has(childItem.title);
+                }
               );
             }
-
-            if (childItem.subject) {
-              const subjectAccess = hasSubjectAccess(childItem.subject);
-              if (subjectAccess) return true;
-              // Subject check failed - fall back to explicit permission check
-            }
-            return checkItemAccess(childItem.access);
-          };
-
-          // Determine accessible non-header children first
-          const accessibleNonHeaderChildren = item.items.filter((childItem) => {
-            if (childItem.isHeader) return false;
-            return checkChildAccess(childItem);
-          });
-
-          // Only keep children (including headers) if there are accessible non-header children
-          if (accessibleNonHeaderChildren.length > 0) {
-            const accessibleTitles = new Set(
-              accessibleNonHeaderChildren.map((c) => c.title)
-            );
-
-            filteredChildren = item.items.filter((childItem, idx, arr) => {
-              if (childItem.isHeader) {
-                // Only keep header if there's at least one accessible non-header item
-                // between this header and the next header
-                const nextHeaderIdx = arr.findIndex(
-                  (c, i) => i > idx && c.isHeader
-                );
-                const end = nextHeaderIdx === -1 ? arr.length : nextHeaderIdx;
-                return arr
-                  .slice(idx + 1, end)
-                  .some((c) => !c.isHeader && accessibleTitles.has(c.title));
-              }
-              return checkChildAccess(childItem);
-            });
           }
-        }
 
-        return {
-          ...item,
-          items: filteredChildren,
-          _wasParent: wasParent
-        };
-      })
-      .filter((item) => {
-        const wasParent = (item as any)._wasParent;
+          return {
+            ...item,
+            items: filteredChildren,
+            _wasParent: wasParent
+          };
+        })
+        .filter((item) => {
+          const wasParent = (item as any)._wasParent;
 
-        // Check if item is super admin only
-        if (item.superAdminOnly && user?.roleType !== 'SUPER_ADMIN') {
-          return false;
-        }
+          // Check if item is super admin only
+          if (item.superAdminOnly && user?.roleType !== 'SUPER_ADMIN') {
+            return false;
+          }
 
-        // SUPER_ADMIN bypass - sees everything
-        if (user?.roleType === 'SUPER_ADMIN') {
-          return true;
-        }
+          // SUPER_ADMIN bypass - sees everything
+          if (user?.roleType === 'SUPER_ADMIN') {
+            return true;
+          }
 
-        // If no session, only show items with empty permissions (public items)
-        if (!session) {
-          return (
-            !item.access?.permissions || item.access.permissions.length === 0
-          );
-        }
+          // If no session, only show items with empty permissions (public items)
+          if (!session) {
+            return (
+              !item.access?.permissions || item.access.permissions.length === 0
+            );
+          }
 
-        // For parent items (originally had children): show only if there are accessible non-header children
-        if (wasParent) {
-          const hasAccessibleChildren = item.items
-            ? item.items.some((child) => !child.isHeader)
-            : false;
-          return hasAccessibleChildren;
-        }
+          // For parent items (originally had children): show only if there are accessible non-header children
+          if (wasParent) {
+            const hasAccessibleChildren = item.items
+              ? item.items.some((child) => !child.isHeader)
+              : false;
+            return hasAccessibleChildren;
+          }
 
-        // Leaf item: check subject-based access first, then fall back to permission check
-        if (item.subject) {
-          const subjectAccess = hasSubjectAccess(item.subject);
-          if (subjectAccess) return true;
-          // Subject check failed - fall back to explicit permission check
-        }
+          // Leaf item: check subject-based access first, then fall back to permission check
+          if (item.subject) {
+            const subjectAccess = hasSubjectAccess(item.subject);
+            if (subjectAccess) return true;
+            // Subject check failed - fall back to explicit permission check
+          }
 
-        return checkItemAccess(item.access);
-      })
-      .map((item) => {
-        // Clean up the internal _wasParent flag before returning
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { _wasParent: _removed, ...cleanItem } = item as any;
-        return cleanItem as NavItem;
-      });
+          return checkItemAccess(item.access);
+        })
+        .map((item) => {
+          // Clean up the internal _wasParent flag before returning
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { _wasParent: _removed, ...cleanItem } = item as any;
+          return cleanItem as NavItem;
+        });
+    };
+
+    const filtered = filterNavItems(items);
 
     return filtered;
   }, [items, checkItemAccess, session, status, user]);
