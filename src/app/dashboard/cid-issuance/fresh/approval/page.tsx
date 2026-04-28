@@ -5,6 +5,7 @@ import { getAllPaymentServiceTypes } from '@/actions/common/payment-service-type
 import { getCIDApplicationsByPaymentType } from '@/actions/issuance/cid-issuance-actions';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { IconInfoCircle } from '@tabler/icons-react';
+import { DUMMY_CID_APPLICATION } from '../../_dummy-data';
 
 export const metadata = {
   title: 'Dashboard: Fresh CID - Approval'
@@ -65,8 +66,8 @@ export default async function FreshApprovalPage() {
 
         <DataTable
           columns={columns}
-          data={applications}
-          totalItems={applications.length}
+          data={[DUMMY_CID_APPLICATION, ...applications]}
+          totalItems={applications.length + 1}
         />
       </div>
     </PageContainer>

@@ -4,6 +4,7 @@ import { assessmentColumns } from '../../_components/assessment-columns';
 import { getSubmittedApplicationsByPaymentType } from '@/actions/issuance/cid-issuance-actions';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { IconInfoCircle } from '@tabler/icons-react';
+import { DUMMY_CID_APPLICATION } from '../../_dummy-data';
 
 export const metadata = {
   title: 'Dashboard: CID Replacement - Assessment'
@@ -39,8 +40,8 @@ export default async function ReplacementAssessmentPage() {
 
         <DataTable
           columns={assessmentColumns}
-          data={applications}
-          totalItems={applications.length}
+          data={[DUMMY_CID_APPLICATION, ...applications]}
+          totalItems={applications.length + 1}
         />
       </div>
     </PageContainer>
