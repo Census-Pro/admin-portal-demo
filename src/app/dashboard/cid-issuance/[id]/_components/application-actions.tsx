@@ -23,7 +23,21 @@ interface ApplicationActionsProps {
     id: string;
     status: string;
     application_no: string;
+    payment_type_id?: string;
   };
+}
+
+function getBackUrl(
+  paymentTypeId: string | undefined,
+  section: 'assessment' | 'payment'
+) {
+  const typeMap: Record<string, string> = {
+    FRESH: 'fresh',
+    RENEWAL: 'renewal',
+    REPLACEMENT: 'replacement'
+  };
+  const type = typeMap[paymentTypeId?.toUpperCase() ?? ''] ?? 'fresh';
+  return `/dashboard/cid-issuance/${type}/${section}`;
 }
 
 export function ApplicationActions({ application }: ApplicationActionsProps) {
@@ -37,7 +51,7 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
 
       if (result.success) {
         toast.success(result.message || 'Application assessed successfully');
-        router.refresh();
+        router.push(getBackUrl(application.payment_type_id, 'assessment'));
       } else {
         toast.error(result.message || 'Failed to assess application');
       }
@@ -57,7 +71,7 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
       // TODO: Implement approve API call
       console.log('Approving application:', application.id);
       // await approveApplication(application.id);
-      router.refresh();
+      router.push(getBackUrl(application.payment_type_id, 'payment'));
     } catch (error) {
       console.error('Error approving application:', error);
     } finally {
@@ -71,7 +85,7 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
       // TODO: Implement reject API call
       console.log('Rejecting application:', application.id);
       // await rejectApplication(application.id);
-      router.refresh();
+      router.push(getBackUrl(application.payment_type_id, 'assessment'));
     } catch (error) {
       console.error('Error rejecting application:', error);
     } finally {
