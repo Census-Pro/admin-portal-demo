@@ -26,9 +26,11 @@ export default async function FreshApprovalPage() {
       : paymentTypesResult?.data || [];
 
     const freshPaymentType = paymentTypes.find((type: any) => {
-      const name = type.name?.toLowerCase() || '';
+      const paymentType = (type.payment_type || type.name || '').toLowerCase();
       return (
-        name.includes('new') || name.includes('fresh') || name === 'cid new'
+        paymentType.includes('new') ||
+        paymentType.includes('fresh') ||
+        paymentType === 'cid new'
       );
     });
 

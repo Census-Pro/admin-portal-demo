@@ -26,9 +26,11 @@ export default async function RenewalApprovalPage() {
       : paymentTypesResult?.data || [];
 
     const renewalPaymentType = paymentTypes.find((type: any) => {
-      const name = type.name?.toLowerCase() || '';
+      const paymentType = (type.payment_type || type.name || '').toLowerCase();
       return (
-        name.includes('renew') || name === 'cid renewal' || name === 'cid renew'
+        paymentType.includes('renew') ||
+        paymentType === 'cid renewal' ||
+        paymentType === 'cid renew'
       );
     });
 

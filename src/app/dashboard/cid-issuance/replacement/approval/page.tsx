@@ -26,8 +26,10 @@ export default async function ReplacementApprovalPage() {
       : paymentTypesResult?.data || [];
 
     const replacementPaymentType = paymentTypes.find((type: any) => {
-      const name = type.name?.toLowerCase() || '';
-      return name.includes('replace') || name === 'cid replacement';
+      const paymentType = (type.payment_type || type.name || '').toLowerCase();
+      return (
+        paymentType.includes('replace') || paymentType === 'cid replacement'
+      );
     });
 
     if (replacementPaymentType) {

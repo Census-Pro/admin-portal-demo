@@ -81,14 +81,6 @@ export const columns: ColumnDef<CIDApplication>[] = [
     }
   },
   {
-    accessorKey: 'cid_no',
-    header: 'CID Number',
-    cell: ({ row }) => {
-      const cid = row.getValue('cid_no') as string;
-      return <div className="font-mono">{cid || 'N/A'}</div>;
-    }
-  },
-  {
     accessorKey: 'applicant_contact_no',
     header: 'Contact No',
     cell: ({ row }) => {
