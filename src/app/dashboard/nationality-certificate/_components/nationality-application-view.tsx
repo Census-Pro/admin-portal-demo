@@ -47,6 +47,35 @@ import {
 } from '@/actions/issuance/nationality-application-actions';
 import { format } from 'date-fns';
 
+const DUMMY_DATA_MAP: Record<string, NationalityApplicationData> = {
+  'dummy-1': {
+    id: 'dummy-1',
+    application_no: 'NC-2026-00001',
+    applicant_cid_no: '11607000001',
+    applicant_contact_no: '17654321',
+    applicant_is: 'PARENT',
+    minor_cid: '11607000099',
+    minor_name: 'Tshering Dorji',
+    dob: '2015-05-20',
+    half_photo: null,
+    payment_type_id: null,
+    payment_service_type_id: 'svc-1',
+    parent_approval: 'APPROVED',
+    application_status: 'ASSESSED',
+    createdAt: '2026-04-10T08:00:00.000Z',
+    updatedAt: '2026-04-15T10:00:00.000Z',
+    fee: {
+      id: 'fee-1',
+      application_no: 'NC-2026-00001',
+      amount: 500,
+      status: 'PAID',
+      transaction_no: 'TXN-20260410-001',
+      contact_no: '17654321',
+      payment_service_type_id: 'svc-1'
+    }
+  }
+};
+
 interface NationalityApplicationData {
   id: string;
   createdAt: string;
@@ -116,6 +145,11 @@ export function NationalityApplicationView({
       setIsLoading(true);
       setFetchError(null);
       try {
+        // Use dummy data if available
+        if (DUMMY_DATA_MAP[applicationId]) {
+          if (!cancelled) setData(DUMMY_DATA_MAP[applicationId]);
+          return;
+        }
         const result = await getNationalityApplicationById(applicationId);
         if (cancelled) return;
         if (result.error || !result.application) {
@@ -394,7 +428,96 @@ export function NationalityApplicationView({
 
         {/* Action Buttons Section */}
         <div className="flex gap-4 pt-4">
-          {from === 'payment' ? (
+          {from === 'approval' ? (
+            <>
+              {/* Approve Button */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button className="flex-1 bg-green-600 hover:bg-green-700">
+                    <IconCheck className="mr-2 h-4 w-4" />
+                    Approve
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to approve this nationality
+                      certificate application (CID: {data.applicant_cid_no})?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() =>
+                        toast.info('Approval action not yet implemented')
+                      }
+                    >
+                      <IconCheck className="mr-2 h-4 w-4" />
+                      Yes, Approve
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              {/* Reject Button */}
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={() => {
+                  setRemarks('');
+                  setRejectDialogOpen(true);
+                }}
+              >
+                <IconX className="mr-2 h-4 w-4" />
+                Reject
+              </Button>
+
+              <Dialog
+                open={rejectDialogOpen}
+                onOpenChange={setRejectDialogOpen}
+              >
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Reject Application</DialogTitle>
+                    <DialogDescription>
+                      Please provide a reason for rejecting this application.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="remarks">Rejection Remarks</Label>
+                      <Textarea
+                        id="remarks"
+                        placeholder="Enter reason for rejection..."
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setRejectDialogOpen(false)}
+                      disabled={isRejecting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleReject}
+                      disabled={isRejecting}
+                    >
+                      <IconX className="mr-2 h-4 w-4" />
+                      {isRejecting ? 'Rejecting...' : 'Reject Application'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </>
+          ) : from === 'payment' ? (
             <>
               <Button
                 variant="default"
