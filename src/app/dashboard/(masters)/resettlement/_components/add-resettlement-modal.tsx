@@ -128,7 +128,7 @@ export function AddResettlementModal({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || isCheckingCid}>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && (
                 <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
               )}

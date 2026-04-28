@@ -161,7 +161,7 @@ export function EditCidCollectionPointModal({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || isCheckingName}>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && (
                 <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
