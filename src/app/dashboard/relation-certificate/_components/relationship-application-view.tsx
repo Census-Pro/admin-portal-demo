@@ -46,6 +46,37 @@ import {
 } from '@/actions/issuance/relationship-application-actions';
 import { format } from 'date-fns';
 
+const DUMMY_APPLICATION: RelationshipApplicationData = {
+  id: 'dummy-1',
+  application_no: 'RC-2026-00001',
+  applicant_cid: '11607000001',
+  applicant_name: 'Karma Wangchuk',
+  applicant_contact_no: '17654321',
+  relationship_to_cid: '11607000002',
+  relationship_to_name: 'Sonam Dema',
+  purpose_id: 'purpose-1',
+  payment_type_id: null,
+  payment_service_type_id: 'svc-1',
+  application_status: 'ASSESSED',
+  createdAt: '2026-04-10T08:00:00.000Z',
+  updatedAt: '2026-04-15T10:00:00.000Z',
+  purpose: {
+    id: 'purpose-1',
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+    name: 'Legal Proceedings'
+  },
+  fee: {
+    id: 'fee-1',
+    application_no: 'RC-2026-00001',
+    amount: 300,
+    status: 'PAID',
+    transaction_no: 'TXN-20260410-001',
+    contact_no: '17654321',
+    payment_service_type_id: 'svc-1'
+  }
+};
+
 interface RelationshipApplicationData {
   id: string;
   createdAt: string;
@@ -119,6 +150,10 @@ export function RelationshipApplicationView({
       setIsLoading(true);
       setFetchError(null);
       try {
+        if (applicationId === 'dummy-1') {
+          setData(DUMMY_APPLICATION);
+          return;
+        }
         const result = await getRelationshipApplicationById(applicationId);
         if (cancelled) return;
         if (result.error || !result.application) {
@@ -359,7 +394,98 @@ export function RelationshipApplicationView({
 
         {/* Action Buttons Section */}
         <div className="flex gap-4 pt-4">
-          {from === 'payment' ? (
+          {from === 'approval' ? (
+            <>
+              {/* Approve Button */}
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    disabled={isAssessing || isRejecting}
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                  >
+                    <IconCheck className="mr-2 h-4 w-4" />
+                    {isAssessing ? 'Approving...' : 'Approve'}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to approve this relationship
+                      certificate application for {data.applicant_name}?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={handleAssess}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <IconCheck className="mr-2 h-4 w-4" />
+                      Yes, Approve
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              {/* Reject Button */}
+              <Button
+                disabled={isAssessing || isRejecting}
+                variant="destructive"
+                className="flex-1"
+                onClick={() => {
+                  setRemarks('');
+                  setRejectDialogOpen(true);
+                }}
+              >
+                <IconX className="mr-2 h-4 w-4" />
+                {isRejecting ? 'Rejecting...' : 'Reject'}
+              </Button>
+
+              <Dialog
+                open={rejectDialogOpen}
+                onOpenChange={setRejectDialogOpen}
+              >
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Reject Application</DialogTitle>
+                    <DialogDescription>
+                      Please provide a reason for rejecting this application.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="remarks">Rejection Remarks</Label>
+                      <Textarea
+                        id="remarks"
+                        placeholder="Enter reason for rejection..."
+                        value={remarks}
+                        onChange={(e) => setRemarks(e.target.value)}
+                        rows={4}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setRejectDialogOpen(false)}
+                      disabled={isRejecting}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleReject}
+                      disabled={isRejecting}
+                    >
+                      <IconX className="mr-2 h-4 w-4" />
+                      {isRejecting ? 'Rejecting...' : 'Reject Application'}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </>
+          ) : from === 'payment' ? (
             <>
               <Button
                 variant="default"

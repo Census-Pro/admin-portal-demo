@@ -9,6 +9,39 @@ export const metadata = {
   title: 'Dashboard: Relation Certificate - Approval'
 };
 
+const DUMMY_APPLICATIONS = [
+  {
+    id: 'dummy-1',
+    application_no: 'RC-2026-00001',
+    applicant_cid: '11607000001',
+    applicant_name: 'Karma Wangchuk',
+    applicant_contact_no: '17654321',
+    relationship_to_cid: '11607000002',
+    relationship_to_name: 'Sonam Dema',
+    purpose_id: 'purpose-1',
+    payment_type_id: null,
+    payment_service_type_id: 'svc-1',
+    application_status: 'ASSESSED',
+    createdAt: '2026-04-10T08:00:00.000Z',
+    updatedAt: '2026-04-15T10:00:00.000Z',
+    purpose: {
+      id: 'purpose-1',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      name: 'Legal Proceedings'
+    },
+    fee: {
+      id: 'fee-1',
+      application_no: 'RC-2026-00001',
+      amount: 300,
+      status: 'PAID',
+      transaction_no: 'TXN-20260410-001',
+      contact_no: '17654321',
+      payment_service_type_id: 'svc-1'
+    }
+  }
+];
+
 export default async function RelationCertificateApprovalPage() {
   const result = await getAssessedPaidPaymentApplications();
 
@@ -17,8 +50,12 @@ export default async function RelationCertificateApprovalPage() {
 
   if (result?.error) {
     errorMessage = result.message || 'Failed to load applications';
+    applications = DUMMY_APPLICATIONS;
   } else {
-    applications = result.applications || [];
+    applications =
+      result.applications?.length > 0
+        ? result.applications
+        : DUMMY_APPLICATIONS;
   }
 
   return (
