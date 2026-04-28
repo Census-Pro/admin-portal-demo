@@ -113,10 +113,15 @@ export const columns: ColumnDef<Role>[] = [
     accessorKey: 'description',
     header: 'Description',
     enableSorting: false,
+    size: 400,
     cell: ({ row }) => {
+      const desc: string = row.getValue('description') || 'No description';
       return (
-        <span className="text-muted-foreground text-sm">
-          {row.getValue('description') || 'No description'}
+        <span
+          className="text-muted-foreground line-clamp-2 max-w-xs text-sm"
+          title={desc}
+        >
+          {desc}
         </span>
       );
     }

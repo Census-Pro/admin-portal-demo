@@ -82,6 +82,27 @@ export async function getCities({
   }
 }
 
+export async function getCityById(id: string) {
+  try {
+    const response = await fetch(`${API_URL}/cities/${id}`, {
+      headers: await instance(),
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      return {
+        error: true,
+        message: `Failed to fetch city: ${response.statusText}`
+      };
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching city:', error);
+    return { error: true, message: 'Failed to fetch city' };
+  }
+}
+
 export async function getAllCities() {
   try {
     const response = await fetch(`${API_URL}/cities/all`, {

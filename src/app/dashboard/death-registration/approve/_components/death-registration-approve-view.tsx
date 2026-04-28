@@ -51,6 +51,8 @@ import { getDzongkhagById } from '@/actions/common/dzongkhag-actions';
 import { getGewogById } from '@/actions/common/gewog-actions';
 import { getChiwogById } from '@/actions/common/chiwog-actions';
 import { getVillageById } from '@/actions/common/village-actions';
+import { getCountryById } from '@/actions/common/country-actions';
+import { getCityById } from '@/actions/common/city-actions';
 
 interface DeathRegistrationData {
   applicant_cid?: string;
@@ -85,6 +87,8 @@ interface DeathRegistrationData {
   dzongkhag_of_death_name?: string;
   gewog_of_death_name?: string;
   village_of_death_name?: string;
+  country_of_death_name?: string;
+  city_name?: string;
   [key: string]: unknown;
 }
 
@@ -126,7 +130,9 @@ export function DeathRegistrationApproveView({
           villageRes,
           dzongkhagOfDeathRes,
           gewogOfDeathRes,
-          villageOfDeathRes
+          villageOfDeathRes,
+          countryOfDeathRes,
+          cityRes
         ] = await Promise.all([
           app.dzongkhag_id ? getDzongkhagById(app.dzongkhag_id) : null,
           app.gewog_id ? getGewogById(app.gewog_id) : null,
@@ -138,22 +144,26 @@ export function DeathRegistrationApproveView({
           app.gewog_of_death_id ? getGewogById(app.gewog_of_death_id) : null,
           app.village_of_death_id
             ? getVillageById(app.village_of_death_id)
-            : null
+            : null,
+          app.country_of_death_id
+            ? getCountryById(app.country_of_death_id)
+            : null,
+          app.city_id ? getCityById(app.city_id) : null
         ]);
 
         if (cancelled) return;
 
         setData({
           ...app,
-          dzongkhag_name: dzongkhagRes?.name ?? app.dzongkhag_id,
-          gewog_name: gewogRes?.name ?? app.gewog_id,
-          chiwog_name: chiwogRes?.name ?? app.chiwog_id,
-          village_name: villageRes?.name ?? app.village_id,
-          dzongkhag_of_death_name:
-            dzongkhagOfDeathRes?.name ?? app.dzongkhag_of_death_id,
-          gewog_of_death_name: gewogOfDeathRes?.name ?? app.gewog_of_death_id,
-          village_of_death_name:
-            villageOfDeathRes?.name ?? app.village_of_death_id
+          dzongkhag_name: dzongkhagRes?.name ?? undefined,
+          gewog_name: gewogRes?.name ?? undefined,
+          chiwog_name: chiwogRes?.name ?? undefined,
+          village_name: villageRes?.name ?? undefined,
+          dzongkhag_of_death_name: dzongkhagOfDeathRes?.name ?? undefined,
+          gewog_of_death_name: gewogOfDeathRes?.name ?? undefined,
+          village_of_death_name: villageOfDeathRes?.name ?? undefined,
+          country_of_death_name: countryOfDeathRes?.name ?? undefined,
+          city_name: cityRes?.name ?? undefined
         });
       } catch (err) {
         if (!cancelled)
@@ -394,14 +404,14 @@ export function DeathRegistrationApproveView({
                     Country
                   </Label>
                   <p className="flex-1 text-sm">
-                    {data.country_of_death_id || 'N/A'}
+                    {data.country_of_death_name || 'N/A'}
                   </p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
                     City
                   </Label>
-                  <p className="flex-1 text-sm">{data.city_id || 'N/A'}</p>
+                  <p className="flex-1 text-sm">{data.city_name || 'N/A'}</p>
                 </div>
                 <div className="flex items-start gap-4">
                   <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
