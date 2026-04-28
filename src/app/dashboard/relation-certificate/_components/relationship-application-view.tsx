@@ -45,6 +45,7 @@ import {
   assessRelationshipApplication
 } from '@/actions/issuance/relationship-application-actions';
 import { format } from 'date-fns';
+import { RelationshipCertificatePreview } from './relationship-certificate-preview';
 
 const DUMMY_APPLICATION: RelationshipApplicationData = {
   id: 'dummy-1',
@@ -53,7 +54,7 @@ const DUMMY_APPLICATION: RelationshipApplicationData = {
   applicant_name: 'Karma Wangchuk',
   applicant_contact_no: '17654321',
   relationship_to_cid: '11607000002',
-  relationship_to_name: 'Sonam Dema',
+  relationship_to_name: 'Tshering Wangchuk',
   purpose_id: 'purpose-1',
   payment_type_id: null,
   payment_service_type_id: 'svc-1',
@@ -64,7 +65,7 @@ const DUMMY_APPLICATION: RelationshipApplicationData = {
     id: 'purpose-1',
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
-    name: 'Legal Proceedings'
+    name: 'Brother'
   },
   fee: {
     id: 'fee-1',
@@ -274,524 +275,538 @@ export function RelationshipApplicationView({
     );
   }
 
+  const certData = {
+    refNo: `DHA(DCRC-17)${new Date().getFullYear()}/${data.application_no}`,
+    date: format(new Date(), 'dd-MM-yyyy'),
+    applicantCid: data.applicant_cid,
+    applicantName: data.applicant_name,
+    relation: data.purpose?.name ?? '',
+    relatedCid: data.relationship_to_cid,
+    relatedName: data.relationship_to_name,
+    applicantPhotoUrl: '/person1Compare.png',
+    relatedPhotoUrl: '/person2Compare.png'
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      {/* Main Content - Left Column */}
-      <div className="space-y-6 lg:col-span-2">
-        {/* Applicant Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <IconUser className="text-primary h-5 w-5" />
-              Applicant Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-8">
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs font-medium uppercase">
-                  Applicant Name
-                </Label>
-                <p className="text-sm font-semibold uppercase">
-                  {data.applicant_name || 'N/A'}
-                </p>
-              </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs font-medium uppercase">
-                  CID Number
-                </Label>
-                <p className="font-mono text-sm font-semibold">
-                  {data.applicant_cid || 'N/A'}
-                </p>
-              </div>
-              {data.applicant_contact_no && (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Main Content - Left Column */}
+        <div className="space-y-6 lg:col-span-2">
+          {/* Applicant Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <IconUser className="text-primary h-5 w-5" />
+                Applicant Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-8">
                 <div className="space-y-1">
                   <Label className="text-muted-foreground text-xs font-medium uppercase">
-                    Contact Number
+                    Applicant Name
                   </Label>
-                  <p className="flex items-center gap-2 text-sm font-medium">
-                    <IconPhone className="h-4 w-4" />
-                    {data.applicant_contact_no}
+                  <p className="text-sm font-semibold uppercase">
+                    {data.applicant_name || 'N/A'}
                   </p>
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Related Person Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <IconUsers className="text-primary h-5 w-5" />
-              Related Person Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-8">
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs font-medium uppercase">
-                  Related Person Name
-                </Label>
-                <p className="text-sm font-semibold uppercase">
-                  {data.relationship_to_name || 'N/A'}
-                </p>
+                <div className="space-y-1">
+                  <Label className="text-muted-foreground text-xs font-medium uppercase">
+                    CID Number
+                  </Label>
+                  <p className="font-mono text-sm font-semibold">
+                    {data.applicant_cid || 'N/A'}
+                  </p>
+                </div>
+                {data.applicant_contact_no && (
+                  <div className="space-y-1">
+                    <Label className="text-muted-foreground text-xs font-medium uppercase">
+                      Contact Number
+                    </Label>
+                    <p className="flex items-center gap-2 text-sm font-medium">
+                      <IconPhone className="h-4 w-4" />
+                      {data.applicant_contact_no}
+                    </p>
+                  </div>
+                )}
               </div>
-              <div className="space-y-1">
-                <Label className="text-muted-foreground text-xs font-medium uppercase">
-                  CID Number
-                </Label>
-                <p className="font-mono text-sm font-semibold">
-                  {data.relationship_to_cid || 'N/A'}
-                </p>
+            </CardContent>
+          </Card>
+
+          {/* Related Person Information */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <IconUsers className="text-primary h-5 w-5" />
+                Related Person Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 gap-y-4 md:grid-cols-2 md:gap-x-8">
+                <div className="space-y-1">
+                  <Label className="text-muted-foreground text-xs font-medium uppercase">
+                    Related Person Name
+                  </Label>
+                  <p className="text-sm font-semibold uppercase">
+                    {data.relationship_to_name || 'N/A'}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-muted-foreground text-xs font-medium uppercase">
+                    CID Number
+                  </Label>
+                  <p className="font-mono text-sm font-semibold">
+                    {data.relationship_to_cid || 'N/A'}
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Application Overview */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <IconFileText className="text-primary h-5 w-5" />
-              Application Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Application No</span>
-              <span className="font-mono font-semibold">
-                {data.application_no || 'N/A'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Applied Date</span>
-              <span className="font-semibold">
-                {data.createdAt
-                  ? format(new Date(data.createdAt), 'MMM dd, yyyy')
-                  : 'N/A'}
-              </span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Last Updated</span>
-              <span className="font-semibold">
-                {data.updatedAt
-                  ? format(new Date(data.updatedAt), 'MMM dd, yyyy')
-                  : 'N/A'}
-              </span>
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <Label className="text-muted-foreground text-xs font-medium uppercase">
-                Status
-              </Label>
-              <Badge variant={variant} className={statusClassName}>
-                {data.application_status}
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Application Overview */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <IconFileText className="text-primary h-5 w-5" />
+                Application Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Application No</span>
+                <span className="font-mono font-semibold">
+                  {data.application_no || 'N/A'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Applied Date</span>
+                <span className="font-semibold">
+                  {data.createdAt
+                    ? format(new Date(data.createdAt), 'MMM dd, yyyy')
+                    : 'N/A'}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Last Updated</span>
+                <span className="font-semibold">
+                  {data.updatedAt
+                    ? format(new Date(data.updatedAt), 'MMM dd, yyyy')
+                    : 'N/A'}
+                </span>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between">
+                <Label className="text-muted-foreground text-xs font-medium uppercase">
+                  Status
+                </Label>
+                <Badge variant={variant} className={statusClassName}>
+                  {data.application_status}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Action Buttons Section */}
-        <div className="flex gap-4 pt-4">
-          {from === 'approval' ? (
-            <>
-              {/* Approve Button */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    disabled={isAssessing || isRejecting}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    {isAssessing ? 'Approving...' : 'Approve'}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to approve this relationship
-                      certificate application for {data.applicant_name}?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleAssess}
-                      className="bg-green-600 hover:bg-green-700"
+          {/* Action Buttons Section */}
+          <div className="flex gap-4 pt-4">
+            {from === 'approval' ? (
+              <>
+                {/* Approve Button */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      disabled={isAssessing || isRejecting}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
                     >
                       <IconCheck className="mr-2 h-4 w-4" />
-                      Yes, Approve
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                      {isAssessing ? 'Approving...' : 'Approve'}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to approve this relationship
+                        certificate application for {data.applicant_name}?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleAssess}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <IconCheck className="mr-2 h-4 w-4" />
+                        Yes, Approve
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
 
-              {/* Reject Button */}
-              <Button
-                disabled={isAssessing || isRejecting}
-                variant="destructive"
-                className="flex-1"
-                onClick={() => {
-                  setRemarks('');
-                  setRejectDialogOpen(true);
-                }}
-              >
-                <IconX className="mr-2 h-4 w-4" />
-                {isRejecting ? 'Rejecting...' : 'Reject'}
-              </Button>
+                {/* Reject Button */}
+                <Button
+                  disabled={isAssessing || isRejecting}
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => {
+                    setRemarks('');
+                    setRejectDialogOpen(true);
+                  }}
+                >
+                  <IconX className="mr-2 h-4 w-4" />
+                  {isRejecting ? 'Rejecting...' : 'Reject'}
+                </Button>
 
-              <Dialog
-                open={rejectDialogOpen}
-                onOpenChange={setRejectDialogOpen}
-              >
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Reject Application</DialogTitle>
-                    <DialogDescription>
-                      Please provide a reason for rejecting this application.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="remarks">Rejection Remarks</Label>
-                      <Textarea
-                        id="remarks"
-                        placeholder="Enter reason for rejection..."
-                        value={remarks}
-                        onChange={(e) => setRemarks(e.target.value)}
-                        rows={4}
-                      />
+                <Dialog
+                  open={rejectDialogOpen}
+                  onOpenChange={setRejectDialogOpen}
+                >
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Reject Application</DialogTitle>
+                      <DialogDescription>
+                        Please provide a reason for rejecting this application.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="remarks">Rejection Remarks</Label>
+                        <Textarea
+                          id="remarks"
+                          placeholder="Enter reason for rejection..."
+                          value={remarks}
+                          onChange={(e) => setRemarks(e.target.value)}
+                          rows={4}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setRejectDialogOpen(false)}
-                      disabled={isRejecting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={handleReject}
-                      disabled={isRejecting}
-                    >
-                      <IconX className="mr-2 h-4 w-4" />
-                      {isRejecting ? 'Rejecting...' : 'Reject Application'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </>
-          ) : from === 'payment' ? (
-            <>
-              <Button
-                variant="default"
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
-                onClick={handleSendPaymentNotification}
-                disabled={isSendingNotification || isManualPaymentLoading}
-              >
-                <IconBell className="mr-2 h-4 w-4" />
-                {isSendingNotification
-                  ? 'Sending...'
-                  : 'Send Payment Notification'}
-              </Button>
-              <Button
-                variant="default"
-                className="flex-1 bg-green-600 hover:bg-green-700"
-                onClick={() => {
-                  setManualPaymentForm((f) => ({
-                    ...f,
-                    totalAmount: data.fee?.amount ?? 0
-                  }));
-                  setManualPaymentOpen(true);
-                }}
-                disabled={isSendingNotification || isManualPaymentLoading}
-              >
-                <IconCash className="mr-2 h-4 w-4" />
-                Manual Payment
-              </Button>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setRejectDialogOpen(false)}
+                        disabled={isRejecting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleReject}
+                        disabled={isRejecting}
+                      >
+                        <IconX className="mr-2 h-4 w-4" />
+                        {isRejecting ? 'Rejecting...' : 'Reject Application'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
+            ) : from === 'payment' ? (
+              <>
+                <Button
+                  variant="default"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  onClick={handleSendPaymentNotification}
+                  disabled={isSendingNotification || isManualPaymentLoading}
+                >
+                  <IconBell className="mr-2 h-4 w-4" />
+                  {isSendingNotification
+                    ? 'Sending...'
+                    : 'Send Payment Notification'}
+                </Button>
+                <Button
+                  variant="default"
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={() => {
+                    setManualPaymentForm((f) => ({
+                      ...f,
+                      totalAmount: data.fee?.amount ?? 0
+                    }));
+                    setManualPaymentOpen(true);
+                  }}
+                  disabled={isSendingNotification || isManualPaymentLoading}
+                >
+                  <IconCash className="mr-2 h-4 w-4" />
+                  Manual Payment
+                </Button>
 
-              <Dialog
-                open={manualPaymentOpen}
-                onOpenChange={setManualPaymentOpen}
-              >
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Manual Payment</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-1.5">
-                      <Label htmlFor="totalAmount">
-                        Total Amount <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="totalAmount"
-                        type="number"
-                        value={manualPaymentForm.totalAmount}
-                        readOnly
-                        className="bg-muted cursor-not-allowed"
-                      />
+                <Dialog
+                  open={manualPaymentOpen}
+                  onOpenChange={setManualPaymentOpen}
+                >
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Manual Payment</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-1.5">
+                        <Label htmlFor="totalAmount">
+                          Total Amount <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="totalAmount"
+                          type="number"
+                          value={manualPaymentForm.totalAmount}
+                          readOnly
+                          className="bg-muted cursor-not-allowed"
+                        />
+                      </div>
+                      <div className="grid gap-1.5">
+                        <Label htmlFor="transactionNo">
+                          Transaction No <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="transactionNo"
+                          type="text"
+                          value={manualPaymentForm.transactionNo}
+                          onChange={(e) =>
+                            setManualPaymentForm((f) => ({
+                              ...f,
+                              transactionNo: e.target.value
+                            }))
+                          }
+                          placeholder="Enter transaction number"
+                        />
+                      </div>
+                      <div className="grid gap-1.5">
+                        <Label htmlFor="transactionDate">
+                          Transaction Date{' '}
+                          <span className="text-red-500">*</span>
+                        </Label>
+                        <Input
+                          id="transactionDate"
+                          type="date"
+                          value={manualPaymentForm.transactionDate}
+                          onChange={(e) =>
+                            setManualPaymentForm((f) => ({
+                              ...f,
+                              transactionDate: e.target.value
+                            }))
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-1.5">
+                        <Label htmlFor="paymentRemarks">Remarks</Label>
+                        <Textarea
+                          id="paymentRemarks"
+                          value={manualPaymentForm.remarks}
+                          onChange={(e) =>
+                            setManualPaymentForm((f) => ({
+                              ...f,
+                              remarks: e.target.value
+                            }))
+                          }
+                          placeholder="Enter remarks (optional)"
+                          rows={3}
+                        />
+                      </div>
                     </div>
-                    <div className="grid gap-1.5">
-                      <Label htmlFor="transactionNo">
-                        Transaction No <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="transactionNo"
-                        type="text"
-                        value={manualPaymentForm.transactionNo}
-                        onChange={(e) =>
-                          setManualPaymentForm((f) => ({
-                            ...f,
-                            transactionNo: e.target.value
-                          }))
-                        }
-                        placeholder="Enter transaction number"
-                      />
-                    </div>
-                    <div className="grid gap-1.5">
-                      <Label htmlFor="transactionDate">
-                        Transaction Date <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="transactionDate"
-                        type="date"
-                        value={manualPaymentForm.transactionDate}
-                        onChange={(e) =>
-                          setManualPaymentForm((f) => ({
-                            ...f,
-                            transactionDate: e.target.value
-                          }))
-                        }
-                      />
-                    </div>
-                    <div className="grid gap-1.5">
-                      <Label htmlFor="paymentRemarks">Remarks</Label>
-                      <Textarea
-                        id="paymentRemarks"
-                        value={manualPaymentForm.remarks}
-                        onChange={(e) =>
-                          setManualPaymentForm((f) => ({
-                            ...f,
-                            remarks: e.target.value
-                          }))
-                        }
-                        placeholder="Enter remarks (optional)"
-                        rows={3}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setManualPaymentOpen(false)}
+                        disabled={isManualPaymentLoading}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleManualPaymentSubmit}
+                        disabled={isManualPaymentLoading}
+                      >
+                        {isManualPaymentLoading
+                          ? 'Processing...'
+                          : 'Submit Payment'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
+            ) : (
+              <>
+                {/* Assess Button */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
                     <Button
-                      variant="outline"
-                      onClick={() => setManualPaymentOpen(false)}
-                      disabled={isManualPaymentLoading}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={handleManualPaymentSubmit}
-                      disabled={isManualPaymentLoading}
-                    >
-                      {isManualPaymentLoading
-                        ? 'Processing...'
-                        : 'Submit Payment'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </>
-          ) : (
-            <>
-              {/* Assess Button */}
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    disabled={isAssessing || isRejecting}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    {isAssessing ? 'Assessing...' : 'Assess'}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Confirm Assessment</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to assess and approve this
-                      relationship certificate application for{' '}
-                      {data.applicant_name}?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={handleAssess}
-                      className="bg-green-600 hover:bg-green-700"
+                      disabled={isAssessing || isRejecting}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
                     >
                       <IconCheck className="mr-2 h-4 w-4" />
-                      Yes, Assess
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                      {isAssessing ? 'Assessing...' : 'Assess'}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirm Assessment</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to assess and approve this
+                        relationship certificate application for{' '}
+                        {data.applicant_name}?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleAssess}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <IconCheck className="mr-2 h-4 w-4" />
+                        Yes, Assess
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
 
-              {/* Reject Button */}
-              <Button
-                disabled={isAssessing || isRejecting}
-                variant="destructive"
-                className="flex-1"
-                onClick={() => {
-                  setRemarks('');
-                  setRejectDialogOpen(true);
-                }}
-              >
-                <IconX className="mr-2 h-4 w-4" />
-                {isRejecting ? 'Rejecting...' : 'Reject'}
-              </Button>
+                {/* Reject Button */}
+                <Button
+                  disabled={isAssessing || isRejecting}
+                  variant="destructive"
+                  className="flex-1"
+                  onClick={() => {
+                    setRemarks('');
+                    setRejectDialogOpen(true);
+                  }}
+                >
+                  <IconX className="mr-2 h-4 w-4" />
+                  {isRejecting ? 'Rejecting...' : 'Reject'}
+                </Button>
 
-              <Dialog
-                open={rejectDialogOpen}
-                onOpenChange={setRejectDialogOpen}
-              >
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Reject Application</DialogTitle>
-                    <DialogDescription>
-                      Please provide a reason for rejecting this application.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="remarks">Rejection Remarks</Label>
-                      <Textarea
-                        id="remarks"
-                        placeholder="Enter reason for rejection..."
-                        value={remarks}
-                        onChange={(e) => setRemarks(e.target.value)}
-                        rows={4}
-                      />
+                <Dialog
+                  open={rejectDialogOpen}
+                  onOpenChange={setRejectDialogOpen}
+                >
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Reject Application</DialogTitle>
+                      <DialogDescription>
+                        Please provide a reason for rejecting this application.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="remarks">Rejection Remarks</Label>
+                        <Textarea
+                          id="remarks"
+                          placeholder="Enter reason for rejection..."
+                          value={remarks}
+                          onChange={(e) => setRemarks(e.target.value)}
+                          rows={4}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setRejectDialogOpen(false)}
-                      disabled={isRejecting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      onClick={handleReject}
-                      disabled={isRejecting}
-                    >
-                      <IconX className="mr-2 h-4 w-4" />
-                      {isRejecting ? 'Rejecting...' : 'Reject Application'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </>
-          )}
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => setRejectDialogOpen(false)}
+                        disabled={isRejecting}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={handleReject}
+                        disabled={isRejecting}
+                      >
+                        <IconX className="mr-2 h-4 w-4" />
+                        {isRejecting ? 'Rejecting...' : 'Reject Application'}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Sidebar - Right Column */}
-      <div className="space-y-6">
-        {/* Application Details Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <IconFileText className="text-primary h-4 w-4" />
-              Application Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="space-y-1">
-              <span className="text-muted-foreground text-xs uppercase">
-                Purpose
-              </span>
-              <p className="font-medium">
-                {data.purpose && typeof data.purpose === 'object'
-                  ? data.purpose.name
-                  : 'Not specified'}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Payment Details Card */}
-        {data.fee && (
+        {/* Sidebar - Right Column */}
+        <div className="space-y-6">
+          {/* Application Details Card */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <IconFileText className="text-primary h-4 w-4" />
-                Payment Details
+                Application Details
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="space-y-1">
                 <span className="text-muted-foreground text-xs uppercase">
-                  Fee Amount
+                  Purpose
                 </span>
-                <p className="font-semibold">
-                  Nu. {data.fee.amount.toFixed(2)}
+                <p className="font-medium">
+                  {data.purpose && typeof data.purpose === 'object'
+                    ? data.purpose.name
+                    : 'Not specified'}
                 </p>
-              </div>
-              <Separator />
-              <div className="space-y-1">
-                <span className="text-muted-foreground text-xs uppercase">
-                  Payment Status
-                </span>
-                <div>
-                  <Badge
-                    variant={
-                      data.fee.status === 'PAID'
-                        ? 'default'
-                        : data.fee.status === 'PENDING'
-                          ? 'outline'
-                          : 'destructive'
-                    }
-                    className={
-                      data.fee.status === 'PENDING'
-                        ? 'border-yellow-600 bg-yellow-600 text-white'
-                        : ''
-                    }
-                  >
-                    {data.fee.status}
-                  </Badge>
-                </div>
-              </div>
-              {data.fee.transaction_no && (
-                <>
-                  <Separator />
-                  <div className="space-y-1">
-                    <span className="text-muted-foreground text-xs uppercase">
-                      Transaction No.
-                    </span>
-                    <p className="font-mono text-xs font-medium">
-                      {data.fee.transaction_no}
-                    </p>
-                  </div>
-                </>
-              )}
-              <Separator />
-              <div className="space-y-1">
-                <span className="text-muted-foreground text-xs uppercase">
-                  Contact No.
-                </span>
-                <p className="font-medium">{data.fee.contact_no}</p>
               </div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Application Timeline - Can be added when timeline data is available */}
-        {/* <Card>
+          {/* Payment Details Card */}
+          {data.fee && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <IconFileText className="text-primary h-4 w-4" />
+                  Payment Details
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="space-y-1">
+                  <span className="text-muted-foreground text-xs uppercase">
+                    Fee Amount
+                  </span>
+                  <p className="font-semibold">
+                    Nu. {data.fee.amount.toFixed(2)}
+                  </p>
+                </div>
+                <Separator />
+                <div className="space-y-1">
+                  <span className="text-muted-foreground text-xs uppercase">
+                    Payment Status
+                  </span>
+                  <div>
+                    <Badge
+                      variant={
+                        data.fee.status === 'PAID'
+                          ? 'default'
+                          : data.fee.status === 'PENDING'
+                            ? 'outline'
+                            : 'destructive'
+                      }
+                      className={
+                        data.fee.status === 'PENDING'
+                          ? 'border-yellow-600 bg-yellow-600 text-white'
+                          : ''
+                      }
+                    >
+                      {data.fee.status}
+                    </Badge>
+                  </div>
+                </div>
+                {data.fee.transaction_no && (
+                  <>
+                    <Separator />
+                    <div className="space-y-1">
+                      <span className="text-muted-foreground text-xs uppercase">
+                        Transaction No.
+                      </span>
+                      <p className="font-mono text-xs font-medium">
+                        {data.fee.transaction_no}
+                      </p>
+                    </div>
+                  </>
+                )}
+                <Separator />
+                <div className="space-y-1">
+                  <span className="text-muted-foreground text-xs uppercase">
+                    Contact No.
+                  </span>
+                  <p className="font-medium">{data.fee.contact_no}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Application Timeline - Can be added when timeline data is available */}
+          {/* <Card>
           <CardHeader>
             <CardTitle className="text-base">Timeline</CardTitle>
           </CardHeader>
@@ -809,7 +824,23 @@ export function RelationshipApplicationView({
             </div>
           </CardContent>
         </Card> */}
+        </div>
       </div>
+
+      {/* Certificate Preview - shown on approval page */}
+      {from === 'approval' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <IconFileText className="text-primary h-5 w-5" />
+              Certificate Preview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <RelationshipCertificatePreview data={certData} />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

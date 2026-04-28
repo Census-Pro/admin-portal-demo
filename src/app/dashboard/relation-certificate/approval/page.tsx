@@ -17,7 +17,7 @@ const DUMMY_APPLICATIONS = [
     applicant_name: 'Karma Wangchuk',
     applicant_contact_no: '17654321',
     relationship_to_cid: '11607000002',
-    relationship_to_name: 'Sonam Dema',
+    relationship_to_name: 'Tshering Wangchuk',
     purpose_id: 'purpose-1',
     payment_type_id: null,
     payment_service_type_id: 'svc-1',
@@ -28,7 +28,7 @@ const DUMMY_APPLICATIONS = [
       id: 'purpose-1',
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
-      name: 'Legal Proceedings'
+      name: 'Brother'
     },
     fee: {
       id: 'fee-1',
