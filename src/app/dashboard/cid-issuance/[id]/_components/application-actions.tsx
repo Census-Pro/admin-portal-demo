@@ -1,93 +1,71 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { IconCheck, IconX } from '@tabler/icons-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { assessFreshCidApplication } from '@/actions/issuance/cid-issuance-actions';
-import { toast } from 'sonner';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger
-} from '@/components/ui/alert-dialog';
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { IconBell, IconCash } from '@tabler/icons-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface ApplicationActionsProps {
   application: {
     id: string;
     status: string;
     application_no: string;
-    payment_type_id?: string;
   };
 }
 
-function getBackUrl(
-  paymentTypeId: string | undefined,
-  section: 'assessment' | 'payment'
-) {
-  const typeMap: Record<string, string> = {
-    FRESH: 'fresh',
-    RENEWAL: 'renewal',
-    REPLACEMENT: 'replacement'
-  };
-  const type = typeMap[paymentTypeId?.toUpperCase() ?? ''] ?? 'fresh';
-  return `/dashboard/cid-issuance/${type}/${section}`;
+interface ManualPaymentForm {
+  totalAmount: number;
+  transactionNo: string;
+  transactionDate: string;
+  remarks: string;
+  attachment: File | null;
 }
 
 export function ApplicationActions({ application }: ApplicationActionsProps) {
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [manualPaymentOpen, setManualPaymentOpen] = useState(false);
+  const [form, setForm] = useState<ManualPaymentForm>({
+    totalAmount: 300,
+    transactionNo: '',
+    transactionDate: '',
+    remarks: '',
+    attachment: null
+  });
 
-  const handleAssess = async () => {
+  const handleSendPaymentNotification = async () => {
     setIsLoading(true);
     try {
-      const result = await assessFreshCidApplication(application.id);
-
-      if (result.success) {
-        toast.success(result.message || 'Application assessed successfully');
-        router.push(getBackUrl(application.payment_type_id, 'assessment'));
-      } else {
-        toast.error(result.message || 'Failed to assess application');
-      }
+      // TODO: Implement send payment notification API call
+      console.log('Sending payment notification for:', application.id);
+      toast.success('Payment notification sent successfully');
     } catch (error) {
-      console.error('Error assessing application:', error);
-      toast.error(
-        'An unexpected error occurred while assessing the application'
-      );
+      console.error('Error sending payment notification:', error);
+      toast.error('Failed to send payment notification');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleApprove = async () => {
+  const handleManualPaymentSubmit = async () => {
     setIsLoading(true);
     try {
-      // TODO: Implement approve API call
-      console.log('Approving application:', application.id);
-      // await approveApplication(application.id);
-      router.push(getBackUrl(application.payment_type_id, 'payment'));
+      // TODO: Implement manual payment API call
+      console.log('Processing manual payment for:', application.id, form);
+      toast.success('Manual payment processed successfully');
+      setManualPaymentOpen(false);
     } catch (error) {
-      console.error('Error approving application:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleReject = async () => {
-    setIsLoading(true);
-    try {
-      // TODO: Implement reject API call
-      console.log('Rejecting application:', application.id);
-      // await rejectApplication(application.id);
-      router.push(getBackUrl(application.payment_type_id, 'assessment'));
-    } catch (error) {
-      console.error('Error rejecting application:', error);
+      console.error('Error processing manual payment:', error);
+      toast.error('Failed to process manual payment');
     } finally {
       setIsLoading(false);
     }
@@ -96,72 +74,26 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
   const renderActionButtons = () => {
     switch (application.status) {
       case 'SUBMITTED':
-        return (
-          <>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="default"
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                  disabled={isLoading}
-                >
-                  <IconCheck className="mr-2 h-4 w-4" />
-                  {isLoading ? 'Assessing...' : 'Assess'}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Confirm Assessment</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Are you sure you want to assess and approve this
-                    relationship certificate application for{' '}
-                    {application.application_no}?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleAssess}
-                    className="bg-green-600 hover:bg-green-700"
-                    disabled={isLoading}
-                  >
-                    <IconCheck className="mr-2 h-4 w-4" />
-                    Yes, Assess
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            <Button
-              variant="destructive"
-              className="flex-1"
-              onClick={handleReject}
-              disabled={isLoading}
-            >
-              <IconX className="mr-2 h-4 w-4" />
-              Reject
-            </Button>
-          </>
-        );
       case 'ASSESSED':
         return (
           <>
             <Button
               variant="default"
-              className="flex-1 bg-green-600 hover:bg-green-700"
-              onClick={handleApprove}
+              className="flex-1 bg-blue-600 hover:bg-blue-700"
+              onClick={handleSendPaymentNotification}
               disabled={isLoading}
             >
-              <IconCheck className="mr-2 h-4 w-4" />
-              Approve
+              <IconBell className="mr-2 h-4 w-4" />
+              {isLoading ? 'Sending...' : 'Send Payment Notification'}
             </Button>
             <Button
-              variant="destructive"
-              className="flex-1"
-              onClick={handleReject}
+              variant="default"
+              className="flex-1 bg-green-600 hover:bg-green-700"
+              onClick={() => setManualPaymentOpen(true)}
               disabled={isLoading}
             >
-              <IconX className="mr-2 h-4 w-4" />
-              Reject
+              <IconCash className="mr-2 h-4 w-4" />
+              Manual Payment
             </Button>
           </>
         );
@@ -186,5 +118,114 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
     }
   };
 
-  return <div className="flex gap-3 pt-4">{renderActionButtons()}</div>;
+  return (
+    <>
+      <div className="flex gap-3 pt-4">{renderActionButtons()}</div>
+
+      <Dialog open={manualPaymentOpen} onOpenChange={setManualPaymentOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Manual Payment</DialogTitle>
+          </DialogHeader>
+
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-1.5">
+              <Label htmlFor="totalAmount">
+                Total Amount <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="totalAmount"
+                type="number"
+                value={form.totalAmount}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    totalAmount: Number(e.target.value)
+                  }))
+                }
+                placeholder="Enter total amount"
+              />
+            </div>
+
+            <div className="grid gap-1.5">
+              <Label htmlFor="transactionNo">
+                Transaction No <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="transactionNo"
+                type="text"
+                value={form.transactionNo}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, transactionNo: e.target.value }))
+                }
+                placeholder="Enter transaction number"
+              />
+            </div>
+
+            <div className="grid gap-1.5">
+              <Label htmlFor="transactionDate">
+                Transaction Date <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="transactionDate"
+                type="date"
+                value={form.transactionDate}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, transactionDate: e.target.value }))
+                }
+              />
+            </div>
+
+            <div className="grid gap-1.5">
+              <Label htmlFor="remarks">Remarks</Label>
+              <Textarea
+                id="remarks"
+                value={form.remarks}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, remarks: e.target.value }))
+                }
+                placeholder="Enter remarks (optional)"
+                rows={3}
+              />
+            </div>
+
+            <div className="grid gap-1.5">
+              <Label htmlFor="attachment">Attachment</Label>
+              <Input
+                id="attachment"
+                type="file"
+                accept="image/*,.pdf"
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    attachment: e.target.files?.[0] ?? null
+                  }))
+                }
+              />
+              <p className="text-muted-foreground text-xs">
+                Payment receipt or proof (image / PDF)
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setManualPaymentOpen(false)}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-green-600 hover:bg-green-700"
+              onClick={handleManualPaymentSubmit}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Submitting...' : 'Submit Payment'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
