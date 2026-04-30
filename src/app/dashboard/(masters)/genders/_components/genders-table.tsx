@@ -10,10 +10,7 @@ import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 interface Gender {
   id: string;
   name: string;
-  description?: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface GendersTableProps {
@@ -51,9 +48,9 @@ export function GendersTable({
           search: searchParams.q
         });
 
-        if (result.genders) {
-          setData(result.genders);
-          setTotalItems(result.totalGenders || result.genders.length);
+        if (result.data) {
+          setData(result.data);
+          setTotalItems(result.meta?.itemCount || result.data.length);
           setError(null);
         } else {
           setError('Failed to fetch genders');

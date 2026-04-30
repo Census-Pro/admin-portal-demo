@@ -18,10 +18,7 @@ import { AddGenderModal } from './add-gender-modal';
 interface Gender {
   id: string;
   name: string;
-  description?: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export const createColumns = (
@@ -54,6 +51,25 @@ export const createColumns = (
             {gender.name.charAt(0).toUpperCase()}
           </div>
           <div className="font-medium">{gender.name}</div>
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: 'isActive',
+    header: 'Status',
+    cell: ({ row }) => {
+      const gender = row.original;
+      return (
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              gender.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+          <span className="text-sm font-medium">
+            {gender.isActive ? 'Active' : 'Inactive'}
+          </span>
         </div>
       );
     }
@@ -149,7 +165,6 @@ function ActionsCell({
           }
           setIsEditOpen(false);
         }}
-        initialData={gender}
       />
     </>
   );

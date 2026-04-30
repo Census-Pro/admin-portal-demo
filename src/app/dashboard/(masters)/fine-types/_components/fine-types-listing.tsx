@@ -17,8 +17,8 @@ export async function FineTypesListing() {
 
   // API call
   const data = await getFineTypes(filters || {});
-  const totalFineTypes = data?.totalFineTypes;
-  const fineTypes = data?.fineTypes || [];
+  const totalFineTypes = data?.meta?.itemCount || 0;
+  const fineTypes = data?.data || [];
 
   return <FineTypesTable data={fineTypes} totalData={totalFineTypes} />;
 }

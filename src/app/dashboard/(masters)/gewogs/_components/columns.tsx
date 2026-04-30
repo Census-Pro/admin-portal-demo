@@ -18,8 +18,9 @@ import { AddGewogModal } from './add-gewog-modal';
 interface Gewog {
   id: string;
   name: string;
-  dzongkha_name?: string;
-  code?: string;
+  dzongkhagId: string;
+  dzongkhagName: string;
+  isActive: boolean;
 }
 
 export const columns: ColumnDef<Gewog>[] = [
@@ -54,19 +55,30 @@ export const columns: ColumnDef<Gewog>[] = [
     }
   },
   {
-    accessorKey: 'dzongkha_name',
-    header: 'Dzongkha Name',
+    accessorKey: 'dzongkhagName',
+    header: 'Dzongkhag',
     cell: ({ row }) => {
       const gewog = row.original;
-      return <div className="font-medium">{gewog.dzongkha_name || '-'}</div>;
+      return <div className="font-medium">{gewog.dzongkhagName}</div>;
     }
   },
   {
-    accessorKey: 'code',
-    header: 'Code',
+    accessorKey: 'isActive',
+    header: 'Status',
     cell: ({ row }) => {
       const gewog = row.original;
-      return <div className="font-medium">{gewog.code || '-'}</div>;
+      return (
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              gewog.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+          <span className="text-sm font-medium">
+            {gewog.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+      );
     }
   },
   {
@@ -144,7 +156,6 @@ function ActionsCell({ gewog }: { gewog: Gewog }) {
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         onSuccess={() => setIsEditOpen(false)}
-        initialData={gewog}
       />
     </>
   );
