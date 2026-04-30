@@ -101,16 +101,43 @@ export function AddVillageModal({
             getAllChiwogs()
           ]);
 
-        if (dzongkhagsResult && !dzongkhagsResult.error) {
-          setDzongkhags(dzongkhagsResult.data || dzongkhagsResult || []);
+        // Handle dzongkhags result
+        if (
+          dzongkhagsResult &&
+          typeof dzongkhagsResult === 'object' &&
+          'data' in dzongkhagsResult
+        ) {
+          setDzongkhags((dzongkhagsResult as any).data || []);
+        } else if (Array.isArray(dzongkhagsResult)) {
+          setDzongkhags(dzongkhagsResult);
+        } else {
+          setDzongkhags([]);
         }
 
-        if (gewogsResult && !gewogsResult.error) {
-          setGewogs(gewogsResult.data || gewogsResult || []);
+        // Handle gewogs result
+        if (
+          gewogsResult &&
+          typeof gewogsResult === 'object' &&
+          'data' in gewogsResult
+        ) {
+          setGewogs((gewogsResult as any).data || []);
+        } else if (Array.isArray(gewogsResult)) {
+          setGewogs(gewogsResult);
+        } else {
+          setGewogs([]);
         }
 
-        if (chiwogsResult && !chiwogsResult.error) {
-          setChiwogs(chiwogsResult.data || chiwogsResult || []);
+        // Handle chiwogs result
+        if (
+          chiwogsResult &&
+          typeof chiwogsResult === 'object' &&
+          'data' in chiwogsResult
+        ) {
+          setChiwogs((chiwogsResult as any).data || []);
+        } else if (Array.isArray(chiwogsResult)) {
+          setChiwogs(chiwogsResult);
+        } else {
+          setChiwogs([]);
         }
       } catch (error) {
         console.error('Error fetching data:', error);

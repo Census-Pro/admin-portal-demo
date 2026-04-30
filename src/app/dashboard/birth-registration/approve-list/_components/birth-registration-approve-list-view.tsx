@@ -49,9 +49,9 @@ interface BirthRegistrationData {
   applicant_cid: string;
   applicant_contact_no?: string;
   applicant_is?: string;
-  is_born_in_bhutan: boolean;
+  is_born_in_bhutan?: boolean;
   is_applicant_parent?: boolean;
-  is_epis_registered: boolean;
+  is_epis_registered?: boolean;
   birth_country_id?: string;
   birth_city_id?: string;
   birth_dzongkhag_id?: string;

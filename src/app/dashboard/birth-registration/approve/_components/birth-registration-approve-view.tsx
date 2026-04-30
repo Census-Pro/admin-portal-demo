@@ -49,9 +49,9 @@ interface BirthRegistrationData {
   applicant_cid: string;
   applicant_contact_no?: string;
   applicant_is?: string;
-  is_born_in_bhutan: boolean;
+  is_born_in_bhutan?: boolean;
   is_applicant_parent?: boolean;
-  is_epis_registered: boolean;
+  is_epis_registered?: boolean;
   birth_country_id?: string;
   birth_city_id?: string;
   birth_dzongkhag_id?: string;
@@ -125,7 +125,7 @@ export function BirthRegistrationApproveView({
         toast.success('Birth registration approved successfully!');
         router.push('/dashboard/birth-registration/approve');
       } else {
-        toast.error(result.error || 'Failed to approve birth registration');
+        toast.error('Failed to approve birth registration');
       }
     } catch {
       toast.error('An unexpected error occurred');
@@ -146,7 +146,7 @@ export function BirthRegistrationApproveView({
         toast.error('Birth registration rejected');
         router.push('/dashboard/birth-registration/approve');
       } else {
-        toast.error(result.error || 'Failed to reject birth registration');
+        toast.error('Failed to reject birth registration');
       }
     } catch {
       toast.error('An unexpected error occurred');
