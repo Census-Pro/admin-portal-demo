@@ -20,31 +20,36 @@ export function ApproveListTable<TData extends Record<string, any>>({
 
   useEffect(() => {
     let cancelled = false;
+    let isMounted = true;
 
     async function fetchData() {
+      if (!isMounted) return;
       setIsLoading(true);
       setError(null);
       try {
         const result = await getMyBirthTaskList();
-        if (cancelled) return;
+        if (!isMounted || cancelled) return;
         if (!result.success) {
-          setError(result.error ?? 'Failed to fetch applications');
+          setError('Failed to fetch applications');
           return;
         }
-        setData(result.data as TData[]);
+        if (!isMounted || cancelled) return;
+        setData(result.data as unknown as TData[]);
       } catch (err) {
-        if (cancelled) return;
+        if (!isMounted || cancelled) return;
         setError(
           err instanceof Error ? err.message : 'An unexpected error occurred'
         );
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!isMounted || cancelled) return;
+        setIsLoading(false);
       }
     }
 
     fetchData();
     return () => {
       cancelled = true;
+      isMounted = false;
     };
   }, []);
 

@@ -28,8 +28,10 @@ export function BirthApplicationsTable<TData>({
 
   useEffect(() => {
     let cancelled = false;
+    let isMounted = true;
 
     async function fetchData() {
+      if (!isMounted) return;
       setIsLoading(true);
       setError(null);
       try {
@@ -42,34 +44,37 @@ export function BirthApplicationsTable<TData>({
             return getBirthApplicationsByStatus(s);
           })
         );
-        if (cancelled) return;
+        if (!isMounted || cancelled) return;
 
         const hasError = results.find((r) => !r.success);
         if (hasError) {
-          setError(hasError.error ?? 'Failed to fetch applications');
+          setError('Failed to fetch applications');
           return;
         }
 
-        const combined = results.flatMap((r) => r.data as TData[]);
+        const combined = results.flatMap((r) => r.data as unknown as TData[]);
         const total = results.reduce(
           (sum, r) => sum + (r.total_count ?? r.data.length),
           0
         );
+        if (!isMounted || cancelled) return;
         setData(combined);
         setTotalItems(total);
       } catch (err) {
-        if (cancelled) return;
+        if (!isMounted || cancelled) return;
         setError(
           err instanceof Error ? err.message : 'An unexpected error occurred'
         );
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!isMounted || cancelled) return;
+        setIsLoading(false);
       }
     }
 
     fetchData();
     return () => {
       cancelled = true;
+      isMounted = false;
     };
   }, [status]);
 

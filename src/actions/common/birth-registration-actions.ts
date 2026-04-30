@@ -5,8 +5,145 @@ import { instance } from '../instance';
 const API_URL =
   process.env.COMMON_SERVICE || process.env.API_URL || 'http://localhost:5002';
 
-const BIRTH_DEATH_API_URL =
-  process.env.BIRTH_DEATH_SERVICE || 'http://localhost:5004';
+// Dummy data for demo
+const dummyBirthApplications = [
+  {
+    id: '1',
+    applicant_cid: '10304001001',
+    first_name: 'Tashi',
+    middle_name: '',
+    last_name: 'Wangmo',
+    date_of_birth: '2024-01-15',
+    place_of_birth: 'Thimphu Hospital',
+    gender: 'Female',
+    father_name: 'Karma Dorji',
+    father_cid: '10304001002',
+    mother_name: 'Pema Lhamo',
+    mother_cid: '10304001003',
+    status: 'SUBMITTED',
+    createdAt: '2024-01-16T10:30:00Z',
+    remarks: ''
+  },
+  {
+    id: '2',
+    applicant_cid: '10304001004',
+    first_name: 'Dorji',
+    middle_name: '',
+    last_name: 'Penjor',
+    date_of_birth: '2024-02-20',
+    place_of_birth: 'Paro Hospital',
+    gender: 'Male',
+    father_name: 'Sonam Tshering',
+    father_cid: '10304001005',
+    mother_name: 'Dechen Wangmo',
+    mother_cid: '10304001006',
+    status: 'ENDORSED',
+    createdAt: '2024-02-21T14:45:00Z',
+    remarks: 'Documents verified'
+  },
+  {
+    id: '3',
+    applicant_cid: '10304001007',
+    first_name: 'Kinley',
+    middle_name: '',
+    last_name: 'Yangzom',
+    date_of_birth: '2024-03-10',
+    place_of_birth: 'Punakha Hospital',
+    gender: 'Female',
+    father_name: 'Jigme Wangchuk',
+    father_cid: '10304001008',
+    mother_name: 'Sonam Deki',
+    mother_cid: '10304001009',
+    status: 'VERIFIED',
+    createdAt: '2024-03-11T09:15:00Z',
+    remarks: 'Field verification completed'
+  },
+  {
+    id: '4',
+    applicant_cid: '10304001010',
+    first_name: 'Namgay',
+    middle_name: '',
+    last_name: 'Thinley',
+    date_of_birth: '2024-04-05',
+    place_of_birth: 'Wangdue Hospital',
+    gender: 'Male',
+    father_name: 'Tshewang Dorji',
+    father_cid: '10304001011',
+    mother_name: 'Chimi Dema',
+    mother_cid: '10304001012',
+    status: 'APPROVED',
+    createdAt: '2024-04-06T11:20:00Z',
+    remarks: 'Approved by Registrar'
+  },
+  {
+    id: '5',
+    applicant_cid: '10304001013',
+    first_name: 'Pema',
+    middle_name: '',
+    last_name: 'Choden',
+    date_of_birth: '2024-05-12',
+    place_of_birth: 'Bumthang Hospital',
+    gender: 'Female',
+    father_name: 'Karma Tshering',
+    father_cid: '10304001014',
+    mother_name: 'Yangzom Wangmo',
+    mother_cid: '10304001015',
+    status: 'SUBMITTED',
+    createdAt: '2024-05-13T16:00:00Z',
+    remarks: ''
+  },
+  {
+    id: '6',
+    applicant_cid: '10304001016',
+    first_name: 'Tshering',
+    middle_name: '',
+    last_name: 'Dorji',
+    date_of_birth: '2024-06-18',
+    place_of_birth: 'Trashigang Hospital',
+    gender: 'Male',
+    father_name: 'Dorji Wangchuk',
+    father_cid: '10304001017',
+    mother_name: 'Leki Wangmo',
+    mother_cid: '10304001018',
+    status: 'ENDORSED',
+    createdAt: '2024-06-19T08:30:00Z',
+    remarks: 'Endorsed by Local Authority'
+  },
+  {
+    id: '7',
+    applicant_cid: '10304001019',
+    first_name: 'Dechen',
+    middle_name: '',
+    last_name: 'Pemo',
+    date_of_birth: '2024-07-22',
+    place_of_birth: 'Samtse Hospital',
+    gender: 'Female',
+    father_name: 'Penjor Wangdi',
+    father_cid: '10304001020',
+    mother_name: 'Tshering Yangzom',
+    mother_cid: '10304001021',
+    status: 'VERIFIED',
+    createdAt: '2024-07-23T13:45:00Z',
+    remarks: 'Verification pending approval'
+  },
+  {
+    id: '8',
+    applicant_cid: '10304001022',
+    first_name: 'Sonam',
+    middle_name: '',
+    last_name: 'Gyeltshen',
+    date_of_birth: '2024-08-30',
+    place_of_birth: 'Mongar Hospital',
+    gender: 'Male',
+    father_name: 'Karma Phuntsho',
+    father_cid: '10304001023',
+    mother_name: 'Choki Dema',
+    mother_cid: '10304001024',
+    status: 'APPROVED',
+    createdAt: '2024-08-31T10:00:00Z',
+    remarks: 'Certificate issued'
+  }
+];
 
 export type BirthApplicationStatus =
   | 'PENDING'
@@ -19,278 +156,65 @@ export type BirthApplicationStatus =
 export async function getBirthApplicationsByStatus(
   status: BirthApplicationStatus
 ) {
-  try {
-    const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-applications/get-status?status=${status}`;
-
-    console.log('[getBirthApplicationsByStatus] Fetching from:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    console.log(
-      '[getBirthApplicationsByStatus] Response status:',
-      response.status
-    );
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch birth applications';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      console.error('[getBirthApplicationsByStatus] API Error:', errorMessage);
-
-      return {
-        success: false,
-        error: errorMessage,
-        data: [],
-        total_count: 0
-      };
-    }
-
-    const result = await response.json();
-    console.log(
-      '[getBirthApplicationsByStatus] Fetched successfully:',
-      result.total_count ?? result.data?.length ?? 0
-    );
-
-    return {
-      success: true,
-      data: result.data || [],
-      total_count: result.total_count ?? result.data?.length ?? 0
-    };
-  } catch (error) {
-    console.error('[getBirthApplicationsByStatus] Unexpected error:', error);
-    const isConnRefused =
-      error instanceof Error &&
-      (error.message.includes('ECONNREFUSED') ||
-        error.message.includes('fetch failed'));
-    return {
-      success: false,
-      error: isConnRefused
-        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
-        : error instanceof Error
-          ? error.message
-          : 'An unexpected error occurred',
-      data: [],
-      total_count: 0
-    };
-  }
+  // Demo: Return dummy data
+  // For approve page, return ENDORSED applications when VERIFIED is requested
+  const targetStatus = status === 'VERIFIED' ? 'ENDORSED' : status;
+  const filtered = dummyBirthApplications.filter(
+    (app) => app.status === targetStatus
+  );
+  return {
+    success: true,
+    data: filtered,
+    total_count: filtered.length
+  };
 }
 
 export async function getSubmittedBirthApplications() {
-  try {
-    const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-applications/submitted`;
-
-    console.log('[getSubmittedBirthApplications] Fetching from:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch submitted birth applications';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-      return { success: false, error: errorMessage, data: [], total_count: 0 };
-    }
-
-    const result = await response.json();
-    const submittedApplications = Array.isArray(result)
-      ? result
-      : (result.data ?? []);
-
-    return {
-      success: true,
-      data: submittedApplications,
-      total_count: result.total_count ?? submittedApplications.length
-    };
-  } catch (error) {
-    const isConnRefused =
-      error instanceof Error &&
-      (error.message.includes('ECONNREFUSED') ||
-        error.message.includes('fetch failed'));
-    return {
-      success: false,
-      error: isConnRefused
-        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
-        : error instanceof Error
-          ? error.message
-          : 'An unexpected error occurred',
-      data: [],
-      total_count: 0
-    };
-  }
+  // Demo: Return dummy data
+  const submitted = dummyBirthApplications.filter(
+    (app) => app.status === 'SUBMITTED'
+  );
+  return {
+    success: true,
+    data: submitted,
+    total_count: submitted.length
+  };
 }
 
 export async function getMyBirthTaskList() {
-  try {
-    const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-task-list/mytasklist`;
-
-    console.log('[getMyBirthTaskList] Fetching from:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch my birth task list';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-      return { success: false, error: errorMessage, data: [], total_count: 0 };
-    }
-
-    const result = await response.json();
-    const taskList = Array.isArray(result) ? result : (result.data ?? []);
-    const normalizedApplications = taskList
-      .filter((task: any) => task.birth_application?.id)
-      .map((task: any) => {
-        const application = task.birth_application;
-        return {
-          ...application,
-          id: application.id,
-          createdAt: application.createdAt ?? task.assigned_at
-        };
-      });
-
-    return {
-      success: true,
-      data: normalizedApplications,
-      total_count: normalizedApplications.length
-    };
-  } catch (error) {
-    const isConnRefused =
-      error instanceof Error &&
-      (error.message.includes('ECONNREFUSED') ||
-        error.message.includes('fetch failed'));
-    return {
-      success: false,
-      error: isConnRefused
-        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
-        : error instanceof Error
-          ? error.message
-          : 'An unexpected error occurred',
-      data: [],
-      total_count: 0
-    };
-  }
+  // Demo: Return dummy data for approve list (ENDORSED applications)
+  const taskList = dummyBirthApplications.filter(
+    (app) => app.status === 'ENDORSED'
+  );
+  return {
+    success: true,
+    data: taskList,
+    total_count: taskList.length
+  };
 }
 
 export async function getEndorsedBirthApplications() {
-  try {
-    const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-applications/endorsed`;
-
-    console.log('[getEndorsedBirthApplications] Fetching from:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch endorsed birth applications';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-      return { success: false, error: errorMessage, data: [], total_count: 0 };
-    }
-
-    const result = await response.json();
-    return {
-      success: true,
-      data: result.data || result || [],
-      total_count: result.total_count ?? result.data?.length ?? 0
-    };
-  } catch (error) {
-    const isConnRefused =
-      error instanceof Error &&
-      (error.message.includes('ECONNREFUSED') ||
-        error.message.includes('fetch failed'));
-    return {
-      success: false,
-      error: isConnRefused
-        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
-        : error instanceof Error
-          ? error.message
-          : 'An unexpected error occurred',
-      data: [],
-      total_count: 0
-    };
-  }
+  // Demo: Return dummy data (VERIFIED status for endorse page)
+  const endorsed = dummyBirthApplications.filter(
+    (app) => app.status === 'VERIFIED'
+  );
+  return {
+    success: true,
+    data: endorsed,
+    total_count: endorsed.length
+  };
 }
 
 export async function getVerifiedBirthApplications() {
-  try {
-    const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-applications/verified`;
-
-    console.log('[getVerifiedBirthApplications] Fetching from:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch verified birth applications';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-      return { success: false, error: errorMessage, data: [], total_count: 0 };
-    }
-
-    const result = await response.json();
-    return {
-      success: true,
-      data: result.data || result || [],
-      total_count: result.total_count ?? result.data?.length ?? 0
-    };
-  } catch (error) {
-    const isConnRefused =
-      error instanceof Error &&
-      (error.message.includes('ECONNREFUSED') ||
-        error.message.includes('fetch failed'));
-    return {
-      success: false,
-      error: isConnRefused
-        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
-        : error instanceof Error
-          ? error.message
-          : 'An unexpected error occurred',
-      data: [],
-      total_count: 0
-    };
-  }
+  // Demo: Return dummy data (ENDORSED status for approve page)
+  const verified = dummyBirthApplications.filter(
+    (app) => app.status === 'ENDORSED'
+  );
+  return {
+    success: true,
+    data: verified,
+    total_count: verified.length
+  };
 }
 
 export async function getBirthRegistrations() {
@@ -348,50 +272,16 @@ export async function getBirthRegistrations() {
 }
 
 export async function rejectBirthApplication(id: string, remarks: string) {
-  try {
-    const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-applications/${id}/reject`;
-
-    console.log('[rejectBirthApplication] Patching:', url, { remarks });
-
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ remarks })
-    });
-
-    console.log('[rejectBirthApplication] Response status:', response.status);
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to reject birth application';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-      console.error('[rejectBirthApplication] API Error:', errorMessage);
-      return { success: false, error: errorMessage };
-    }
-
-    const result = await response.json();
-    console.log('[rejectBirthApplication] Rejected successfully');
-
-    return {
-      success: true,
-      data: result.data || result
-    };
-  } catch (error) {
-    console.error('[rejectBirthApplication] Unexpected error:', error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'An unexpected error occurred'
-    };
-  }
+  // Demo: Return success
+  console.log(
+    '[rejectBirthApplication] Demo: Rejecting application',
+    id,
+    remarks
+  );
+  return {
+    success: true,
+    data: { id, status: 'REJECTED', remarks }
+  };
 }
 
 export async function updateBirthApplicationStatus(
@@ -399,109 +289,25 @@ export async function updateBirthApplicationStatus(
   status: BirthApplicationStatus,
   remarks?: string
 ) {
-  try {
-    const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-applications/${id}`;
-
-    console.log('[updateBirthApplicationStatus] Patching:', url, {
-      status,
-      remarks
-    });
-
-    const body: Record<string, string> = { status };
-    if (remarks) body.remarks = remarks;
-
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    console.log(
-      '[updateBirthApplicationStatus] Response status:',
-      response.status
-    );
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to update birth application status';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      console.error('[updateBirthApplicationStatus] API Error:', errorMessage);
-
-      return {
-        success: false,
-        error: errorMessage
-      };
-    }
-
-    const result = await response.json();
-    console.log('[updateBirthApplicationStatus] Updated successfully');
-
-    return {
-      success: true,
-      data: result.data || result
-    };
-  } catch (error) {
-    console.error('[updateBirthApplicationStatus] Unexpected error:', error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'An unexpected error occurred'
-    };
-  }
+  // Demo: Return success
+  console.log(
+    '[updateBirthApplicationStatus] Demo: Updating status',
+    id,
+    status
+  );
+  return {
+    success: true,
+    data: { id, status, remarks: remarks || '' }
+  };
 }
 
 export async function assignBirthTask(applicationId: string) {
-  try {
-    const headers = await instance();
-    const url = `${BIRTH_DEATH_API_URL}/birth-task-list`;
-
-    console.log('[assignBirthTask] Posting to:', url, { applicationId });
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ application_id: applicationId })
-    });
-
-    console.log('[assignBirthTask] Response status:', response.status);
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to assign task';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      console.error('[assignBirthTask] API Error:', errorMessage);
-      return { success: false, error: errorMessage };
-    }
-
-    const result = await response.json();
-    console.log('[assignBirthTask] Assigned successfully');
-
-    return { success: true, data: result.data || result };
-  } catch (error) {
-    console.error('[assignBirthTask] Unexpected error:', error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'An unexpected error occurred'
-    };
-  }
+  // Demo: Return success
+  console.log('[assignBirthTask] Demo: Assigning task', applicationId);
+  return {
+    success: true,
+    data: { application_id: applicationId, assigned: true }
+  };
 }
 
 export async function getBirthRegistrationById(id: string) {
@@ -554,122 +360,14 @@ export async function getBirthRegistrationById(id: string) {
 }
 
 export async function getBirthApplicationById(id: string) {
-  try {
-    const headers = await instance();
-    const fetchByApplicationId = async (applicationId: string) => {
-      const url = `${BIRTH_DEATH_API_URL}/birth-applications/${applicationId}`;
-      const response = await fetch(url, {
-        method: 'GET',
-        headers,
-        cache: 'no-store'
-      });
-
-      if (!response.ok) {
-        let errorMessage = 'Failed to fetch birth application';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorData.error || errorMessage;
-        } catch {
-          errorMessage = `${response.status}: ${response.statusText}`;
-        }
-
-        return {
-          success: false as const,
-          status: response.status,
-          error: errorMessage,
-          data: null
-        };
-      }
-
-      const result = await response.json();
-      return {
-        success: true as const,
-        status: response.status,
-        data: result
-      };
-    };
-
-    console.log('[getBirthApplicationById] Fetching by id:', id);
-    const directResult = await fetchByApplicationId(id);
-    if (directResult.success) {
-      console.log('[getBirthApplicationById] Fetched successfully');
-      return { success: true, data: directResult.data };
-    }
-
-    // When the source is task list, route param may contain task id instead of application id.
-    if (
-      directResult.status === 404 ||
-      directResult.error?.includes('not found')
-    ) {
-      const taskListUrl = `${BIRTH_DEATH_API_URL}/birth-task-list/mytasklist`;
-      const taskListResponse = await fetch(taskListUrl, {
-        method: 'GET',
-        headers,
-        cache: 'no-store'
-      });
-
-      if (taskListResponse.ok) {
-        const taskListResult = await taskListResponse.json();
-        const tasks = Array.isArray(taskListResult)
-          ? taskListResult
-          : (taskListResult.data ?? []);
-        const matchedTask = tasks.find((task: any) => task.id === id);
-
-        if (matchedTask?.application_id) {
-          console.log(
-            '[getBirthApplicationById] Resolved task id to application id:',
-            matchedTask.application_id
-          );
-          const resolvedResult = await fetchByApplicationId(
-            matchedTask.application_id
-          );
-          if (resolvedResult.success) {
-            return { success: true, data: resolvedResult.data };
-          }
-
-          if (
-            resolvedResult.status !== 404 &&
-            !resolvedResult.error?.toLowerCase().includes('not found')
-          ) {
-            console.error(
-              '[getBirthApplicationById] API Error after id resolution:',
-              resolvedResult.error
-            );
-          }
-          return {
-            success: false,
-            error: resolvedResult.error,
-            data: null
-          };
-        }
-      }
-    }
-
-    if (
-      directResult.status !== 404 &&
-      !directResult.error?.toLowerCase().includes('not found')
-    ) {
-      console.error('[getBirthApplicationById] API Error:', directResult.error);
-    }
-    return {
-      success: false,
-      error: directResult.error,
-      data: null
-    };
-  } catch (error) {
-    console.error('[getBirthApplicationById] Unexpected error:', error);
-    const isConnRefused =
-      error instanceof Error &&
-      (error.message.includes('ECONNREFUSED') ||
-        error.message.includes('fetch failed'));
-    return {
-      success: false,
-      error: isConnRefused
-        ? `Birth-death service is unreachable at ${BIRTH_DEATH_API_URL}. Make sure it is running.`
-        : error instanceof Error
-          ? error.message
-          : 'An unexpected error occurred',
-      data: null
-    };
+  // Demo: Return dummy data
+  const application = dummyBirthApplications.find((app) => app.id === id);
+  if (application) {
+    return { success: true, data: application };
   }
+  return {
+    success: false,
+    error: 'Birth application not found',
+    data: null
+  };
 }
