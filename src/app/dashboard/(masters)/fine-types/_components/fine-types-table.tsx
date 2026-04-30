@@ -5,14 +5,8 @@ import { columns } from './columns';
 
 interface FineType {
   id: string;
-  fine_type: string;
   name: string;
-  service_code: string;
-  currency: string;
-  fine_value: number;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface FineTypesTableProps {
