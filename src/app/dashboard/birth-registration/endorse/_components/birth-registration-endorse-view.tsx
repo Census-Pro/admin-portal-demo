@@ -49,10 +49,10 @@ import {
 interface BirthRegistrationData {
   applicant_cid: string;
   applicant_contact_no?: string;
-  is_born_in_bhutan: boolean;
+  is_born_in_bhutan?: boolean;
   applicant_is?: string;
   is_applicant_parent?: boolean;
-  is_epis_registered: boolean;
+  is_epis_registered?: boolean;
   birth_country_id?: string;
   birth_city_id?: string;
   birth_dzongkhag_id?: string;
@@ -130,7 +130,7 @@ export function BirthRegistrationEndorseView({
         toast.success('Birth registration endorsed successfully!');
         router.push('/dashboard/birth-registration/endorse');
       } else {
-        toast.error(result.error || 'Failed to endorse birth registration');
+        toast.error('Failed to endorse birth registration');
       }
     } catch (error) {
       toast.error('An unexpected error occurred while endorsing');
@@ -151,7 +151,7 @@ export function BirthRegistrationEndorseView({
         toast.error('Birth registration rejected');
         router.push('/dashboard/birth-registration/endorse');
       } else {
-        toast.error(result.error || 'Failed to reject birth registration');
+        toast.error('Failed to reject birth registration');
       }
     } catch {
       toast.error('An unexpected error occurred');

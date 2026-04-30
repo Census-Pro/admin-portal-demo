@@ -52,12 +52,18 @@ export default async function EndorseDetailPage({
 
   const appData = result.data;
 
-  // Resolve location IDs to names in parallel
+  // Resolve location IDs to names in parallel - handle missing properties
   const [dzongkhagRes, gewogRes, chiwogRes, villageRes] = await Promise.all([
-    appData.dzongkhag_id ? getDzongkhagById(appData.dzongkhag_id) : null,
-    appData.gewog_id ? getGewogById(appData.gewog_id) : null,
-    appData.chiwog_id ? getChiwogById(appData.chiwog_id) : null,
-    appData.village_id ? getVillageById(appData.village_id) : null
+    (appData as any).dzongkhag_id
+      ? getDzongkhagById((appData as any).dzongkhag_id)
+      : null,
+    (appData as any).gewog_id ? getGewogById((appData as any).gewog_id) : null,
+    (appData as any).chiwog_id
+      ? getChiwogById((appData as any).chiwog_id)
+      : null,
+    (appData as any).village_id
+      ? getVillageById((appData as any).village_id)
+      : null
   ]);
 
   const enrichedData = {
@@ -65,13 +71,17 @@ export default async function EndorseDetailPage({
     dzongkhag_name:
       dzongkhagRes && !dzongkhagRes.error
         ? dzongkhagRes.name
-        : appData.dzongkhag_name,
+        : (appData as any).dzongkhag_name,
     gewog_name:
-      gewogRes && !gewogRes.error ? gewogRes.name : appData.gewog_name,
+      gewogRes && !gewogRes.error ? gewogRes.name : (appData as any).gewog_name,
     chiwog_name:
-      chiwogRes && !chiwogRes.error ? chiwogRes.name : appData.chiwog_name,
+      chiwogRes && !chiwogRes.error
+        ? chiwogRes.name
+        : (appData as any).chiwog_name,
     village_name:
-      villageRes && !villageRes.error ? villageRes.name : appData.village_name
+      villageRes && !villageRes.error
+        ? villageRes.name
+        : (appData as any).village_name
   };
 
   return (
