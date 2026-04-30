@@ -8,23 +8,102 @@ const API_URL =
 
 // Dummy agencies data
 const DUMMY_AGENCIES = [
-  { id: '1', name: 'Ministry of Home Affairs', code: 'MOHA', isActive: true },
-  { id: '2', name: 'Department of Immigration', code: 'DOI', isActive: true },
-  { id: '3', name: 'Regional Immigration Office', code: 'RIO', isActive: true },
-  { id: '4', name: 'Dzongkhag Administration', code: 'DZA', isActive: true },
-  { id: '5', name: 'Local Government Office', code: 'LGO', isActive: true },
-  { id: '6', name: 'Civil Registration Office', code: 'CRO', isActive: true },
+  {
+    id: '1',
+    name: 'Ministry of Home Affairs',
+    code: 'MOHA',
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '2',
+    name: 'Department of Immigration',
+    code: 'DOI',
+    isActive: true,
+    createdAt: '2024-01-02T00:00:00Z',
+    updatedAt: '2024-01-02T00:00:00Z'
+  },
+  {
+    id: '3',
+    name: 'Regional Immigration Office',
+    code: 'RIO',
+    isActive: true,
+    createdAt: '2024-01-03T00:00:00Z',
+    updatedAt: '2024-01-03T00:00:00Z'
+  },
+  {
+    id: '4',
+    name: 'Dzongkhag Administration',
+    code: 'DZA',
+    isActive: true,
+    createdAt: '2024-01-04T00:00:00Z',
+    updatedAt: '2024-01-04T00:00:00Z'
+  },
+  {
+    id: '5',
+    name: 'Local Government Office',
+    code: 'LGO',
+    isActive: true,
+    createdAt: '2024-01-05T00:00:00Z',
+    updatedAt: '2024-01-05T00:00:00Z'
+  },
+  {
+    id: '6',
+    name: 'Civil Registration Office',
+    code: 'CRO',
+    isActive: true,
+    createdAt: '2024-01-06T00:00:00Z',
+    updatedAt: '2024-01-06T00:00:00Z'
+  },
   {
     id: '7',
     name: 'National Registration Office',
     code: 'NRO',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-07T00:00:00Z',
+    updatedAt: '2024-01-07T00:00:00Z'
   },
-  { id: '8', name: 'Department of Law and Order', code: 'DLO', isActive: true },
-  { id: '9', name: 'Bureau of Law and Order', code: 'BLO', isActive: true },
-  { id: '10', name: 'Royal Bhutan Police', code: 'RBP', isActive: true },
-  { id: '11', name: 'Immigration Division', code: 'IDD', isActive: true },
-  { id: '12', name: 'Passport Division', code: 'PAD', isActive: true }
+  {
+    id: '8',
+    name: 'Department of Law and Order',
+    code: 'DLO',
+    isActive: true,
+    createdAt: '2024-01-08T00:00:00Z',
+    updatedAt: '2024-01-08T00:00:00Z'
+  },
+  {
+    id: '9',
+    name: 'Bureau of Law and Order',
+    code: 'BLO',
+    isActive: true,
+    createdAt: '2024-01-09T00:00:00Z',
+    updatedAt: '2024-01-09T00:00:00Z'
+  },
+  {
+    id: '10',
+    name: 'Royal Bhutan Police',
+    code: 'RBP',
+    isActive: true,
+    createdAt: '2024-01-10T00:00:00Z',
+    updatedAt: '2024-01-10T00:00:00Z'
+  },
+  {
+    id: '11',
+    name: 'Immigration Division',
+    code: 'IDD',
+    isActive: true,
+    createdAt: '2024-01-11T00:00:00Z',
+    updatedAt: '2024-01-11T00:00:00Z'
+  },
+  {
+    id: '12',
+    name: 'Passport Division',
+    code: 'PAD',
+    isActive: true,
+    createdAt: '2024-01-12T00:00:00Z',
+    updatedAt: '2024-01-12T00:00:00Z'
+  }
 ];
 
 export async function getAgencies({

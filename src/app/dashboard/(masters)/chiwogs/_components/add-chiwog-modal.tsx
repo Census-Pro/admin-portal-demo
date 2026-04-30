@@ -81,12 +81,12 @@ export function AddChiwogModal({
           getAllGewogs()
         ]);
 
-        if (dzongkhagsResult && !dzongkhagsResult.error) {
-          setDzongkhags(dzongkhagsResult.data || dzongkhagsResult || []);
+        if (dzongkhagsResult && Array.isArray(dzongkhagsResult)) {
+          setDzongkhags(dzongkhagsResult);
         }
 
-        if (gewogsResult && !gewogsResult.error) {
-          setGewogs(gewogsResult.data || gewogsResult || []);
+        if (gewogsResult && Array.isArray(gewogsResult)) {
+          setGewogs(gewogsResult);
         }
       } catch (error) {
         console.error('Error fetching data:', error);

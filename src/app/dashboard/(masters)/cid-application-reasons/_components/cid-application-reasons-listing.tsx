@@ -17,8 +17,8 @@ export async function CidApplicationReasonsListing() {
 
   // API call
   const data = await getCidApplicationReasons(filters || {});
-  const totalCidApplicationReasons = data?.totalCidApplicationReasons;
-  const cidApplicationReasons = data?.cidApplicationReasons || [];
+  const totalCidApplicationReasons = data?.meta?.itemCount || 0;
+  const cidApplicationReasons = data?.data || [];
 
   return (
     <CidApplicationReasonsTable

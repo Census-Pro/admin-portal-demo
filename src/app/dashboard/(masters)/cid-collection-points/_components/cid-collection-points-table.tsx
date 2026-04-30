@@ -57,7 +57,7 @@ export function CidCollectionPointsTable({
 
         if (result.success) {
           setData(result.data || []);
-          setTotalItems(result.totalItems || 0);
+          setTotalItems(result.meta?.itemCount || 0);
           setError(null);
         } else {
           // Check if session expired - if so, show dialog instead of error in table

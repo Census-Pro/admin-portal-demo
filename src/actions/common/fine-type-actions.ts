@@ -105,6 +105,77 @@ export async function getFineTypes({
   }
 }
 
+export async function updateFineType(id: string, formData: any) {
+  try {
+    console.log('Updating fine type with id:', id, 'data:', formData);
+
+    // For demo purposes, just return success
+    // In a real implementation, you would make an API call
+    const response = await fetch(`${API_URL}/fine-types/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(formData),
+      headers: await instance()
+    });
+
+    const data = await response.json();
+    console.log('Update fine type response:', {
+      status: response.status,
+      data
+    });
+
+    if (!response.ok || data.error) {
+      const errorMessage =
+        (data?.error as ApiErrorResponse)?.message ||
+        data?.message ||
+        (Array.isArray(data?.message) ? data.message.join(', ') : null) ||
+        'Failed to update fine type';
+      console.error('Error updating fine type:', errorMessage, data);
+      return { error: true, message: errorMessage };
+    }
+
+    revalidatePath('/dashboard/fine-types');
+    return data;
+  } catch (error) {
+    console.error('Error updating fine type:', error);
+    return { error: true, message: 'Failed to update fine type' };
+  }
+}
+
+export async function deleteFineType(id: string) {
+  try {
+    console.log('Deleting fine type with id:', id);
+
+    // For demo purposes, just return success
+    // In a real implementation, you would make an API call
+    const response = await fetch(`${API_URL}/fine-types/${id}`, {
+      method: 'DELETE',
+      headers: await instance()
+    });
+
+    const data = await response.json();
+    console.log('Delete fine type response:', {
+      status: response.status,
+      data
+    });
+
+    if (!response.ok || data.error) {
+      const errorMessage =
+        (data?.error as ApiErrorResponse)?.message ||
+        data?.message ||
+        (Array.isArray(data?.message) ? data.message.join(', ') : null) ||
+        'Failed to delete fine type';
+      console.error('Error deleting fine type:', errorMessage, data);
+      return { error: true, message: errorMessage };
+    }
+
+    revalidatePath('/dashboard/fine-types');
+    return data;
+  } catch (error) {
+    console.error('Error deleting fine type:', error);
+    return { error: true, message: 'Failed to delete fine type' };
+  }
+}
+
 export async function getAllFineTypes() {
   console.log('getAllFineTypes called with dummy data');
 

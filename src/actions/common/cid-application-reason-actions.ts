@@ -34,18 +34,90 @@ export async function createCidApplicationReason(formData: any) {
 
 // Dummy CID application reasons data
 const DUMMY_CID_APPLICATION_REASONS = [
-  { id: '1', name: 'First Time Application', isActive: true },
-  { id: '2', name: 'Lost CID', isActive: true },
-  { id: '3', name: 'Damaged CID', isActive: true },
-  { id: '4', name: 'CID Expiry Renewal', isActive: true },
-  { id: '5', name: 'Name Change', isActive: true },
-  { id: '6', name: 'Address Change', isActive: true },
-  { id: '7', name: 'Date of Birth Correction', isActive: true },
-  { id: '8', name: 'Gender Change', isActive: true },
-  { id: '9', name: 'Replacement due to wear and tear', isActive: true },
-  { id: '10', name: 'Replacement due to system upgrade', isActive: true },
-  { id: '11', name: 'Replacement for minor corrections', isActive: true },
-  { id: '12', name: 'Replacement due to security reasons', isActive: true }
+  {
+    id: '1',
+    name: 'First Time Application',
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
+  },
+  {
+    id: '2',
+    name: 'Lost CID',
+    isActive: true,
+    createdAt: '2024-01-02T00:00:00Z',
+    updatedAt: '2024-01-02T00:00:00Z'
+  },
+  {
+    id: '3',
+    name: 'Damaged CID',
+    isActive: true,
+    createdAt: '2024-01-03T00:00:00Z',
+    updatedAt: '2024-01-03T00:00:00Z'
+  },
+  {
+    id: '4',
+    name: 'CID Expiry Renewal',
+    isActive: true,
+    createdAt: '2024-01-04T00:00:00Z',
+    updatedAt: '2024-01-04T00:00:00Z'
+  },
+  {
+    id: '5',
+    name: 'Name Change',
+    isActive: true,
+    createdAt: '2024-01-05T00:00:00Z',
+    updatedAt: '2024-01-05T00:00:00Z'
+  },
+  {
+    id: '6',
+    name: 'Address Change',
+    isActive: true,
+    createdAt: '2024-01-06T00:00:00Z',
+    updatedAt: '2024-01-06T00:00:00Z'
+  },
+  {
+    id: '7',
+    name: 'Date of Birth Correction',
+    isActive: true,
+    createdAt: '2024-01-07T00:00:00Z',
+    updatedAt: '2024-01-07T00:00:00Z'
+  },
+  {
+    id: '8',
+    name: 'Gender Change',
+    isActive: true,
+    createdAt: '2024-01-08T00:00:00Z',
+    updatedAt: '2024-01-08T00:00:00Z'
+  },
+  {
+    id: '9',
+    name: 'Replacement due to wear and tear',
+    isActive: true,
+    createdAt: '2024-01-09T00:00:00Z',
+    updatedAt: '2024-01-09T00:00:00Z'
+  },
+  {
+    id: '10',
+    name: 'Replacement due to system upgrade',
+    isActive: true,
+    createdAt: '2024-01-10T00:00:00Z',
+    updatedAt: '2024-01-10T00:00:00Z'
+  },
+  {
+    id: '11',
+    name: 'Replacement for minor corrections',
+    isActive: true,
+    createdAt: '2024-01-11T00:00:00Z',
+    updatedAt: '2024-01-11T00:00:00Z'
+  },
+  {
+    id: '12',
+    name: 'Replacement due to security reasons',
+    isActive: true,
+    createdAt: '2024-01-12T00:00:00Z',
+    updatedAt: '2024-01-12T00:00:00Z'
+  }
 ];
 
 export async function getCidApplicationReasons({

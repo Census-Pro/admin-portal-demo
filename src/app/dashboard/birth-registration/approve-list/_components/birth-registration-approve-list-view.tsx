@@ -31,6 +31,8 @@ import {
 import {
   IconUser,
   IconMapPin,
+  IconHome,
+  IconUsers,
   IconShieldCheck,
   IconFileText,
   IconCheck,
@@ -450,6 +452,489 @@ export function BirthRegistrationApproveListView({
                   </div>
                 </div>
               )}
+            </div>
+
+            <Separator />
+
+            {/* Parent Information */}
+            <div className="space-y-3">
+              <h3 className="flex items-center gap-2 text-sm font-semibold">
+                <IconUsers className="h-4 w-4" />
+                Parent Information
+              </h3>
+
+              {data.is_mc_valid ? (
+                <>
+                  {/* MC Valid = YES: Green EPIS border for Father's CID + Marriage Certificate Valid */}
+                  <div className="relative space-y-2 rounded-lg border-2 border-green-500 p-4">
+                    <div className="bg-background absolute -top-3 right-4 px-2">
+                      <span className="text-xs font-medium text-green-600">
+                        EPIS
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Father's CID
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.father_cid || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Marriage Certificate Valid
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">Yes</p>
+                    </div>
+                  </div>
+
+                  {/* MC Valid = YES: Yellow Manual Entry border for remaining fields */}
+                  <div className="relative space-y-2 rounded-lg border-2 border-yellow-500 p-4">
+                    <div className="bg-background absolute -top-3 right-4 px-2">
+                      <span className="text-xs font-medium text-yellow-600">
+                        Manual Entry
+                      </span>
+                    </div>
+                    {data.fathers_contact_no && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Father's Contact
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.fathers_contact_no}
+                        </p>
+                      </div>
+                    )}
+                    {data.is_father_alive != null && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Father Alive
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.is_father_alive ? 'Yes' : 'No'}
+                        </p>
+                      </div>
+                    )}
+                    {data.father_approval && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Father Approval
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.father_approval}
+                        </p>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Mother's CID
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.mother_cid || 'N/A'}
+                      </p>
+                    </div>
+                    {data.mothers_contact_no && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Mother's Contact
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.mothers_contact_no}
+                        </p>
+                      </div>
+                    )}
+                    {data.is_mother_alive != null && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Mother Alive
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.is_mother_alive ? 'Yes' : 'No'}
+                        </p>
+                      </div>
+                    )}
+                    {data.mother_approval && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Mother Approval
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.mother_approval}
+                        </p>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Applicant CID
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.applicant_cid}
+                      </p>
+                    </div>
+                    {data.applicant_contact_no && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Applicant Contact
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.applicant_contact_no}
+                        </p>
+                      </div>
+                    )}
+                    {data.applicant_is && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Applicant Is
+                        </Label>
+                        <p className="flex-1 text-sm font-medium capitalize">
+                          {data.applicant_is}
+                        </p>
+                      </div>
+                    )}
+                    {data.is_applicant_parent != null && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Is Applicant Parent
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.is_applicant_parent ? 'Yes' : 'No'}
+                        </p>
+                      </div>
+                    )}
+                    {data.guarantor_cid && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Guarantor CID
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.guarantor_cid}
+                        </p>
+                      </div>
+                    )}
+                    {data.guarantor_contact_no && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Guarantor Contact
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.guarantor_contact_no}
+                        </p>
+                      </div>
+                    )}
+                    {data.relationship && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Relationship
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.relationship}
+                        </p>
+                      </div>
+                    )}
+                    {data.guarantor_approval && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          Guarantor Approval
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.guarantor_approval}
+                        </p>
+                      </div>
+                    )}
+                    {data.hoh_cid && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          HOH CID
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.hoh_cid}
+                        </p>
+                      </div>
+                    )}
+                    {data.hoh_contact_no && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          HOH Contact
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.hoh_contact_no}
+                        </p>
+                      </div>
+                    )}
+                    {data.hoh_approval && (
+                      <div className="flex items-center gap-4">
+                        <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                          HOH Approval
+                        </Label>
+                        <p className="flex-1 text-sm font-medium">
+                          {data.hoh_approval}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                /* MC Valid = NO: Single yellow Manual Entry border for everything */
+                <div className="relative space-y-2 rounded-lg border-2 border-yellow-500 p-4">
+                  <div className="bg-background absolute -top-3 right-4 px-2">
+                    <span className="text-xs font-medium text-yellow-600">
+                      Manual Entry
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Marriage Certificate Valid
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">No</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Father's CID
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.father_cid || 'N/A'}
+                    </p>
+                  </div>
+                  {data.fathers_contact_no && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Father's Contact
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.fathers_contact_no}
+                      </p>
+                    </div>
+                  )}
+                  {data.is_father_alive != null && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Father Alive
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.is_father_alive ? 'Yes' : 'No'}
+                      </p>
+                    </div>
+                  )}
+                  {data.father_approval && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Father Approval
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.father_approval}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Mother's CID
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.mother_cid || 'N/A'}
+                    </p>
+                  </div>
+                  {data.mothers_contact_no && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Mother's Contact
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.mothers_contact_no}
+                      </p>
+                    </div>
+                  )}
+                  {data.is_mother_alive != null && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Mother Alive
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.is_mother_alive ? 'Yes' : 'No'}
+                      </p>
+                    </div>
+                  )}
+                  {data.mother_approval && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Mother Approval
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.mother_approval}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Applicant CID
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.applicant_cid}
+                    </p>
+                  </div>
+                  {data.applicant_contact_no && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Applicant Contact
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.applicant_contact_no}
+                      </p>
+                    </div>
+                  )}
+                  {data.applicant_is && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Applicant Is
+                      </Label>
+                      <p className="flex-1 text-sm font-medium capitalize">
+                        {data.applicant_is}
+                      </p>
+                    </div>
+                  )}
+                  {data.is_applicant_parent != null && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Is Applicant Parent
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.is_applicant_parent ? 'Yes' : 'No'}
+                      </p>
+                    </div>
+                  )}
+                  {data.guarantor_cid && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Guarantor CID
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.guarantor_cid}
+                      </p>
+                    </div>
+                  )}
+                  {data.guarantor_contact_no && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Guarantor Contact
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.guarantor_contact_no}
+                      </p>
+                    </div>
+                  )}
+                  {data.relationship && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Relationship
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.relationship}
+                      </p>
+                    </div>
+                  )}
+                  {data.guarantor_approval && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        Guarantor Approval
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.guarantor_approval}
+                      </p>
+                    </div>
+                  )}
+                  {data.hoh_cid && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        HOH CID
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.hoh_cid}
+                      </p>
+                    </div>
+                  )}
+                  {data.hoh_contact_no && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        HOH Contact
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.hoh_contact_no}
+                      </p>
+                    </div>
+                  )}
+                  {data.hoh_approval && (
+                    <div className="flex items-center gap-4">
+                      <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                        HOH Approval
+                      </Label>
+                      <p className="flex-1 text-sm font-medium">
+                        {data.hoh_approval}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <Separator />
+
+            {/* Address Information */}
+            <div className="space-y-3">
+              <h3 className="flex items-center gap-2 text-sm font-semibold">
+                <IconHome className="h-4 w-4" />
+                Address Information
+              </h3>
+              <div className="space-y-2">
+                <div className="flex items-center gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Household No.
+                  </Label>
+                  <p className="flex-1 text-sm font-medium">
+                    {data.house_hold_no || 'N/A'}
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    House No.
+                  </Label>
+                  <p className="flex-1 text-sm font-medium">
+                    {data.house_no || 'N/A'}
+                  </p>
+                </div>
+                {data.tharm_no && (
+                  <div className="flex items-center gap-4">
+                    <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                      Tharm No.
+                    </Label>
+                    <p className="flex-1 text-sm font-medium">
+                      {data.tharm_no}
+                    </p>
+                  </div>
+                )}
+                <div className="flex items-start gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Dzongkhag
+                  </Label>
+                  <p className="flex-1 text-sm">
+                    {data.dzongkhag_name || data.dzongkhag_id || 'N/A'}
+                  </p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Gewog
+                  </Label>
+                  <p className="flex-1 text-sm">
+                    {data.gewog_name || data.gewog_id || 'N/A'}
+                  </p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                    Village
+                  </Label>
+                  <p className="flex-1 text-sm">
+                    {data.village_name || data.village_id || 'N/A'}
+                  </p>
+                </div>
+              </div>
             </div>
 
             <Separator />

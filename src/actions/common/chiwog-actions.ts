@@ -38,7 +38,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '1',
     gewogName: 'Chang',
     dzongkhagName: 'Thimphu',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z'
   },
   {
     id: '2',
@@ -46,7 +48,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '1',
     gewogName: 'Chang',
     dzongkhagName: 'Thimphu',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-02T00:00:00Z',
+    updatedAt: '2024-01-02T00:00:00Z'
   },
   {
     id: '3',
@@ -54,7 +58,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '1',
     gewogName: 'Chang',
     dzongkhagName: 'Thimphu',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-03T00:00:00Z',
+    updatedAt: '2024-01-03T00:00:00Z'
   },
   {
     id: '4',
@@ -62,7 +68,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '2',
     gewogName: 'Dagala',
     dzongkhagName: 'Thimphu',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-04T00:00:00Z',
+    updatedAt: '2024-01-04T00:00:00Z'
   },
   {
     id: '5',
@@ -70,7 +78,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '3',
     gewogName: 'Genekha',
     dzongkhagName: 'Thimphu',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-05T00:00:00Z',
+    updatedAt: '2024-01-05T00:00:00Z'
   },
   {
     id: '6',
@@ -78,7 +88,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '4',
     gewogName: 'Kawang',
     dzongkhagName: 'Thimphu',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-06T00:00:00Z',
+    updatedAt: '2024-01-06T00:00:00Z'
   },
   {
     id: '7',
@@ -86,7 +98,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '7',
     gewogName: 'Lingzhi',
     dzongkhagName: 'Thimphu',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-07T00:00:00Z',
+    updatedAt: '2024-01-07T00:00:00Z'
   },
   {
     id: '8',
@@ -94,7 +108,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '8',
     gewogName: 'Soe',
     dzongkhagName: 'Thimphu',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-08T00:00:00Z',
+    updatedAt: '2024-01-08T00:00:00Z'
   },
   {
     id: '9',
@@ -102,7 +118,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '9',
     gewogName: 'Toepisa',
     dzongkhagName: 'Thimphu',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-09T00:00:00Z',
+    updatedAt: '2024-01-09T00:00:00Z'
   },
   {
     id: '10',
@@ -110,7 +128,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '16',
     gewogName: 'Shaba',
     dzongkhagName: 'Paro',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-10T00:00:00Z',
+    updatedAt: '2024-01-10T00:00:00Z'
   },
   {
     id: '11',
@@ -118,7 +138,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '18',
     gewogName: 'Tsento',
     dzongkhagName: 'Paro',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-11T00:00:00Z',
+    updatedAt: '2024-01-11T00:00:00Z'
   },
   {
     id: '12',
@@ -126,7 +148,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '19',
     gewogName: 'Wangchang',
     dzongkhagName: 'Paro',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-12T00:00:00Z',
+    updatedAt: '2024-01-12T00:00:00Z'
   },
   {
     id: '13',
@@ -134,7 +158,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '14',
     gewogName: 'Lamgong',
     dzongkhagName: 'Paro',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-13T00:00:00Z',
+    updatedAt: '2024-01-13T00:00:00Z'
   },
   {
     id: '14',
@@ -142,7 +168,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '13',
     gewogName: 'Hungrel',
     dzongkhagName: 'Paro',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-14T00:00:00Z',
+    updatedAt: '2024-01-14T00:00:00Z'
   },
   {
     id: '15',
@@ -150,7 +178,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '12',
     gewogName: 'Dopshari',
     dzongkhagName: 'Paro',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-15T00:00:00Z',
+    updatedAt: '2024-01-15T00:00:00Z'
   },
   {
     id: '16',
@@ -158,7 +188,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '11',
     gewogName: 'Dogar',
     dzongkhagName: 'Paro',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-16T00:00:00Z',
+    updatedAt: '2024-01-16T00:00:00Z'
   },
   {
     id: '17',
@@ -166,7 +198,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '20',
     gewogName: 'Bajo',
     dzongkhagName: 'Punakha',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-17T00:00:00Z',
+    updatedAt: '2024-01-17T00:00:00Z'
   },
   {
     id: '18',
@@ -174,7 +208,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '20',
     gewogName: 'Bajo',
     dzongkhagName: 'Punakha',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-18T00:00:00Z',
+    updatedAt: '2024-01-18T00:00:00Z'
   },
   {
     id: '19',
@@ -182,7 +218,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '20',
     gewogName: 'Bajo',
     dzongkhagName: 'Punakha',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-19T00:00:00Z',
+    updatedAt: '2024-01-19T00:00:00Z'
   },
   {
     id: '20',
@@ -190,7 +228,9 @@ const DUMMY_CHIWOGS = [
     gewogId: '20',
     gewogName: 'Bajo',
     dzongkhagName: 'Punakha',
-    isActive: true
+    isActive: true,
+    createdAt: '2024-01-20T00:00:00Z',
+    updatedAt: '2024-01-20T00:00:00Z'
   }
 ];
 
