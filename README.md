@@ -5,6 +5,7 @@ This is a **frontend-only demo** of the Bhutan Civil Registration System (BCRS) 
 ## 🎯 Demo Mode
 
 This application runs in demo mode with:
+
 - ✅ Mock authentication (no backend required)
 - ✅ Demo user accounts with different permission levels
 - ✅ Frontend UI showcase
@@ -32,21 +33,23 @@ The application will start on [http://localhost:3003](http://localhost:3003)
 See [DEMO_CREDENTIALS.md](./DEMO_CREDENTIALS.md) for available demo accounts.
 
 **Quick Login:**
+
 - **CID**: `11111111111`
 - **Password**: `admin123`
 
 ## 📋 Available Demo Accounts
 
-| Role | CID | Password | Permissions |
-|------|-----|----------|-------------|
-| Super Admin | `11111111111` | `admin123` | Full system access |
-| Registration Officer | `22222222222` | `officer123` | Birth/Death registration |
-| Approval Officer | `33333333333` | `approval123` | Approve/reject registrations |
-| Read-Only User | `44444444444` | `viewer123` | View-only access |
+| Role                 | CID           | Password      | Permissions                  |
+| -------------------- | ------------- | ------------- | ---------------------------- |
+| Super Admin          | `11111111111` | `admin123`    | Full system access           |
+| Registration Officer | `22222222222` | `officer123`  | Birth/Death registration     |
+| Approval Officer     | `33333333333` | `approval123` | Approve/reject registrations |
+| Read-Only User       | `44444444444` | `viewer123`   | View-only access             |
 
 ## 🔧 Technical Details
 
 ### Tech Stack
+
 - **Framework**: Next.js 15+ (App Router)
 - **Authentication**: NextAuth.js with mock credentials
 - **Styling**: Tailwind CSS
@@ -56,12 +59,14 @@ See [DEMO_CREDENTIALS.md](./DEMO_CREDENTIALS.md) for available demo accounts.
 ### Mock Authentication
 
 The authentication is implemented using:
+
 - `/src/auth.config.ts` - NextAuth configuration with mock provider
 - `/src/lib/mock-users.ts` - Demo user data and authentication logic
 
 ### Environment Variables
 
 The `.env` file is pre-configured for demo mode. Key variables:
+
 - `AUTH_SECRET` - Required for JWT signing
 - `NEXTAUTH_SECRET` - Alternative JWT secret
 - `PORT` - Application port (default: 3003)
@@ -99,6 +104,7 @@ admin-portal-demo/
 ## ⚠️ Limitations
 
 Since this is a frontend-only demo:
+
 - **No data persistence** - Data resets on page refresh
 - **No backend integration** - API calls will fail gracefully
 - **Mock data only** - All displayed data is hardcoded
@@ -108,6 +114,7 @@ Since this is a frontend-only demo:
 ## 🔐 Security Note
 
 This demo uses hardcoded credentials for demonstration purposes only. **Never** use this authentication approach in production. In a real application:
+
 - Passwords must be properly hashed
 - Credentials must be stored securely in a database
 - JWT secrets must be strong and unique
@@ -156,23 +163,27 @@ Edit the `ability` array in each user object to change permissions:
 ability: [
   { action: ['create', 'read'], subject: 'birth-registration' },
   { action: 'read', subject: 'reports' }
-]
+];
 ```
 
 ## 🆘 Troubleshooting
 
 ### Login not working?
+
 - Ensure you're using credentials from `DEMO_CREDENTIALS.md`
 - Check browser console for error messages
 - Clear browser cookies and try again
 
 ### Port already in use?
+
 Change the port in `.env`:
+
 ```
 PORT=3004
 ```
 
 ### Build errors?
+
 ```bash
 rm -rf .next node_modules
 pnpm install

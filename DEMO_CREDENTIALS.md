@@ -5,24 +5,28 @@ This is a demo frontend application with **mock authentication**. No backend ser
 ## Available Demo Accounts
 
 ### 1. Super Admin Account
+
 - **CID**: `11111111111`
 - **Password**: `admin123`
 - **Role**: Super Administrator
 - **Permissions**: Full system access, all CRUD operations
 
 ### 2. Registration Officer
+
 - **CID**: `22222222222`
 - **Password**: `officer123`
 - **Role**: Registration Officer
 - **Permissions**: Birth/Death registration, view operations
 
 ### 3. Approval Officer
+
 - **CID**: `33333333333`
 - **Password**: `approval123`
 - **Role**: Approval Officer
 - **Permissions**: Approve/reject registrations, view reports
 
 ### 4. Read-Only User
+
 - **CID**: `44444444444`
 - **Password**: `viewer123`
 - **Role**: Viewer
@@ -45,6 +49,7 @@ This is a demo frontend application with **mock authentication**. No backend ser
 ## For Developers
 
 The mock authentication is implemented in:
+
 - `/src/auth.config.ts` - Authentication configuration
 - `/src/lib/mock-users.ts` - Demo user data
 
