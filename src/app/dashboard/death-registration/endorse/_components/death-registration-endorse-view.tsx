@@ -88,6 +88,7 @@ interface DeathRegistrationData {
   gewog_of_death_name?: string;
   village_of_death_name?: string;
   country_of_death_name?: string;
+  city_name?: string;
   [key: string]: unknown;
 }
 
