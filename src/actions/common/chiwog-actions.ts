@@ -30,6 +30,170 @@ export async function createChiwog(formData: any) {
   }
 }
 
+// Dummy chiwogs data
+const DUMMY_CHIWOGS = [
+  {
+    id: '1',
+    name: 'Motithang',
+    gewogId: '1',
+    gewogName: 'Chang',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '2',
+    name: 'Jungshina',
+    gewogId: '1',
+    gewogName: 'Chang',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '3',
+    name: 'Zilukha',
+    gewogId: '1',
+    gewogName: 'Chang',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '4',
+    name: 'Taba',
+    gewogId: '2',
+    gewogName: 'Dagala',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '5',
+    name: 'Babesa',
+    gewogId: '3',
+    gewogName: 'Genekha',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '6',
+    name: 'Kawang',
+    gewogId: '4',
+    gewogName: 'Kawang',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '7',
+    name: 'Lingzhi',
+    gewogId: '7',
+    gewogName: 'Lingzhi',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '8',
+    name: 'Soe',
+    gewogId: '8',
+    gewogName: 'Soe',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '9',
+    name: 'Toepisa',
+    gewogId: '9',
+    gewogName: 'Toepisa',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '10',
+    name: 'Shaba',
+    gewogId: '16',
+    gewogName: 'Shaba',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '11',
+    name: 'Tsento',
+    gewogId: '18',
+    gewogName: 'Tsento',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '12',
+    name: 'Wangchang',
+    gewogId: '19',
+    gewogName: 'Wangchang',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '13',
+    name: 'Lamgong',
+    gewogId: '14',
+    gewogName: 'Lamgong',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '14',
+    name: 'Hungrel',
+    gewogId: '13',
+    gewogName: 'Hungrel',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '15',
+    name: 'Dopshari',
+    gewogId: '12',
+    gewogName: 'Dopshari',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '16',
+    name: 'Dogar',
+    gewogId: '11',
+    gewogName: 'Dogar',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '17',
+    name: 'Bajo',
+    gewogId: '20',
+    gewogName: 'Bajo',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '18',
+    name: 'Gangtey',
+    gewogId: '20',
+    gewogName: 'Bajo',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '19',
+    name: 'Toedwang',
+    gewogId: '20',
+    gewogName: 'Bajo',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '20',
+    name: 'Kabjisa',
+    gewogId: '20',
+    gewogName: 'Bajo',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  }
+];
+
 export async function getChiwogs({
   page,
   limit,
@@ -39,36 +203,34 @@ export async function getChiwogs({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/chiwogs?page=${page}&take=${limit}`;
+  console.log('getChiwogs called with dummy data:', { page, limit, search });
+
   try {
+    // Filter chiwogs based on search query
+    let filteredChiwogs = DUMMY_CHIWOGS;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredChiwogs = DUMMY_CHIWOGS.filter(
+        (chiwog) =>
+          chiwog.name.toLowerCase().includes(searchLower) ||
+          chiwog.gewogName.toLowerCase().includes(searchLower) ||
+          chiwog.dzongkhagName.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalChiwogs: 0,
-        chiwogs: []
-      };
-    }
-
-    const data = await response.json();
-
-    const chiwogs = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedChiwogs = filteredChiwogs.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalChiwogs: meta.itemCount,
-      chiwogs
+      page: currentPage,
+      limit: pageSize,
+      totalChiwogs: filteredChiwogs.length,
+      chiwogs: paginatedChiwogs
     };
   } catch (error) {
     console.error('Error fetching chiwogs:', error);

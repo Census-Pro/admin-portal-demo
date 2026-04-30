@@ -30,6 +30,150 @@ export async function createGewogs(formData: any) {
   }
 }
 
+// Dummy gewogs data
+const DUMMY_GEWOGS = [
+  {
+    id: '1',
+    name: 'Chang',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '2',
+    name: 'Dagala',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '3',
+    name: 'Genekha',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '4',
+    name: 'Kawang',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '5',
+    name: 'Lingzhi',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '6',
+    name: 'Mewang',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '7',
+    name: 'Naro',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '8',
+    name: 'Soe',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '9',
+    name: 'Toepisa',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '10',
+    name: 'Barp',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '11',
+    name: 'Dogar',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '12',
+    name: 'Dopshari',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '13',
+    name: 'Hungrel',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '14',
+    name: 'Lamgong',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '15',
+    name: 'Lungnyi',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '16',
+    name: 'Shaba',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '17',
+    name: 'Shapa',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '18',
+    name: 'Tsento',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '19',
+    name: 'Wangchang',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '20',
+    name: 'Bajo',
+    dzongkhagId: '3',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  }
+];
+
 export async function getGewogs({
   page,
   limit,
@@ -39,37 +183,33 @@ export async function getGewogs({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/gewogs?page=${page}&take=${limit}`;
+  console.log('getGewogs called with dummy data:', { page, limit, search });
+
   try {
-    // Search
+    // Filter gewogs based on search query
+    let filteredGewogs = DUMMY_GEWOGS;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredGewogs = DUMMY_GEWOGS.filter(
+        (gewog) =>
+          gewog.name.toLowerCase().includes(searchLower) ||
+          gewog.dzongkhagName.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalGewogs: 0,
-        gewogs: []
-      };
-    }
-
-    const data = await response.json();
-
-    const gewogs = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedGewogs = filteredGewogs.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalGewogs: meta.itemCount,
-      gewogs
+      page: currentPage,
+      limit: pageSize,
+      totalGewogs: filteredGewogs.length,
+      gewogs: paginatedGewogs
     };
   } catch (error) {
     console.error('Error fetching gewogs:', error);
@@ -83,22 +223,13 @@ export async function getGewogs({
 }
 
 export async function getAllGewogs() {
+  console.log('getAllGewogs called with dummy data');
+
   try {
-    const response = await fetch(`${API_URL}/gewogs/all`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch gewogs: ${response.statusText}`
-      };
-    }
-
-    return response.json();
+    return DUMMY_GEWOGS;
   } catch (error) {
     console.error('Error fetching gewogs:', error);
+    return [];
   }
 }
 

@@ -31,6 +31,20 @@ export async function createHohChangeReasons(formData: any) {
   }
 }
 
+// Dummy HOH change reasons data
+const DUMMY_HOH_CHANGE_REASONS = [
+  { id: '1', name: 'Death of Head of Household', isActive: true },
+  { id: '2', name: 'Migration of Head of Household', isActive: true },
+  { id: '3', name: 'Marriage of New Head of Household', isActive: true },
+  { id: '4', name: 'Divorce of Head of Household', isActive: true },
+  { id: '5', name: 'Abandonment by Head of Household', isActive: true },
+  { id: '6', name: 'Incapacity of Head of Household', isActive: true },
+  { id: '7', name: 'Change due to Court Order', isActive: true },
+  { id: '8', name: 'Change due to Adoption', isActive: true },
+  { id: '9', name: 'Change due to Legal Separation', isActive: true },
+  { id: '10', name: 'Change due to Correction of Errors', isActive: true }
+];
+
 export async function getHohChangeReasons({
   page,
   limit,
@@ -40,45 +54,47 @@ export async function getHohChangeReasons({
   limit?: number;
   search?: string;
 } = {}) {
+  console.log('getHohChangeReasons called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
-    let url = `${API_URL}/hoh-change-reason?page=${page}&take=${limit}`;
+    // Filter HOH change reasons based on search query
+    let filteredReasons = DUMMY_HOH_CHANGE_REASONS;
 
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredReasons = DUMMY_HOH_CHANGE_REASONS.filter((reason) =>
+        reason.name.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalHohChangeReasons: 0,
-        hohChangeReasons: []
-      };
-    }
-
-    const data = await response.json();
-
-    const hohChangeReasons = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedReasons = filteredReasons.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalHohChangeReasons: meta.itemCount,
-      hohChangeReasons
+      success: true,
+      data: paginatedReasons,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredReasons.length
+      }
     };
   } catch (error) {
     console.error('Error fetching HOH change reasons:', error);
     return {
-      page: 0,
-      limit: 0,
-      totalHohChangeReasons: 0,
-      hohChangeReasons: []
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }
@@ -100,6 +116,7 @@ export async function getAllHohChangeReasons() {
     return response.json();
   } catch (error) {
     console.error('Error fetching HOH change reasons:', error);
+    return [];
   }
 }
 

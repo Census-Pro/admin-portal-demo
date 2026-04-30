@@ -39,6 +39,22 @@ export async function createFineType(formData: any) {
   }
 }
 
+// Dummy fine types data
+const DUMMY_FINE_TYPES = [
+  { id: '1', name: 'Traffic Violation', isActive: true },
+  { id: '2', name: 'Parking Violation', isActive: true },
+  { id: '3', name: 'Public Nuisance', isActive: true },
+  { id: '4', name: 'Environmental Violation', isActive: true },
+  { id: '5', name: 'Building Code Violation', isActive: true },
+  { id: '6', name: 'Business License Violation', isActive: true },
+  { id: '7', name: 'Health Code Violation', isActive: true },
+  { id: '8', name: 'Fire Safety Violation', isActive: true },
+  { id: '9', name: 'Noise Violation', isActive: true },
+  { id: '10', name: 'Waste Management Violation', isActive: true },
+  { id: '11', name: 'Water Supply Violation', isActive: true },
+  { id: '12', name: 'Electrical Code Violation', isActive: true }
+];
+
 export async function getFineTypes({
   page,
   limit,
@@ -48,183 +64,54 @@ export async function getFineTypes({
   limit?: number;
   search?: string;
 } = {}) {
+  console.log('getFineTypes called with dummy data:', { page, limit, search });
+
   try {
-    console.log('Fetching all fine types from /all endpoint');
-    const response = await fetch(`${API_URL}/fine-types/all`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
+    // Filter fine types based on search query
+    let filteredFineTypes = DUMMY_FINE_TYPES;
 
-    console.log('Response status:', response.status);
-
-    if (!response.ok) {
-      let errorData;
-      try {
-        errorData = await response.json();
-      } catch (e) {
-        errorData = await response.text();
-      }
-      console.error(
-        'Response not OK:',
-        response.status,
-        response.statusText,
-        errorData
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredFineTypes = DUMMY_FINE_TYPES.filter((fineType) =>
+        fineType.name.toLowerCase().includes(searchLower)
       );
-
-      if (errorData?.message && Array.isArray(errorData.message)) {
-        console.error('Validation errors:', errorData.message);
-      }
-
-      return {
-        page: 0,
-        limit: 0,
-        totalFineTypes: 0,
-        fineTypes: []
-      };
     }
 
-    const data = await response.json();
-    console.log('API Response data:', data);
-
-    // For /all endpoint, data might be directly an array or in data.data
-    const fineTypes = Array.isArray(data) ? data : data.data || [];
-
-    console.log('Parsed data:', {
-      totalFineTypes: fineTypes.length,
-      fineTypes
-    });
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedFineTypes = filteredFineTypes.slice(startIndex, endIndex);
 
     return {
-      page: 1,
-      limit: fineTypes.length,
-      totalFineTypes: fineTypes.length,
-      fineTypes
+      success: true,
+      data: paginatedFineTypes,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredFineTypes.length
+      }
     };
   } catch (error) {
     console.error('Error fetching fine types:', error);
     return {
-      page: 0,
-      limit: 0,
-      totalFineTypes: 0,
-      fineTypes: []
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }
 
 export async function getAllFineTypes() {
+  console.log('getAllFineTypes called with dummy data');
+
   try {
-    const response = await fetch(`${API_URL}/fine-types/all`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch fine types: ${response.statusText}`
-      };
-    }
-
-    return response.json();
+    return DUMMY_FINE_TYPES;
   } catch (error) {
     console.error('Error fetching fine types:', error);
-  }
-}
-
-export async function getSimpleFineTypes() {
-  try {
-    const response = await fetch(`${API_URL}/fine-types/simple`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch simple fine types: ${response.statusText}`
-      };
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching simple fine types:', error);
-    return {
-      error: true,
-      message: 'Failed to fetch simple fine types'
-    };
-  }
-}
-
-export async function getFineTypeById(id: string) {
-  try {
-    const response = await fetch(`${API_URL}/fine-types/${id}`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch fine type: ${response.statusText}`
-      };
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching fine type:', error);
-    return {
-      error: true,
-      message: 'Failed to fetch fine type'
-    };
-  }
-}
-
-export async function deleteFineType(id?: string) {
-  try {
-    const response = await fetch(`${API_URL}/fine-types/${id}`, {
-      method: 'DELETE',
-      headers: await instance()
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to delete fine type: ${response.statusText}`
-      };
-    }
-
-    revalidatePath('/dashboard/fine-types');
-    return {
-      error: false,
-      message: 'Fine type deleted successfully'
-    };
-  } catch (error) {
-    console.error('Error deleting fine type:', error);
-    return { error: true, message: 'Failed to delete fine type' };
-  }
-}
-
-export async function updateFineType(id: string, data: any) {
-  try {
-    const response = await fetch(`${API_URL}/fine-types/${id}`, {
-      method: 'PATCH',
-      headers: await instance(),
-      body: JSON.stringify(data)
-    });
-
-    const res = await response.json();
-
-    if (!response.ok || res?.error) {
-      const errorMessage =
-        (res?.error as ApiErrorResponse)?.message ||
-        'Failed to update fine type';
-      return { error: true, message: errorMessage };
-    }
-
-    revalidatePath('/dashboard/fine-types');
-    return res;
-  } catch (error) {
-    console.error('Error updating fine type:', error);
-    return { error: true, message: 'Failed to update fine type' };
+    return [];
   }
 }

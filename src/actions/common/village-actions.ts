@@ -40,6 +40,190 @@ export async function createVillages(formData: any) {
   }
 }
 
+// Dummy villages data
+const DUMMY_VILLAGES = [
+  {
+    id: '1',
+    name: 'Motithang Lower',
+    chiwogId: '1',
+    chiwogName: 'Motithang',
+    gewogName: 'Chang',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '2',
+    name: 'Motithang Upper',
+    chiwogId: '1',
+    chiwogName: 'Motithang',
+    gewogName: 'Chang',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '3',
+    name: 'Jungshina',
+    chiwogId: '2',
+    chiwogName: 'Jungshina',
+    gewogName: 'Chang',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '4',
+    name: 'Zilukha',
+    chiwogId: '3',
+    chiwogName: 'Zilukha',
+    gewogName: 'Chang',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '5',
+    name: 'Taba',
+    chiwogId: '4',
+    chiwogName: 'Taba',
+    gewogName: 'Dagala',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '6',
+    name: 'Babesa',
+    chiwogId: '5',
+    chiwogName: 'Babesa',
+    gewogName: 'Genekha',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '7',
+    name: 'Kawang',
+    chiwogId: '6',
+    chiwogName: 'Kawang',
+    gewogName: 'Kawang',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '8',
+    name: 'Shaba',
+    chiwogId: '10',
+    chiwogName: 'Shaba',
+    gewogName: 'Shaba',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '9',
+    name: 'Tsento',
+    chiwogId: '11',
+    chiwogName: 'Tsento',
+    gewogName: 'Tsento',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '10',
+    name: 'Wangchang',
+    chiwogId: '12',
+    chiwogName: 'Wangchang',
+    gewogName: 'Wangchang',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '11',
+    name: 'Lamgong',
+    chiwogId: '13',
+    chiwogName: 'Lamgong',
+    gewogName: 'Lamgong',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '12',
+    name: 'Hungrel',
+    chiwogId: '14',
+    chiwogName: 'Hungrel',
+    gewogName: 'Hungrel',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '13',
+    name: 'Dopshari',
+    chiwogId: '15',
+    chiwogName: 'Dopshari',
+    gewogName: 'Dopshari',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '14',
+    name: 'Dogar',
+    chiwogId: '16',
+    chiwogName: 'Dogar',
+    gewogName: 'Dogar',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '15',
+    name: 'Bajo',
+    chiwogId: '17',
+    chiwogName: 'Bajo',
+    gewogName: 'Bajo',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '16',
+    name: 'Gangtey',
+    chiwogId: '18',
+    chiwogName: 'Gangtey',
+    gewogName: 'Bajo',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '17',
+    name: 'Toedwang',
+    chiwogId: '19',
+    chiwogName: 'Toedwang',
+    gewogName: 'Bajo',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '18',
+    name: 'Kabjisa',
+    chiwogId: '20',
+    chiwogName: 'Kabjisa',
+    gewogName: 'Bajo',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '19',
+    name: 'Lingzhi',
+    chiwogId: '7',
+    chiwogName: 'Lingzhi',
+    gewogName: 'Lingzhi',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '20',
+    name: 'Soe',
+    chiwogId: '8',
+    chiwogName: 'Soe',
+    gewogName: 'Soe',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  }
+];
+
 export async function getVillages({
   page,
   limit,
@@ -49,37 +233,35 @@ export async function getVillages({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/villages?page=${page}&take=${limit}`;
+  console.log('getVillages called with dummy data:', { page, limit, search });
+
   try {
-    // Search
+    // Filter villages based on search query
+    let filteredVillages = DUMMY_VILLAGES;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredVillages = DUMMY_VILLAGES.filter(
+        (village) =>
+          village.name.toLowerCase().includes(searchLower) ||
+          village.chiwogName.toLowerCase().includes(searchLower) ||
+          village.gewogName.toLowerCase().includes(searchLower) ||
+          village.dzongkhagName.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalVillages: 0,
-        villages: []
-      };
-    }
-
-    const data = await response.json();
-
-    const villages = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedVillages = filteredVillages.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalVillages: meta.itemCount,
-      villages
+      page: currentPage,
+      limit: pageSize,
+      totalVillages: filteredVillages.length,
+      villages: paginatedVillages
     };
   } catch (error) {
     console.error('Error fetching villages:', error);

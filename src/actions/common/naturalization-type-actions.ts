@@ -31,6 +31,18 @@ export async function createNaturalizationType(formData: any) {
   }
 }
 
+// Dummy naturalization types data
+const DUMMY_NATURALIZATION_TYPES = [
+  { id: '1', name: 'Birth Registration', isActive: true },
+  { id: '2', name: 'Residence Registration', isActive: true },
+  { id: '3', name: 'Marriage Registration', isActive: true },
+  { id: '4', name: 'Death Registration', isActive: true },
+  { id: '5', name: 'Migration Registration', isActive: true },
+  { id: '6', name: 'Special Registration', isActive: true },
+  { id: '7', name: 'Court Order Registration', isActive: true },
+  { id: '8', name: 'Adoption Registration', isActive: true }
+];
+
 export async function getNaturalizationTypes({
   page,
   limit,
@@ -40,65 +52,48 @@ export async function getNaturalizationTypes({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/naturalization-types?page=${page}&take=${limit}`;
+  console.log('getNaturalizationTypes called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
+    // Filter naturalization types based on search query
+    let filteredTypes = DUMMY_NATURALIZATION_TYPES;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredTypes = filteredTypes.filter((type) =>
+        type.name.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      next: { tags: ['naturalization-types'] }
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalItems: 0,
-        data: []
-      };
-    }
-
-    const data = await response.json();
-
-    const naturalizationTypes = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedTypes = filteredTypes.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalItems: meta.itemCount,
-      data: naturalizationTypes
+      success: true,
+      data: paginatedTypes,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredTypes.length
+      }
     };
   } catch (error) {
     console.error('Error fetching naturalization types:', error);
     return {
-      page: 0,
-      limit: 0,
-      totalItems: 0,
-      data: []
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
-  }
-}
-
-export async function getAllNaturalizationTypes() {
-  try {
-    const response = await fetch(`${API_URL}/naturalization-types/all`, {
-      headers: await instance(),
-      next: { tags: ['naturalization-types'] }
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch naturalization types: ${response.statusText}`
-      };
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching naturalization types:', error);
   }
 }
 

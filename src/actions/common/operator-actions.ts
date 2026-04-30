@@ -5,6 +5,40 @@ import { instance } from '../instance';
 
 const API_URL = process.env.COMMON_SERVICE || 'http://localhost:5003';
 
+// Dummy operators data
+const DUMMY_OPERATORS = [
+  { id: '1', name: 'Census Officer', cidNo: '11001000001', isActive: true },
+  { id: '2', name: 'Field Supervisor', cidNo: '11001000002', isActive: true },
+  {
+    id: '3',
+    name: 'Data Entry Operator',
+    cidNo: '11001000003',
+    isActive: true
+  },
+  {
+    id: '4',
+    name: 'Verification Officer',
+    cidNo: '11001000004',
+    isActive: true
+  },
+  { id: '5', name: 'Team Lead', cidNo: '11001000005', isActive: true },
+  { id: '6', name: 'Senior Enumerator', cidNo: '11001000006', isActive: true },
+  { id: '7', name: 'Junior Enumerator', cidNo: '11001000007', isActive: true },
+  {
+    id: '8',
+    name: 'Volunteer Enumerator',
+    cidNo: '11001000008',
+    isActive: true
+  },
+  { id: '9', name: 'IT Support Staff', cidNo: '11001000009', isActive: true },
+  {
+    id: '10',
+    name: 'Administrative Officer',
+    cidNo: '11001000010',
+    isActive: true
+  }
+];
+
 export async function getOperators({
   page,
   limit,
@@ -14,83 +48,43 @@ export async function getOperators({
   limit?: number;
   search?: string;
 } = {}) {
+  console.log('getOperators called with dummy data:', { page, limit, search });
+
   try {
-    const headers = await instance();
+    // Filter operators based on search query
+    let filteredOperators = DUMMY_OPERATORS;
 
-    // Build query params - backend expects 'take' not 'limit', and 'cidNo' not 'search'
-    const params = new URLSearchParams();
-    if (page) params.append('page', page.toString());
-    if (limit) params.append('take', limit.toString());
-    if (search) params.append('cidNo', search);
-
-    const url = `${API_URL}/operators${params.toString() ? `?${params.toString()}` : ''}`;
-
-    console.log('[getOperators] URL:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch operators';
-
-      try {
-        const error = await response.json();
-        console.error('[getOperators] Error response:', error);
-        errorMessage = error.message || error.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      if (response.status === 404) {
-        errorMessage =
-          'Operators endpoint not found. Please ensure the backend service is running and the endpoint is configured.';
-      } else if (response.status === 403) {
-        errorMessage =
-          "You don't have permission to view operators. Please contact your administrator.";
-      } else if (response.status === 401) {
-        errorMessage = 'Unauthorized. Please log in again.';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        data: [],
-        totalItems: 0
-      };
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredOperators = DUMMY_OPERATORS.filter((operator) =>
+        operator.name.toLowerCase().includes(searchLower)
+      );
     }
 
-    const result = await response.json();
-    console.log('[getOperators] Success response:', result);
-
-    // Handle different response formats
-    const data = result.data || result.items || result || [];
-    const totalItems =
-      result.meta?.totalItems ||
-      result.meta?.itemCount ||
-      result.total ||
-      (Array.isArray(data) ? data.length : 0);
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedOperators = filteredOperators.slice(startIndex, endIndex);
 
     return {
       success: true,
-      data: Array.isArray(data) ? data : [],
-      totalItems
+      data: paginatedOperators,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredOperators.length
+      }
     };
   } catch (error) {
-    console.error('[getOperators] Unexpected error:', error);
-    console.error('[getOperators] Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : undefined
-    });
+    console.error('Error fetching operators:', error);
     return {
       success: false,
       error:
         error instanceof Error ? error.message : 'An unexpected error occurred',
       data: [],
-      totalItems: 0
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }

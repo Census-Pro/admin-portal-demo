@@ -30,6 +30,115 @@ export async function createCities(formData: any) {
   }
 }
 
+// Dummy cities data
+const DUMMY_CITIES = [
+  {
+    id: '1',
+    name: 'Thimphu City',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '2',
+    name: 'Phuentsholing',
+    dzongkhagId: '5',
+    dzongkhagName: 'Chukha',
+    isActive: true
+  },
+  {
+    id: '3',
+    name: 'Gelephu',
+    dzongkhagId: '12',
+    dzongkhagName: 'Sarpang',
+    isActive: true
+  },
+  {
+    id: '4',
+    name: 'Samdrup Jongkhar',
+    dzongkhagId: '7',
+    dzongkhagName: 'Samdrup Jongkhar',
+    isActive: true
+  },
+  {
+    id: '5',
+    name: 'Trashigang',
+    dzongkhagId: '7',
+    dzongkhagName: 'Trashigang',
+    isActive: true
+  },
+  {
+    id: '6',
+    name: 'Mongar',
+    dzongkhagId: '6',
+    dzongkhagName: 'Mongar',
+    isActive: true
+  },
+  {
+    id: '7',
+    name: 'Punakha',
+    dzongkhagId: '3',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '8',
+    name: 'Paro',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '9',
+    name: 'Wangdue Phodrang',
+    dzongkhagId: '4',
+    dzongkhagName: 'Wangdue Phodrang',
+    isActive: true
+  },
+  {
+    id: '10',
+    name: 'Trongsa',
+    dzongkhagId: '18',
+    dzongkhagName: 'Trongsa',
+    isActive: true
+  },
+  {
+    id: '11',
+    name: 'Bumthang',
+    dzongkhagId: '17',
+    dzongkhagName: 'Bumthang',
+    isActive: true
+  },
+  {
+    id: '12',
+    name: 'Lhuentse',
+    dzongkhagId: '5',
+    dzongkhagName: 'Lhuentse',
+    isActive: true
+  },
+  {
+    id: '13',
+    name: 'Zhemgang',
+    dzongkhagId: '11',
+    dzongkhagName: 'Zhemgang',
+    isActive: true
+  },
+  {
+    id: '14',
+    name: 'Sarpang',
+    dzongkhagId: '12',
+    dzongkhagName: 'Sarpang',
+    isActive: true
+  },
+  {
+    id: '15',
+    name: 'Samtse',
+    dzongkhagId: '13',
+    dzongkhagName: 'Samtse',
+    isActive: true
+  }
+];
+
 export async function getCities({
   page,
   limit,
@@ -39,37 +148,33 @@ export async function getCities({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/cities?page=${page}&take=${limit}`;
+  console.log('getCities called with dummy data:', { page, limit, search });
+
   try {
-    // Search
+    // Filter cities based on search query
+    let filteredCities = DUMMY_CITIES;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredCities = DUMMY_CITIES.filter(
+        (city) =>
+          city.name.toLowerCase().includes(searchLower) ||
+          city.dzongkhagName.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalCities: 0,
-        cities: []
-      };
-    }
-
-    const data = await response.json();
-
-    const cities = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedCities = filteredCities.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalCities: meta.itemCount,
-      cities
+      page: currentPage,
+      limit: pageSize,
+      totalCities: filteredCities.length,
+      cities: paginatedCities
     };
   } catch (error) {
     console.error('Error fetching cities:', error);

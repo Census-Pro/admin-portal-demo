@@ -31,6 +31,19 @@ export async function createRegularizationType(formData: any) {
   }
 }
 
+// Dummy regularization types data
+const DUMMY_REGULARIZATION_TYPES = [
+  { id: '1', name: 'Residence Regularization', isActive: true },
+  { id: '2', name: 'Marriage Regularization', isActive: true },
+  { id: '3', name: 'Birth Regularization', isActive: true },
+  { id: '4', name: 'Death Regularization', isActive: true },
+  { id: '5', name: 'Migration Regularization', isActive: true },
+  { id: '6', name: 'Name Change Regularization', isActive: true },
+  { id: '7', name: 'Address Change Regularization', isActive: true },
+  { id: '8', name: 'Citizenship Regularization', isActive: true },
+  { id: '9', name: 'Property Regularization', isActive: true }
+];
+
 export async function getRegularizationTypes({
   page,
   limit,
@@ -40,44 +53,47 @@ export async function getRegularizationTypes({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/regularization-types?page=${page}&take=${limit}`;
+  console.log('getRegularizationTypes called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
+    // Filter regularization types based on search query
+    let filteredTypes = DUMMY_REGULARIZATION_TYPES;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredTypes = DUMMY_REGULARIZATION_TYPES.filter((type) =>
+        type.name.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      next: { tags: ['regularization-types'] }
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalItems: 0,
-        data: []
-      };
-    }
-
-    const data = await response.json();
-
-    const regularizationTypes = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedTypes = filteredTypes.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalItems: meta.itemCount,
-      data: regularizationTypes
+      success: true,
+      data: paginatedTypes,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredTypes.length
+      }
     };
   } catch (error) {
     console.error('Error fetching regularization types:', error);
     return {
-      page: 0,
-      limit: 0,
-      totalItems: 0,
-      data: []
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }
@@ -99,6 +115,7 @@ export async function getAllRegularizationTypes() {
     return response.json();
   } catch (error) {
     console.error('Error fetching regularization types:', error);
+    return [];
   }
 }
 

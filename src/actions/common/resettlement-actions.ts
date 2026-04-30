@@ -23,6 +23,70 @@ function transformResettlementData(item: any): ResettlementData | null {
   };
 }
 
+// Dummy resettlements data
+const DUMMY_RESETTLEMENTS = [
+  {
+    id: '1',
+    cidNo: '11001000001',
+    createdAt: '2024-01-15',
+    updatedAt: '2024-01-15'
+  },
+  {
+    id: '2',
+    cidNo: '11001000002',
+    createdAt: '2024-02-20',
+    updatedAt: '2024-02-20'
+  },
+  {
+    id: '3',
+    cidNo: '11001000003',
+    createdAt: '2024-03-10',
+    updatedAt: '2024-03-10'
+  },
+  {
+    id: '4',
+    cidNo: '11001000004',
+    createdAt: '2024-04-05',
+    updatedAt: '2024-04-05'
+  },
+  {
+    id: '5',
+    cidNo: '11001000005',
+    createdAt: '2024-05-12',
+    updatedAt: '2024-05-12'
+  },
+  {
+    id: '6',
+    cidNo: '11001000006',
+    createdAt: '2024-06-18',
+    updatedAt: '2024-06-18'
+  },
+  {
+    id: '7',
+    cidNo: '11001000007',
+    createdAt: '2024-07-22',
+    updatedAt: '2024-07-22'
+  },
+  {
+    id: '8',
+    cidNo: '11001000008',
+    createdAt: '2024-08-30',
+    updatedAt: '2024-08-30'
+  },
+  {
+    id: '9',
+    cidNo: '11001000009',
+    createdAt: '2024-09-14',
+    updatedAt: '2024-09-14'
+  },
+  {
+    id: '10',
+    cidNo: '11001000010',
+    createdAt: '2024-10-25',
+    updatedAt: '2024-10-25'
+  }
+];
+
 export async function getResettlements({
   page,
   limit,
@@ -32,90 +96,50 @@ export async function getResettlements({
   limit?: number;
   search?: string;
 } = {}) {
+  console.log('getResettlements called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
-    const headers = await instance();
+    // Filter resettlements based on search query
+    let filteredResettlements = DUMMY_RESETTLEMENTS;
 
-    // Build query params - backend expects 'take' not 'limit', and 'cidNo' not 'search'
-    const params = new URLSearchParams();
-    if (page) params.append('page', page.toString());
-    if (limit) params.append('take', limit.toString());
-    if (search) params.append('cidNo', search);
-
-    const url = `${API_URL}/resettlement${params.toString() ? `?${params.toString()}` : ''}`;
-
-    console.log('[getResettlements] URL:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch resettlement';
-
-      try {
-        const error = await response.json();
-        console.error('[getResettlements] Error response:', error);
-        errorMessage = error.message || error.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      if (response.status === 404) {
-        errorMessage =
-          'Resettlement endpoint not found. Please ensure the backend service is running and the endpoint is configured.';
-      } else if (response.status === 403) {
-        errorMessage =
-          "You don't have permission to view resettlement. Please contact your administrator.";
-      } else if (response.status === 401) {
-        errorMessage = 'Unauthorized. Please log in again.';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        data: [],
-        totalItems: 0
-      };
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredResettlements = DUMMY_RESETTLEMENTS.filter((resettlement) =>
+        resettlement.cidNo.toLowerCase().includes(searchLower)
+      );
     }
 
-    const result = await response.json();
-    console.log('[getResettlements] Success response:', result);
-
-    // Handle different response formats
-    const data = result.data || result.items || result || [];
-    const totalItems =
-      result.meta?.totalItems ||
-      result.meta?.itemCount ||
-      result.total ||
-      (Array.isArray(data) ? data.length : 0);
-
-    // Transform snake_case to camelCase
-    const transformedData: ResettlementData[] = Array.isArray(data)
-      ? data
-          .map(transformResettlementData)
-          .filter((item): item is ResettlementData => item !== null)
-      : [];
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedResettlements = filteredResettlements.slice(
+      startIndex,
+      endIndex
+    );
 
     return {
       success: true,
-      data: transformedData,
-      totalItems
+      data: paginatedResettlements,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredResettlements.length
+      }
     };
   } catch (error) {
-    console.error('[getResettlements] Unexpected error:', error);
-    console.error('[getResettlements] Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : undefined
-    });
+    console.error('Error fetching resettlements:', error);
     return {
       success: false,
       error:
         error instanceof Error ? error.message : 'An unexpected error occurred',
       data: [],
-      totalItems: 0
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }

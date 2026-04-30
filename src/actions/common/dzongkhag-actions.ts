@@ -31,6 +31,30 @@ export async function createDzongkhags(formData: any) {
   }
 }
 
+// Dummy dzongkhags data
+const DUMMY_DZONGKHAGS = [
+  { id: '1', name: 'Thimphu', code: 'THI', isActive: true },
+  { id: '2', name: 'Paro', code: 'PAR', isActive: true },
+  { id: '3', name: 'Punakha', code: 'PUN', isActive: true },
+  { id: '4', name: 'Wangdue Phodrang', code: 'WAN', isActive: true },
+  { id: '5', name: 'Lhuentse', code: 'LHU', isActive: true },
+  { id: '6', name: 'Mongar', code: 'MON', isActive: true },
+  { id: '7', name: 'Trashigang', code: 'TRA', isActive: true },
+  { id: '8', name: 'Yangtse', code: 'YAN', isActive: true },
+  { id: '9', name: 'Lhuentse', code: 'LHU', isActive: true },
+  { id: '10', name: 'Pemagatshel', code: 'PEM', isActive: true },
+  { id: '11', name: 'Zhemgang', code: 'ZHE', isActive: true },
+  { id: '12', name: 'Sarpang', code: 'SAR', isActive: true },
+  { id: '13', name: 'Samtse', code: 'SAM', isActive: true },
+  { id: '14', name: 'Chukha', code: 'CHU', isActive: true },
+  { id: '15', name: 'Haa', code: 'HAA', isActive: true },
+  { id: '16', name: 'Gasa', code: 'GAS', isActive: true },
+  { id: '17', name: 'Bumthang', code: 'BUM', isActive: true },
+  { id: '18', name: 'Trongsa', code: 'TRG', isActive: true },
+  { id: '19', name: 'Dagana', code: 'DAG', isActive: true },
+  { id: '20', name: 'Tsirang', code: 'TSI', isActive: true }
+];
+
 export async function getDzongkhags({
   page,
   limit,
@@ -40,37 +64,33 @@ export async function getDzongkhags({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/dzongkhags?page=${page}&take=${limit}`;
+  console.log('getDzongkhags called with dummy data:', { page, limit, search });
+
   try {
-    // Search
+    // Filter dzongkhags based on search query
+    let filteredDzongkhags = DUMMY_DZONGKHAGS;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredDzongkhags = DUMMY_DZONGKHAGS.filter(
+        (dzongkhag) =>
+          dzongkhag.name.toLowerCase().includes(searchLower) ||
+          dzongkhag.code.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalDzongkhags: 0,
-        dzongkhags: []
-      };
-    }
-
-    const data = await response.json();
-
-    const dzongkhags = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedDzongkhags = filteredDzongkhags.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalDzongkhags: meta.itemCount,
-      dzongkhags
+      page: currentPage,
+      limit: pageSize,
+      totalDzongkhags: filteredDzongkhags.length,
+      dzongkhags: paginatedDzongkhags
     };
   } catch (error) {
     console.error('Error fetching dzongkhags:', error);
@@ -84,22 +104,13 @@ export async function getDzongkhags({
 }
 
 export async function getAllDzongkhags() {
+  console.log('getAllDzongkhags called with dummy data');
+
   try {
-    const response = await fetch(`${API_URL}/dzongkhags/all`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch dzongkhags: ${response.statusText}`
-      };
-    }
-
-    return response.json();
+    return DUMMY_DZONGKHAGS;
   } catch (error) {
     console.error('Error fetching dzongkhags:', error);
+    return [];
   }
 }
 

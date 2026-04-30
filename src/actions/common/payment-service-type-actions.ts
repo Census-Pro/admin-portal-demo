@@ -32,6 +32,22 @@ export async function createPaymentServiceType(formData: any) {
   }
 }
 
+// Dummy payment service types data
+const DUMMY_PAYMENT_SERVICE_TYPES = [
+  { id: '1', name: 'CID Application Fee', isActive: true },
+  { id: '2', name: 'CID Renewal Fee', isActive: true },
+  { id: '3', name: 'CID Replacement Fee', isActive: true },
+  { id: '4', name: 'Birth Registration Fee', isActive: true },
+  { id: '5', name: 'Death Registration Fee', isActive: true },
+  { id: '6', name: 'Marriage Registration Fee', isActive: true },
+  { id: '7', name: 'HOH Change Fee', isActive: true },
+  { id: '8', name: 'Move In/Out Fee', isActive: true },
+  { id: '9', name: 'Nationality Certificate Fee', isActive: true },
+  { id: '10', name: 'Relation Certificate Fee', isActive: true },
+  { id: '11', name: 'Fine Payment', isActive: true },
+  { id: '12', name: 'Resettlement Fee', isActive: true }
+];
+
 export async function getPaymentServiceTypes({
   page,
   limit,
@@ -41,65 +57,47 @@ export async function getPaymentServiceTypes({
   limit?: number;
   search?: string;
 } = {}) {
+  console.log('getPaymentServiceTypes called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
-    console.log('Fetching all payment service types from /all endpoint');
-    const response = await fetch(`${API_URL}/payment-service-types/all`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
+    // Filter payment service types based on search query
+    let filteredTypes = DUMMY_PAYMENT_SERVICE_TYPES;
 
-    console.log('Response status:', response.status);
-
-    if (!response.ok) {
-      let errorData;
-      try {
-        errorData = await response.json();
-      } catch (e) {
-        errorData = await response.text();
-      }
-      console.error(
-        'Response not OK:',
-        response.status,
-        response.statusText,
-        errorData
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredTypes = DUMMY_PAYMENT_SERVICE_TYPES.filter((type) =>
+        type.name.toLowerCase().includes(searchLower)
       );
-
-      if (errorData?.message && Array.isArray(errorData.message)) {
-        console.error('Validation errors:', errorData.message);
-      }
-
-      return {
-        page: 0,
-        limit: 0,
-        totalPaymentServiceTypes: 0,
-        paymentServiceTypes: []
-      };
     }
 
-    const data = await response.json();
-    console.log('API Response data:', data);
-
-    // For /all endpoint, data might be directly an array or in data.data
-    const paymentServiceTypes = Array.isArray(data) ? data : data.data || [];
-
-    console.log('Parsed data:', {
-      totalPaymentServiceTypes: paymentServiceTypes.length,
-      paymentServiceTypes
-    });
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedTypes = filteredTypes.slice(startIndex, endIndex);
 
     return {
-      page: 1,
-      limit: paymentServiceTypes.length,
-      totalPaymentServiceTypes: paymentServiceTypes.length,
-      paymentServiceTypes
+      success: true,
+      data: paginatedTypes,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredTypes.length
+      }
     };
   } catch (error) {
     console.error('Error fetching payment service types:', error);
     return {
-      page: 0,
-      limit: 0,
-      totalPaymentServiceTypes: 0,
-      paymentServiceTypes: []
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }

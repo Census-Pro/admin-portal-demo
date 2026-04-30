@@ -31,6 +31,80 @@ export async function createMajorThromde(formData: any) {
   }
 }
 
+// Dummy major thromdes data
+const DUMMY_MAJOR_THROMDES = [
+  {
+    id: '1',
+    name: 'Thimphu Thromde',
+    dzongkhagId: '1',
+    dzongkhagName: 'Thimphu',
+    isActive: true
+  },
+  {
+    id: '2',
+    name: 'Phuentsholing Thromde',
+    dzongkhagId: '14',
+    dzongkhagName: 'Chukha',
+    isActive: true
+  },
+  {
+    id: '3',
+    name: 'Gelephu Thromde',
+    dzongkhagId: '12',
+    dzongkhagName: 'Sarpang',
+    isActive: true
+  },
+  {
+    id: '4',
+    name: 'Samdrup Jongkhar Thromde',
+    dzongkhagId: '7',
+    dzongkhagName: 'Samdrup Jongkhar',
+    isActive: true
+  },
+  {
+    id: '5',
+    name: 'Trashigang Thromde',
+    dzongkhagId: '7',
+    dzongkhagName: 'Trashigang',
+    isActive: true
+  },
+  {
+    id: '6',
+    name: 'Mongar Thromde',
+    dzongkhagId: '6',
+    dzongkhagName: 'Mongar',
+    isActive: true
+  },
+  {
+    id: '7',
+    name: 'Punakha Thromde',
+    dzongkhagId: '3',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '8',
+    name: 'Paro Thromde',
+    dzongkhagId: '2',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '9',
+    name: 'Wangdue Phodrang Thromde',
+    dzongkhagId: '4',
+    dzongkhagName: 'Wangdue Phodrang',
+    isActive: true
+  },
+  {
+    id: '10',
+    name: 'Trongsa Thromde',
+    dzongkhagId: '18',
+    dzongkhagName: 'Trongsa',
+    isActive: true
+  }
+];
+
 export async function getMajorThromdes({
   page,
   limit,
@@ -40,37 +114,40 @@ export async function getMajorThromdes({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/major-thromdes/search/query?page=${page}&take=${limit}`;
+  console.log('getMajorThromdes called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
-    // Search
+    // Filter major thromdes based on search query
+    let filteredMajorThromdes = DUMMY_MAJOR_THROMDES;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredMajorThromdes = DUMMY_MAJOR_THROMDES.filter(
+        (thromde) =>
+          thromde.name.toLowerCase().includes(searchLower) ||
+          thromde.dzongkhagName.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalMajorThromdes: 0,
-        majorThromdes: []
-      };
-    }
-
-    const data = await response.json();
-
-    const majorThromdes = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedMajorThromdes = filteredMajorThromdes.slice(
+      startIndex,
+      endIndex
+    );
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalMajorThromdes: meta.itemCount,
-      majorThromdes
+      page: currentPage,
+      limit: pageSize,
+      totalMajorThromdes: filteredMajorThromdes.length,
+      majorThromdes: paginatedMajorThromdes
     };
   } catch (error) {
     console.error('Error fetching major thromdes:', error);

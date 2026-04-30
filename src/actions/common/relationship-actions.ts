@@ -5,6 +5,27 @@ import { instance } from '../instance';
 
 const API_URL = process.env.COMMON_SERVICE;
 
+// Dummy relationships data
+const DUMMY_RELATIONSHIPS = [
+  { id: '1', name: 'Father', isActive: true },
+  { id: '2', name: 'Mother', isActive: true },
+  { id: '3', name: 'Son', isActive: true },
+  { id: '4', name: 'Daughter', isActive: true },
+  { id: '5', name: 'Husband', isActive: true },
+  { id: '6', name: 'Wife', isActive: true },
+  { id: '7', name: 'Brother', isActive: true },
+  { id: '8', name: 'Sister', isActive: true },
+  { id: '9', name: 'Grandfather', isActive: true },
+  { id: '10', name: 'Grandmother', isActive: true },
+  { id: '11', name: 'Grandson', isActive: true },
+  { id: '12', name: 'Granddaughter', isActive: true },
+  { id: '13', name: 'Uncle', isActive: true },
+  { id: '14', name: 'Aunt', isActive: true },
+  { id: '15', name: 'Cousin', isActive: true },
+  { id: '16', name: 'Nephew', isActive: true },
+  { id: '17', name: 'Niece', isActive: true }
+];
+
 export async function getRelationships({
   page = 1,
   limit = 10,
@@ -14,49 +35,35 @@ export async function getRelationships({
   limit?: number;
   search?: string;
 } = {}) {
+  console.log('getRelationships called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
-    const headers = await instance();
-    let url = `${API_URL}/relationships?page=${page}&take=${limit}`;
+    // Filter relationships based on search query
+    let filteredRelationships = DUMMY_RELATIONSHIPS;
 
     if (search) {
-      url += `&name=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredRelationships = DUMMY_RELATIONSHIPS.filter((relationship) =>
+        relationship.name.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch relationships';
-
-      try {
-        const error = await response.json();
-        errorMessage = error.message || error.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      if (response.status === 403) {
-        errorMessage =
-          "You don't have permission to view relationships. Please contact your administrator.";
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        data: [],
-        meta: { page: 0, take: 0, itemCount: 0 }
-      };
-    }
-
-    const result = await response.json();
+    // Pagination
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedRelationships = filteredRelationships.slice(
+      startIndex,
+      endIndex
+    );
 
     return {
       success: true,
-      data: result.data || [],
-      meta: result.meta || { page: 0, take: 0, itemCount: 0 }
+      data: paginatedRelationships,
+      meta: { page, take: limit, itemCount: filteredRelationships.length }
     };
   } catch (error) {
     console.error('getRelationships error:', error);
@@ -71,28 +78,12 @@ export async function getRelationships({
 }
 
 export async function getAllRelationships() {
+  console.log('getAllRelationships called with dummy data');
+
   try {
-    const headers = await instance();
-    const url = `${API_URL}/relationships/all`;
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      next: { tags: ['relationships'] }
-    });
-
-    if (!response.ok) {
-      return {
-        success: false,
-        error: 'Failed to fetch all relationships',
-        data: []
-      };
-    }
-
-    const result = await response.json();
     return {
       success: true,
-      data: result || []
+      data: DUMMY_RELATIONSHIPS
     };
   } catch (error) {
     console.error('getAllRelationships error:', error);

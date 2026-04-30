@@ -30,6 +30,13 @@ export async function createGenders(formData: any) {
   }
 }
 
+// Dummy genders data
+const DUMMY_GENDERS = [
+  { id: '1', name: 'Male', isActive: true },
+  { id: '2', name: 'Female', isActive: true },
+  { id: '3', name: 'Other', isActive: true }
+];
+
 export async function getGenders({
   page,
   limit,
@@ -39,45 +46,43 @@ export async function getGenders({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/genders?page=${page}&take=${limit}`;
+  console.log('getGenders called with dummy data:', { page, limit, search });
+
   try {
-    // Search
+    // Filter genders based on search query
+    let filteredGenders = DUMMY_GENDERS;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredGenders = DUMMY_GENDERS.filter((gender) =>
+        gender.name.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalGenders: 0,
-        genders: []
-      };
-    }
-
-    const data = await response.json();
-
-    const genders = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedGenders = filteredGenders.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalGenders: meta.itemCount,
-      genders
+      success: true,
+      data: paginatedGenders,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredGenders.length
+      }
     };
   } catch (error) {
     console.error('Error fetching genders:', error);
     return {
-      page: 0,
-      limit: 0,
-      totalGenders: 0,
-      genders: []
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }

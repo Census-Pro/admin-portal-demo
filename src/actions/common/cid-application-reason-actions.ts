@@ -32,6 +32,22 @@ export async function createCidApplicationReason(formData: any) {
   }
 }
 
+// Dummy CID application reasons data
+const DUMMY_CID_APPLICATION_REASONS = [
+  { id: '1', name: 'First Time Application', isActive: true },
+  { id: '2', name: 'Lost CID', isActive: true },
+  { id: '3', name: 'Damaged CID', isActive: true },
+  { id: '4', name: 'CID Expiry Renewal', isActive: true },
+  { id: '5', name: 'Name Change', isActive: true },
+  { id: '6', name: 'Address Change', isActive: true },
+  { id: '7', name: 'Date of Birth Correction', isActive: true },
+  { id: '8', name: 'Gender Change', isActive: true },
+  { id: '9', name: 'Replacement due to wear and tear', isActive: true },
+  { id: '10', name: 'Replacement due to system upgrade', isActive: true },
+  { id: '11', name: 'Replacement for minor corrections', isActive: true },
+  { id: '12', name: 'Replacement due to security reasons', isActive: true }
+];
+
 export async function getCidApplicationReasons({
   page,
   limit,
@@ -41,66 +57,47 @@ export async function getCidApplicationReasons({
   limit?: number;
   search?: string;
 } = {}) {
+  console.log('getCidApplicationReasons called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
-    console.log('Fetching all CID application reasons from /all endpoint');
-    const response = await fetch(`${API_URL}/cid-application-reasons/all`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
+    // Filter CID application reasons based on search query
+    let filteredReasons = DUMMY_CID_APPLICATION_REASONS;
 
-    console.log('Response status:', response.status);
-
-    if (!response.ok) {
-      let errorData;
-      try {
-        errorData = await response.json();
-      } catch (e) {
-        errorData = await response.text();
-      }
-      console.error(
-        'Response not OK:',
-        response.status,
-        response.statusText,
-        errorData
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredReasons = DUMMY_CID_APPLICATION_REASONS.filter((reason) =>
+        reason.name.toLowerCase().includes(searchLower)
       );
-
-      // Log the specific validation messages if available
-      if (errorData?.message && Array.isArray(errorData.message)) {
-        console.error('Validation errors:', errorData.message);
-      }
-
-      return {
-        page: 0,
-        limit: 0,
-        totalCidApplicationReasons: 0,
-        cidApplicationReasons: []
-      };
     }
 
-    const data = await response.json();
-    console.log('API Response data:', data);
-
-    // For /all endpoint, data might be directly an array or in data.data
-    const cidApplicationReasons = Array.isArray(data) ? data : data.data || [];
-
-    console.log('Parsed data:', {
-      totalCidApplicationReasons: cidApplicationReasons.length,
-      cidApplicationReasons
-    });
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedReasons = filteredReasons.slice(startIndex, endIndex);
 
     return {
-      page: 1,
-      limit: cidApplicationReasons.length,
-      totalCidApplicationReasons: cidApplicationReasons.length,
-      cidApplicationReasons
+      success: true,
+      data: paginatedReasons,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredReasons.length
+      }
     };
   } catch (error) {
     console.error('Error fetching CID application reasons:', error);
     return {
-      page: 0,
-      limit: 0,
-      totalCidApplicationReasons: 0,
-      cidApplicationReasons: []
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }

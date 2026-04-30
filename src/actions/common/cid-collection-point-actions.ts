@@ -5,6 +5,30 @@ import { instance } from '../instance';
 
 const API_URL = process.env.COMMON_SERVICE || 'http://localhost:5003';
 
+// Dummy CID collection points data
+const DUMMY_CID_COLLECTION_POINTS = [
+  { id: '1', name: 'Dzongkhag Office', isActive: true },
+  { id: '2', name: 'Thimphu Office', isActive: true },
+  { id: '3', name: 'Paro Office', isActive: true },
+  { id: '4', name: 'Punakha Office', isActive: true },
+  { id: '5', name: 'Wangdue Office', isActive: true },
+  { id: '6', name: 'Trongsa Office', isActive: true },
+  { id: '7', name: 'Bumthang Office', isActive: true },
+  { id: '8', name: 'Lhuentse Office', isActive: true },
+  { id: '9', name: 'Mongar Office', isActive: true },
+  { id: '10', name: 'Samdrup Jongkhar Office', isActive: true },
+  { id: '11', name: 'Trashigang Office', isActive: true },
+  { id: '12', name: 'Sarpang Office', isActive: true },
+  { id: '13', name: 'Samtse Office', isActive: true },
+  { id: '14', name: 'Zhemgang Office', isActive: true },
+  { id: '15', name: 'Haa Office', isActive: true },
+  { id: '16', name: 'Gasa Office', isActive: true },
+  { id: '17', name: 'Chukha Office', isActive: true },
+  { id: '18', name: 'Dagana Office', isActive: true },
+  { id: '19', name: 'Laya Office', isActive: true },
+  { id: '20', name: 'Pemagatshel Office', isActive: true }
+];
+
 export async function getCidCollectionPoints({
   page,
   limit,
@@ -14,83 +38,47 @@ export async function getCidCollectionPoints({
   limit?: number;
   search?: string;
 } = {}) {
+  console.log('getCidCollectionPoints called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
-    const headers = await instance();
+    // Filter CID collection points based on search query
+    let filteredPoints = DUMMY_CID_COLLECTION_POINTS;
 
-    // Build query params
-    const params = new URLSearchParams();
-    if (page) params.append('page', page.toString());
-    if (limit) params.append('take', limit.toString());
-    if (search) params.append('name', search);
-
-    const url = `${API_URL}/cid-collection-points${params.toString() ? `?${params.toString()}` : ''}`;
-
-    console.log('[getCidCollectionPoints] URL:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch CID collection points';
-
-      try {
-        const error = await response.json();
-        console.error('[getCidCollectionPoints] Error response:', error);
-        errorMessage = error.message || error.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      if (response.status === 404) {
-        errorMessage =
-          'CID Collection Points endpoint not found. Please ensure the backend service is running and the endpoint is configured.';
-      } else if (response.status === 403) {
-        errorMessage =
-          "You don't have permission to view CID collection points. Please contact your administrator.";
-      } else if (response.status === 401) {
-        errorMessage = 'Unauthorized. Please log in again.';
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        data: [],
-        totalItems: 0
-      };
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredPoints = DUMMY_CID_COLLECTION_POINTS.filter((point) =>
+        point.name.toLowerCase().includes(searchLower)
+      );
     }
 
-    const result = await response.json();
-    console.log('[getCidCollectionPoints] Success response:', result);
-
-    // Handle different response formats
-    const data = result.data || result.items || result || [];
-    const totalItems =
-      result.meta?.totalItems ||
-      result.meta?.itemCount ||
-      result.total ||
-      (Array.isArray(data) ? data.length : 0);
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedPoints = filteredPoints.slice(startIndex, endIndex);
 
     return {
       success: true,
-      data: Array.isArray(data) ? data : [],
-      totalItems
+      data: paginatedPoints,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredPoints.length
+      }
     };
   } catch (error) {
-    console.error('[getCidCollectionPoints] Unexpected error:', error);
-    console.error('[getCidCollectionPoints] Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      name: error instanceof Error ? error.name : undefined
-    });
+    console.error('Error fetching CID collection points:', error);
     return {
       success: false,
       error:
         error instanceof Error ? error.message : 'An unexpected error occurred',
       data: [],
-      totalItems: 0
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }

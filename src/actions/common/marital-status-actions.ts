@@ -31,6 +31,15 @@ export async function createMaritalStatus(formData: any) {
   }
 }
 
+// Dummy marital status data
+const DUMMY_MARITAL_STATUS = [
+  { id: '1', name: 'Single', isActive: true },
+  { id: '2', name: 'Married', isActive: true },
+  { id: '3', name: 'Divorced', isActive: true },
+  { id: '4', name: 'Widowed', isActive: true },
+  { id: '5', name: 'Separated', isActive: true }
+];
+
 export async function getMaritalStatuses({
   page,
   limit,
@@ -40,45 +49,47 @@ export async function getMaritalStatuses({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/marital-statuses?page=${page}&take=${limit}`;
+  console.log('getMaritalStatuses called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
-    // Search
+    // Filter marital status based on search query
+    let filteredStatus = DUMMY_MARITAL_STATUS;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredStatus = DUMMY_MARITAL_STATUS.filter((status) =>
+        status.name.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      next: { tags: ['marital-status'] }
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalMaritalStatuses: 0,
-        maritalStatuses: []
-      };
-    }
-
-    const data = await response.json();
-
-    const maritalStatuses = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedStatus = filteredStatus.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalMaritalStatuses: meta.itemCount,
-      maritalStatuses
+      success: true,
+      data: paginatedStatus,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredStatus.length
+      }
     };
   } catch (error) {
-    console.error('Error fetching marital statuses:', error);
+    console.error('Error fetching marital status:', error);
     return {
-      page: 0,
-      limit: 0,
-      totalMaritalStatuses: 0,
-      maritalStatuses: []
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
   }
 }
@@ -86,8 +97,7 @@ export async function getMaritalStatuses({
 export async function getAllMaritalStatuses() {
   try {
     const response = await fetch(`${API_URL}/marital-statuses/all`, {
-      headers: await instance(),
-      next: { tags: ['marital-status'] }
+      headers: await instance()
     });
 
     if (!response.ok) {

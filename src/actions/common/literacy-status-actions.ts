@@ -31,6 +31,14 @@ export async function createLiteracyStatus(formData: any) {
   }
 }
 
+// Dummy literacy status data
+const DUMMY_LITERACY_STATUS = [
+  { id: '1', name: 'Literate', isActive: true },
+  { id: '2', name: 'Semi-literate', isActive: true },
+  { id: '3', name: 'Non-literate', isActive: true },
+  { id: '4', name: 'Not Applicable', isActive: true }
+];
+
 export async function getLiteracyStatuses({
   page,
   limit,
@@ -40,66 +48,47 @@ export async function getLiteracyStatuses({
   limit?: number;
   search?: string;
 } = {}) {
-  let url = `${API_URL}/literacy-statuses?page=${page}&take=${limit}`;
+  console.log('getLiteracyStatuses called with dummy data:', {
+    page,
+    limit,
+    search
+  });
+
   try {
-    // Search
+    // Filter literacy status based on search query
+    let filteredStatus = DUMMY_LITERACY_STATUS;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredStatus = filteredStatus.filter((status) =>
+        status.name.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      headers: await instance(),
-      next: { tags: ['literacy-status'] }
-    });
-
-    if (!response.ok) {
-      return {
-        page: 0,
-        limit: 0,
-        totalLiteracyStatuses: 0,
-        literacyStatuses: []
-      };
-    }
-
-    const data = await response.json();
-
-    const literacyStatuses = data.data || [];
-    const meta = data.meta || { page: 0, take: 0, itemCount: 0 };
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedStatus = filteredStatus.slice(startIndex, endIndex);
 
     return {
-      page: meta.page,
-      limit: meta.take,
-      totalLiteracyStatuses: meta.itemCount,
-      literacyStatuses
+      success: true,
+      data: paginatedStatus,
+      meta: {
+        page: currentPage,
+        take: pageSize,
+        itemCount: filteredStatus.length
+      }
     };
   } catch (error) {
     console.error('Error fetching literacy statuses:', error);
     return {
-      page: 0,
-      limit: 0,
-      totalLiteracyStatuses: 0,
-      literacyStatuses: []
+      success: false,
+      error:
+        error instanceof Error ? error.message : 'An unexpected error occurred',
+      data: [],
+      meta: { page: 0, take: 0, itemCount: 0 }
     };
-  }
-}
-
-export async function getAllLiteracyStatuses() {
-  try {
-    const response = await fetch(`${API_URL}/literacy-statuses/all`, {
-      headers: await instance(),
-      next: { tags: ['literacy-status'] }
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch literacy statuses: ${response.statusText}`
-      };
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching literacy statuses:', error);
   }
 }
 

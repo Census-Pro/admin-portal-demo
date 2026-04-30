@@ -6,6 +6,27 @@ import { instance } from '../instance';
 const API_URL =
   process.env.AUTH_SERVICE || process.env.API_URL || 'http://localhost:5001';
 
+// Dummy agencies data
+const DUMMY_AGENCIES = [
+  { id: '1', name: 'Ministry of Home Affairs', code: 'MOHA', isActive: true },
+  { id: '2', name: 'Department of Immigration', code: 'DOI', isActive: true },
+  { id: '3', name: 'Regional Immigration Office', code: 'RIO', isActive: true },
+  { id: '4', name: 'Dzongkhag Administration', code: 'DZA', isActive: true },
+  { id: '5', name: 'Local Government Office', code: 'LGO', isActive: true },
+  { id: '6', name: 'Civil Registration Office', code: 'CRO', isActive: true },
+  {
+    id: '7',
+    name: 'National Registration Office',
+    code: 'NRO',
+    isActive: true
+  },
+  { id: '8', name: 'Department of Law and Order', code: 'DLO', isActive: true },
+  { id: '9', name: 'Bureau of Law and Order', code: 'BLO', isActive: true },
+  { id: '10', name: 'Royal Bhutan Police', code: 'RBP', isActive: true },
+  { id: '11', name: 'Immigration Division', code: 'IDD', isActive: true },
+  { id: '12', name: 'Passport Division', code: 'PAD', isActive: true }
+];
+
 export async function getAgencies({
   page,
   limit,
@@ -15,47 +36,32 @@ export async function getAgencies({
   limit?: number;
   search?: string;
 } = {}) {
+  console.log('getAgencies called with dummy data:', { page, limit, search });
+
   try {
-    const headers = await instance();
-    let url = `${API_URL}/agencies?page=${page}&take=${limit}`;
+    // Filter agencies based on search query
+    let filteredAgencies = DUMMY_AGENCIES;
+
     if (search) {
-      url += `&q=${search}`;
+      const searchLower = search.toLowerCase();
+      filteredAgencies = DUMMY_AGENCIES.filter(
+        (agency) =>
+          agency.name.toLowerCase().includes(searchLower) ||
+          agency.code.toLowerCase().includes(searchLower)
+      );
     }
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch agencies';
-
-      try {
-        const error = await response.json();
-        errorMessage = error.message || error.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      if (response.status === 403) {
-        errorMessage =
-          "You don't have permission to view agencies. Please contact your administrator.";
-      }
-
-      return {
-        success: false,
-        error: errorMessage,
-        data: []
-      };
-    }
-
-    const result = await response.json();
+    // Pagination
+    const currentPage = page || 1;
+    const pageSize = limit || 10;
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    const paginatedAgencies = filteredAgencies.slice(startIndex, endIndex);
 
     return {
       success: true,
-      data: result.data || [],
-      totalItems: result.meta?.itemCount || (result.data || []).length
+      data: paginatedAgencies,
+      totalItems: filteredAgencies.length
     };
   } catch (error) {
     console.error('getAgencies error:', error);
