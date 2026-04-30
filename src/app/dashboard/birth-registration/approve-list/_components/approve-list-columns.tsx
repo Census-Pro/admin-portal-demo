@@ -29,7 +29,7 @@ function ActionsCell({ registration }: { registration: BirthRegistration }) {
         size="icon"
         onClick={() =>
           router.push(
-            `/dashboard/birth-registration/approve/${registration.id}`
+            `/dashboard/birth-registration/approve-list/${registration.id}`
           )
         }
       >
