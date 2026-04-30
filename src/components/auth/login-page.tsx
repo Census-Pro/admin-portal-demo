@@ -5,7 +5,6 @@ import { ArrowRight, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { NDILoginButton } from './ndi-login-button';
 import { toast } from 'sonner';
 
 export function LoginPage() {
@@ -151,36 +150,25 @@ export function LoginPage() {
           </button>
         </form>
 
-        {/* Divider */}
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200 dark:border-gray-700" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card text-muted-foreground px-2">
-              Or continue with
-            </span>
-          </div>
+        {/* Demo Mode Instructions */}
+        <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/20 dark:bg-blue-500/10">
+          <p className="mb-2 text-sm font-medium text-blue-800 dark:text-blue-300">
+            🎯 Demo Mode
+          </p>
+          <p className="text-xs text-blue-700 dark:text-blue-400">
+            Use demo credentials from <strong>DEMO_CREDENTIALS.md</strong> file.
+            Try CID:{' '}
+            <code className="rounded bg-blue-100 px-1 dark:bg-blue-900/30">
+              11111111111
+            </code>{' '}
+            with password:{' '}
+            <code className="rounded bg-blue-100 px-1 dark:bg-blue-900/30">
+              admin123
+            </code>
+          </p>
         </div>
 
-        {/* NDI Login Button */}
-        <NDILoginButton
-          size="md"
-          className="w-full"
-          onLoginSuccess={async (data) => {
-            console.log('🔐 NDI login successful:', data);
-
-            // Add small delay to ensure session is established
-            await new Promise((resolve) => setTimeout(resolve, 100));
-
-            // Use window.location for hard navigation
-            window.location.href = '/dashboard';
-          }}
-          onLoginError={(error) => {
-            console.error('🔐 NDI login error:', error);
-            setError(error);
-          }}
-        />
+        {/* Removed NDI Login - Demo Mode Only */}
 
         <div className="mt-6 text-center">
           <p className="text-muted-foreground text-xs">

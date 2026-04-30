@@ -1,16 +1,16 @@
 import { NextAuthConfig, User } from 'next-auth';
 import { AdapterUser } from 'next-auth/adapters';
 import CredentialProvider from 'next-auth/providers/credentials';
+import { authenticateUser } from './lib/mock-users';
 
-// import { createSession } from './lib/session';
-
-const API_URL = `${process.env.AUTH_SERVICE}`;
+// ============================================
+// DEMO MODE - NO BACKEND REQUIRED
+// ============================================
+// This is a frontend-only demo application
+// See DEMO_CREDENTIALS.md for login credentials
+// ============================================
 
 // Validate required environment variables
-if (!process.env.AUTH_SERVICE) {
-  throw new Error('AUTH_SERVICE environment variable is required');
-}
-
 if (!process.env.AUTH_SECRET && !process.env.NEXTAUTH_SECRET) {
   throw new Error(
     'AUTH_SECRET or NEXTAUTH_SECRET environment variable is required'
@@ -59,145 +59,75 @@ const authConfig = {
       },
       async authorize(credentials, req) {
         try {
-          // NDI Login Flow - If tokens are provided directly
-          if (credentials?.accessToken && credentials?.user) {
-            const userData = JSON.parse(credentials.user as string);
-            const rememberMe = credentials?.rememberMe === 'true';
-            const sessionDuration = rememberMe
-              ? SESSION_MAX_AGE_REMEMBER
-              : SESSION_MAX_AGE_DEFAULT;
+          console.log('🔐 [DEMO MODE] Authenticating with mock users');
 
-            // Validate required user data structure
-            if (!userData.roles || !Array.isArray(userData.roles)) {
-              console.warn(
-                'User missing roles array, defaulting to empty array'
-              );
-              userData.roles = [];
-            }
-
-            // Get ability from user data
-            const ability = userData.ability || [];
-
-            // Transform backend ability format to frontend permission format
-            const transformedAbilities = ability.flatMap((abilityItem: any) => {
-              if (!abilityItem.action || !abilityItem.subject) {
-                console.warn('Invalid ability item:', abilityItem);
-                return [];
-              }
-
-              const subjects = Array.isArray(abilityItem.subject)
-                ? abilityItem.subject
-                : [abilityItem.subject];
-
-              const actions = Array.isArray(abilityItem.action)
-                ? abilityItem.action
-                : [abilityItem.action];
-
-              return subjects.flatMap((subject: string) => {
-                const normalizedSubject = subject
-                  .toLowerCase()
-                  .replace(/\s+/g, '-');
-
-                return actions.map(
-                  (action: string) => `${action}:${normalizedSubject}`
-                );
-              });
-            });
-
-            return {
-              ...userData,
-              ability,
-              permissions: transformedAbilities,
-              accessToken: credentials.accessToken,
-              refreshToken: credentials.refreshToken,
-              sessionId: userData.id,
-              tokenExpiry: Math.floor(Date.now() / 1000) + sessionDuration,
-              rememberMe
-            };
-          }
-
-          // Regular Password Login Flow
-          const response = await fetch(`${API_URL}/auth/admin/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              cidNo: credentials?.cidNo,
-              password: credentials?.password
-            })
-          });
-
-          if (!response.ok) {
-            const errorText = await response.text();
+          // Demo Mode: Use mock authentication
+          if (!credentials?.cidNo || !credentials?.password) {
+            console.log('❌ Missing credentials');
             return null;
           }
 
-          const data = await response.json();
+          const user = authenticateUser(
+            credentials.cidNo as string,
+            credentials.password as string
+          );
 
-          if (data?.user && data?.accessToken) {
-            const rememberMe = credentials?.rememberMe === 'true';
-            const sessionDuration = rememberMe
-              ? SESSION_MAX_AGE_REMEMBER
-              : SESSION_MAX_AGE_DEFAULT;
-
-            // Validate required user data structure
-            if (!data.user.roles || !Array.isArray(data.user.roles)) {
-              console.warn(
-                'User missing roles array, defaulting to empty array'
-              );
-              data.user.roles = [];
-            }
-
-            // Add ability from top-level to user object
-            const ability = data.ability || [];
-
-            // Transform backend ability format to frontend permission format
-            // Backend: {action: ["create", "update"], subject: ["Birth Registration", "Death Registration"]}
-            // Frontend: ["create:birth-registration", "update:birth-registration", "create:death-registration", ...]
-            const transformedAbilities = ability.flatMap((abilityItem: any) => {
-              if (!abilityItem.action || !abilityItem.subject) {
-                console.warn('Invalid ability item:', abilityItem);
-                return [];
-              }
-
-              // Ensure subject is an array
-              const subjects = Array.isArray(abilityItem.subject)
-                ? abilityItem.subject
-                : [abilityItem.subject];
-
-              // Ensure action is an array
-              const actions = Array.isArray(abilityItem.action)
-                ? abilityItem.action
-                : [abilityItem.action];
-
-              // Map each action+subject combination to permission format
-              return subjects.flatMap((subject: string) => {
-                // Normalize subject: "Birth Registration" -> "birth-registration"
-                const normalizedSubject = subject
-                  .toLowerCase()
-                  .replace(/\s+/g, '-');
-
-                return actions.map(
-                  (action: string) => `${action}:${normalizedSubject}`
-                );
-              });
-            });
-
-            // Store tokens, sessionId, and rememberMe preference in user object for JWT callback
-            return {
-              ...data.user,
-              ability, // Keep original for subject-based checks
-              permissions: transformedAbilities, // Add transformed permissions
-              accessToken: data.accessToken,
-              refreshToken: data.refreshToken,
-              sessionId: data.user.id, // Use user ID as session ID for activity tracking
-              tokenExpiry: Math.floor(Date.now() / 1000) + sessionDuration,
-              accessTokenExpiry:
-                Math.floor(Date.now() / 1000) + (data.expiresIn || 3600), // Access token expiry from backend
-              rememberMe
-            };
+          if (!user) {
+            console.log('❌ Invalid credentials');
+            return null;
           }
 
-          return null;
+          console.log('✅ Authentication successful for:', user.fullName);
+
+          const rememberMe = credentials?.rememberMe === 'true';
+          const sessionDuration = rememberMe
+            ? SESSION_MAX_AGE_REMEMBER
+            : SESSION_MAX_AGE_DEFAULT;
+
+          // Get ability from user data
+          const ability = user.ability || [];
+
+          // Transform backend ability format to frontend permission format
+          const transformedAbilities = ability.flatMap((abilityItem: any) => {
+            if (!abilityItem.action || !abilityItem.subject) {
+              console.warn('Invalid ability item:', abilityItem);
+              return [];
+            }
+
+            const subjects = Array.isArray(abilityItem.subject)
+              ? abilityItem.subject
+              : [abilityItem.subject];
+
+            const actions = Array.isArray(abilityItem.action)
+              ? abilityItem.action
+              : [abilityItem.action];
+
+            return subjects.flatMap((subject: string) => {
+              const normalizedSubject = subject
+                .toLowerCase()
+                .replace(/\s+/g, '-');
+
+              return actions.map(
+                (action: string) => `${action}:${normalizedSubject}`
+              );
+            });
+          });
+
+          // Generate mock tokens
+          const mockAccessToken = `demo-access-token-${user.id}-${Date.now()}`;
+          const mockRefreshToken = `demo-refresh-token-${user.id}-${Date.now()}`;
+
+          return {
+            ...user,
+            ability,
+            permissions: transformedAbilities,
+            accessToken: mockAccessToken,
+            refreshToken: mockRefreshToken,
+            sessionId: user.id,
+            tokenExpiry: Math.floor(Date.now() / 1000) + sessionDuration,
+            accessTokenExpiry: Math.floor(Date.now() / 1000) + 3600,
+            rememberMe
+          };
         } catch (error) {
           console.error('Login error:', error);
           return null;
@@ -226,30 +156,16 @@ const authConfig = {
         token.user = user;
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
-        token.sessionId = user.sessionId; // Redis session ID for activity tracking
+        token.sessionId = user.sessionId;
         token.tokenExpiry = user.tokenExpiry;
         token.accessTokenExpiry = user.accessTokenExpiry;
         token.rememberMe = user.rememberMe;
       }
 
       // Validate we have required data
-      if (!token.accessToken) {
+      if (!token.accessToken || !token.user || !token.tokenExpiry) {
         console.error(
-          '❌ JWT Callback - Missing accessToken, invalidating session'
-        );
-        return null;
-      }
-
-      if (!token.user) {
-        console.error(
-          '❌ JWT Callback - Missing user data, invalidating session'
-        );
-        return null;
-      }
-
-      if (!token.tokenExpiry) {
-        console.error(
-          '❌ JWT Callback - Missing tokenExpiry, invalidating session'
+          '❌ JWT Callback - Missing required data, invalidating session'
         );
         return null;
       }
@@ -257,77 +173,32 @@ const authConfig = {
       // Check if session has expired (based on rememberMe setting)
       const timeUntilExpiry = (token.tokenExpiry as number) - now;
       if (timeUntilExpiry <= 0) {
-        // Session expired - force logout
+        console.log('🔐 [DEMO MODE] Session expired');
         return null;
       }
 
-      // Check if access token needs refresh (refresh 5 minutes before expiry)
-      // We use accessTokenExpiry to decide when to refresh the backend token
-      const accessTokenExpiry = (token.accessTokenExpiry as number) || 0;
-      const timeUntilAccessTokenExpiry = accessTokenExpiry - now;
-
-      // Refresh if less than 5 minutes left, OR if it's already expired (and we have a refresh token)
-      const shouldRefresh = timeUntilAccessTokenExpiry < 300;
-
-      if (shouldRefresh && token.refreshToken) {
-        try {
-          const response = await fetch(`${API_URL}/auth/refresh`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refreshToken: token.refreshToken })
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            // Keep original session expiry based on rememberMe, just refresh access token
-            token.accessToken = data.accessToken || data.token.accessToken;
-            token.refreshToken = data.refreshToken || data.token.refreshToken;
-
-            // Update access token expiry
-            token.accessTokenExpiry =
-              Math.floor(Date.now() / 1000) + (data.expiresIn || 3600);
-
-            // Extend session expiry based on rememberMe preference (optional: keep session alive as long as specific activity occurs)
-            const sessionDuration = token.rememberMe
-              ? SESSION_MAX_AGE_REMEMBER
-              : SESSION_MAX_AGE_DEFAULT;
-            token.tokenExpiry = Math.floor(Date.now() / 1000) + sessionDuration;
-          } else {
-            // If refresh failed and token is already expired, we must return null
-            if (timeUntilAccessTokenExpiry <= 0) {
-              return null;
-            }
-          }
-        } catch (error) {
-          console.error('Token refresh error:', error);
-          if (timeUntilAccessTokenExpiry <= 0) {
-            return null;
-          }
-        }
-      } else if (shouldRefresh && !token.refreshToken) {
-        // If we should refresh but have no refresh token, and token is expired, die.
-        if (timeUntilAccessTokenExpiry <= 0) {
-          return null;
-        }
-      }
+      // Demo mode: No need to refresh tokens from backend
+      // Tokens are valid for the entire session duration
+      console.log(
+        `🔐 [DEMO MODE] Session valid for ${Math.floor(timeUntilExpiry / 60)} more minutes`
+      );
 
       return token;
     },
     async session({ session, token }) {
       if (!token.user || !token.accessToken) {
-        console.error('❌ Session Callback - Missing required data:', {
-          hasUser: !!token.user,
-          hasAccessToken: !!token.accessToken
-        });
-        return null as any; // TypeScript workaround
+        console.error('❌ Session Callback - Missing required data');
+        return null as any;
       }
 
       session.user = token.user as AdapterUser & User;
       session.accessToken = token.accessToken as string;
       session.refreshToken = token.refreshToken as string;
-      session.sessionId = token.sessionId as string; // Redis session ID for activity tracking
+      session.sessionId = token.sessionId as string;
       session.tokenExpiry = token.tokenExpiry as number;
       session.rememberMe = token.rememberMe as boolean;
+
+      console.log('🔐 [DEMO MODE] Session active for:', session.user.fullName);
 
       return session;
     }
