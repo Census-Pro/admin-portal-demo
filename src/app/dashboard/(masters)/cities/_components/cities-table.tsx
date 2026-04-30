@@ -6,10 +6,9 @@ import { columns } from './columns';
 interface City {
   id: string;
   name: string;
-  description?: string;
+  dzongkhagId: string;
+  dzongkhagName: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface CitiesTableProps {

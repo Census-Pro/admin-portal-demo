@@ -18,12 +18,8 @@ import { AddDzongkhagModal } from './add-dzongkhag-modal';
 interface Dzongkhag {
   id: string;
   name: string;
-  dzongkha_name?: string;
-  code?: string;
-  description?: string;
+  code: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export const createColumns = (
@@ -61,21 +57,30 @@ export const createColumns = (
     }
   },
   {
-    accessorKey: 'dzongkha_name',
-    header: 'Dzongkha Name',
-    cell: ({ row }) => {
-      const dzongkhag = row.original;
-      return (
-        <div className="font-medium">{dzongkhag.dzongkha_name || '-'}</div>
-      );
-    }
-  },
-  {
     accessorKey: 'code',
     header: 'Code',
     cell: ({ row }) => {
       const dzongkhag = row.original;
-      return <div className="font-medium">{dzongkhag.code || '-'}</div>;
+      return <div className="font-medium">{dzongkhag.code}</div>;
+    }
+  },
+  {
+    accessorKey: 'isActive',
+    header: 'Status',
+    cell: ({ row }) => {
+      const dzongkhag = row.original;
+      return (
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              dzongkhag.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+          <span className="text-sm font-medium">
+            {dzongkhag.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </div>
+      );
     }
   },
   {

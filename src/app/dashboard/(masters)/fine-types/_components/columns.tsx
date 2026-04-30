@@ -15,15 +15,11 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { AddFineTypeModal } from './add-fine-type-modal';
 import { useRouter } from 'next/navigation';
-import { Badge } from '@/components/ui/badge';
 
 interface FineType {
   id: string;
-  fine_type: string;
   name: string;
-  service_code: string;
-  currency: string;
-  fine_value: number;
+  isActive: boolean;
 }
 
 export const columns: ColumnDef<FineType>[] = [
@@ -58,65 +54,21 @@ export const columns: ColumnDef<FineType>[] = [
     }
   },
   {
-    accessorKey: 'service_code',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        className="-ml-3 h-8 gap-1"
-      >
-        Service Code
-        {column.getIsSorted() === 'asc' ? (
-          <IconSortAscending className="h-4 w-4" />
-        ) : column.getIsSorted() === 'desc' ? (
-          <IconSortDescending className="h-4 w-4" />
-        ) : (
-          <IconArrowsSort className="h-4 w-4 opacity-50" />
-        )}
-      </Button>
-    ),
-    cell: ({ row }) => (
-      <Badge variant="secondary" className="font-mono">
-        {row.original.service_code}
-      </Badge>
-    )
-  },
-  {
-    accessorKey: 'currency',
-    header: 'Currency',
-    cell: ({ row }) => (
-      <span className="text-muted-foreground text-sm">
-        {row.original.currency}
-      </span>
-    )
-  },
-  {
-    accessorKey: 'fine_value',
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-        className="-ml-3 h-8 gap-1"
-      >
-        Fine Value
-        {column.getIsSorted() === 'asc' ? (
-          <IconSortAscending className="h-4 w-4" />
-        ) : column.getIsSorted() === 'desc' ? (
-          <IconSortDescending className="h-4 w-4" />
-        ) : (
-          <IconArrowsSort className="h-4 w-4 opacity-50" />
-        )}
-      </Button>
-    ),
+    accessorKey: 'isActive',
+    header: 'Status',
     cell: ({ row }) => {
-      const fineValue = row.original.fine_value;
-      const currency = row.original.currency;
-      const fineValueNumber =
-        typeof fineValue === 'number' ? fineValue : parseFloat(fineValue) || 0;
+      const type = row.original;
       return (
-        <span className="font-semibold">
-          {currency} {fineValueNumber.toFixed(2)}
-        </span>
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              type.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+          <span className="text-sm font-medium">
+            {type.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </div>
       );
     }
   },
@@ -199,7 +151,6 @@ function ActionsCell({ type }: { type: FineType }) {
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         onSuccess={handleEditSuccess}
-        initialData={type}
       />
     </>
   );

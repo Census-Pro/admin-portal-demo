@@ -18,6 +18,9 @@ import { AddCityModal } from './add-city-modal';
 interface City {
   id: string;
   name: string;
+  dzongkhagId: string;
+  dzongkhagName: string;
+  isActive: boolean;
 }
 
 export const columns: ColumnDef<City>[] = [
@@ -47,6 +50,48 @@ export const columns: ColumnDef<City>[] = [
             {city.name.charAt(0).toUpperCase()}
           </div>
           <div className="font-medium">{city.name}</div>
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: 'dzongkhagName',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        className="-ml-3 h-8 gap-1"
+      >
+        Dzongkhag
+        {column.getIsSorted() === 'asc' ? (
+          <IconSortAscending className="h-4 w-4" />
+        ) : column.getIsSorted() === 'desc' ? (
+          <IconSortDescending className="h-4 w-4" />
+        ) : (
+          <IconArrowsSort className="h-4 w-4 opacity-50" />
+        )}
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const city = row.original;
+      return <div className="font-medium">{city.dzongkhagName}</div>;
+    }
+  },
+  {
+    accessorKey: 'isActive',
+    header: 'Status',
+    cell: ({ row }) => {
+      const city = row.original;
+      return (
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              city.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+          <span className="text-sm font-medium">
+            {city.isActive ? 'Active' : 'Inactive'}
+          </span>
         </div>
       );
     }
