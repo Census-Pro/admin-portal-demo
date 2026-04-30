@@ -11,8 +11,6 @@ interface HohChangeReason {
   id: string;
   name: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface HohChangeReasonTableProps {
@@ -50,11 +48,9 @@ export function HohChangeReasonTable({
           search: searchParams.q
         });
 
-        if (result.hohChangeReasons) {
-          setData(result.hohChangeReasons);
-          setTotalItems(
-            result.totalHohChangeReasons || result.hohChangeReasons.length
-          );
+        if (result.data) {
+          setData(result.data);
+          setTotalItems(result.meta?.itemCount || result.data.length);
           setError(null);
         } else {
           setError('Failed to fetch HOH change reasons');

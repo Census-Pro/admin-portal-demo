@@ -19,8 +19,6 @@ interface HohChangeReason {
   id: string;
   name: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 export const createColumns = (
@@ -53,6 +51,25 @@ export const createColumns = (
             {reason.name.charAt(0).toUpperCase()}
           </div>
           <div className="font-medium">{reason.name}</div>
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: 'isActive',
+    header: 'Status',
+    cell: ({ row }) => {
+      const reason = row.original;
+      return (
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              reason.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+          <span className="text-sm font-medium">
+            {reason.isActive ? 'Active' : 'Inactive'}
+          </span>
         </div>
       );
     }
@@ -148,7 +165,6 @@ function ActionsCell({
           }
           setIsEditOpen(false);
         }}
-        initialData={reason}
       />
     </>
   );

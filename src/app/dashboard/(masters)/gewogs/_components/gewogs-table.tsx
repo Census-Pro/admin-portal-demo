@@ -6,11 +6,9 @@ import { columns } from './columns';
 interface Gewog {
   id: string;
   name: string;
-  dzongkha_name?: string;
-  description?: string;
+  dzongkhagId: string;
+  dzongkhagName: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface GewogsTableProps {

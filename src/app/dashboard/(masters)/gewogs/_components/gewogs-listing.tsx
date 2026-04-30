@@ -17,7 +17,7 @@ export async function GewogsListing() {
 
   // API call
   const data = await getGewogs(filters || {});
-  const totalGewogs = data?.totalGewogs;
+  const totalGewogs = data?.totalGewogs || 0;
   const gewogs = data?.gewogs || [];
 
   return <GewogsTable data={gewogs} totalData={totalGewogs} />;
