@@ -210,7 +210,7 @@ export function DeathRegistrationApproveView({
         toast.success('Death registration approved successfully!');
         router.push('/dashboard/death-registration/approve');
       } else {
-        toast.error(result.error || 'Failed to approve death registration');
+        toast.error('Failed to approve death registration');
       }
     } catch {
       toast.error('An unexpected error occurred');
@@ -231,7 +231,7 @@ export function DeathRegistrationApproveView({
         toast.error('Death registration rejected');
         router.push('/dashboard/death-registration/approve');
       } else {
-        toast.error(result.error || 'Failed to reject death registration');
+        toast.error('Failed to reject death registration');
       }
     } catch {
       toast.error('An unexpected error occurred');

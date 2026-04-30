@@ -210,7 +210,7 @@ export function DeathRegistrationVerifyView({
         toast.success('Death registration verified successfully!');
         router.push('/dashboard/death-registration/verify');
       } else {
-        toast.error(result.error || 'Failed to verify death registration');
+        toast.error('Failed to verify death registration');
       }
     } catch {
       toast.error('An unexpected error occurred while verifying');
@@ -231,7 +231,7 @@ export function DeathRegistrationVerifyView({
         toast.error('Death registration rejected');
         router.push('/dashboard/death-registration/verify');
       } else {
-        toast.error(result.error || 'Failed to reject death registration');
+        toast.error('Failed to reject death registration');
       }
     } catch {
       toast.error('An unexpected error occurred');

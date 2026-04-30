@@ -42,7 +42,7 @@ function ActionsCell({
         toast.success('Task assigned to you successfully');
         setTimeout(() => router.refresh(), 1000);
       } else {
-        toast.error(result.error || 'Failed to assign task');
+        toast.error('Failed to assign task');
       }
     } catch {
       toast.error('An unexpected error occurred');

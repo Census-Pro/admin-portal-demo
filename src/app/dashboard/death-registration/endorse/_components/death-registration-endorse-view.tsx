@@ -214,7 +214,7 @@ export function DeathRegistrationEndorseView({
         toast.success('Death registration endorsed successfully!');
         router.push('/dashboard/death-registration/endorse');
       } else {
-        toast.error(result.error || 'Failed to endorse death registration');
+        toast.error('Failed to endorse death registration');
       }
     } catch {
       toast.error('An unexpected error occurred while endorsing');
@@ -235,7 +235,7 @@ export function DeathRegistrationEndorseView({
         toast.error('Death registration rejected');
         router.push('/dashboard/death-registration/endorse');
       } else {
-        toast.error(result.error || 'Failed to reject death registration');
+        toast.error('Failed to reject death registration');
       }
     } catch {
       toast.error('An unexpected error occurred');

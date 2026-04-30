@@ -56,7 +56,7 @@ export function DeathApplicationsTable<TData>({
 
           const hasError = results.find((r) => !r.success);
           if (hasError) {
-            setError(hasError.error ?? 'Failed to fetch applications');
+            setError('Failed to fetch applications');
             return;
           }
 
