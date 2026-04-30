@@ -5,10 +5,10 @@ import { columns } from './columns';
 
 interface MajorThromde {
   id: string;
-  thromdeName: string;
+  name: string;
+  dzongkhagId: string;
+  dzongkhagName: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface MajorThromdesTableProps {

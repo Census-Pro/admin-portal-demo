@@ -18,10 +18,7 @@ import { AddMaritalStatusModal } from './add-marital-status-modal';
 interface MaritalStatus {
   id: string;
   name: string;
-  description?: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface CreateColumnsProps {
@@ -62,6 +59,25 @@ export function createColumns({
               {maritalStatus.name.charAt(0).toUpperCase()}
             </div>
             <div className="font-medium">{maritalStatus.name}</div>
+          </div>
+        );
+      }
+    },
+    {
+      accessorKey: 'isActive',
+      header: 'Status',
+      cell: ({ row }) => {
+        const maritalStatus = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <div
+              className={`h-2 w-2 rounded-full ${
+                maritalStatus.isActive ? 'bg-green-500' : 'bg-red-500'
+              }`}
+            />
+            <span className="text-sm font-medium">
+              {maritalStatus.isActive ? 'Active' : 'Inactive'}
+            </span>
           </div>
         );
       }
@@ -167,7 +183,6 @@ function ActionsCell({
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         onSuccess={handleUpdateSuccess}
-        initialData={maritalStatus}
       />
     </>
   );

@@ -17,7 +17,7 @@ export async function MajorThromdesListing() {
 
   // API call
   const data = await getMajorThromdes(filters || {});
-  const totalMajorThromdes = data?.totalMajorThromdes;
+  const totalMajorThromdes = data?.totalMajorThromdes || 0;
   const majorThromdes = data?.majorThromdes || [];
 
   return (
