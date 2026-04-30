@@ -18,6 +18,7 @@ import { EditRelationshipModal } from './edit-relationship-modal';
 interface Relationship {
   id: string;
   name: string;
+  isActive: boolean;
 }
 
 export const columns = (
@@ -49,6 +50,25 @@ export const columns = (
             {relationship.name.charAt(0).toUpperCase()}
           </div>
           <div className="font-medium">{relationship.name}</div>
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: 'isActive',
+    header: 'Status',
+    cell: ({ row }) => {
+      const relationship = row.original;
+      return (
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              relationship.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+          <span className="text-sm font-medium">
+            {relationship.isActive ? 'Active' : 'Inactive'}
+          </span>
         </div>
       );
     }

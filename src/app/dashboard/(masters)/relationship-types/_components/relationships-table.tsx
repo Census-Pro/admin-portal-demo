@@ -10,10 +10,7 @@ import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 interface Relationship {
   id: string;
   name: string;
-  description?: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface RelationshipsTableProps {

@@ -5,13 +5,8 @@ import { columns } from './columns';
 
 interface PaymentServiceType {
   id: string;
-  payment_type: string;
-  service_code: string;
-  currency: string;
-  amount: number;
+  name: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface PaymentServiceTypesTableProps {
