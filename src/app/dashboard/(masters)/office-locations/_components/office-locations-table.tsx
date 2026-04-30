@@ -10,11 +10,7 @@ import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 interface OfficeLocation {
   id: string;
   name: string;
-  code?: string;
-  description?: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface OfficeLocationsTableProps {

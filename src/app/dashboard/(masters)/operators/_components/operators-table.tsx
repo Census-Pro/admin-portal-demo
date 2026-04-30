@@ -10,9 +10,9 @@ import { useSessionExpired } from '@/hooks/use-session-expired';
 
 interface Operator {
   id: string;
+  name: string;
   cidNo: string;
-  createdAt?: string;
-  updatedAt?: string;
+  isActive: boolean;
 }
 
 interface OperatorsTableProps {
@@ -57,7 +57,7 @@ export function OperatorsTable({
 
         if (result.success) {
           setData(result.data || []);
-          setTotalItems(result.totalItems || 0);
+          setTotalItems(result.meta?.itemCount || 0);
           setError(null);
         } else {
           // Check if session expired - if so, show dialog instead of error in table

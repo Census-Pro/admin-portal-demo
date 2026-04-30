@@ -17,8 +17,8 @@ export async function PaymentServiceTypesListing() {
 
   // API call
   const data = await getPaymentServiceTypes(filters || {});
-  const totalPaymentServiceTypes = data?.totalPaymentServiceTypes;
-  const paymentServiceTypes = data?.paymentServiceTypes || [];
+  const totalPaymentServiceTypes = data?.meta?.itemCount || 0;
+  const paymentServiceTypes = data?.data || [];
 
   return (
     <PaymentServiceTypesTable

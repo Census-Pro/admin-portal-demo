@@ -17,12 +17,42 @@ import { EditOperatorModal } from './edit-operator-modal';
 
 interface Operator {
   id: string;
+  name: string;
   cidNo: string;
-  createdAt?: string;
-  updatedAt?: string;
+  isActive: boolean;
 }
 
 export const columns = (onDataChange?: () => void): ColumnDef<Operator>[] => [
+  {
+    accessorKey: 'name',
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        className="-ml-3 h-8 gap-1"
+      >
+        Name
+        {column.getIsSorted() === 'asc' ? (
+          <IconSortAscending className="h-4 w-4" />
+        ) : column.getIsSorted() === 'desc' ? (
+          <IconSortDescending className="h-4 w-4" />
+        ) : (
+          <IconArrowsSort className="h-4 w-4 opacity-50" />
+        )}
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const operator = row.original;
+      return (
+        <div className="flex items-center gap-3">
+          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
+            {operator.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="font-medium">{operator.name}</div>
+        </div>
+      );
+    }
+  },
   {
     accessorKey: 'cidNo',
     header: ({ column }) => (
@@ -43,33 +73,25 @@ export const columns = (onDataChange?: () => void): ColumnDef<Operator>[] => [
     ),
     cell: ({ row }) => {
       const operator = row.original;
-      return (
-        <div className="flex items-center gap-3">
-          <div className="bg-muted text-muted-foreground border-border/10 flex h-9 w-9 items-center justify-center rounded-full border text-xs font-medium">
-            {operator.cidNo.charAt(0)}
-          </div>
-          <div>
-            <div className="font-mono font-medium">{operator.cidNo}</div>
-          </div>
-        </div>
-      );
+      return <div className="font-mono font-medium">{operator.cidNo}</div>;
     }
   },
   {
-    accessorKey: 'createdAt',
-    header: 'Created Date',
+    accessorKey: 'isActive',
+    header: 'Status',
     cell: ({ row }) => {
-      const date = row.getValue('createdAt');
-      if (!date) return <span className="text-muted-foreground">-</span>;
-
+      const operator = row.original;
       return (
-        <span className="text-muted-foreground text-sm">
-          {new Date(date as string).toLocaleDateString('en-BT', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-          })}
-        </span>
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              operator.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+          <span className="text-sm font-medium">
+            {operator.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </div>
       );
     }
   },
