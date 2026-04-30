@@ -18,10 +18,7 @@ import { AddNaturalizationTypeModal } from './add-naturalization-type-modal';
 interface NaturalizationType {
   id: string;
   name: string;
-  description?: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface CreateColumnsProps {
@@ -62,6 +59,25 @@ export function createColumns({
               {type.name.charAt(0).toUpperCase()}
             </div>
             <div className="font-medium">{type.name}</div>
+          </div>
+        );
+      }
+    },
+    {
+      accessorKey: 'isActive',
+      header: 'Status',
+      cell: ({ row }) => {
+        const type = row.original;
+        return (
+          <div className="flex items-center gap-2">
+            <div
+              className={`h-2 w-2 rounded-full ${
+                type.isActive ? 'bg-green-500' : 'bg-red-500'
+              }`}
+            />
+            <span className="text-sm font-medium">
+              {type.isActive ? 'Active' : 'Inactive'}
+            </span>
           </div>
         );
       }
@@ -163,7 +179,6 @@ function ActionsCell({
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         onSuccess={handleUpdateSuccess}
-        initialData={type}
       />
     </>
   );

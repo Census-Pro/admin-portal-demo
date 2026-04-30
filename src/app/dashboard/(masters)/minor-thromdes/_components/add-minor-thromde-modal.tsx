@@ -64,8 +64,13 @@ export function AddMinorThromdeModal({
       setLoadingDzongkhags(true);
       try {
         const result = await getAllDzongkhags();
-        if (result && !result.error) {
-          setDzongkhags(result.data || result || []);
+        // Handle different response formats
+        if (result && typeof result === 'object' && 'data' in result) {
+          setDzongkhags((result as any).data || []);
+        } else if (Array.isArray(result)) {
+          setDzongkhags(result);
+        } else {
+          setDzongkhags([]);
         }
       } catch (error) {
         console.error('Error fetching dzongkhags:', error);

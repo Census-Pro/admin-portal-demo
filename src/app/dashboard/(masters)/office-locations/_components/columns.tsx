@@ -18,9 +18,7 @@ import { EditOfficeLocationModal } from './edit-office-location-modal';
 interface OfficeLocation {
   id: string;
   name: string;
-  isActive?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  isActive: boolean;
 }
 
 export const columns = (
@@ -54,6 +52,25 @@ export const columns = (
           <div>
             <div className="font-medium">{location.name}</div>
           </div>
+        </div>
+      );
+    }
+  },
+  {
+    accessorKey: 'isActive',
+    header: 'Status',
+    cell: ({ row }) => {
+      const location = row.original;
+      return (
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              location.isActive ? 'bg-green-500' : 'bg-red-500'
+            }`}
+          />
+          <span className="text-sm font-medium">
+            {location.isActive ? 'Active' : 'Inactive'}
+          </span>
         </div>
       );
     }

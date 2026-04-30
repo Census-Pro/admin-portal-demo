@@ -10,10 +10,7 @@ import { DataTableSkeleton } from '@/components/ui/table/data-table-skeleton';
 interface MaritalStatus {
   id: string;
   name: string;
-  description?: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
 }
 
 interface MaritalStatusesTableProps {
@@ -51,11 +48,9 @@ export function MaritalStatusesTable({
           search: searchParams.q
         });
 
-        if (result.maritalStatuses) {
-          setData(result.maritalStatuses);
-          setTotalItems(
-            result.totalMaritalStatuses || result.maritalStatuses.length
-          );
+        if (result.data) {
+          setData(result.data);
+          setTotalItems(result.meta?.itemCount || result.data.length);
           setError(null);
         } else {
           setError('Failed to fetch marital statuses');
