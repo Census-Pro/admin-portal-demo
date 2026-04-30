@@ -34,10 +34,10 @@ export function HohChangeTable<TData extends Record<string, any>>({
         const result = await getSubmittedHohChanges();
         if (cancelled) return;
         if (!result.success) {
-          setError(result.error ?? 'Failed to fetch applications');
+          setError('Failed to fetch applications');
           return;
         }
-        setData(result.data as TData[]);
+        setData(result.data as unknown as TData[]);
       } catch (err) {
         if (cancelled) return;
         setError(

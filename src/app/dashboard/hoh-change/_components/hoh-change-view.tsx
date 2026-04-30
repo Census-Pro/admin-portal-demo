@@ -148,10 +148,10 @@ export function HohChangeView({ applicationId }: HohChangeViewProps) {
       if (!data?.id) return;
       const result = await approveHohChange(data.id);
       if (result.success) {
-        toast.success('HOH change application approved successfully!');
+        toast.success('Application approved successfully!');
         router.push('/dashboard/hoh-change');
       } else {
-        toast.error(result.error || 'Failed to approve application');
+        toast.error('Failed to approve application');
       }
     } catch {
       toast.error('An unexpected error occurred while approving');
@@ -174,10 +174,10 @@ export function HohChangeView({ applicationId }: HohChangeViewProps) {
       const result = await rejectHohChange(data.id, remarks);
       if (result.success) {
         setRejectDialogOpen(false);
-        toast.success('HOH change application rejected');
+        toast.error('Application rejected');
         router.push('/dashboard/hoh-change');
       } else {
-        toast.error(result.error || 'Failed to reject application');
+        toast.error('Failed to reject application');
       }
     } catch {
       toast.error('An unexpected error occurred while rejecting');

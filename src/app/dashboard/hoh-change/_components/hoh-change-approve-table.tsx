@@ -34,10 +34,10 @@ export function HohChangeApproveTable<TData extends Record<string, any>>({
         const result = await getHohApproveList();
         if (cancelled) return;
         if (!result.success) {
-          setError(result.error ?? 'Failed to fetch applications for approval');
+          setError('Failed to fetch applications for approval');
           return;
         }
-        setData(result.data as TData[]);
+        setData(result.data as unknown as TData[]);
       } catch (err) {
         if (cancelled) return;
         setError(
