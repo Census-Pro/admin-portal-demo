@@ -16,10 +16,14 @@ export interface MockUser {
   roles: Array<{
     id: string;
     name: string;
-    description: string;
+    permissions: Array<{
+      id: string;
+      name: string;
+    }>;
   }>;
   ability: Array<{
-    action: string | string[];
+    name: string;
+    action: string[];
     subject: string | string[];
   }>;
   createdAt: string;
@@ -41,11 +45,15 @@ export const DEMO_USERS: MockUser[] = [
       {
         id: 'role-1',
         name: 'Super Admin',
-        description: 'Full system access with all permissions'
+        permissions: [{ id: 'perm-1', name: 'manage:all' }]
       }
     ],
     ability: [
-      { action: ['create', 'read', 'update', 'delete'], subject: 'all' }
+      {
+        name: 'Manage All',
+        action: ['create', 'read', 'update', 'delete'],
+        subject: 'all'
+      }
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -64,14 +72,25 @@ export const DEMO_USERS: MockUser[] = [
       {
         id: 'role-2',
         name: 'Registration Officer',
-        description: 'Can register births and deaths'
+        permissions: [
+          { id: 'perm-2', name: 'manage:birth-registration' },
+          { id: 'perm-3', name: 'manage:death-registration' }
+        ]
       }
     ],
     ability: [
-      { action: ['create', 'read', 'update'], subject: 'birth-registration' },
-      { action: ['create', 'read', 'update'], subject: 'death-registration' },
-      { action: 'read', subject: 'household' },
-      { action: 'read', subject: 'citizen' }
+      {
+        name: 'Birth Registration',
+        action: ['create', 'read', 'update'],
+        subject: 'birth-registration'
+      },
+      {
+        name: 'Death Registration',
+        action: ['create', 'read', 'update'],
+        subject: 'death-registration'
+      },
+      { name: 'Household View', action: ['read'], subject: 'household' },
+      { name: 'Citizen View', action: ['read'], subject: 'citizen' }
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -90,15 +109,30 @@ export const DEMO_USERS: MockUser[] = [
       {
         id: 'role-3',
         name: 'Approval Officer',
-        description: 'Can approve or reject registrations'
+        permissions: [
+          { id: 'perm-4', name: 'approve:birth-registration' },
+          { id: 'perm-5', name: 'approve:death-registration' }
+        ]
       }
     ],
     ability: [
-      { action: ['read', 'update'], subject: 'birth-registration' },
-      { action: ['read', 'update'], subject: 'death-registration' },
-      { action: 'read', subject: 'household' },
-      { action: 'read', subject: 'citizen' },
-      { action: ['read', 'create'], subject: 'reports' }
+      {
+        name: 'Birth Registration Approval',
+        action: ['read', 'update'],
+        subject: 'birth-registration'
+      },
+      {
+        name: 'Death Registration Approval',
+        action: ['read', 'update'],
+        subject: 'death-registration'
+      },
+      { name: 'Household View', action: ['read'], subject: 'household' },
+      { name: 'Citizen View', action: ['read'], subject: 'citizen' },
+      {
+        name: 'Reports Management',
+        action: ['read', 'create'],
+        subject: 'reports'
+      }
     ],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -117,10 +151,10 @@ export const DEMO_USERS: MockUser[] = [
       {
         id: 'role-4',
         name: 'Viewer',
-        description: 'Read-only access to all modules'
+        permissions: [{ id: 'perm-6', name: 'read:all' }]
       }
     ],
-    ability: [{ action: 'read', subject: 'all' }],
+    ability: [{ name: 'Read All', action: ['read'], subject: 'all' }],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
