@@ -60,23 +60,13 @@ const DUMMY_TOTAL_PENDING = DUMMY_ANALYTICS_SERVICES.reduce(
 );
 
 export default async function OverviewPage() {
-  const session = await auth();
+  // DUMMY session check (remove auth/redirect for demo)
 
-  // Dashboard is restricted to SUPER_ADMIN only
-  if (session?.user?.roleType !== 'SUPER_ADMIN') {
-    redirect('/dashboard/unauthorized');
-  }
-
-  // Fetch real data from auth_service
-  const statsResult = await getDashboardStats();
-
-  const statsData = statsResult.success ? statsResult.data : null;
-
-  // Build dashboard config with real data (using icon names as strings)
+  // DUMMY dashboard stats
   const dashboardStats = [
     {
       label: 'Total Users',
-      value: statsData?.totalUsers.toString() || '0',
+      value: '1,234',
       iconName: 'users' as const,
       trend: 'Total registered users',
       trendUp: true,
@@ -85,7 +75,7 @@ export default async function OverviewPage() {
     },
     {
       label: 'Roles',
-      value: statsData?.totalRoles.toString() || '0',
+      value: '8',
       iconName: 'shield' as const,
       trend: 'Total available roles',
       trendUp: false,
@@ -94,7 +84,7 @@ export default async function OverviewPage() {
     },
     {
       label: 'Permissions',
-      value: statsData?.totalPermissions.toString() || '0',
+      value: '42',
       iconName: 'lock' as const,
       trend: 'Total available permissions',
       trendUp: true,
@@ -118,7 +108,7 @@ export default async function OverviewPage() {
     >
       <DashboardClient
         stats={dashboardStats}
-        error={statsResult.error}
+        error={undefined}
         analyticsServices={DUMMY_ANALYTICS_SERVICES}
         analyticsTotalPending={DUMMY_TOTAL_PENDING}
       />
