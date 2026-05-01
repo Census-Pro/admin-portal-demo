@@ -40,11 +40,9 @@ import {
   IconX
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { markBirthVerified } from '@/lib/cid-assessed-store';
 import { BirthCertificateViewer } from '../../_components/birth-certificate-viewer';
-import {
-  updateBirthApplicationStatus,
-  rejectBirthApplication
-} from '@/actions/common/birth-registration-actions';
+import { rejectBirthApplication } from '@/actions/common/birth-registration-actions';
 
 interface BirthRegistrationData {
   applicant_cid: string;
@@ -118,16 +116,9 @@ export function BirthRegistrationVerifyView({
   const handleVerify = async () => {
     try {
       setIsVerifying(true);
-      const result = await updateBirthApplicationStatus(
-        applicationId,
-        'VERIFIED'
-      );
-      if (result.success) {
-        toast.success('Birth registration verified successfully!');
-        router.push('/dashboard/birth-registration/verify');
-      } else {
-        toast.error('Failed to verify birth registration');
-      }
+      markBirthVerified(applicationId);
+      toast.success('Birth registration verified successfully!');
+      router.push('/dashboard/birth-registration/verify');
     } catch {
       toast.error('An unexpected error occurred');
     } finally {

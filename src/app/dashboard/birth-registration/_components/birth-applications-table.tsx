@@ -10,6 +10,10 @@ import {
   getVerifiedBirthApplications,
   BirthApplicationStatus
 } from '@/actions/common/birth-registration-actions';
+import {
+  getBirthVerifiedIds,
+  getBirthEndorsedIds
+} from '@/lib/cid-assessed-store';
 
 interface BirthApplicationsTableProps<TData> {
   status: BirthApplicationStatus | BirthApplicationStatus[];
@@ -53,12 +57,17 @@ export function BirthApplicationsTable<TData>({
         }
 
         const combined = results.flatMap((r) => r.data as unknown as TData[]);
-        const total = results.reduce(
-          (sum, r) => sum + (r.total_count ?? r.data.length),
-          0
-        );
+        const verifiedIds = getBirthVerifiedIds();
+        const endorsedIds = getBirthEndorsedIds();
+        const filteredCombined =
+          status === 'SUBMITTED'
+            ? combined.filter((r: any) => !verifiedIds.has(r.id))
+            : status === 'VERIFIED'
+              ? combined.filter((r: any) => !endorsedIds.has(r.id))
+              : combined;
+        const total = filteredCombined.length;
         if (!isMounted || cancelled) return;
-        setData(combined);
+        setData(filteredCombined);
         setTotalItems(total);
       } catch (err) {
         if (!isMounted || cancelled) return;
