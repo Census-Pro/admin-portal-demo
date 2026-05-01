@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
+import { Input } from '@/components/ui/input';
 import { ColumnDef } from '@tanstack/react-table';
 import {
   getSubmittedMoveInOutApplications,
@@ -10,10 +11,12 @@ import {
 
 interface MoveInOutApplicationsTableProps {
   columns: ColumnDef<MoveInOutApplication, any>[];
+  headerAction?: React.ReactNode;
 }
 
 export function MoveInOutApplicationsTable({
-  columns
+  columns,
+  headerAction
 }: MoveInOutApplicationsTableProps) {
   const [data, setData] = useState<MoveInOutApplication[]>([]);
   const [totalItems, setTotalItems] = useState(0);
@@ -70,5 +73,16 @@ export function MoveInOutApplicationsTable({
     );
   }
 
-  return <DataTable columns={columns} data={data} totalItems={totalItems} />;
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Input
+          placeholder="Search by name, CID, or application number..."
+          className="w-full md:max-w-sm"
+        />
+        {headerAction}
+      </div>
+      <DataTable columns={columns} data={data} totalItems={totalItems} />
+    </div>
+  );
 }

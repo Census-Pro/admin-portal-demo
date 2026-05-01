@@ -28,7 +28,7 @@ export default async function MoveInOutDetailPage({
         </Link>
       }
     >
-      <MoveInOutView applicationId={id} />
+      <MoveInOutView applicationId={id} mode="verify" />
     </PageContainer>
   );
 }

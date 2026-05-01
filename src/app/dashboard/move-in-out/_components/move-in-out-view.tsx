@@ -40,6 +40,7 @@ import { getStatusColor } from '@/lib/status-utils';
 import {
   getMoveInOutById,
   approveMoveInOut,
+  verifyMoveInOut,
   rejectMoveInOut,
   MoveInOutApplication
 } from '@/actions/common/move-in-out-actions';
@@ -47,9 +48,13 @@ import { format } from 'date-fns';
 
 interface MoveInOutViewProps {
   applicationId: string;
+  mode?: 'verify' | 'approve';
 }
 
-export function MoveInOutView({ applicationId }: MoveInOutViewProps) {
+export function MoveInOutView({
+  applicationId,
+  mode = 'approve'
+}: MoveInOutViewProps) {
   const router = useRouter();
   const [data, setData] = useState<MoveInOutApplication | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -91,12 +96,23 @@ export function MoveInOutView({ applicationId }: MoveInOutViewProps) {
     setIsApproving(true);
     try {
       if (!data?.id) return;
-      const result = await approveMoveInOut(data.id);
+
+      // Use verifyMoveInOut for verify mode, approveMoveInOut for approve mode
+      const result =
+        mode === 'verify'
+          ? await verifyMoveInOut(data.id)
+          : await approveMoveInOut(data.id);
+
       if (result.success) {
-        toast.success('Move-in-out application approved successfully!');
-        router.push('/dashboard/move-in-out/relieving');
+        const successMsg =
+          mode === 'verify'
+            ? 'Move-in-out application verified successfully!'
+            : 'Move-in-out application approved successfully!';
+        toast.success(successMsg);
+        // Redirect back to list page
+        window.location.href = '/dashboard/move-in-out/relieving';
       } else {
-        toast.error(result.error || 'Failed to approve application');
+        toast.error(result.error || 'Failed to process application');
       }
     } catch {
       toast.error('An unexpected error occurred while approving');
@@ -326,7 +342,7 @@ export function MoveInOutView({ applicationId }: MoveInOutViewProps) {
 
         {/* Action Buttons Section */}
         <div className="flex gap-4 pt-4">
-          {/* Approve */}
+          {/* Verify / Approve */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
@@ -334,15 +350,26 @@ export function MoveInOutView({ applicationId }: MoveInOutViewProps) {
                 className="flex-1 bg-green-600 hover:bg-green-700"
               >
                 <IconCheck className="mr-2 h-4 w-4" />
-                {isApproving ? 'Approving...' : 'Approve'}
+                {isApproving
+                  ? mode === 'verify'
+                    ? 'Verifying...'
+                    : 'Approving...'
+                  : mode === 'verify'
+                    ? 'Verify'
+                    : 'Approve'}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Confirm Approval</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {mode === 'verify'
+                    ? 'Confirm Verification'
+                    : 'Confirm Approval'}
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to approve this move-in-out application?
-                  This will update the records for {data.name}.
+                  {mode === 'verify'
+                    ? `Are you sure you want to verify this move-in-out application for ${data.name}?`
+                    : `Are you sure you want to approve this move-in-out application? This will update the records for ${data.name}.`}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -352,7 +379,7 @@ export function MoveInOutView({ applicationId }: MoveInOutViewProps) {
                   className="bg-green-600 hover:bg-green-700"
                 >
                   <IconCheck className="mr-2 h-4 w-4" />
-                  Yes, Approve
+                  {mode === 'verify' ? 'Yes, Verify' : 'Yes, Approve'}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
