@@ -202,7 +202,7 @@ const originalBirthApplications = [
     gewog_name: 'Chang',
     village_id: '1',
     village_name: 'Motithang',
-    status: 'APPROVED',
+    status: 'ENDORSED',
     createdAt: '2024-09-16T08:00:00Z',
     updatedAt: '2024-09-19T16:45:00Z',
     remarks: 'Application approved - certificate ready for issuance',
@@ -348,10 +348,9 @@ const originalBirthApplications = [
     gewog_name: 'Samtse',
     village_id: '60',
     village_name: 'Samtse Town',
-    status: 'VERIFIED',
+    status: 'SUBMITTED',
     createdAt: '2024-07-23T13:45:00Z',
-    updatedAt: '2024-07-24T09:30:00Z',
-    remarks: 'Verification completed'
+    remarks: 'New application - awaiting verification'
   },
   {
     id: '8',
@@ -397,17 +396,117 @@ const originalBirthApplications = [
     gewog_name: 'Mongar',
     village_id: '68',
     village_name: 'Mongar Town',
-    status: 'APPROVED',
+    status: 'ENDORSED',
     createdAt: '2024-08-31T10:00:00Z',
-    remarks: 'Certificate issued'
+    remarks: 'Certificate issued',
+    assigned: true
+  },
+  {
+    id: '9',
+    applicant_cid: '10501002031',
+    applicant_contact_no: '17778899',
+    applicant_is: 'father',
+    is_born_in_bhutan: true,
+    is_applicant_parent: true,
+    is_epis_registered: true,
+    birth_country_id: '1',
+    birth_country_name: 'Bhutan',
+    birth_dzongkhag_id: '3',
+    birth_dzongkhag_name: 'Punakha',
+    birth_gewog_id: '12',
+    birth_gewog_name: 'Toewang',
+    birth_village_id: '22',
+    birth_village_name: 'Lobeysa',
+    first_name: 'Kinley',
+    middle_name: '',
+    last_name: 'Wangchuk',
+    date_of_birth: '2024-10-05',
+    time_of_birth: '11:20:00',
+    place_of_birth: 'Punakha Hospital',
+    gender: 'Male',
+    weight: 3100,
+    is_mc_valid: true,
+    father_name: 'Tshewang Dorji',
+    father_cid: '10501002032',
+    fathers_contact_no: '17778899',
+    is_father_alive: true,
+    father_approval: 'APPROVED',
+    mother_name: 'Karma Dema',
+    mother_cid: '10501002033',
+    mothers_contact_no: '17889900',
+    is_mother_alive: true,
+    mother_approval: 'APPROVED',
+    house_hold_no: 'HH-009-2024',
+    house_no: 'H-101',
+    tharm_no: 'TH-202',
+    dzongkhag_id: '3',
+    dzongkhag_name: 'Punakha',
+    gewog_id: '12',
+    gewog_name: 'Toewang',
+    village_id: '22',
+    village_name: 'Lobeysa',
+    status: 'ENDORSED',
+    createdAt: '2024-10-06T09:00:00Z',
+    updatedAt: '2024-10-08T11:00:00Z',
+    remarks: 'Endorsed by Local Authority',
+    assigned: true
+  },
+  {
+    id: '10',
+    applicant_cid: '10202003044',
+    applicant_contact_no: '17665544',
+    applicant_is: 'mother',
+    is_born_in_bhutan: true,
+    is_applicant_parent: true,
+    is_epis_registered: false,
+    birth_country_id: '1',
+    birth_country_name: 'Bhutan',
+    birth_dzongkhag_id: '4',
+    birth_dzongkhag_name: 'Trongsa',
+    birth_gewog_id: '18',
+    birth_gewog_name: 'Trongsa',
+    birth_village_id: '35',
+    birth_village_name: 'Trongsa Town',
+    first_name: 'Tenzin',
+    middle_name: 'Lhamo',
+    last_name: 'Zangmo',
+    date_of_birth: '2024-11-20',
+    time_of_birth: '08:45:00',
+    place_of_birth: 'Trongsa Hospital',
+    gender: 'Female',
+    weight: 2870,
+    is_mc_valid: true,
+    father_name: 'Ugyen Tshering',
+    father_cid: '10202003045',
+    fathers_contact_no: '17554433',
+    is_father_alive: true,
+    father_approval: 'APPROVED',
+    mother_name: 'Pema Seldon',
+    mother_cid: '10202003046',
+    mothers_contact_no: '17665544',
+    is_mother_alive: true,
+    mother_approval: 'APPROVED',
+    house_hold_no: 'HH-010-2024',
+    house_no: 'H-203',
+    tharm_no: 'TH-404',
+    dzongkhag_id: '4',
+    dzongkhag_name: 'Trongsa',
+    gewog_id: '18',
+    gewog_name: 'Trongsa',
+    village_id: '35',
+    village_name: 'Trongsa Town',
+    status: 'ENDORSED',
+    createdAt: '2024-11-21T07:30:00Z',
+    updatedAt: '2024-11-22T13:15:00Z',
+    remarks: 'Endorsed by Local Authority',
+    assigned: true
   }
 ];
 
 // Global store to persist data across serverless function calls
 const globalStore = globalThis as any;
-if (!globalStore.birthApplicationsData) {
-  globalStore.birthApplicationsData = [...originalBirthApplications];
-}
+// Always re-initialize to pick up any changes to originalBirthApplications
+globalStore.birthApplicationsData = [...originalBirthApplications];
 
 // Working copy that can be modified
 let dummyBirthApplications = globalStore.birthApplicationsData;
@@ -449,9 +548,9 @@ export async function getSubmittedBirthApplications() {
 }
 
 export async function getMyBirthTaskList() {
-  // Demo: Return dummy data for approve list (APPROVED applications - completed)
+  // Demo: Return dummy data for approve list (ENDORSED applications - assigned for approval)
   const taskList = dummyBirthApplications.filter(
-    (app: any) => app.status === 'APPROVED'
+    (app: any) => app.status === 'ENDORSED' && app.assigned === true
   );
   return {
     success: true,
@@ -461,9 +560,9 @@ export async function getMyBirthTaskList() {
 }
 
 export async function getEndorsedBirthApplications() {
-  // Demo: Return dummy data (ENDORSED status for approve page)
+  // Demo: Return dummy data (ENDORSED status for approve page, not yet assigned)
   const endorsed = dummyBirthApplications.filter(
-    (app: any) => app.status === 'ENDORSED'
+    (app: any) => app.status === 'ENDORSED' && !app.assigned
   );
   return {
     success: true,
