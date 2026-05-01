@@ -186,7 +186,7 @@ export function DeathRegistrationVerifyView({
           {
             name: 'Death Certificate',
             type: 'pdf',
-            url: `/api/death-applications/${applicationId}/certificate`
+            url: data.death_certificate_url
           }
         ]
       : [])
