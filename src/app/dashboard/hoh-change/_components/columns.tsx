@@ -1,12 +1,13 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import { IconEye } from '@tabler/icons-react';
+import { IconEye, IconUserCheck } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { getStatusColor } from '@/lib/status-utils';
+import { toast } from 'sonner';
 
 export interface HohChange {
   id: string;
@@ -24,16 +25,36 @@ export interface HohChange {
   dzongkhagName?: string;
 }
 
-function ActionsCell({ registration }: { registration: HohChange }) {
+interface ActionsCellProps {
+  registration: HohChange;
+  onAssign?: (id: string) => void;
+  onAssignStart?: (id: string) => void;
+  onAssignError?: (id: string) => void;
+  isAssigning?: boolean;
+}
+
+function ActionsCell({
+  registration,
+  onAssign,
+  onAssignStart,
+  onAssignError,
+  isAssigning
+}: ActionsCellProps) {
   const router = useRouter();
 
   const handleClick = () => {
-    console.log(
-      'Navigating to application with applicationNo:',
-      registration.applicationNo
-    );
-    console.log('Full registration data:', registration);
     router.push(`/dashboard/hoh-change/${registration.applicationNo}`);
+  };
+
+  const handleAssignToMe = () => {
+    onAssignStart?.(registration.id);
+    try {
+      toast.success('Task assigned to you successfully');
+      onAssign?.(registration.id);
+    } catch {
+      toast.error('An unexpected error occurred');
+      onAssignError?.(registration.id);
+    }
   };
 
   return (
@@ -41,6 +62,16 @@ function ActionsCell({ registration }: { registration: HohChange }) {
       <Button variant="ghost" size="icon" onClick={handleClick}>
         <IconEye className="h-4 w-4" />
         <span className="sr-only">View Details</span>
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        className="h-8 gap-1.5 border-teal-600 bg-teal-600 text-xs text-white hover:border-teal-700 hover:bg-teal-700 hover:text-white"
+        onClick={handleAssignToMe}
+        disabled={isAssigning}
+      >
+        <IconUserCheck className="h-3.5 w-3.5" />
+        {isAssigning ? 'Assigning...' : 'Assign to me'}
       </Button>
     </div>
   );
@@ -99,6 +130,21 @@ export const columns: ColumnDef<HohChange>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => <ActionsCell registration={row.original} />
+    cell: ({ row, table }) => {
+      const registration = row.original;
+      const meta = table.options.meta as any;
+      const assigningIds = meta?.assigningIds as Set<string> | undefined;
+      const isAssigning = assigningIds?.has(registration.id) ?? false;
+
+      return (
+        <ActionsCell
+          registration={registration}
+          onAssign={meta?.onAssign}
+          onAssignStart={meta?.onAssignStart}
+          onAssignError={meta?.onAssignError}
+          isAssigning={isAssigning}
+        />
+      );
+    }
   }
 ];

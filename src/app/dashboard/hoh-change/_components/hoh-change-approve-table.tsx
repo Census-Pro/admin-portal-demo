@@ -1,12 +1,15 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useQueryState, parseAsString, parseAsInteger } from 'nuqs';
 import { getHohApproveList } from '@/actions/common/hoh-change-actions';
 import { Input } from '@/components/ui/input';
-import { getHohChangeApprovedIds } from '@/lib/cid-assessed-store';
+import {
+  getHohChangeApprovedIds,
+  markHohChangeApproved
+} from '@/lib/cid-assessed-store';
 
 interface HohChangeTableProps<TData> {
   columns: ColumnDef<TData, any>[];
@@ -16,6 +19,7 @@ export function HohChangeApproveTable<TData extends Record<string, any>>({
   columns
 }: HohChangeTableProps<TData>) {
   const [data, setData] = useState<TData[]>([]);
+  const [assigningIds, setAssigningIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [q, setQ] = useQueryState('q', parseAsString.withDefault(''));
@@ -58,6 +62,28 @@ export function HohChangeApproveTable<TData extends Record<string, any>>({
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  const handleAssign = useCallback((id: string) => {
+    markHohChangeApproved(id);
+    setData((prev) => prev.filter((r: any) => r.id !== id));
+    setAssigningIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }, []);
+
+  const handleAssignStart = useCallback((id: string) => {
+    setAssigningIds((prev) => new Set(Array.from(prev).concat(id)));
+  }, []);
+
+  const handleAssignError = useCallback((id: string) => {
+    setAssigningIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   }, []);
 
   const filtered = useMemo(() => {
@@ -115,6 +141,12 @@ export function HohChangeApproveTable<TData extends Record<string, any>>({
         columns={columns}
         data={filtered}
         totalItems={filtered.length}
+        meta={{
+          onAssign: handleAssign,
+          onAssignStart: handleAssignStart,
+          onAssignError: handleAssignError,
+          assigningIds
+        }}
       />
     </div>
   );
