@@ -47,6 +47,11 @@ import {
 } from '@/actions/issuance/nationality-application-actions';
 import { format } from 'date-fns';
 import { NationalityCertificatePreview } from './nationality-certificate-preview';
+import {
+  markNcAssessed,
+  markNcPaymentDone,
+  markNcApprovalDone
+} from '@/lib/nc-assessed-store';
 
 const DUMMY_DATA_MAP: Record<string, NationalityApplicationData> = {
   '1': {
@@ -387,15 +392,32 @@ export function NationalityApplicationView({
     setIsAssessing(true);
     try {
       if (!data?.id) return;
-      const result = await assessNationalityApplication(data.id);
-      if (result.success) {
+      const isDummy = data.id in DUMMY_DATA_MAP;
+      if (from === 'approval') {
+        if (!isDummy) {
+          const result = await assessNationalityApplication(data.id);
+          if (!result.success) {
+            toast.error(result.message || 'Failed to approve application');
+            return;
+          }
+        }
+        markNcApprovalDone(data.id);
+        toast.success('Application approved successfully!');
+        router.push('/dashboard/nationality-certificate/approval');
+      } else {
+        if (!isDummy) {
+          const result = await assessNationalityApplication(data.id);
+          if (!result.success) {
+            toast.error(result.message || 'Failed to assess application');
+            return;
+          }
+        }
+        markNcAssessed(data.id);
         toast.success('Application assessed successfully!');
         router.push('/dashboard/nationality-certificate/assessment');
-      } else {
-        toast.error(result.message || 'Failed to assess application');
       }
     } catch {
-      toast.error('An unexpected error occurred while assessing');
+      toast.error('An unexpected error occurred');
     } finally {
       setIsAssessing(false);
     }
@@ -451,8 +473,10 @@ export function NationalityApplicationView({
     setIsManualPaymentLoading(true);
     try {
       // TODO: Implement manual payment API call
+      if (data?.id) markNcPaymentDone(data.id);
       toast.success('Manual payment processed successfully');
       setManualPaymentOpen(false);
+      router.push('/dashboard/nationality-certificate/payment');
     } catch {
       toast.error('Failed to process manual payment');
     } finally {
@@ -528,7 +552,14 @@ export function NationalityApplicationView({
                   <Label className="text-muted-foreground text-xs font-medium uppercase">
                     Applicant Type
                   </Label>
-                  {data.applicant_is === 'PARENT' ? (
+                  {data.applicant_is === 'SELF' ? (
+                    <Badge
+                      variant="default"
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      {data.applicant_is?.replace(/_/g, ' ') || 'N/A'}
+                    </Badge>
+                  ) : data.applicant_is === 'PARENT' ? (
                     <Badge
                       variant="default"
                       className="bg-purple-600 hover:bg-purple-700"
@@ -559,8 +590,13 @@ export function NationalityApplicationView({
                       data.parent_approval === 'APPROVED'
                         ? 'default'
                         : data.parent_approval === 'PENDING'
-                          ? 'secondary'
+                          ? 'default'
                           : 'destructive'
+                    }
+                    className={
+                      data.parent_approval === 'PENDING'
+                        ? 'bg-orange-500 hover:bg-orange-600'
+                        : ''
                     }
                   >
                     {data.parent_approval || 'N/A'}
@@ -683,9 +719,7 @@ export function NationalityApplicationView({
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         className="bg-green-600 hover:bg-green-700"
-                        onClick={() =>
-                          toast.info('Approval action not yet implemented')
-                        }
+                        onClick={handleAssess}
                       >
                         <IconCheck className="mr-2 h-4 w-4" />
                         Yes, Approve
