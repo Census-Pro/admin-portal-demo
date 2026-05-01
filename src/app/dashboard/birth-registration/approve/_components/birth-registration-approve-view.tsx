@@ -39,11 +39,9 @@ import {
   IconX
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { markBirthApproved } from '@/lib/cid-assessed-store';
 import { BirthCertificateViewer } from '../../_components/birth-certificate-viewer';
-import {
-  updateBirthApplicationStatus,
-  rejectBirthApplication
-} from '@/actions/common/birth-registration-actions';
+import { rejectBirthApplication } from '@/actions/common/birth-registration-actions';
 
 interface BirthRegistrationData {
   applicant_cid: string;
@@ -117,16 +115,9 @@ export function BirthRegistrationApproveView({
   const handleApprove = async () => {
     try {
       setIsApproving(true);
-      const result = await updateBirthApplicationStatus(
-        applicationId,
-        'APPROVED'
-      );
-      if (result.success) {
-        toast.success('Birth registration approved successfully!');
-        router.push('/dashboard/birth-registration/approve');
-      } else {
-        toast.error('Failed to approve birth registration');
-      }
+      markBirthApproved(applicationId);
+      toast.success('Birth registration approved successfully!');
+      router.push('/dashboard/birth-registration/approve');
     } catch {
       toast.error('An unexpected error occurred');
     } finally {

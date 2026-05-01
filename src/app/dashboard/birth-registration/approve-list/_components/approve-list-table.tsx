@@ -5,6 +5,7 @@ import { DataTable } from '@/components/ui/table/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { useQueryState, parseAsString } from 'nuqs';
 import { getMyBirthTaskList } from '@/actions/common/birth-registration-actions';
+import { getBirthApproveListDoneIds } from '@/lib/cid-assessed-store';
 
 interface ApproveListTableProps<TData> {
   columns: ColumnDef<TData, any>[];
@@ -34,7 +35,12 @@ export function ApproveListTable<TData extends Record<string, any>>({
           return;
         }
         if (!isMounted || cancelled) return;
-        setData(result.data as unknown as TData[]);
+        const doneIds = getBirthApproveListDoneIds();
+        setData(
+          (result.data as unknown as TData[]).filter(
+            (r: any) => !doneIds.has(r.id)
+          )
+        );
       } catch (err) {
         if (!isMounted || cancelled) return;
         setError(
