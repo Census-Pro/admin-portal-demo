@@ -41,9 +41,9 @@ import {
   IconSkull
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { markDeathVerified } from '@/lib/cid-assessed-store';
 import {
   getDeathApplicationById,
-  updateDeathApplicationStatus,
   rejectDeathApplication
 } from '@/actions/common/death-registration-actions';
 import { getDzongkhagById } from '@/actions/common/dzongkhag-actions';
@@ -202,16 +202,9 @@ export function DeathRegistrationVerifyView({
   const handleVerify = async () => {
     setIsVerifying(true);
     try {
-      const result = await updateDeathApplicationStatus(
-        applicationId,
-        'VERIFIED'
-      );
-      if (result.success) {
-        toast.success('Death registration verified successfully!');
-        router.push('/dashboard/death-registration/verify');
-      } else {
-        toast.error('Failed to verify death registration');
-      }
+      markDeathVerified(applicationId);
+      toast.success('Death registration verified successfully!');
+      router.push('/dashboard/death-registration/verify');
     } catch {
       toast.error('An unexpected error occurred while verifying');
     } finally {

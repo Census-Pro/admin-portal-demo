@@ -41,8 +41,8 @@ import {
   IconSkull
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { markDeathEndorsed } from '@/lib/cid-assessed-store';
 import {
-  updateDeathApplicationStatus,
   rejectDeathApplication,
   getDeathApplicationById
 } from '@/actions/common/death-registration-actions';
@@ -206,16 +206,9 @@ export function DeathRegistrationEndorseView({
   const handleEndorse = async () => {
     setIsEndorsing(true);
     try {
-      const result = await updateDeathApplicationStatus(
-        applicationId,
-        'ENDORSED'
-      );
-      if (result.success) {
-        toast.success('Death registration endorsed successfully!');
-        router.push('/dashboard/death-registration/endorse');
-      } else {
-        toast.error('Failed to endorse death registration');
-      }
+      markDeathEndorsed(applicationId);
+      toast.success('Death registration endorsed successfully!');
+      router.push('/dashboard/death-registration/endorse');
     } catch {
       toast.error('An unexpected error occurred while endorsing');
     } finally {
