@@ -44,9 +44,12 @@ import {
 import { getStatusColor } from '@/lib/status-utils';
 import {
   getDeathApplicationById,
-  updateDeathApplicationStatus,
   rejectDeathApplication
 } from '@/actions/common/death-registration-actions';
+import {
+  markDeathApproved,
+  markDeathApproveListDone
+} from '@/lib/cid-assessed-store';
 import { getDzongkhagById } from '@/actions/common/dzongkhag-actions';
 import { getGewogById } from '@/actions/common/gewog-actions';
 import { getChiwogById } from '@/actions/common/chiwog-actions';
@@ -202,16 +205,10 @@ export function DeathRegistrationApproveView({
   const handleApprove = async () => {
     try {
       setIsApproving(true);
-      const result = await updateDeathApplicationStatus(
-        applicationId,
-        'APPROVED'
-      );
-      if (result.success) {
-        toast.success('Death registration approved successfully!');
-        router.push('/dashboard/death-registration/approve');
-      } else {
-        toast.error('Failed to approve death registration');
-      }
+      markDeathApproved(applicationId);
+      markDeathApproveListDone(applicationId);
+      toast.success('Death registration approved successfully!');
+      router.push('/dashboard/death-registration/approve');
     } catch {
       toast.error('An unexpected error occurred');
     } finally {

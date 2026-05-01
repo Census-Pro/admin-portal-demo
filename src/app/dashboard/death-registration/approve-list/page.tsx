@@ -1,8 +1,7 @@
 import PageContainer from '@/components/layout/page-container';
 import { approveListColumns } from './_components/approve-list-columns';
 import { ApproveListSearchBar } from './_components/search-bar';
-import { DeathApplicationsTable } from '../_components/death-applications-table';
-import { getMyDeathTaskList } from '@/actions/common/death-registration-actions';
+import { ApproveListTable } from './_components/approve-list-table';
 
 export const metadata = {
   title: 'Death Registration - Approve List'
@@ -16,10 +15,7 @@ export default function DeathRegistrationApproveListPage() {
     >
       <div className="space-y-4">
         <ApproveListSearchBar />
-        <DeathApplicationsTable
-          columns={approveListColumns}
-          fetchFn={getMyDeathTaskList}
-        />
+        <ApproveListTable columns={approveListColumns} />
       </div>
     </PageContainer>
   );
