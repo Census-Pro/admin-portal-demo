@@ -74,8 +74,8 @@ export const getStatusColor = (status: string) => {
     };
   }
 
-  // Verified / Successful -> Green
-  if (['verified', 'successful', 'collected', 'printed'].includes(s)) {
+  // Verified / Successful / Paid -> Green
+  if (['verified', 'successful', 'collected', 'printed', 'paid'].includes(s)) {
     return {
       variant: 'outline' as const,
       className: 'border-green-600 bg-green-600 text-white'
