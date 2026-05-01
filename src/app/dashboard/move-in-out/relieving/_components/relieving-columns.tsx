@@ -68,7 +68,14 @@ export const columns: ColumnDef<MoveInOutApplication>[] = [
     cell: ({ row }) => {
       const value = row.getValue('inter_dzongkhag') as string;
       return (
-        <Badge variant={value === 'YES' ? 'default' : 'secondary'}>
+        <Badge
+          variant="default"
+          className={
+            value === 'YES'
+              ? 'bg-green-600 text-white hover:bg-green-700'
+              : 'bg-red-600 text-white hover:bg-red-700'
+          }
+        >
           {value}
         </Badge>
       );
@@ -79,7 +86,20 @@ export const columns: ColumnDef<MoveInOutApplication>[] = [
     header: 'Area Type',
     cell: ({ row }) => {
       const value = row.getValue('area_type') as string;
-      return <Badge variant="outline">{value}</Badge>;
+      return (
+        <Badge
+          variant="default"
+          className={
+            value === 'URBAN'
+              ? 'bg-purple-600 text-white hover:bg-purple-700'
+              : value === 'RURAL'
+                ? 'bg-teal-600 text-white hover:bg-teal-700'
+                : 'bg-gray-600 text-white hover:bg-gray-700'
+          }
+        >
+          {value}
+        </Badge>
+      );
     }
   },
   {
