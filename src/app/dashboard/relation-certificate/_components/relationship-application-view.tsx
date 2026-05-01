@@ -44,6 +44,11 @@ import {
   getRelationshipApplicationById,
   assessRelationshipApplication
 } from '@/actions/issuance/relationship-application-actions';
+import {
+  markRcAssessed,
+  markRcPaymentDone,
+  markRcApprovalDone
+} from '@/lib/rc-assessed-store';
 import { format } from 'date-fns';
 import { RelationshipCertificatePreview } from './relationship-certificate-preview';
 
@@ -399,15 +404,32 @@ export function RelationshipApplicationView({
     setIsAssessing(true);
     try {
       if (!data?.id) return;
-      const result = await assessRelationshipApplication(data.id);
-      if (result.success) {
+      const isDummy = data.id in DUMMY_DATA_MAP;
+      if (from === 'approval') {
+        if (!isDummy) {
+          const result = await assessRelationshipApplication(data.id);
+          if (!result.success) {
+            toast.error(result.message || 'Failed to approve application');
+            return;
+          }
+        }
+        markRcApprovalDone(data.id);
+        toast.success('Application approved successfully!');
+        router.push('/dashboard/relation-certificate/approval');
+      } else {
+        if (!isDummy) {
+          const result = await assessRelationshipApplication(data.id);
+          if (!result.success) {
+            toast.error(result.message || 'Failed to assess application');
+            return;
+          }
+        }
+        markRcAssessed(data.id);
         toast.success('Application assessed successfully!');
         router.push('/dashboard/relation-certificate/assessment');
-      } else {
-        toast.error(result.message || 'Failed to assess application');
       }
     } catch {
-      toast.error('An unexpected error occurred while assessing');
+      toast.error('An unexpected error occurred');
     } finally {
       setIsAssessing(false);
     }
@@ -464,8 +486,10 @@ export function RelationshipApplicationView({
     setIsManualPaymentLoading(true);
     try {
       // TODO: Implement manual payment API call
+      if (data?.id) markRcPaymentDone(data.id);
       toast.success('Manual payment processed successfully');
       setManualPaymentOpen(false);
+      router.push('/dashboard/relation-certificate/payment');
     } catch {
       toast.error('Failed to process manual payment');
     } finally {
