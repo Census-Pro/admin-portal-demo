@@ -69,17 +69,19 @@ export default async function EndorseDetailPage({
   const enrichedData = {
     ...appData,
     dzongkhag_name:
-      dzongkhagRes && !dzongkhagRes.error
+      dzongkhagRes && 'name' in dzongkhagRes
         ? dzongkhagRes.name
         : (appData as any).dzongkhag_name,
     gewog_name:
-      gewogRes && !gewogRes.error ? gewogRes.name : (appData as any).gewog_name,
+      gewogRes && 'name' in gewogRes
+        ? gewogRes.name
+        : (appData as any).gewog_name,
     chiwog_name:
-      chiwogRes && !chiwogRes.error
+      chiwogRes && 'name' in chiwogRes
         ? chiwogRes.name
         : (appData as any).chiwog_name,
     village_name:
-      villageRes && !villageRes.error
+      villageRes && 'name' in villageRes
         ? villageRes.name
         : (appData as any).village_name
   };
