@@ -133,8 +133,14 @@ export const columns: ColumnDef<CIDApplication>[] = [
     header: 'Status',
     cell: ({ row }) => {
       const status = row.getValue('status') as string;
+      if (status === 'PAID') {
+        return (
+          <Badge className="bg-green-600 text-white uppercase hover:bg-green-700">
+            {status}
+          </Badge>
+        );
+      }
       const { variant, className } = getStatusColor(status);
-
       return (
         <Badge variant={variant} className={`uppercase ${className}`}>
           {status}

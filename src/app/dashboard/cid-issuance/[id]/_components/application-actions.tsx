@@ -24,7 +24,13 @@ import { toast } from 'sonner';
 import {
   markCidAssessed,
   markCidPaymentDone,
-  markCidApprovalDone
+  markCidApprovalDone,
+  markCidRenewalAssessed,
+  markCidRenewalPaymentDone,
+  markCidRenewalApprovalDone,
+  markCidReplacementAssessed,
+  markCidReplacementPaymentDone,
+  markCidReplacementApprovalDone
 } from '@/lib/cid-assessed-store';
 
 interface ApplicationActionsProps {
@@ -32,6 +38,7 @@ interface ApplicationActionsProps {
     id: string;
     status: string;
     application_no: string;
+    applicationType?: 'fresh' | 'renewal' | 'replacement';
   };
 }
 
@@ -45,22 +52,58 @@ interface ManualPaymentForm {
 
 export function ApplicationActions({ application }: ApplicationActionsProps) {
   const router = useRouter();
+
+  const appType =
+    application.applicationType ??
+    (application.id.startsWith('dummy-renewal')
+      ? 'renewal'
+      : application.id.startsWith('dummy-replacement')
+        ? 'replacement'
+        : 'fresh');
+
+  const defaultAmount = appType === 'replacement' ? 300 : 100;
+
   const [isLoading, setIsLoading] = useState(false);
   const [manualPaymentOpen, setManualPaymentOpen] = useState(false);
   const [form, setForm] = useState<ManualPaymentForm>({
-    totalAmount: 300,
+    totalAmount: defaultAmount,
     transactionNo: '',
     transactionDate: '',
     remarks: '',
     attachment: null
   });
 
+  const assessmentRoute = `/dashboard/cid-issuance/${appType}/assessment`;
+  const paymentRoute = `/dashboard/cid-issuance/${appType}/payment`;
+  const approvalRoute = `/dashboard/cid-issuance/${appType}/approval`;
+
+  const markAssessed =
+    appType === 'renewal'
+      ? markCidRenewalAssessed
+      : appType === 'replacement'
+        ? markCidReplacementAssessed
+        : markCidAssessed;
+
+  const markPaymentDone =
+    appType === 'renewal'
+      ? markCidRenewalPaymentDone
+      : appType === 'replacement'
+        ? markCidReplacementPaymentDone
+        : markCidPaymentDone;
+
+  const markApprovalDone =
+    appType === 'renewal'
+      ? markCidRenewalApprovalDone
+      : appType === 'replacement'
+        ? markCidReplacementApprovalDone
+        : markCidApprovalDone;
+
   const handleAssess = async () => {
     setIsLoading(true);
     try {
-      markCidAssessed(application.id);
+      markAssessed(application.id);
       toast.success('Application assessed successfully!');
-      router.push('/dashboard/cid-issuance/fresh/assessment');
+      router.push(assessmentRoute);
     } catch {
       toast.error('An unexpected error occurred');
     } finally {
@@ -87,10 +130,10 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
     try {
       // TODO: Implement manual payment API call
       console.log('Processing manual payment for:', application.id, form);
-      markCidPaymentDone(application.id);
+      markPaymentDone(application.id);
       toast.success('Manual payment processed successfully');
       setManualPaymentOpen(false);
-      router.push('/dashboard/cid-issuance/fresh/payment');
+      router.push(paymentRoute);
     } catch (error) {
       console.error('Error processing manual payment:', error);
       toast.error('Failed to process manual payment');
@@ -101,7 +144,7 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
 
   const renderActionButtons = () => {
     switch (application.status) {
-      case 'PAYMENT_VERIFIED':
+      case 'PAID':
         return (
           <>
             <Button
@@ -109,9 +152,9 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
               className="flex-1 bg-green-600 hover:bg-green-700"
               disabled={isLoading}
               onClick={() => {
-                markCidApprovalDone(application.id);
+                markApprovalDone(application.id);
                 toast.success('Application approved successfully!');
-                router.push('/dashboard/cid-issuance/fresh/approval');
+                router.push(approvalRoute);
               }}
             >
               <IconThumbUp className="mr-2 h-4 w-4" />

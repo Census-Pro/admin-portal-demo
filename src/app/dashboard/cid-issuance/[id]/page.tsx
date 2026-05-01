@@ -12,7 +12,8 @@ import {
   IconFileText,
   IconUsers,
   IconShieldCheck,
-  IconInfoCircle
+  IconInfoCircle,
+  IconCreditCard
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
 import { getCIDApplicationById } from '@/actions/issuance/cid-issuance-actions';
@@ -278,6 +279,51 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
                 </div>
 
                 <Separator />
+
+                {/* Payment Details — shown for ASSESSED status */}
+                {application.status === 'ASSESSED' && (
+                  <>
+                    <div className="space-y-3">
+                      <h3 className="flex items-center gap-2 text-sm font-semibold">
+                        <IconCreditCard className="h-4 w-4" />
+                        Payment Details
+                      </h3>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-4">
+                          <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                            Fee Amount
+                          </Label>
+                          <p className="flex-1 text-sm font-medium">
+                            Nu. {(application.payment_amount ?? 0).toFixed(2)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <Label className="text-muted-foreground w-48 text-right text-xs font-medium uppercase">
+                            Payment Status
+                          </Label>
+                          <div className="flex-1">
+                            <Badge
+                              variant={
+                                application.payment_status === 'PAID'
+                                  ? 'default'
+                                  : 'default'
+                              }
+                              className={
+                                application.payment_status === 'PAID'
+                                  ? 'bg-green-600 text-white uppercase hover:bg-green-700'
+                                  : 'bg-yellow-600 text-white uppercase hover:bg-yellow-700'
+                              }
+                            >
+                              {application.payment_status ?? 'PENDING'}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+                  </>
+                )}
 
                 {/* Action Buttons */}
                 <ApplicationActions application={application} />
