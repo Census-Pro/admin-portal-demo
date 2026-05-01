@@ -155,15 +155,33 @@ export function DeathRegistrationVerifyView({
 
         setData({
           ...app,
-          dzongkhag_name: dzongkhagRes?.name ?? undefined,
-          gewog_name: gewogRes?.name ?? undefined,
-          chiwog_name: chiwogRes?.name ?? undefined,
-          village_name: villageRes?.name ?? undefined,
-          dzongkhag_of_death_name: dzongkhagOfDeathRes?.name ?? undefined,
-          gewog_of_death_name: gewogOfDeathRes?.name ?? undefined,
-          village_of_death_name: villageOfDeathRes?.name ?? undefined,
-          country_of_death_name: countryOfDeathRes?.name ?? undefined,
-          city_name: cityRes?.name ?? undefined
+          dzongkhag_name:
+            dzongkhagRes && 'name' in dzongkhagRes
+              ? dzongkhagRes.name
+              : undefined,
+          gewog_name:
+            gewogRes && 'name' in gewogRes ? gewogRes.name : undefined,
+          chiwog_name:
+            chiwogRes && 'name' in chiwogRes ? chiwogRes.name : undefined,
+          village_name:
+            villageRes && 'name' in villageRes ? villageRes.name : undefined,
+          dzongkhag_of_death_name:
+            dzongkhagOfDeathRes && 'name' in dzongkhagOfDeathRes
+              ? dzongkhagOfDeathRes.name
+              : undefined,
+          gewog_of_death_name:
+            gewogOfDeathRes && 'name' in gewogOfDeathRes
+              ? gewogOfDeathRes.name
+              : undefined,
+          village_of_death_name:
+            villageOfDeathRes && 'name' in villageOfDeathRes
+              ? villageOfDeathRes.name
+              : undefined,
+          country_of_death_name:
+            countryOfDeathRes && 'name' in countryOfDeathRes
+              ? countryOfDeathRes.name
+              : undefined,
+          city_name: cityRes && 'name' in cityRes ? cityRes.name : undefined
         });
       } catch (err) {
         if (!cancelled)
