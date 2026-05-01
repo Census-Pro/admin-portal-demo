@@ -252,9 +252,10 @@ const originalBirthApplications = [
     gewog_name: 'Chhoekhor',
     village_id: '42',
     village_name: 'Jakar',
-    status: 'SUBMITTED',
+    status: 'VERIFIED',
     createdAt: '2024-05-13T16:00:00Z',
-    remarks: ''
+    updatedAt: '2024-05-14T09:30:00Z',
+    remarks: 'Documents verified by verifier'
   },
   {
     id: '6',
@@ -402,8 +403,14 @@ const originalBirthApplications = [
   }
 ];
 
-// Working copy that can be modified (starts as a copy of original)
-let dummyBirthApplications = [...originalBirthApplications];
+// Global store to persist data across serverless function calls
+const globalStore = globalThis as any;
+if (!globalStore.birthApplicationsData) {
+  globalStore.birthApplicationsData = [...originalBirthApplications];
+}
+
+// Working copy that can be modified
+let dummyBirthApplications = globalStore.birthApplicationsData;
 
 export type BirthApplicationStatus =
   | 'PENDING'
@@ -420,7 +427,7 @@ export async function getBirthApplicationsByStatus(
   // For approve page, return ENDORSED applications when VERIFIED is requested
   const targetStatus = status === 'VERIFIED' ? 'ENDORSED' : status;
   const filtered = dummyBirthApplications.filter(
-    (app) => app.status === targetStatus
+    (app: any) => app.status === targetStatus
   );
   return {
     success: true,
@@ -432,7 +439,7 @@ export async function getBirthApplicationsByStatus(
 export async function getSubmittedBirthApplications() {
   // Demo: Return dummy data
   const submitted = dummyBirthApplications.filter(
-    (app) => app.status === 'SUBMITTED'
+    (app: any) => app.status === 'SUBMITTED'
   );
   return {
     success: true,
@@ -444,7 +451,7 @@ export async function getSubmittedBirthApplications() {
 export async function getMyBirthTaskList() {
   // Demo: Return dummy data for approve list (APPROVED applications - completed)
   const taskList = dummyBirthApplications.filter(
-    (app) => app.status === 'APPROVED'
+    (app: any) => app.status === 'APPROVED'
   );
   return {
     success: true,
@@ -454,9 +461,9 @@ export async function getMyBirthTaskList() {
 }
 
 export async function getEndorsedBirthApplications() {
-  // Demo: Return dummy data (VERIFIED status for endorse page)
+  // Demo: Return dummy data (ENDORSED status for approve page)
   const endorsed = dummyBirthApplications.filter(
-    (app) => app.status === 'VERIFIED'
+    (app: any) => app.status === 'ENDORSED'
   );
   return {
     success: true,
@@ -466,9 +473,9 @@ export async function getEndorsedBirthApplications() {
 }
 
 export async function getVerifiedBirthApplications() {
-  // Demo: Return dummy data (ENDORSED status for approve page)
+  // Demo: Return dummy data (VERIFIED status for endorse page)
   const verified = dummyBirthApplications.filter(
-    (app) => app.status === 'ENDORSED'
+    (app: any) => app.status === 'VERIFIED'
   );
   return {
     success: true,
@@ -532,12 +539,24 @@ export async function getBirthRegistrations() {
 }
 
 export async function rejectBirthApplication(id: string, remarks: string) {
-  // Demo: Return success
+  // Demo: Update the dummy data status
   console.log(
     '[rejectBirthApplication] Demo: Rejecting application',
     id,
     remarks
   );
+
+  // Find and update the application in dummy data
+  const applicationIndex = dummyBirthApplications.findIndex(
+    (app: any) => app.id === id
+  );
+  if (applicationIndex !== -1) {
+    dummyBirthApplications[applicationIndex].status = 'REJECTED';
+    dummyBirthApplications[applicationIndex].updatedAt =
+      new Date().toISOString();
+    dummyBirthApplications[applicationIndex].remarks = remarks;
+  }
+
   return {
     success: true,
     data: { id, status: 'REJECTED', remarks }
@@ -549,12 +568,26 @@ export async function updateBirthApplicationStatus(
   status: BirthApplicationStatus,
   remarks?: string
 ) {
-  // Demo: Return success
+  // Demo: Update the dummy data status
   console.log(
     '[updateBirthApplicationStatus] Demo: Updating status',
     id,
     status
   );
+
+  // Find and update the application in dummy data
+  const applicationIndex = dummyBirthApplications.findIndex(
+    (app: any) => app.id === id
+  );
+  if (applicationIndex !== -1) {
+    dummyBirthApplications[applicationIndex].status = status;
+    dummyBirthApplications[applicationIndex].updatedAt =
+      new Date().toISOString();
+    if (remarks) {
+      dummyBirthApplications[applicationIndex].remarks = remarks;
+    }
+  }
+
   return {
     success: true,
     data: { id, status, remarks: remarks || '' }
@@ -621,7 +654,7 @@ export async function getBirthRegistrationById(id: string) {
 
 export async function getBirthApplicationById(id: string) {
   // Demo: Return dummy data
-  const application = dummyBirthApplications.find((app) => app.id === id);
+  const application = dummyBirthApplications.find((app: any) => app.id === id);
   if (application) {
     return { success: true, data: application };
   }
@@ -629,5 +662,20 @@ export async function getBirthApplicationById(id: string) {
     success: false,
     error: 'Birth application not found',
     data: null
+  };
+}
+
+export async function resetBirthApplicationsData() {
+  // Reset to original data
+  dummyBirthApplications.length = 0; // Clear current array
+  dummyBirthApplications.push(...originalBirthApplications); // Restore original data
+
+  // Also update global store
+  const globalStore = globalThis as any;
+  globalStore.birthApplicationsData = dummyBirthApplications;
+
+  return {
+    success: true,
+    message: 'All birth applications data has been reset to original state'
   };
 }

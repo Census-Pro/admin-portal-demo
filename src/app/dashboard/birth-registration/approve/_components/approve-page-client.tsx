@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { ApproveSearchBar } from './search-bar';
 import { columns } from './approve-columns';
 import { DataTable } from '@/components/ui/table/data-table';
-import { getVerifiedBirthApplications } from '@/actions/common/birth-registration-actions';
+import { getEndorsedBirthApplications } from '@/actions/common/birth-registration-actions';
 
 interface BirthRegistration {
   id: string;
@@ -32,7 +32,7 @@ export function ApprovePageClient() {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getVerifiedBirthApplications();
+        const result = await getEndorsedBirthApplications();
         if (cancelled) return;
 
         if (!result.success) {
