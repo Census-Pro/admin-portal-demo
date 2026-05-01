@@ -46,7 +46,7 @@ export function ApprovePageClient() {
 
         const approvedIds = getDeathApprovedIds();
         setData(
-          (result.data as DeathRegistration[]).filter(
+          (result.data as unknown as DeathRegistration[]).filter(
             (r) => !approvedIds.has(r.id)
           )
         );
