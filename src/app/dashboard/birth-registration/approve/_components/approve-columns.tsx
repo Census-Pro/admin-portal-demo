@@ -22,7 +22,12 @@ interface BirthRegistration {
   createdAt?: string;
 }
 
-function ActionsCell({ registration }: { registration: BirthRegistration }) {
+interface ActionsCellProps {
+  registration: BirthRegistration;
+  onAssign?: (id: string) => void;
+}
+
+export function ActionsCell({ registration, onAssign }: ActionsCellProps) {
   const router = useRouter();
   const [isAssigning, setIsAssigning] = useState(false);
   const [isAssigned, setIsAssigned] = useState(false);
@@ -34,7 +39,8 @@ function ActionsCell({ registration }: { registration: BirthRegistration }) {
       if (result.success) {
         setIsAssigned(true);
         toast.success('Task assigned to you successfully');
-        setTimeout(() => router.refresh(), 1000);
+        // Call the onAssign callback to hide the row
+        onAssign?.(registration.id);
       } else {
         toast.error('Failed to assign task');
       }
@@ -150,9 +156,11 @@ export const columns: ColumnDef<BirthRegistration>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const registration = row.original;
-      return <ActionsCell registration={registration} />;
+      // Get onAssign from table meta if provided
+      const onAssign = (table.options.meta as any)?.onAssign;
+      return <ActionsCell registration={registration} onAssign={onAssign} />;
     }
   }
 ];

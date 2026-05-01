@@ -51,6 +51,7 @@ interface DataTableProps<TData, TValue> {
   totalItems: number;
   pageSizeOptions?: number[];
   className?: string;
+  meta?: any;
 }
 
 export function DataTable<TData, TValue>({
@@ -58,7 +59,8 @@ export function DataTable<TData, TValue>({
   className,
   data,
   totalItems,
-  pageSizeOptions = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  pageSizeOptions = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+  meta
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [currentPage, setCurrentPage] = useQueryState(
@@ -107,7 +109,8 @@ export function DataTable<TData, TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     manualPagination: true,
-    manualFiltering: true
+    manualFiltering: true,
+    meta
   });
 
   return (
