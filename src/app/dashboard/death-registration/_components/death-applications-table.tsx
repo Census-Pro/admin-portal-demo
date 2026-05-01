@@ -7,6 +7,10 @@ import {
   getDeathApplicationsByStatus,
   DeathApplicationStatus
 } from '@/actions/common/death-registration-actions';
+import {
+  getDeathVerifiedIds,
+  getDeathEndorsedIds
+} from '@/lib/cid-assessed-store';
 
 type FetchResult = {
   success: boolean;
@@ -45,8 +49,13 @@ export function DeathApplicationsTable<TData>({
             setError(result.error ?? 'Failed to fetch applications');
             return;
           }
-          setData(result.data as TData[]);
-          setTotalItems(result.total_count ?? result.data.length);
+          const verifiedIds = getDeathVerifiedIds();
+          const endorsedIds = getDeathEndorsedIds();
+          const filtered = (result.data as TData[]).filter(
+            (r: any) => !verifiedIds.has(r.id) && !endorsedIds.has(r.id)
+          );
+          setData(filtered);
+          setTotalItems(filtered.length);
         } else if (status) {
           const statuses = Array.isArray(status) ? status : [status];
           const results = await Promise.all(
