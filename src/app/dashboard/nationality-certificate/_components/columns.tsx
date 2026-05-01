@@ -69,6 +69,15 @@ export const columns: ColumnDef<NationalityApplication>[] = [
       const type = row.getValue('applicant_is') as string;
       const formattedType = type?.replace(/_/g, ' ') || 'N/A';
 
+      // Add specific color for SELF type
+      if (type === 'SELF') {
+        return (
+          <Badge variant="default" className="bg-blue-600 hover:bg-blue-700">
+            {formattedType}
+          </Badge>
+        );
+      }
+
       // Add specific color for PARENT type
       if (type === 'PARENT') {
         return (
@@ -119,8 +128,11 @@ export const columns: ColumnDef<NationalityApplication>[] = [
             approval === 'APPROVED'
               ? 'default'
               : approval === 'PENDING'
-                ? 'secondary'
+                ? 'default'
                 : 'destructive'
+          }
+          className={
+            approval === 'PENDING' ? 'bg-orange-500 hover:bg-orange-600' : ''
           }
         >
           {approval || 'N/A'}

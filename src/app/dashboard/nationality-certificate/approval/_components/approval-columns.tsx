@@ -80,7 +80,11 @@ export const approvalColumns: ColumnDef<NationalityApplicationApproval>[] = [
     header: 'Applicant Type',
     cell: ({ row }) => {
       const type = row.getValue('applicant_is') as string;
-      return type === 'PARENT' ? (
+      return type === 'SELF' ? (
+        <Badge className="bg-blue-600 text-white hover:bg-blue-700">
+          {type?.replace(/_/g, ' ') || 'N/A'}
+        </Badge>
+      ) : type === 'PARENT' ? (
         <Badge className="bg-purple-600 text-white hover:bg-purple-700">
           {type?.replace(/_/g, ' ') || 'N/A'}
         </Badge>
