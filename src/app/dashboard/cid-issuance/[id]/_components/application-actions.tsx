@@ -11,9 +11,21 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { IconBell, IconCash } from '@tabler/icons-react';
+import {
+  IconBell,
+  IconCash,
+  IconCheck,
+  IconThumbUp,
+  IconX
+} from '@tabler/icons-react';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import {
+  markCidAssessed,
+  markCidPaymentDone,
+  markCidApprovalDone
+} from '@/lib/cid-assessed-store';
 
 interface ApplicationActionsProps {
   application: {
@@ -32,6 +44,7 @@ interface ManualPaymentForm {
 }
 
 export function ApplicationActions({ application }: ApplicationActionsProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [manualPaymentOpen, setManualPaymentOpen] = useState(false);
   const [form, setForm] = useState<ManualPaymentForm>({
@@ -41,6 +54,19 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
     remarks: '',
     attachment: null
   });
+
+  const handleAssess = async () => {
+    setIsLoading(true);
+    try {
+      markCidAssessed(application.id);
+      toast.success('Application assessed successfully!');
+      router.push('/dashboard/cid-issuance/fresh/assessment');
+    } catch {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSendPaymentNotification = async () => {
     setIsLoading(true);
@@ -61,8 +87,10 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
     try {
       // TODO: Implement manual payment API call
       console.log('Processing manual payment for:', application.id, form);
+      markCidPaymentDone(application.id);
       toast.success('Manual payment processed successfully');
       setManualPaymentOpen(false);
+      router.push('/dashboard/cid-issuance/fresh/payment');
     } catch (error) {
       console.error('Error processing manual payment:', error);
       toast.error('Failed to process manual payment');
@@ -73,7 +101,54 @@ export function ApplicationActions({ application }: ApplicationActionsProps) {
 
   const renderActionButtons = () => {
     switch (application.status) {
+      case 'PAYMENT_VERIFIED':
+        return (
+          <>
+            <Button
+              variant="default"
+              className="flex-1 bg-green-600 hover:bg-green-700"
+              disabled={isLoading}
+              onClick={() => {
+                markCidApprovalDone(application.id);
+                toast.success('Application approved successfully!');
+                router.push('/dashboard/cid-issuance/fresh/approval');
+              }}
+            >
+              <IconThumbUp className="mr-2 h-4 w-4" />
+              {isLoading ? 'Approving...' : 'Approve'}
+            </Button>
+            <Button
+              variant="default"
+              className="flex-1 bg-red-600 hover:bg-red-700"
+              disabled={isLoading}
+            >
+              <IconX className="mr-2 h-4 w-4" />
+              Reject
+            </Button>
+          </>
+        );
       case 'SUBMITTED':
+        return (
+          <>
+            <Button
+              variant="default"
+              className="flex-1 bg-green-600 hover:bg-green-700"
+              disabled={isLoading}
+              onClick={handleAssess}
+            >
+              <IconCheck className="mr-2 h-4 w-4" />
+              {isLoading ? 'Assessing...' : 'Assess'}
+            </Button>
+            <Button
+              variant="default"
+              className="flex-1 bg-red-600 hover:bg-red-700"
+              disabled={isLoading}
+            >
+              <IconX className="mr-2 h-4 w-4" />
+              Reject
+            </Button>
+          </>
+        );
       case 'ASSESSED':
         return (
           <>

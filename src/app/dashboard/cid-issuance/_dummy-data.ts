@@ -1,7 +1,7 @@
 // ============================================================
 // DUMMY DATA — remove this file and all imports when no longer needed
 // Used in:
-//   - fresh/assessment/page.tsx   (pinned top row)
+//   - fresh/assessment/page.tsx   (pinned top rows)
 //   - [id]/page.tsx               (detail page fallback)
 // ============================================================
 
@@ -28,3 +28,216 @@ export const DUMMY_CID_APPLICATION = {
   createdAt: '2026-04-28T08:00:00.000Z',
   updatedAt: '2026-04-28T08:00:00.000Z'
 };
+
+export const DUMMY_CID_APPLICATIONS = [
+  DUMMY_CID_APPLICATION,
+  {
+    id: 'dummy-fresh-002',
+    application_no: 'APP-FRESH-0002',
+    applicant_cid_no: '11410005678',
+    applicant_contact_no: '17234567',
+    cid_no: '11410005678',
+    first_name: 'Karma',
+    middle_name: undefined as string | undefined,
+    last_name: 'Wangchuk',
+    parent_cid_no: '11208009012',
+    parent_contact_no: '17765432',
+    payment_type_id: '11120b08-685f-4767-862e-1d73b9b24023',
+    parent_approval: 'APPROVED',
+    date_of_birth: '2012-07-22',
+    reasons_id: '',
+    photo_url: '/dummyCurrentPic.jpg',
+    census_photo_url: '/dummyPastPic.jpg',
+    face_match_score: 87.5,
+    place_of_collection: 'Paro',
+    status: 'SUBMITTED',
+    createdAt: '2026-04-29T09:30:00.000Z',
+    updatedAt: '2026-04-29T09:30:00.000Z'
+  },
+  {
+    id: 'dummy-fresh-003',
+    application_no: 'APP-FRESH-0003',
+    applicant_cid_no: '11410009999',
+    applicant_contact_no: '17345678',
+    cid_no: '11410009999',
+    first_name: 'Pema',
+    middle_name: undefined as string | undefined,
+    last_name: 'Lhamo',
+    parent_cid_no: '11208003456',
+    parent_contact_no: '17876543',
+    payment_type_id: '11120b08-685f-4767-862e-1d73b9b24023',
+    parent_approval: 'PENDING',
+    date_of_birth: '2015-01-10',
+    reasons_id: '',
+    photo_url: '/dummyCurrentPic.jpg',
+    census_photo_url: '/dummyPastPic.jpg',
+    face_match_score: 79.3,
+    place_of_collection: 'Punakha',
+    status: 'SUBMITTED',
+    createdAt: '2026-04-30T11:00:00.000Z',
+    updatedAt: '2026-04-30T11:00:00.000Z'
+  }
+];
+
+export const DUMMY_CID_APPROVAL_APPLICATIONS = [
+  {
+    id: 'dummy-approval-001',
+    application_no: 'APP-FRESH-0001',
+    applicant_cid_no: '11410001234',
+    applicant_contact_no: '17123456',
+    cid_no: '11410001234',
+    first_name: 'Assesh',
+    middle_name: '' as string | undefined,
+    last_name: 'Nepal',
+    parent_cid_no: '11208005678',
+    parent_contact_no: '17654321',
+    payment_type_id: '11120b08-685f-4767-862e-1d73b9b24023',
+    parent_approval: 'APPROVED',
+    date_of_birth: '2010-03-15',
+    reasons_id: '',
+    photo_url: '/dummyCurrentPic.jpg',
+    place_of_collection: 'Thimphu',
+    status: 'PAYMENT_VERIFIED',
+    createdAt: '2026-04-28T08:00:00.000Z',
+    updatedAt: '2026-05-01T09:00:00.000Z'
+  },
+  {
+    id: 'dummy-approval-002',
+    application_no: 'APP-FRESH-0002',
+    applicant_cid_no: '11410005678',
+    applicant_contact_no: '17234567',
+    cid_no: '11410005678',
+    first_name: 'Karma',
+    middle_name: undefined as string | undefined,
+    last_name: 'Wangchuk',
+    parent_cid_no: '11208009012',
+    parent_contact_no: '17765432',
+    payment_type_id: '11120b08-685f-4767-862e-1d73b9b24023',
+    parent_approval: 'APPROVED',
+    date_of_birth: '2012-07-22',
+    reasons_id: '',
+    photo_url: '/dummyCurrentPic.jpg',
+    place_of_collection: 'Paro',
+    status: 'PAYMENT_VERIFIED',
+    createdAt: '2026-04-29T09:30:00.000Z',
+    updatedAt: '2026-05-01T10:00:00.000Z'
+  },
+  {
+    id: 'dummy-approval-003',
+    application_no: 'APP-FRESH-0003',
+    applicant_cid_no: '11410009999',
+    applicant_contact_no: '17345678',
+    cid_no: '11410009999',
+    first_name: 'Pema',
+    middle_name: undefined as string | undefined,
+    last_name: 'Lhamo',
+    parent_cid_no: '11208003456',
+    parent_contact_no: '17876543',
+    payment_type_id: '11120b08-685f-4767-862e-1d73b9b24023',
+    parent_approval: 'APPROVED',
+    date_of_birth: '2015-01-10',
+    reasons_id: '',
+    photo_url: '/dummyCurrentPic.jpg',
+    place_of_collection: 'Punakha',
+    status: 'PAYMENT_VERIFIED',
+    createdAt: '2026-04-30T11:00:00.000Z',
+    updatedAt: '2026-05-01T11:00:00.000Z'
+  }
+];
+
+export const DUMMY_CID_PAYMENT_APPLICATIONS = [
+  {
+    id: 'dummy-payment-001',
+    application_no: 'APP-FRESH-0001',
+    applicant_cid_no: '11410001234',
+    applicant_contact_no: '17123456',
+    cid_no: '11410001234',
+    first_name: 'Assesh',
+    middle_name: '' as string | undefined,
+    last_name: 'Nepal',
+    parent_cid_no: '11208005678',
+    parent_contact_no: '17654321',
+    payment_type_id: '11120b08-685f-4767-862e-1d73b9b24023',
+    parent_approval: 'APPROVED',
+    date_of_birth: '2010-03-15',
+    reasons_id: '',
+    photo_url: '/dummyCurrentPic.jpg',
+    place_of_collection: 'Thimphu',
+    status: 'ASSESSED',
+    payment_amount: 300,
+    payment_status: 'PENDING',
+    payment_notification_sent: true,
+    payment_notification_sent_at: '2026-04-30T10:15:00.000Z',
+    createdAt: '2026-04-28T08:00:00.000Z',
+    updatedAt: '2026-04-30T10:00:00.000Z'
+  },
+  {
+    id: 'dummy-payment-002',
+    application_no: 'APP-FRESH-0002',
+    applicant_cid_no: '11410005678',
+    applicant_contact_no: '17234567',
+    cid_no: '11410005678',
+    first_name: 'Karma',
+    middle_name: undefined as string | undefined,
+    last_name: 'Wangchuk',
+    parent_cid_no: '11208009012',
+    parent_contact_no: '17765432',
+    payment_type_id: '11120b08-685f-4767-862e-1d73b9b24023',
+    parent_approval: 'APPROVED',
+    date_of_birth: '2012-07-22',
+    reasons_id: '',
+    photo_url: '/dummyCurrentPic.jpg',
+    place_of_collection: 'Paro',
+    status: 'ASSESSED',
+    payment_amount: 300,
+    payment_status: 'PAID',
+    payment_method: 'ONLINE',
+    payment_transaction_no: 'TXN-20260430-0042',
+    payment_date: '2026-04-30T14:30:00.000Z',
+    payment_notification_sent: true,
+    payment_notification_sent_at: '2026-04-30T11:00:00.000Z',
+    createdAt: '2026-04-29T09:30:00.000Z',
+    updatedAt: '2026-04-30T11:00:00.000Z'
+  },
+  {
+    id: 'dummy-payment-003',
+    application_no: 'APP-FRESH-0003',
+    applicant_cid_no: '11410009999',
+    applicant_contact_no: '17345678',
+    cid_no: '11410009999',
+    first_name: 'Pema',
+    middle_name: undefined as string | undefined,
+    last_name: 'Lhamo',
+    parent_cid_no: '11208003456',
+    parent_contact_no: '17876543',
+    payment_type_id: '11120b08-685f-4767-862e-1d73b9b24023',
+    parent_approval: 'APPROVED',
+    date_of_birth: '2015-01-10',
+    reasons_id: '',
+    photo_url: '/dummyCurrentPic.jpg',
+    place_of_collection: 'Punakha',
+    status: 'ASSESSED',
+    payment_amount: 300,
+    payment_status: 'PENDING',
+    payment_notification_sent: false,
+    createdAt: '2026-04-30T11:00:00.000Z',
+    updatedAt: '2026-05-01T08:00:00.000Z'
+  }
+];
+
+// Combined lookup map for detail page
+export const DUMMY_CID_MAP: Record<string, any> = [
+  ...DUMMY_CID_APPLICATIONS,
+  ...DUMMY_CID_PAYMENT_APPLICATIONS,
+  ...DUMMY_CID_APPROVAL_APPLICATIONS
+].reduce(
+  (acc, item) => {
+    acc[item.id] = {
+      ...item,
+      census_photo_url: item.census_photo_url ?? '/dummyPastPic.jpg',
+      face_match_score: item.face_match_score ?? 85
+    };
+    return acc;
+  },
+  {} as Record<string, any>
+);

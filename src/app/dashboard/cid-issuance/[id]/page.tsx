@@ -21,7 +21,7 @@ import { BackButton } from '@/components/ui/back-button';
 import { ApplicationActions } from './_components/application-actions';
 import { ApplicationPhoto } from './_components/application-photo';
 import { PhotoComparison } from './_components/photo-comparison';
-import { DUMMY_CID_APPLICATION } from '../_dummy-data';
+import { DUMMY_CID_MAP } from '../_dummy-data';
 
 interface PageProps {
   params: Promise<{
@@ -32,10 +32,10 @@ interface PageProps {
 export default async function ApplicationDetailPage({ params }: PageProps) {
   const { id } = await params;
 
-  let application: typeof DUMMY_CID_APPLICATION;
+  let application: any;
 
-  if (id === DUMMY_CID_APPLICATION.id) {
-    application = DUMMY_CID_APPLICATION;
+  if (DUMMY_CID_MAP[id]) {
+    application = DUMMY_CID_MAP[id];
   } else {
     // Fetch application from API
     const result = await getCIDApplicationById(id);
@@ -297,11 +297,11 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {id === DUMMY_CID_APPLICATION.id ? (
+                  {application.census_photo_url ? (
                     <PhotoComparison
-                      censusPhotoUrl={DUMMY_CID_APPLICATION.census_photo_url}
-                      uploadedPhotoUrl={DUMMY_CID_APPLICATION.photo_url!}
-                      matchScore={DUMMY_CID_APPLICATION.face_match_score}
+                      censusPhotoUrl={application.census_photo_url}
+                      uploadedPhotoUrl={application.photo_url!}
+                      matchScore={application.face_match_score}
                     />
                   ) : (
                     <ApplicationPhoto

@@ -50,6 +50,14 @@ export const getStatusColor = (status: string) => {
     };
   }
 
+  // Payment Verified -> Purple
+  if (s === 'payment_verified') {
+    return {
+      variant: 'outline' as const,
+      className: 'border-purple-600 bg-purple-600 text-white'
+    };
+  }
+
   // Approved -> Indigo (Final State - Distinct from Verified)
   if (s === 'approved') {
     return {
