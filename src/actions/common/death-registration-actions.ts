@@ -185,10 +185,10 @@ const originalDeathApplications = [
     city_name: 'Thimphu City',
     is_health_registered: true,
     death_certificate_url: '/dummy_death_certificate_bhutan.pdf',
-    status: 'APPROVED',
+    status: 'ENDORSED',
     createdAt: '2024-10-06T08:00:00Z',
     updatedAt: '2024-10-09T16:00:00Z',
-    remarks: 'Application approved - certificate ready for issuance',
+    remarks: 'Endorsed by local authority - ready for approval',
     assigned: true
   },
   // Additional entries for variety
@@ -553,8 +553,13 @@ const originalDeathApplications = [
   }
 ];
 
-// Working copy that can be modified (starts as a copy of original)
-let dummyDeathApplications = [...originalDeathApplications];
+// Global store to persist data across serverless function calls
+const _deathStore = globalThis as any;
+_deathStore.deathApplicationsData = [...originalDeathApplications];
+
+// Working copy that can be modified
+let dummyDeathApplications: typeof originalDeathApplications =
+  _deathStore.deathApplicationsData;
 
 export type DeathApplicationStatus =
   | 'PENDING'
@@ -605,9 +610,9 @@ export async function getSubmittedDeathApplications() {
 }
 
 export async function getMyDeathTaskList() {
-  // Demo: Return dummy data for approve list (APPROVED applications - completed)
+  // Demo: Return dummy data for approve list (ENDORSED applications - assigned for approval)
   const taskList = dummyDeathApplications.filter(
-    (app) => app.status === 'APPROVED'
+    (app) => app.status === 'ENDORSED' && app.assigned === true
   );
   return {
     success: true,
@@ -712,12 +717,20 @@ export async function updateDeathApplicationStatus(
   id: string,
   status: DeathApplicationStatus
 ) {
-  // Demo: Return success
+  // Demo: Actually update the dummy data so the entry disappears from its source page
   console.log(
     '[updateDeathApplicationStatus] Demo: Updating status',
     id,
     status
   );
+  const idx = dummyDeathApplications.findIndex((app) => app.id === id);
+  if (idx !== -1) {
+    dummyDeathApplications[idx] = {
+      ...dummyDeathApplications[idx],
+      status,
+      updatedAt: new Date().toISOString()
+    };
+  }
   return {
     success: true,
     data: { id, status }
@@ -772,4 +785,12 @@ export async function getDeathRegistrationById(id: string) {
     error: 'Death registration not found',
     data: null
   };
+}
+
+export async function resetDeathDemoData() {
+  // Demo: Reset all dummy data back to original state
+  const fresh = originalDeathApplications.map((a) => ({ ...a }));
+  dummyDeathApplications.splice(0, dummyDeathApplications.length, ...fresh);
+  (globalThis as any).deathApplicationsData = dummyDeathApplications;
+  return { success: true };
 }
