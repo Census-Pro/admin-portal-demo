@@ -75,3 +75,33 @@ export function markCidReplacementApprovalDone(id: string) {
 export function getCidReplacementApprovalDoneIds(): Set<string> {
   return replacementApprovalDoneIds;
 }
+
+// Move-in-out Relieving
+const verifiedRelievingIds = new Set<string>();
+
+export function markRelievingVerified(id: string) {
+  verifiedRelievingIds.add(id);
+}
+export function getVerifiedRelievingIds(): Set<string> {
+  return verifiedRelievingIds;
+}
+
+// Move-in-out Receiving/Endorse
+const endorsedReceivingIds = new Set<string>();
+
+export function markReceivingEndorsed(id: string) {
+  endorsedReceivingIds.add(id);
+}
+export function getEndorsedReceivingIds(): Set<string> {
+  return endorsedReceivingIds;
+}
+
+// Move-in-out Receiving/Approve
+const approvedReceivingIds = new Set<string>();
+
+export function markReceivingApproved(id: string) {
+  approvedReceivingIds.add(id);
+}
+export function getApprovedReceivingIds(): Set<string> {
+  return approvedReceivingIds;
+}

@@ -8,6 +8,7 @@ import {
   getSubmittedMoveInOutApplications,
   MoveInOutApplication
 } from '@/actions/common/move-in-out-actions';
+import { getVerifiedRelievingIds } from '@/lib/cid-assessed-store';
 
 interface MoveInOutApplicationsTableProps {
   columns: ColumnDef<MoveInOutApplication, any>[];
@@ -35,12 +36,14 @@ export function MoveInOutApplicationsTable({
         if (cancelled) return;
 
         if (!result.success) {
-          setError(result.error ?? 'Failed to fetch applications');
+          setError('Failed to fetch applications');
           return;
         }
 
-        setData(result.data);
-        setTotalItems(result.total_count ?? result.data.length);
+        const verifiedIds = getVerifiedRelievingIds();
+        const filtered = result.data.filter((app) => !verifiedIds.has(app.id));
+        setData(filtered);
+        setTotalItems(filtered.length);
       } catch (err) {
         if (cancelled) return;
         setError(

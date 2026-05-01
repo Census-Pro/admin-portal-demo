@@ -37,10 +37,10 @@ import {
   IconArrowsRightLeft
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { markRelievingVerified } from '@/lib/cid-assessed-store';
 import {
   getMoveInOutById,
   approveMoveInOut,
-  verifyMoveInOut,
   rejectMoveInOut,
   MoveInOutApplication
 } from '@/actions/common/move-in-out-actions';
@@ -97,22 +97,18 @@ export function MoveInOutView({
     try {
       if (!data?.id) return;
 
-      // Use verifyMoveInOut for verify mode, approveMoveInOut for approve mode
-      const result =
-        mode === 'verify'
-          ? await verifyMoveInOut(data.id)
-          : await approveMoveInOut(data.id);
-
-      if (result.success) {
-        const successMsg =
-          mode === 'verify'
-            ? 'Move-in-out application verified successfully!'
-            : 'Move-in-out application approved successfully!';
-        toast.success(successMsg);
-        // Redirect back to list page
-        window.location.href = '/dashboard/move-in-out/relieving';
+      if (mode === 'verify') {
+        markRelievingVerified(data.id);
+        toast.success('Move-in-out application verified successfully!');
+        router.push('/dashboard/move-in-out/relieving');
       } else {
-        toast.error(result.error || 'Failed to process application');
+        const result = await approveMoveInOut(data.id);
+        if (result.success) {
+          toast.success('Move-in-out application approved successfully!');
+          router.push('/dashboard/move-in-out/relieving');
+        } else {
+          toast.error(result.error || 'Failed to process application');
+        }
       }
     } catch {
       toast.error('An unexpected error occurred while approving');
@@ -209,7 +205,18 @@ export function MoveInOutView({
                 <Label className="text-muted-foreground text-xs font-medium uppercase">
                   Area Type
                 </Label>
-                <Badge variant="outline">{data.area_type}</Badge>
+                <Badge
+                  variant="default"
+                  className={
+                    data.area_type === 'URBAN'
+                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      : data.area_type === 'RURAL'
+                        ? 'bg-teal-600 text-white hover:bg-teal-700'
+                        : 'bg-gray-600 text-white hover:bg-gray-700'
+                  }
+                >
+                  {data.area_type}
+                </Badge>
               </div>
             </div>
           </CardContent>
@@ -312,8 +319,11 @@ export function MoveInOutView({
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Inter Dzongkhag</span>
               <Badge
-                variant={
-                  data.inter_dzongkhag === 'YES' ? 'default' : 'secondary'
+                variant="default"
+                className={
+                  data.inter_dzongkhag === 'YES'
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-red-600 text-white hover:bg-red-700'
                 }
               >
                 {data.inter_dzongkhag}
@@ -322,8 +332,11 @@ export function MoveInOutView({
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">New Household</span>
               <Badge
-                variant={
-                  data.is_new_household === 'YES' ? 'default' : 'secondary'
+                variant="default"
+                className={
+                  data.is_new_household === 'YES'
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-red-600 text-white hover:bg-red-700'
                 }
               >
                 {data.is_new_household}
