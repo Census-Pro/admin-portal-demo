@@ -8,7 +8,6 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { getStatusColor } from '@/lib/status-utils';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { toast } from 'sonner';
 import { assignDeathTask } from '@/actions/common/death-registration-actions';
 
@@ -24,30 +23,38 @@ export type DeathRegistrationApprove = {
   updatedAt?: string;
 };
 
-function ActionsCell({
-  registration
-}: {
+interface ActionsCellProps {
   registration: DeathRegistrationApprove;
-}) {
+  onAssign?: (id: string) => void;
+  onAssignStart?: (id: string) => void;
+  onAssignError?: (id: string) => void;
+  isAssigning?: boolean;
+}
+
+function ActionsCell({
+  registration,
+  onAssign,
+  onAssignStart,
+  onAssignError,
+  isAssigning
+}: ActionsCellProps) {
   const router = useRouter();
-  const [isAssigning, setIsAssigning] = useState(false);
-  const [isAssigned, setIsAssigned] = useState(false);
 
   const handleAssignToMe = async () => {
-    setIsAssigning(true);
+    onAssignStart?.(registration.id);
     try {
       const result = await assignDeathTask(registration.id);
       if (result.success) {
-        setIsAssigned(true);
         toast.success('Task assigned to you successfully');
-        setTimeout(() => router.refresh(), 1000);
+        // Call the onAssign callback to hide the row immediately
+        onAssign?.(registration.id);
       } else {
         toast.error('Failed to assign task');
+        onAssignError?.(registration.id);
       }
     } catch {
       toast.error('An unexpected error occurred');
-    } finally {
-      setIsAssigning(false);
+      onAssignError?.(registration.id);
     }
   };
 
@@ -64,14 +71,10 @@ function ActionsCell({
         size="sm"
         className="h-8 gap-1.5 border-teal-600 bg-teal-600 text-xs text-white hover:border-teal-700 hover:bg-teal-700 hover:text-white"
         onClick={handleAssignToMe}
-        disabled={isAssigning || isAssigned}
+        disabled={isAssigning}
       >
         <IconUserCheck className="h-3.5 w-3.5" />
-        {isAssigning
-          ? 'Assigning...'
-          : isAssigned
-            ? 'Assigned'
-            : 'Assign to me'}
+        {isAssigning ? 'Assigning...' : 'Assign to me'}
       </Button>
     </div>
   );
@@ -141,9 +144,21 @@ export const columns: ColumnDef<DeathRegistrationApprove>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const registration = row.original;
-      return <ActionsCell registration={registration} />;
+      const meta = table.options.meta as any;
+      const assigningIds = meta?.assigningIds as Set<string> | undefined;
+      const isAssigning = assigningIds?.has(registration.id) ?? false;
+
+      return (
+        <ActionsCell
+          registration={registration}
+          onAssign={meta?.onAssign}
+          onAssignStart={meta?.onAssignStart}
+          onAssignError={meta?.onAssignError}
+          isAssigning={isAssigning}
+        />
+      );
     }
   }
 ];

@@ -4,21 +4,22 @@ import { useState, useCallback, useEffect } from 'react';
 import { ApproveSearchBar } from './search-bar';
 import { columns } from './approve-columns';
 import { DataTable } from '@/components/ui/table/data-table';
-import { getVerifiedBirthApplications } from '@/actions/common/birth-registration-actions';
+import { getUnassignedDeathApplications } from '@/actions/common/death-registration-actions';
 
-interface BirthRegistration {
+interface DeathRegistration {
   id: string;
   first_name: string;
   middle_name?: string;
   last_name: string;
-  applicant_cid: string;
-  date_of_birth: string;
+  deceased_cid: string;
+  date_of_death: string;
   status: string;
-  createdAt?: string;
+  created_at: string;
+  updatedAt?: string;
 }
 
 export function ApprovePageClient() {
-  const [data, setData] = useState<BirthRegistration[]>([]);
+  const [data, setData] = useState<DeathRegistration[]>([]);
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [assigningIds, setAssigningIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +33,7 @@ export function ApprovePageClient() {
       setIsLoading(true);
       setError(null);
       try {
-        const result = await getVerifiedBirthApplications();
+        const result = await getUnassignedDeathApplications();
         if (cancelled) return;
 
         if (!result.success) {
@@ -40,7 +41,7 @@ export function ApprovePageClient() {
           return;
         }
 
-        setData(result.data as BirthRegistration[]);
+        setData(result.data as DeathRegistration[]);
       } catch (err) {
         if (cancelled) return;
         setError(
