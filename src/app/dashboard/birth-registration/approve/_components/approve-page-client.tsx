@@ -5,6 +5,10 @@ import { ApproveSearchBar } from './search-bar';
 import { columns } from './approve-columns';
 import { DataTable } from '@/components/ui/table/data-table';
 import { getEndorsedBirthApplications } from '@/actions/common/birth-registration-actions';
+import {
+  getBirthApprovedIds,
+  markBirthApproved
+} from '@/lib/cid-assessed-store';
 
 interface BirthRegistration {
   id: string;
@@ -19,7 +23,6 @@ interface BirthRegistration {
 
 export function ApprovePageClient() {
   const [data, setData] = useState<BirthRegistration[]>([]);
-  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [assigningIds, setAssigningIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +43,12 @@ export function ApprovePageClient() {
           return;
         }
 
-        setData(result.data as BirthRegistration[]);
+        const approvedIds = getBirthApprovedIds();
+        setData(
+          (result.data as BirthRegistration[]).filter(
+            (r) => !approvedIds.has(r.id)
+          )
+        );
       } catch (err) {
         if (cancelled) return;
         setError(
@@ -58,7 +66,8 @@ export function ApprovePageClient() {
   }, []);
 
   const handleAssign = useCallback((id: string) => {
-    setHiddenIds((prev) => new Set(Array.from(prev).concat(id)));
+    markBirthApproved(id);
+    setData((prev) => prev.filter((r) => r.id !== id));
     setAssigningIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -79,11 +88,11 @@ export function ApprovePageClient() {
   }, []);
 
   const handleResetAll = useCallback(() => {
-    setHiddenIds(new Set());
+    // no-op: store-based approach persists across navigation
   }, []);
 
-  // Filter out hidden items
-  const filteredData = data.filter((item) => !hiddenIds.has(item.id));
+  // Filter out approved items
+  const filteredData = data;
 
   if (isLoading) {
     return (
@@ -109,10 +118,7 @@ export function ApprovePageClient() {
 
   return (
     <div className="space-y-4">
-      <ApproveSearchBar
-        onResetAll={handleResetAll}
-        hiddenCount={hiddenIds.size}
-      />
+      <ApproveSearchBar onResetAll={handleResetAll} hiddenCount={0} />
       <DataTable
         columns={columns}
         data={filteredData}

@@ -40,11 +40,9 @@ import {
   IconX
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { markBirthEndorsed } from '@/lib/cid-assessed-store';
 import { BirthCertificateViewer } from '../../_components/birth-certificate-viewer';
-import {
-  updateBirthApplicationStatus,
-  rejectBirthApplication
-} from '@/actions/common/birth-registration-actions';
+import { rejectBirthApplication } from '@/actions/common/birth-registration-actions';
 
 interface BirthRegistrationData {
   applicant_cid: string;
@@ -121,17 +119,10 @@ export function BirthRegistrationEndorseView({
   const handleEndorse = async () => {
     setIsEndorsing(true);
     try {
-      const result = await updateBirthApplicationStatus(
-        applicationId,
-        'ENDORSED'
-      );
-      if (result.success) {
-        setCurrentStatus('ENDORSED');
-        toast.success('Birth registration endorsed successfully!');
-        router.push('/dashboard/birth-registration/endorse');
-      } else {
-        toast.error('Failed to endorse birth registration');
-      }
+      markBirthEndorsed(applicationId);
+      setCurrentStatus('ENDORSED');
+      toast.success('Birth registration endorsed successfully!');
+      router.push('/dashboard/birth-registration/endorse');
     } catch (error) {
       toast.error('An unexpected error occurred while endorsing');
     } finally {
