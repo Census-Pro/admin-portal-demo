@@ -115,3 +115,83 @@ export function markHohChangeApproved(id: string) {
 export function getHohChangeApprovedIds(): Set<string> {
   return hohChangeApprovedIds;
 }
+
+// Birth Registration Verify
+const birthVerifiedIds = new Set<string>();
+
+export function markBirthVerified(id: string) {
+  birthVerifiedIds.add(id);
+}
+export function getBirthVerifiedIds(): Set<string> {
+  return birthVerifiedIds;
+}
+
+// Birth Registration Endorse
+const birthEndorsedIds = new Set<string>();
+
+export function markBirthEndorsed(id: string) {
+  birthEndorsedIds.add(id);
+}
+export function getBirthEndorsedIds(): Set<string> {
+  return birthEndorsedIds;
+}
+
+// Birth Registration Approve
+const birthApprovedIds = new Set<string>();
+
+export function markBirthApproved(id: string) {
+  birthApprovedIds.add(id);
+}
+export function getBirthApprovedIds(): Set<string> {
+  return birthApprovedIds;
+}
+
+// Birth Registration Approve-List
+const birthApproveListDoneIds = new Set<string>();
+
+export function markBirthApproveListDone(id: string) {
+  birthApproveListDoneIds.add(id);
+}
+export function getBirthApproveListDoneIds(): Set<string> {
+  return birthApproveListDoneIds;
+}
+
+// Death Registration Verify
+const deathVerifiedIds = new Set<string>();
+
+export function markDeathVerified(id: string) {
+  deathVerifiedIds.add(id);
+}
+export function getDeathVerifiedIds(): Set<string> {
+  return deathVerifiedIds;
+}
+
+// Death Registration Endorse
+const deathEndorsedIds = new Set<string>();
+
+export function markDeathEndorsed(id: string) {
+  deathEndorsedIds.add(id);
+}
+export function getDeathEndorsedIds(): Set<string> {
+  return deathEndorsedIds;
+}
+
+// Death Registration Approve
+const deathApprovedIds = new Set<string>();
+
+export function markDeathApproved(id: string) {
+  deathApprovedIds.add(id);
+}
+export function getDeathApprovedIds(): Set<string> {
+  return deathApprovedIds;
+}
+
+// Death Registration Approve List
+const deathApproveListDoneIds = new Set<string>();
+
+export function markDeathApproveListDone(id: string) {
+  deathApproveListDoneIds.add(id);
+}
+export function getDeathApproveListDoneIds(): Set<string> {
+  return deathApproveListDoneIds;
+}
