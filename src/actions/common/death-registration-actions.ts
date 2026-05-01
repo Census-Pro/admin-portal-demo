@@ -5,8 +5,8 @@ import { instance } from '../instance';
 const API_URL =
   process.env.COMMON_SERVICE || process.env.API_URL || 'http://localhost:5002';
 
-// Dummy data for demo
-const dummyDeathApplications = [
+// Original dummy data for demo
+const originalDeathApplications = [
   {
     id: '1',
     deceased_cid: '10304002001',
@@ -48,7 +48,8 @@ const dummyDeathApplications = [
     death_certificate_url: '/dummy_death_certificate_bhutan.pdf',
     status: 'SUBMITTED',
     createdAt: '2024-01-21T10:30:00Z',
-    remarks: ''
+    remarks: '',
+    assigned: false
   },
   {
     id: '2',
@@ -91,7 +92,9 @@ const dummyDeathApplications = [
     death_certificate_url: '/dummy_death_certificate_bhutan.pdf',
     status: 'ENDORSED',
     createdAt: '2024-02-26T14:45:00Z',
-    remarks: 'Documents verified'
+    updatedAt: '2024-02-27T10:30:00Z',
+    remarks: 'Documents verified',
+    assigned: false
   },
   {
     id: '3',
@@ -134,7 +137,8 @@ const dummyDeathApplications = [
     death_certificate_url: '/dummy_death_certificate_bhutan.pdf',
     status: 'VERIFIED',
     createdAt: '2024-03-16T09:15:00Z',
-    remarks: 'Field verification completed'
+    remarks: 'Field verification completed',
+    assigned: false
   },
   {
     id: '4',
@@ -177,7 +181,8 @@ const dummyDeathApplications = [
     death_certificate_url: '/dummy_death_certificate_bhutan.pdf',
     status: 'APPROVED',
     createdAt: '2024-04-11T11:20:00Z',
-    remarks: 'Approved by Registrar'
+    remarks: 'Approved by Registrar',
+    assigned: false
   },
   {
     id: '5',
@@ -220,7 +225,8 @@ const dummyDeathApplications = [
     death_certificate_url: '/dummy_death_certificate_bhutan.pdf',
     status: 'SUBMITTED',
     createdAt: '2024-05-19T16:00:00Z',
-    remarks: ''
+    remarks: '',
+    assigned: false
   },
   {
     id: '6',
@@ -263,7 +269,9 @@ const dummyDeathApplications = [
     death_certificate_url: '/dummy_death_certificate_bhutan.pdf',
     status: 'ENDORSED',
     createdAt: '2024-06-23T08:30:00Z',
-    remarks: 'Endorsed by Local Authority'
+    updatedAt: '2024-06-24T15:45:00Z',
+    remarks: 'Endorsed by Local Authority',
+    assigned: false
   },
   {
     id: '7',
@@ -306,7 +314,8 @@ const dummyDeathApplications = [
     death_certificate_url: '/dummy_death_certificate_bhutan.pdf',
     status: 'VERIFIED',
     createdAt: '2024-07-29T13:45:00Z',
-    remarks: 'Verification pending approval'
+    remarks: 'Verification pending approval',
+    assigned: false
   },
   {
     id: '8',
@@ -349,9 +358,13 @@ const dummyDeathApplications = [
     death_certificate_url: '/dummy_death_certificate_bhutan.pdf',
     status: 'APPROVED',
     createdAt: '2024-08-06T10:00:00Z',
-    remarks: 'Certificate issued'
+    remarks: 'Certificate issued',
+    assigned: false
   }
 ];
+
+// Working copy that can be modified (starts as a copy of original)
+let dummyDeathApplications = [...originalDeathApplications];
 
 export type DeathApplicationStatus =
   | 'PENDING'
@@ -362,10 +375,12 @@ export type DeathApplicationStatus =
   | 'REJECTED';
 
 export async function getUnassignedDeathApplications() {
-  // Demo: Return dummy data (ENDORSED and VERIFIED applications)
-  const available = dummyDeathApplications.filter(
-    (app) => app.status === 'ENDORSED' || app.status === 'VERIFIED'
+  // Demo: Return only 2 ENDORSED applications, no VERIFIED applications
+  const endorsed = dummyDeathApplications.filter(
+    (app: any) => app.status === 'ENDORSED' && !app.assigned
   );
+  // Return only first 2 endorsed applications
+  const available = endorsed.slice(0, 2);
   return {
     success: true,
     data: available,
@@ -520,11 +535,39 @@ export async function updateDeathApplicationStatus(
 }
 
 export async function assignDeathTask(applicationId: string) {
-  // Demo: Return success
+  // Demo: Mark application as assigned
   console.log('[assignDeathTask] Demo: Assigning task', applicationId);
+
+  // Find and mark the application as assigned
+  const application = dummyDeathApplications.find(
+    (app: any) => app.id === applicationId
+  );
+  if (application) {
+    application.assigned = true;
+    console.log(
+      '[assignDeathTask] Application marked as assigned:',
+      applicationId
+    );
+  }
+
   return {
     success: true,
     data: { application_id: applicationId, assigned: true }
+  };
+}
+
+export async function resetAssignedDeathApplications() {
+  // Demo: Reset all assigned applications
+  console.log('[resetAssignedDeathApplications] Resetting all assignments');
+
+  // Reset all applications to unassigned
+  dummyDeathApplications.forEach((app: any) => {
+    app.assigned = false;
+  });
+
+  return {
+    success: true,
+    data: { message: 'All assignments reset' }
   };
 }
 

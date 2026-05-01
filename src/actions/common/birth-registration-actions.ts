@@ -5,8 +5,8 @@ import { instance } from '../instance';
 const API_URL =
   process.env.COMMON_SERVICE || process.env.API_URL || 'http://localhost:5002';
 
-// Dummy data for demo
-const dummyBirthApplications = [
+// Original dummy data for demo
+const originalBirthApplications = [
   {
     id: '1',
     applicant_cid: '10304001001',
@@ -394,6 +394,9 @@ const dummyBirthApplications = [
     remarks: 'Certificate issued'
   }
 ];
+
+// Working copy that can be modified (starts as a copy of original)
+let dummyBirthApplications = [...originalBirthApplications];
 
 export type BirthApplicationStatus =
   | 'PENDING'
