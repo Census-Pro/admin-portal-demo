@@ -231,6 +231,66 @@ const DUMMY_CHIWOGS = [
     isActive: true,
     createdAt: '2024-01-20T00:00:00Z',
     updatedAt: '2024-01-20T00:00:00Z'
+  },
+  {
+    id: '21',
+    name: 'Guma',
+    gewogId: '21',
+    gewogName: 'Guma',
+    dzongkhagName: 'Punakha',
+    isActive: true,
+    createdAt: '2024-01-21T00:00:00Z',
+    updatedAt: '2024-01-21T00:00:00Z'
+  },
+  {
+    id: '22',
+    name: 'Athang',
+    gewogId: '22',
+    gewogName: 'Athang',
+    dzongkhagName: 'Wangdue Phodrang',
+    isActive: true,
+    createdAt: '2024-01-22T00:00:00Z',
+    updatedAt: '2024-01-22T00:00:00Z'
+  },
+  {
+    id: '23',
+    name: 'Chhoekhor',
+    gewogId: '23',
+    gewogName: 'Chhoekhor',
+    dzongkhagName: 'Bumthang',
+    isActive: true,
+    createdAt: '2024-01-23T00:00:00Z',
+    updatedAt: '2024-01-23T00:00:00Z'
+  },
+  {
+    id: '24',
+    name: 'Kanglung',
+    gewogId: '24',
+    gewogName: 'Kanglung',
+    dzongkhagName: 'Trashigang',
+    isActive: true,
+    createdAt: '2024-01-24T00:00:00Z',
+    updatedAt: '2024-01-24T00:00:00Z'
+  },
+  {
+    id: '25',
+    name: 'Samtse',
+    gewogId: '25',
+    gewogName: 'Samtse',
+    dzongkhagName: 'Samtse',
+    isActive: true,
+    createdAt: '2024-01-25T00:00:00Z',
+    updatedAt: '2024-01-25T00:00:00Z'
+  },
+  {
+    id: '26',
+    name: 'Mongar',
+    gewogId: '26',
+    gewogName: 'Mongar',
+    dzongkhagName: 'Mongar',
+    isActive: true,
+    createdAt: '2024-01-26T00:00:00Z',
+    updatedAt: '2024-01-26T00:00:00Z'
   }
 ];
 
@@ -304,27 +364,15 @@ export async function getAllChiwogs() {
 }
 
 export async function getChiwogById(id: string) {
-  try {
-    const response = await fetch(`${API_URL}/chiwogs/${id}`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch chiwog: ${response.statusText}`
-      };
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching chiwog:', error);
-    return {
-      error: true,
-      message: 'Failed to fetch chiwog'
-    };
+  // Demo: Return dummy data
+  const chiwog = DUMMY_CHIWOGS.find((c) => c.id === id);
+  if (chiwog) {
+    return chiwog;
   }
+  return {
+    error: true,
+    message: 'Chiwog not found'
+  };
 }
 
 export async function deleteChiwog(id?: string) {

@@ -221,6 +221,69 @@ const DUMMY_VILLAGES = [
     gewogName: 'Soe',
     dzongkhagName: 'Thimphu',
     isActive: true
+  },
+  {
+    id: '12',
+    name: 'Bondey',
+    chiwogId: '10',
+    chiwogName: 'Shaba',
+    gewogName: 'Shaba',
+    dzongkhagName: 'Paro',
+    isActive: true
+  },
+  {
+    id: '25',
+    name: 'Talo',
+    chiwogId: '21',
+    chiwogName: 'Guma',
+    gewogName: 'Guma',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '34',
+    name: 'Gasetsho',
+    chiwogId: '22',
+    chiwogName: 'Athang',
+    gewogName: 'Athang',
+    dzongkhagName: 'Wangdue Phodrang',
+    isActive: true
+  },
+  {
+    id: '42',
+    name: 'Jakar',
+    chiwogId: '23',
+    chiwogName: 'Chhoekhor',
+    gewogName: 'Chhoekhor',
+    dzongkhagName: 'Bumthang',
+    isActive: true
+  },
+  {
+    id: '51',
+    name: 'Yonphu',
+    chiwogId: '24',
+    chiwogName: 'Kanglung',
+    gewogName: 'Kanglung',
+    dzongkhagName: 'Trashigang',
+    isActive: true
+  },
+  {
+    id: '60',
+    name: 'Samtse Town',
+    chiwogId: '25',
+    chiwogName: 'Samtse',
+    gewogName: 'Samtse',
+    dzongkhagName: 'Samtse',
+    isActive: true
+  },
+  {
+    id: '68',
+    name: 'Mongar Town',
+    chiwogId: '26',
+    chiwogName: 'Mongar',
+    gewogName: 'Mongar',
+    dzongkhagName: 'Mongar',
+    isActive: true
   }
 ];
 
@@ -305,27 +368,15 @@ export async function getAllVillages() {
 }
 
 export async function getVillageById(id: string) {
-  try {
-    const response = await fetch(`${API_URL}/villages/${id}`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch village: ${response.statusText}`
-      };
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching village:', error);
-    return {
-      error: true,
-      message: 'Failed to fetch village'
-    };
+  // Demo: Return dummy data
+  const village = DUMMY_VILLAGES.find((v) => v.id === id);
+  if (village) {
+    return village;
   }
+  return {
+    error: true,
+    message: 'Village not found'
+  };
 }
 
 export async function deleteVillage(id?: string) {

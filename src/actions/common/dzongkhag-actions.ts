@@ -37,22 +37,22 @@ const DUMMY_DZONGKHAGS = [
   { id: '2', name: 'Paro', code: 'PAR', isActive: true },
   { id: '3', name: 'Punakha', code: 'PUN', isActive: true },
   { id: '4', name: 'Wangdue Phodrang', code: 'WAN', isActive: true },
-  { id: '5', name: 'Lhuentse', code: 'LHU', isActive: true },
-  { id: '6', name: 'Mongar', code: 'MON', isActive: true },
-  { id: '7', name: 'Trashigang', code: 'TRA', isActive: true },
-  { id: '8', name: 'Yangtse', code: 'YAN', isActive: true },
+  { id: '5', name: 'Bumthang', code: 'BUM', isActive: true },
+  { id: '6', name: 'Trashigang', code: 'TRA', isActive: true },
+  { id: '7', name: 'Samtse', code: 'SAM', isActive: true },
+  { id: '8', name: 'Mongar', code: 'MON', isActive: true },
   { id: '9', name: 'Lhuentse', code: 'LHU', isActive: true },
   { id: '10', name: 'Pemagatshel', code: 'PEM', isActive: true },
   { id: '11', name: 'Zhemgang', code: 'ZHE', isActive: true },
   { id: '12', name: 'Sarpang', code: 'SAR', isActive: true },
-  { id: '13', name: 'Samtse', code: 'SAM', isActive: true },
+  { id: '13', name: 'Yangtse', code: 'YAN', isActive: true },
   { id: '14', name: 'Chukha', code: 'CHU', isActive: true },
   { id: '15', name: 'Haa', code: 'HAA', isActive: true },
   { id: '16', name: 'Gasa', code: 'GAS', isActive: true },
-  { id: '17', name: 'Bumthang', code: 'BUM', isActive: true },
-  { id: '18', name: 'Trongsa', code: 'TRG', isActive: true },
-  { id: '19', name: 'Dagana', code: 'DAG', isActive: true },
-  { id: '20', name: 'Tsirang', code: 'TSI', isActive: true }
+  { id: '17', name: 'Trongsa', code: 'TRG', isActive: true },
+  { id: '18', name: 'Dagana', code: 'DAG', isActive: true },
+  { id: '19', name: 'Tsirang', code: 'TSI', isActive: true },
+  { id: '20', name: 'Samdrup Jongkhar', code: 'SJK', isActive: true }
 ];
 
 export async function getDzongkhags({
@@ -115,27 +115,15 @@ export async function getAllDzongkhags() {
 }
 
 export async function getDzongkhagById(id: string) {
-  try {
-    const response = await fetch(`${API_URL}/dzongkhags/${id}`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch dzongkhag: ${response.statusText}`
-      };
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching dzongkhag:', error);
-    return {
-      error: true,
-      message: 'Failed to fetch dzongkhag'
-    };
+  // Demo: Return dummy data
+  const dzongkhag = DUMMY_DZONGKHAGS.find((d) => d.id === id);
+  if (dzongkhag) {
+    return dzongkhag;
   }
+  return {
+    error: true,
+    message: 'Dzongkhag not found'
+  };
 }
 
 export async function deleteDzongkhag(id?: string) {

@@ -171,6 +171,48 @@ const DUMMY_GEWOGS = [
     dzongkhagId: '3',
     dzongkhagName: 'Punakha',
     isActive: true
+  },
+  {
+    id: '21',
+    name: 'Guma',
+    dzongkhagId: '3',
+    dzongkhagName: 'Punakha',
+    isActive: true
+  },
+  {
+    id: '22',
+    name: 'Athang',
+    dzongkhagId: '4',
+    dzongkhagName: 'Wangdue Phodrang',
+    isActive: true
+  },
+  {
+    id: '23',
+    name: 'Chhoekhor',
+    dzongkhagId: '5',
+    dzongkhagName: 'Bumthang',
+    isActive: true
+  },
+  {
+    id: '24',
+    name: 'Kanglung',
+    dzongkhagId: '6',
+    dzongkhagName: 'Trashigang',
+    isActive: true
+  },
+  {
+    id: '25',
+    name: 'Samtse',
+    dzongkhagId: '7',
+    dzongkhagName: 'Samtse',
+    isActive: true
+  },
+  {
+    id: '26',
+    name: 'Mongar',
+    dzongkhagId: '8',
+    dzongkhagName: 'Mongar',
+    isActive: true
   }
 ];
 
@@ -234,27 +276,15 @@ export async function getAllGewogs() {
 }
 
 export async function getGewogById(id: string) {
-  try {
-    const response = await fetch(`${API_URL}/gewogs/${id}`, {
-      headers: await instance(),
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return {
-        error: true,
-        message: `Failed to fetch gewog: ${response.statusText}`
-      };
-    }
-
-    return response.json();
-  } catch (error) {
-    console.error('Error fetching gewog:', error);
-    return {
-      error: true,
-      message: 'Failed to fetch gewog'
-    };
+  // Demo: Return dummy data
+  const gewog = DUMMY_GEWOGS.find((g) => g.id === id);
+  if (gewog) {
+    return gewog;
   }
+  return {
+    error: true,
+    message: 'Gewog not found'
+  };
 }
 
 export async function deleteGewog(id?: string) {
