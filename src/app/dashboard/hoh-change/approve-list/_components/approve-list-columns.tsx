@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { getStatusColor } from '@/lib/status-utils';
-import type { HohChange } from '../_components/columns';
+import type { HohChange } from '../../_components/columns';
 
 export type { HohChange };
 
