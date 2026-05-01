@@ -666,10 +666,11 @@ export const DUMMY_CID_MAP: Record<string, any> = [
   ...DUMMY_CID_REPLACEMENT_APPROVAL_APPLICATIONS
 ].reduce(
   (acc, item) => {
-    acc[item.id] = {
-      ...item,
-      census_photo_url: item.census_photo_url ?? '/dummyPastPic.jpg',
-      face_match_score: item.face_match_score ?? 85
+    const i = item as any;
+    acc[i.id] = {
+      ...i,
+      census_photo_url: i.census_photo_url ?? '/dummyPastPic.jpg',
+      face_match_score: i.face_match_score ?? 85
     };
     return acc;
   },
