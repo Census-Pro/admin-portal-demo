@@ -6,6 +6,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { useQueryState, parseAsString, parseAsInteger } from 'nuqs';
 import { getHohApproveList } from '@/actions/common/hoh-change-actions';
 import { Input } from '@/components/ui/input';
+import { getHohChangeApprovedIds } from '@/lib/cid-assessed-store';
 
 interface HohChangeTableProps<TData> {
   columns: ColumnDef<TData, any>[];
@@ -37,7 +38,12 @@ export function HohChangeApproveTable<TData extends Record<string, any>>({
           setError('Failed to fetch applications for approval');
           return;
         }
-        setData(result.data as unknown as TData[]);
+        const approvedIds = getHohChangeApprovedIds();
+        setData(
+          (result.data as unknown as TData[]).filter(
+            (row: any) => !approvedIds.has(row.id)
+          )
+        );
       } catch (err) {
         if (cancelled) return;
         setError(

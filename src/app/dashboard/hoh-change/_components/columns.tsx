@@ -21,6 +21,7 @@ export interface HohChange {
   lastName: string;
   status: string;
   createdAt: string;
+  dzongkhagName?: string;
 }
 
 function ActionsCell({ registration }: { registration: HohChange }) {
@@ -60,6 +61,13 @@ export const columns: ColumnDef<HohChange>[] = [
   {
     accessorKey: 'householdNo',
     header: 'Household No.'
+  },
+  {
+    accessorKey: 'dzongkhagName',
+    header: 'Dzongkhag',
+    cell: ({ row }) => (
+      <div>{(row.getValue('dzongkhagName') as string) || '-'}</div>
+    )
   },
   {
     accessorKey: 'createdAt',

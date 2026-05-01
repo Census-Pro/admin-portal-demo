@@ -105,3 +105,13 @@ export function markReceivingApproved(id: string) {
 export function getApprovedReceivingIds(): Set<string> {
   return approvedReceivingIds;
 }
+
+// HOH Change Approve
+const hohChangeApprovedIds = new Set<string>();
+
+export function markHohChangeApproved(id: string) {
+  hohChangeApprovedIds.add(id);
+}
+export function getHohChangeApprovedIds(): Set<string> {
+  return hohChangeApprovedIds;
+}

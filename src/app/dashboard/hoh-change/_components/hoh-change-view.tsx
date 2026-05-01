@@ -39,9 +39,9 @@ import {
   IconMapPin
 } from '@tabler/icons-react';
 import { getStatusColor } from '@/lib/status-utils';
+import { markHohChangeApproved } from '@/lib/cid-assessed-store';
 import {
   getHohChangeByApplicationNo,
-  approveHohChange,
   rejectHohChange
 } from '@/actions/common/hoh-change-actions';
 
@@ -146,13 +146,9 @@ export function HohChangeView({ applicationId }: HohChangeViewProps) {
     setIsApproving(true);
     try {
       if (!data?.id) return;
-      const result = await approveHohChange(data.id);
-      if (result.success) {
-        toast.success('Application approved successfully!');
-        router.push('/dashboard/hoh-change');
-      } else {
-        toast.error('Failed to approve application');
-      }
+      markHohChangeApproved(data.id);
+      toast.success('Application approved successfully!');
+      router.push('/dashboard/hoh-change/approve');
     } catch {
       toast.error('An unexpected error occurred while approving');
     } finally {
