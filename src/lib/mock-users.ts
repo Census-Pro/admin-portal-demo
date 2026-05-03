@@ -172,7 +172,9 @@ export const DEMO_USERS: MockUser[] = [
           { id: 'perm-34', name: 'manage:nationality-certificate-approval' },
           { id: 'perm-35', name: 'manage:relation-certificate-assessment' },
           { id: 'perm-36', name: 'manage:relation-certificate-payment' },
-          { id: 'perm-37', name: 'manage:relation-certificate-approval' }
+          { id: 'perm-37', name: 'manage:relation-certificate-approval' },
+          { id: 'perm-38', name: 'manage:cid-dispatch' },
+          { id: 'perm-39', name: 'manage:cid-receive' }
         ]
       }
     ],
@@ -271,6 +273,16 @@ export const DEMO_USERS: MockUser[] = [
         name: 'HOH Change Approve',
         action: ['manage'],
         subject: 'HOH Change Approve'
+      },
+      {
+        name: 'CID Dispatch',
+        action: ['manage'],
+        subject: 'CID Dispatch'
+      },
+      {
+        name: 'CID Receive',
+        action: ['manage'],
+        subject: 'CID Receive'
       }
     ],
     createdAt: new Date().toISOString(),

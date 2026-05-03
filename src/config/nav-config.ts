@@ -822,5 +822,27 @@ export const navItems: NavItem[] = [
       }
     ]
     // Parent access is automatic - shows if user has access to ANY workflow permission
+  },
+  {
+    title: 'CID Dispatch',
+    url: '/dashboard/cid-dispatch',
+    icon: 'truckDelivery',
+    isActive: false,
+    items: [],
+    subject: 'CID Dispatch',
+    access: {
+      permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CID_DISPATCH]
+    }
+  },
+  {
+    title: 'CID Receive',
+    url: '/dashboard/cid-receive',
+    icon: 'packageImport',
+    isActive: false,
+    items: [],
+    subject: 'CID Receive',
+    access: {
+      permissions: [PERMS.MANAGE_ALL, PERMS.MANAGE_CID_RECEIVE]
+    }
   }
 ];

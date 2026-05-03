@@ -105,6 +105,10 @@ export const MANAGE_CID_ISSUANCE_REPLACEMENT_APPROVAL =
 // General CID issuance permission (grants access to all workflow steps)
 export const MANAGE_CID_ISSUANCE = 'manage:cid-issuance' as const;
 
+// CID Dispatch and Receive
+export const MANAGE_CID_DISPATCH = 'manage:cid-dispatch' as const;
+export const MANAGE_CID_RECEIVE = 'manage:cid-receive' as const;
+
 // Legacy permissions (kept for backward compatibility)
 export const VIEW_CID_ISSUANCE = 'read:cid-issuance' as const;
 export const CREATE_CID_ISSUANCE = 'create:cid-issuance' as const;
@@ -636,6 +640,8 @@ export type Permission =
   | typeof MANAGE_CID_ISSUANCE_REPLACEMENT_ASSESSMENT
   | typeof MANAGE_CID_ISSUANCE_REPLACEMENT_PAYMENT
   | typeof MANAGE_CID_ISSUANCE_REPLACEMENT_APPROVAL
+  | typeof MANAGE_CID_DISPATCH
+  | typeof MANAGE_CID_RECEIVE
   | typeof VIEW_MOVE_IN_OUT
   | typeof CREATE_MOVE_IN_OUT
   | typeof EDIT_MOVE_IN_OUT
