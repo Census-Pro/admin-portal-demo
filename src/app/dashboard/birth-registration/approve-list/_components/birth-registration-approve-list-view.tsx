@@ -456,11 +456,11 @@ export function BirthRegistrationApproveListView({
 
               {data.is_mc_valid ? (
                 <>
-                  {/* MC Valid = YES: Green EPIS border for Father's CID + Marriage Certificate Valid */}
+                  {/* MC Valid = YES: Green JUDICIARY border for Father's CID + Marriage Certificate Valid */}
                   <div className="relative space-y-2 rounded-lg border-2 border-green-500 p-4">
                     <div className="bg-background absolute -top-3 right-4 px-2">
                       <span className="text-xs font-medium text-green-600">
-                        EPIS
+                        JUDICIARY
                       </span>
                     </div>
                     <div className="flex items-center gap-4">

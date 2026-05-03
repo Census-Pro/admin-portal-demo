@@ -20,59 +20,6 @@ import {
   IconBuildingCommunity,
   IconShieldLock
 } from '@tabler/icons-react';
-import { instance } from '@/actions/instance';
-
-const API_URL = process.env.AUTH_SERVICE;
-
-async function getAdminProfile(id: string) {
-  try {
-    const headers = await instance();
-    console.log('Fetching admin profile for ID:', id);
-    console.log('API URL:', `${API_URL}/admin/${id}`);
-
-    const response = await fetch(`${API_URL}/admin/${id}`, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    console.log('API Response status:', response.status);
-    console.log('API Response ok:', response.ok);
-
-    if (!response.ok) {
-      console.log('API Response not ok, returning null');
-      return null;
-    }
-
-    const data = await response.json();
-    console.log('API Response data:', data);
-    return data;
-  } catch (error) {
-    console.error('Error fetching admin profile:', error);
-    return null;
-  }
-}
-
-async function getAgencyName(id: string) {
-  try {
-    const headers = await instance();
-    const response = await fetch(`${API_URL}/agencies/${id}`, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data = await response.json();
-    return data.name;
-  } catch (error) {
-    console.error('Error fetching agency:', error);
-    return null;
-  }
-}
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -81,30 +28,7 @@ export default async function ProfilePage() {
     redirect('/');
   }
 
-  const user = session.user;
-
-  // Fetch fresh admin profile data from API
-  const adminProfile = await getAdminProfile(user.id);
-
-  // If API returned data but agency is missing, fetch agency name separately
-  let agencyName = adminProfile?.agency?.name;
-  if (adminProfile?.agencyId && !agencyName) {
-    agencyName = await getAgencyName(adminProfile.agencyId);
-  }
-
-  // Use fresh API data if available, fallback to session data
-  const profileData = adminProfile || user;
-
-  // Debug: Log profile data
-  console.log('Profile data:', {
-    sessionUser: user,
-    apiProfile: adminProfile,
-    finalData: profileData,
-    agency: profileData?.agency,
-    agencyName: agencyName,
-    officeLocation: profileData?.officeLocation,
-    officeLocationName: profileData?.officeLocation?.name
-  });
+  const profileData = session.user;
 
   return (
     <PageContainer scrollable>
@@ -165,7 +89,7 @@ export default async function ProfilePage() {
                   <DetailItem
                     icon={<IconBuildingCommunity size={18} />}
                     label="Agency"
-                    value={profileData.agency?.name || agencyName}
+                    value={profileData.agency?.name}
                   />
                 </div>
               </div>
