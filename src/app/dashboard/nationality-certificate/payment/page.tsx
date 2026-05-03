@@ -1,5 +1,6 @@
 import PageContainer from '@/components/layout/page-container';
 import { NcPaymentTable } from './_components/payment-table';
+import { PaymentSearchBar } from './_components/search-bar';
 
 export const metadata = {
   title: 'Dashboard: Nationality Certificate - Payment'
@@ -11,7 +12,10 @@ export default function NationalityCertificatePaymentPage() {
       pageTitle="Nationality Certificate - Payment"
       pageDescription="Assessed applications with pending payment."
     >
-      <NcPaymentTable />
+      <div className="space-y-4">
+        <PaymentSearchBar />
+        <NcPaymentTable />
+      </div>
     </PageContainer>
   );
 }
