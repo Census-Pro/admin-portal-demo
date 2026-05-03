@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import {
   paymentColumns,
   NationalityApplicationPayment
 } from '../_components/payment-columns';
 import { getNcPaymentDoneIds } from '@/lib/nc-assessed-store';
+import { useQueryState, parseAsString } from 'nuqs';
 
 const ALL_APPLICATIONS: NationalityApplicationPayment[] = [
   {
@@ -83,6 +84,7 @@ const ALL_APPLICATIONS: NationalityApplicationPayment[] = [
 export function NcPaymentTable() {
   const [applications, setApplications] =
     useState<NationalityApplicationPayment[]>(ALL_APPLICATIONS);
+  const [q] = useQueryState('q', parseAsString.withDefault(''));
 
   useEffect(() => {
     const doneIds = getNcPaymentDoneIds();
@@ -91,11 +93,26 @@ export function NcPaymentTable() {
     }
   }, []);
 
+  const filtered = useMemo(() => {
+    if (!q) return applications;
+    const lower = q.toLowerCase();
+    return applications.filter((app) => {
+      const minorName = (app.minor_name ?? '').toLowerCase();
+      const applicantCid = (app.applicant_cid_no ?? '').toLowerCase();
+      const applicationNo = (app.application_no ?? '').toLowerCase();
+      return (
+        minorName.includes(lower) ||
+        applicantCid.includes(lower) ||
+        applicationNo.includes(lower)
+      );
+    });
+  }, [applications, q]);
+
   return (
     <DataTable
       columns={paymentColumns}
-      data={applications}
-      totalItems={applications.length}
+      data={filtered}
+      totalItems={filtered.length}
     />
   );
 }

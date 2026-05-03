@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import { columns, NationalityApplication } from '../../_components/columns';
 import { getNcAssessedIds } from '@/lib/nc-assessed-store';
+import { useQueryState, parseAsString } from 'nuqs';
 
 const ALL_APPLICATIONS: NationalityApplication[] = [
   {
@@ -17,7 +18,7 @@ const ALL_APPLICATIONS: NationalityApplication[] = [
     minor_cid: '11815000101',
     minor_name: 'Pema Dorji',
     dob: null,
-    parent_approval: 'PENDING',
+    parent_approval: 'APPROVED',
     application_status: 'SUBMITTED'
   },
   {
@@ -31,7 +32,7 @@ const ALL_APPLICATIONS: NationalityApplication[] = [
     minor_cid: '11815000789',
     minor_name: 'Tenzin Wangchuk',
     dob: '2015-06-20',
-    parent_approval: 'PENDING',
+    parent_approval: 'APPROVED',
     application_status: 'SUBMITTED'
   },
   {
@@ -45,7 +46,7 @@ const ALL_APPLICATIONS: NationalityApplication[] = [
     minor_cid: '11815000303',
     minor_name: 'Sonam Choden',
     dob: null,
-    parent_approval: 'PENDING',
+    parent_approval: 'APPROVED',
     application_status: 'SUBMITTED'
   }
 ];
@@ -53,6 +54,7 @@ const ALL_APPLICATIONS: NationalityApplication[] = [
 export function NcAssessmentTable() {
   const [applications, setApplications] =
     useState<NationalityApplication[]>(ALL_APPLICATIONS);
+  const [q] = useQueryState('q', parseAsString.withDefault(''));
 
   useEffect(() => {
     const doneIds = getNcAssessedIds();
@@ -61,11 +63,22 @@ export function NcAssessmentTable() {
     }
   }, []);
 
+  const filtered = useMemo(() => {
+    if (!q) return applications;
+    const lower = q.toLowerCase();
+    return applications.filter((app) => {
+      const minorName = (app.minor_name ?? '').toLowerCase();
+      const applicantCid = (app.applicant_cid_no ?? '').toLowerCase();
+      const applicationNo = (app.application_no ?? '').toLowerCase();
+      return (
+        minorName.includes(lower) ||
+        applicantCid.includes(lower) ||
+        applicationNo.includes(lower)
+      );
+    });
+  }, [applications, q]);
+
   return (
-    <DataTable
-      columns={columns}
-      data={applications}
-      totalItems={applications.length}
-    />
+    <DataTable columns={columns} data={filtered} totalItems={filtered.length} />
   );
 }
