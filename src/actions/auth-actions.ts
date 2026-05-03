@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { instance } from './instance';
 
-const API_URL = process.env.AUTH_SERVICE;
+const API_URL = process.env.AUTH_SERVICE || 'http://localhost:5001';
 
 export async function changePassword(formData: {
   currentPassword: string;

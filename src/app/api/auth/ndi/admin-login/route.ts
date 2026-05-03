@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const AUTH_SERVICE = process.env.AUTH_SERVICE;
-
-if (!AUTH_SERVICE) {
-  throw new Error('AUTH_SERVICE environment variable is required');
-}
+const AUTH_SERVICE = process.env.AUTH_SERVICE || 'http://localhost:5001';
 
 export async function POST(request: NextRequest) {
   try {
