@@ -119,6 +119,7 @@ const authConfig = {
 
           return {
             ...user,
+            cidNo: user.cidNumber,
             ability,
             permissions: transformedAbilities,
             accessToken: mockAccessToken,

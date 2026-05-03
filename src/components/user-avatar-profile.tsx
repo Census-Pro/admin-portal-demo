@@ -30,7 +30,7 @@ export function UserAvatarProfile({
           </span>
           {user?.roleType && (
             <span className="text-muted-foreground truncate text-[10px] font-medium uppercase">
-              {user.roleType.replace('_', ' ')}
+              {user.roleType === 'SUPER_ADMIN' ? 'SUPER ADMIN' : 'ADMIN'}
             </span>
           )}
         </div>

@@ -157,6 +157,211 @@ export const DEMO_USERS: MockUser[] = [
     ability: [{ name: 'Read All', action: ['read'], subject: 'all' }],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
+  },
+  {
+    id: '5',
+    fullName: 'Tsogpa',
+    cidNumber: '11407002841',
+    password: '11407002841',
+    email: 'tsogpa@demo.gov.bt',
+    mobileNo: '+97517555555',
+    roleType: 'Registration Officer',
+    status: 'active',
+    avatar: null,
+    roles: [
+      {
+        id: 'role-5',
+        name: 'Registration Officer',
+        permissions: [
+          { id: 'perm-7', name: 'manage:birth-registration-verify' },
+          { id: 'perm-8', name: 'manage:death-registration-verify' },
+          { id: 'perm-9', name: 'manage:move-in-out' }
+        ]
+      }
+    ],
+    ability: [
+      {
+        name: 'Birth Registration Verify',
+        action: ['manage'],
+        subject: 'birth-registration-verify'
+      },
+      {
+        name: 'Death Registration Verify',
+        action: ['manage'],
+        subject: 'death-registration-verify'
+      },
+      {
+        name: 'Move In Out Relieving',
+        action: ['manage'],
+        subject: 'Move In Out Relieving'
+      }
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '6',
+    fullName: 'Karma',
+    cidNumber: '66666666666',
+    password: 'karma123',
+    email: 'karma@demo.gov.bt',
+    mobileNo: '+97517666666',
+    roleType: 'Registration Officer',
+    status: 'active',
+    avatar: null,
+    roles: [
+      {
+        id: 'role-6',
+        name: 'Registration Officer',
+        permissions: [
+          { id: 'perm-10', name: 'manage:birth-registration-verify' },
+          { id: 'perm-11', name: 'manage:death-registration-verify' },
+          { id: 'perm-12', name: 'manage:move-in-out' }
+        ]
+      }
+    ],
+    ability: [
+      {
+        name: 'Birth Registration Verify',
+        action: ['manage'],
+        subject: 'birth-registration-verify'
+      },
+      {
+        name: 'Death Registration Verify',
+        action: ['manage'],
+        subject: 'death-registration-verify'
+      },
+      {
+        name: 'Move In Out',
+        action: ['manage'],
+        subject: 'move-in-out'
+      }
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '7',
+    fullName: 'Tenzin',
+    cidNumber: '77777777777',
+    password: 'tenzin123',
+    email: 'tenzin@demo.gov.bt',
+    mobileNo: '+97517777777',
+    roleType: 'Registration Officer',
+    status: 'active',
+    avatar: null,
+    roles: [
+      {
+        id: 'role-7',
+        name: 'Registration Officer',
+        permissions: [
+          { id: 'perm-13', name: 'manage:birth-registration-verify' },
+          { id: 'perm-14', name: 'manage:death-registration-verify' },
+          { id: 'perm-15', name: 'manage:move-in-out' }
+        ]
+      }
+    ],
+    ability: [
+      {
+        name: 'Birth Registration Verify',
+        action: ['manage'],
+        subject: 'birth-registration-verify'
+      },
+      {
+        name: 'Death Registration Verify',
+        action: ['manage'],
+        subject: 'death-registration-verify'
+      },
+      {
+        name: 'Move In Out',
+        action: ['manage'],
+        subject: 'move-in-out'
+      }
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '8',
+    fullName: 'Gup',
+    cidNumber: '10904003521',
+    password: '10904003521',
+    email: 'gup@demo.gov.bt',
+    mobileNo: '+97517888888',
+    roleType: 'Gup',
+    status: 'active',
+    avatar: null,
+    roles: [
+      {
+        id: 'role-8',
+        name: 'Gup',
+        permissions: [
+          { id: 'perm-16', name: 'manage:birth-registration-endorse' },
+          { id: 'perm-18', name: 'manage:death-registration-endorse' },
+          { id: 'perm-19', name: 'manage:move-in-out-receiving-endorse' }
+        ]
+      }
+    ],
+    ability: [
+      {
+        name: 'Birth Registration Endorse',
+        action: ['manage'],
+        subject: 'Birth Registration Endorse'
+      },
+      {
+        name: 'Death Registration Endorse',
+        action: ['manage'],
+        subject: 'Death Registration Endorse'
+      },
+      {
+        name: 'Move In Out Receiving Endorse',
+        action: ['manage'],
+        subject: 'Move In Out Receiving Endorse'
+      }
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: '9',
+    fullName: 'Headquarters',
+    cidNumber: '11302004178',
+    password: '11302004178',
+    email: 'hq@demo.gov.bt',
+    mobileNo: '+97517999999',
+    roleType: 'Headquarters',
+    status: 'active',
+    avatar: null,
+    roles: [
+      {
+        id: 'role-9',
+        name: 'Headquarters',
+        permissions: [
+          { id: 'perm-20', name: 'manage:birth-registration-approve' },
+          { id: 'perm-21', name: 'manage:death-registration-approve' },
+          { id: 'perm-22', name: 'manage:move-in-out-receiving-approve' }
+        ]
+      }
+    ],
+    ability: [
+      {
+        name: 'Birth Registration Approve',
+        action: ['manage'],
+        subject: 'Birth Registration Approve'
+      },
+      {
+        name: 'Death Registration Approve',
+        action: ['manage'],
+        subject: 'Death Registration Approve'
+      },
+      {
+        name: 'Move In Out Receiving Approve',
+        action: ['manage'],
+        subject: 'Move In Out Receiving Approve'
+      }
+    ],
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 ];
 

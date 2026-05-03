@@ -3,14 +3,28 @@
 import Image from 'next/image';
 import { ArrowRight, Lock, User, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+
+const DEMO_ACCOUNTS = [
+  { label: 'Super Admin', cid: '10910001327', password: '10910001327' },
+  { label: 'Tsogpa', cid: '11407002841', password: '11407002841' },
+  { label: 'Gup', cid: '10904003521', password: '10904003521' },
+  { label: 'Headquarters', cid: '11302004178', password: '11302004178' }
+];
 
 export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const cidRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const fillCredentials = (cid: string, password: string) => {
+    if (cidRef.current) cidRef.current.value = cid;
+    if (passwordRef.current) passwordRef.current.value = password;
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,6 +72,35 @@ export function LoginPage() {
 
   return (
     <div className="dark:bg-background fixed inset-0 flex items-center justify-center bg-gray-50/50 p-4">
+      {/* Demo credentials box — top-left corner */}
+      <div className="absolute top-4 left-4 w-80 rounded-xl border border-blue-200 bg-blue-50 p-5 shadow-md dark:border-blue-500/20 dark:bg-blue-500/10">
+        <p className="mb-4 text-sm font-bold tracking-wider text-blue-800 uppercase dark:text-blue-300">
+          🎯 Demo Credentials
+        </p>
+        <div className="space-y-3">
+          {DEMO_ACCOUNTS.map((account) => (
+            <button
+              key={account.cid}
+              type="button"
+              onClick={() => fillCredentials(account.cid, account.password)}
+              className="w-full rounded-lg border border-blue-200 bg-white/70 px-4 py-3 text-left transition-colors hover:bg-white dark:border-blue-500/20 dark:bg-blue-900/20 dark:hover:bg-blue-900/40"
+            >
+              <p className="text-sm font-semibold text-blue-900 dark:text-blue-200">
+                {account.label}
+              </p>
+              <p className="mt-1 font-mono text-xs text-blue-700 dark:text-blue-400">
+                CID: {account.cid}
+              </p>
+              <p className="font-mono text-xs text-blue-700 dark:text-blue-400">
+                PW: {account.password}
+              </p>
+            </button>
+          ))}
+        </div>
+        <p className="mt-4 text-xs text-blue-600 dark:text-blue-400">
+          Click an account to fill credentials
+        </p>
+      </div>
       <div className="bg-card dark:border-border w-full max-w-md rounded-2xl border border-gray-200 p-8 shadow-xl">
         <div className="mb-6 flex flex-col items-center">
           <div className="relative mb-4 h-20 w-20">
@@ -100,6 +143,7 @@ export function LoginPage() {
                 type="text"
                 placeholder="Enter your CID Number"
                 required
+                ref={cidRef}
                 className="bg-muted/50 focus:bg-background focus:border-primary focus:ring-primary w-full rounded-xl border border-transparent py-3 pr-4 pl-10 text-sm transition-all outline-none focus:ring-1"
               />
             </div>
@@ -120,6 +164,7 @@ export function LoginPage() {
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
                 required
+                ref={passwordRef}
                 className="bg-muted/50 focus:bg-background focus:border-primary focus:ring-primary w-full rounded-xl border border-transparent py-3 pr-10 pl-10 text-sm transition-all outline-none focus:ring-1"
               />
               <button
@@ -149,24 +194,6 @@ export function LoginPage() {
             {!isLoading && <ArrowRight className="h-4 w-4" />}
           </button>
         </form>
-
-        {/* Demo Mode Instructions */}
-        <div className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-500/20 dark:bg-blue-500/10">
-          <p className="mb-2 text-sm font-medium text-blue-800 dark:text-blue-300">
-            🎯 Demo Mode
-          </p>
-          <p className="text-xs text-blue-700 dark:text-blue-400">
-            Use demo credentials from <strong>DEMO_CREDENTIALS.md</strong> file.
-            Try CID:{' '}
-            <code className="rounded bg-blue-100 px-1 dark:bg-blue-900/30">
-              11111111111
-            </code>{' '}
-            with password:{' '}
-            <code className="rounded bg-blue-100 px-1 dark:bg-blue-900/30">
-              admin123
-            </code>
-          </p>
-        </div>
 
         {/* Removed NDI Login - Demo Mode Only */}
 

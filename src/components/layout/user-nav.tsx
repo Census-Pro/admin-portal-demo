@@ -43,13 +43,13 @@ export function UserNav() {
             <div className="flex flex-col space-y-1">
               {/* Name removed as requested */}
               <p className="text-xs leading-none font-bold text-gray-900 dark:text-white">
-                {session.user.cidNo
-                  ? `CID: ${session.user.cidNo}`
-                  : session.user.email}
+                CID: {session.user.cidNo || '—'}
               </p>
               {session.user.roleType && (
                 <p className="pt-1 text-[10px] leading-none font-bold text-gray-900 uppercase dark:text-white">
-                  {session.user.roleType.replace('_', ' ')}
+                  {session.user.roleType === 'SUPER_ADMIN'
+                    ? 'SUPER ADMIN'
+                    : 'ADMIN'}
                 </p>
               )}
             </div>

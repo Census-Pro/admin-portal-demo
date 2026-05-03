@@ -32,6 +32,27 @@ This is a demo frontend application with **mock authentication**. No backend ser
 - **Role**: Viewer
 - **Permissions**: Read-only access to all modules
 
+### 5. Tsogpa
+
+- **CID**: `55555555555`
+- **Password**: `tsogpa123`
+- **Role**: Registration Officer
+- **Permissions**: Birth Registration (Verify), Death Registration (Verify), Move In Move Out (Relieving)
+
+### 6. Karma
+
+- **CID**: `66666666666`
+- **Password**: `karma123`
+- **Role**: Registration Officer
+- **Permissions**: Birth Registration (Verify), Death Registration (Verify), Move In Move Out (Relieving)
+
+### 7. Tenzin
+
+- **CID**: `77777777777`
+- **Password**: `tenzin123`
+- **Role**: Registration Officer
+- **Permissions**: Birth Registration (Verify), Death Registration (Verify), Move In Move Out (Relieving)
+
 ## Quick Start
 
 1. Navigate to the login page
