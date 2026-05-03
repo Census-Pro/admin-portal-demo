@@ -45,7 +45,9 @@ import {
   IconCertificate,
   IconGrave2,
   IconEdit,
-  IconInbox
+  IconInbox,
+  IconTruckDelivery,
+  IconPackageImport
 } from '@tabler/icons-react';
 
 export type Icon = React.ComponentType<IconProps>;
@@ -98,5 +100,7 @@ export const Icons = {
   certificate: IconCertificate,
   grave: IconGrave2,
   edit: IconEdit,
-  inbox: IconInbox
+  inbox: IconInbox,
+  truckDelivery: IconTruckDelivery,
+  packageImport: IconPackageImport
 };

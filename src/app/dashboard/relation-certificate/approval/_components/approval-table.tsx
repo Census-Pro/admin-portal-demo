@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DataTable } from '@/components/ui/table/data-table';
 import {
   approvalColumns,
   RelationshipApplicationApproval
 } from '../_components/approval-columns';
 import { getRcApprovalDoneIds } from '@/lib/rc-assessed-store';
+import { useQueryState, parseAsString } from 'nuqs';
 
 const ALL_APPLICATIONS: RelationshipApplicationApproval[] = [
   {
@@ -94,6 +95,7 @@ const ALL_APPLICATIONS: RelationshipApplicationApproval[] = [
 export function ApprovalTable() {
   const [applications, setApplications] =
     useState<RelationshipApplicationApproval[]>(ALL_APPLICATIONS);
+  const [q] = useQueryState('q', parseAsString.withDefault(''));
 
   useEffect(() => {
     const doneIds = getRcApprovalDoneIds();
@@ -102,11 +104,30 @@ export function ApprovalTable() {
     }
   }, []);
 
+  const filtered = useMemo(() => {
+    if (!q) return applications;
+    const lower = q.toLowerCase();
+    return applications.filter((app) => {
+      const applicantName = (app.applicant_name ?? '').toLowerCase();
+      const applicantCid = (app.applicant_cid ?? '').toLowerCase();
+      const relationshipToName = (app.relationship_to_name ?? '').toLowerCase();
+      const relationshipToCid = (app.relationship_to_cid ?? '').toLowerCase();
+      const applicationNo = (app.application_no ?? '').toLowerCase();
+      return (
+        applicantName.includes(lower) ||
+        applicantCid.includes(lower) ||
+        relationshipToName.includes(lower) ||
+        relationshipToCid.includes(lower) ||
+        applicationNo.includes(lower)
+      );
+    });
+  }, [applications, q]);
+
   return (
     <DataTable
       columns={approvalColumns}
-      data={applications}
-      totalItems={applications.length}
+      data={filtered}
+      totalItems={filtered.length}
     />
   );
 }

@@ -1,5 +1,6 @@
 import PageContainer from '@/components/layout/page-container';
 import { ApprovalTable } from './_components/approval-table';
+import { ApprovalSearchBar } from './_components/search-bar';
 
 export const metadata = {
   title: 'Dashboard: Relation Certificate - Approval'
@@ -11,7 +12,10 @@ export default function RelationCertificateApprovalPage() {
       pageTitle="Relation Certificate - Approval"
       pageDescription="Assessed applications with paid payment pending approval."
     >
-      <ApprovalTable />
+      <div className="space-y-4">
+        <ApprovalSearchBar />
+        <ApprovalTable />
+      </div>
     </PageContainer>
   );
 }
