@@ -195,7 +195,32 @@ export function LoginPage() {
           </button>
         </form>
 
-        {/* Removed NDI Login - Demo Mode Only */}
+        {/* NDI Login Button - UI only, not functional in demo mode */}
+        <div className="mt-4">
+          <div className="relative flex items-center justify-center">
+            <div className="border-border absolute inset-0 flex items-center">
+              <div className="border-border w-full border-t" />
+            </div>
+            <div className="bg-background relative px-3">
+              <span className="text-muted-foreground text-xs">or</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            disabled
+            className="mt-4 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#124143] px-6 py-3 font-semibold text-white opacity-50 shadow-lg transition-all"
+            title="NDI login coming soon"
+          >
+            <div className="relative h-6 w-6">
+              <img
+                src="/NDI.png"
+                alt="NDI Logo"
+                className="h-6 w-6 object-contain"
+              />
+            </div>
+            Login with Bhutan NDI
+          </button>
+        </div>
 
         <div className="mt-6 text-center">
           <p className="text-muted-foreground text-xs">
