@@ -8,6 +8,273 @@ const API_URL =
   process.env.AUTH_SERVICE || process.env.API_URL || 'http://localhost:5001';
 
 export async function getPermissions(page: number = 1, take: number = 100) {
+  // DEMO MODE: return mock permissions based on demo users
+  return {
+    success: true,
+    data: [
+      {
+        id: 'perm-1',
+        name: 'manage:all',
+        description: 'Full access to all system resources',
+        actions: ['manage'],
+        subjects: ['all'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-7',
+        name: 'manage:birth-registration-verify',
+        description: 'Verify birth registration submissions',
+        actions: ['manage'],
+        subjects: ['birth-registration-verify'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-8',
+        name: 'manage:death-registration-verify',
+        description: 'Verify death registration submissions',
+        actions: ['manage'],
+        subjects: ['death-registration-verify'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-9',
+        name: 'manage:move-in-out-relieving',
+        description: 'Handle move-in/move-out relieving process',
+        actions: ['manage'],
+        subjects: ['move-in-out-relieving'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-16',
+        name: 'manage:birth-registration-endorse',
+        description: 'Endorse birth registration applications',
+        actions: ['manage'],
+        subjects: ['birth-registration-endorse'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-18',
+        name: 'manage:death-registration-endorse',
+        description: 'Endorse death registration applications',
+        actions: ['manage'],
+        subjects: ['death-registration-endorse'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-19',
+        name: 'manage:move-in-out-receiving-endorse',
+        description: 'Endorse move-in/move-out receiving applications',
+        actions: ['manage'],
+        subjects: ['move-in-out-receiving-endorse'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-20',
+        name: 'manage:birth-registration-approve',
+        description: 'Approve birth registration applications',
+        actions: ['manage'],
+        subjects: ['birth-registration-approve'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-21',
+        name: 'manage:death-registration-approve',
+        description: 'Approve death registration applications',
+        actions: ['manage'],
+        subjects: ['death-registration-approve'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-22',
+        name: 'manage:move-in-out-receiving-approve',
+        description: 'Approve move-in/move-out receiving applications',
+        actions: ['manage'],
+        subjects: ['move-in-out-receiving-approve'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-hoh',
+        name: 'manage:hoh-change-approve',
+        description: 'Approve Head of Household change requests',
+        actions: ['manage'],
+        subjects: ['hoh-change-approve'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-23',
+        name: 'manage:cid-issuance-fresh-assessment',
+        description: 'Assess fresh CID issuance applications',
+        actions: ['manage'],
+        subjects: ['cid-issuance-fresh-assessment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-24',
+        name: 'manage:cid-issuance-fresh-payment',
+        description: 'Process payment for fresh CID issuance',
+        actions: ['manage'],
+        subjects: ['cid-issuance-fresh-payment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-25',
+        name: 'manage:cid-issuance-fresh-approval',
+        description: 'Approve fresh CID issuance applications',
+        actions: ['manage'],
+        subjects: ['cid-issuance-fresh-approval'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-26',
+        name: 'manage:cid-issuance-renewal-assessment',
+        description: 'Assess CID renewal applications',
+        actions: ['manage'],
+        subjects: ['cid-issuance-renewal-assessment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-27',
+        name: 'manage:cid-issuance-renewal-payment',
+        description: 'Process payment for CID renewal',
+        actions: ['manage'],
+        subjects: ['cid-issuance-renewal-payment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-28',
+        name: 'manage:cid-issuance-renewal-approval',
+        description: 'Approve CID renewal applications',
+        actions: ['manage'],
+        subjects: ['cid-issuance-renewal-approval'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-29',
+        name: 'manage:cid-issuance-replacement-assessment',
+        description: 'Assess CID replacement applications',
+        actions: ['manage'],
+        subjects: ['cid-issuance-replacement-assessment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-30',
+        name: 'manage:cid-issuance-replacement-payment',
+        description: 'Process payment for CID replacement',
+        actions: ['manage'],
+        subjects: ['cid-issuance-replacement-payment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-31',
+        name: 'manage:cid-issuance-replacement-approval',
+        description: 'Approve CID replacement applications',
+        actions: ['manage'],
+        subjects: ['cid-issuance-replacement-approval'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-32',
+        name: 'manage:nationality-certificate-assessment',
+        description: 'Assess nationality certificate applications',
+        actions: ['manage'],
+        subjects: ['nationality-certificate-assessment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-33',
+        name: 'manage:nationality-certificate-payment',
+        description: 'Process payment for nationality certificates',
+        actions: ['manage'],
+        subjects: ['nationality-certificate-payment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-34',
+        name: 'manage:nationality-certificate-approval',
+        description: 'Approve nationality certificate applications',
+        actions: ['manage'],
+        subjects: ['nationality-certificate-approval'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-35',
+        name: 'manage:relation-certificate-assessment',
+        description: 'Assess relation certificate applications',
+        actions: ['manage'],
+        subjects: ['relation-certificate-assessment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-36',
+        name: 'manage:relation-certificate-payment',
+        description: 'Process payment for relation certificates',
+        actions: ['manage'],
+        subjects: ['relation-certificate-payment'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'perm-37',
+        name: 'manage:relation-certificate-approval',
+        description: 'Approve relation certificate applications',
+        actions: ['manage'],
+        subjects: ['relation-certificate-approval'],
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ]
+  };
+
   try {
     const headers = await instance();
 

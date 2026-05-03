@@ -8,6 +8,49 @@ const API_URL =
   process.env.AUTH_SERVICE || process.env.API_URL || 'http://localhost:5001';
 
 export async function getRoles() {
+  // DEMO MODE: return mock roles based on demo users
+  return {
+    success: true,
+    data: [
+      {
+        id: 'role-1',
+        name: 'Super Admin',
+        description:
+          'Full system access with all CRUD operations across all modules.',
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'role-5',
+        name: 'Tsogpa',
+        description:
+          'Handles birth and death registration verification and move-in/move-out relieving.',
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'role-8',
+        name: 'Gup',
+        description:
+          'Endorses birth and death registrations and move-in/move-out receiving.',
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      },
+      {
+        id: 'role-9',
+        name: 'Headquarters',
+        description:
+          'Approves registrations, HOH changes, CID issuance, and certificate applications.',
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+    ]
+  };
+
   try {
     const headers = await instance();
 
@@ -106,6 +149,216 @@ export async function getRoles() {
 }
 
 export async function getRoleById(id: string) {
+  // DEMO MODE: return mock role data
+  const MOCK_ROLES: Record<string, any> = {
+    'role-1': {
+      id: 'role-1',
+      name: 'Super Admin',
+      description:
+        'Full system access with all CRUD operations across all modules.',
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      permissions: [
+        {
+          id: 'perm-1',
+          name: 'manage:all',
+          actions: ['manage'],
+          subjects: ['all']
+        }
+      ]
+    },
+    'role-5': {
+      id: 'role-5',
+      name: 'Tsogpa',
+      description:
+        'Handles birth and death registration verification and move-in/move-out relieving.',
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      permissions: [
+        {
+          id: 'perm-7',
+          name: 'manage:birth-registration-verify',
+          actions: ['manage'],
+          subjects: ['birth-registration-verify']
+        },
+        {
+          id: 'perm-8',
+          name: 'manage:death-registration-verify',
+          actions: ['manage'],
+          subjects: ['death-registration-verify']
+        },
+        {
+          id: 'perm-9',
+          name: 'manage:move-in-out-relieving',
+          actions: ['manage'],
+          subjects: ['move-in-out-relieving']
+        }
+      ]
+    },
+    'role-8': {
+      id: 'role-8',
+      name: 'Gup',
+      description:
+        'Endorses birth and death registrations and move-in/move-out receiving.',
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      permissions: [
+        {
+          id: 'perm-16',
+          name: 'manage:birth-registration-endorse',
+          actions: ['manage'],
+          subjects: ['birth-registration-endorse']
+        },
+        {
+          id: 'perm-18',
+          name: 'manage:death-registration-endorse',
+          actions: ['manage'],
+          subjects: ['death-registration-endorse']
+        },
+        {
+          id: 'perm-19',
+          name: 'manage:move-in-out-receiving-endorse',
+          actions: ['manage'],
+          subjects: ['move-in-out-receiving-endorse']
+        }
+      ]
+    },
+    'role-9': {
+      id: 'role-9',
+      name: 'Headquarters',
+      description:
+        'Approves registrations, HOH changes, CID issuance, and certificate applications.',
+      isActive: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      permissions: [
+        {
+          id: 'perm-20',
+          name: 'manage:birth-registration-approve',
+          actions: ['manage'],
+          subjects: ['birth-registration-approve']
+        },
+        {
+          id: 'perm-21',
+          name: 'manage:death-registration-approve',
+          actions: ['manage'],
+          subjects: ['death-registration-approve']
+        },
+        {
+          id: 'perm-22',
+          name: 'manage:move-in-out-receiving-approve',
+          actions: ['manage'],
+          subjects: ['move-in-out-receiving-approve']
+        },
+        {
+          id: 'perm-hoh',
+          name: 'manage:hoh-change-approve',
+          actions: ['manage'],
+          subjects: ['hoh-change-approve']
+        },
+        {
+          id: 'perm-23',
+          name: 'manage:cid-issuance-fresh-assessment',
+          actions: ['manage'],
+          subjects: ['cid-issuance-fresh-assessment']
+        },
+        {
+          id: 'perm-24',
+          name: 'manage:cid-issuance-fresh-payment',
+          actions: ['manage'],
+          subjects: ['cid-issuance-fresh-payment']
+        },
+        {
+          id: 'perm-25',
+          name: 'manage:cid-issuance-fresh-approval',
+          actions: ['manage'],
+          subjects: ['cid-issuance-fresh-approval']
+        },
+        {
+          id: 'perm-26',
+          name: 'manage:cid-issuance-renewal-assessment',
+          actions: ['manage'],
+          subjects: ['cid-issuance-renewal-assessment']
+        },
+        {
+          id: 'perm-27',
+          name: 'manage:cid-issuance-renewal-payment',
+          actions: ['manage'],
+          subjects: ['cid-issuance-renewal-payment']
+        },
+        {
+          id: 'perm-28',
+          name: 'manage:cid-issuance-renewal-approval',
+          actions: ['manage'],
+          subjects: ['cid-issuance-renewal-approval']
+        },
+        {
+          id: 'perm-29',
+          name: 'manage:cid-issuance-replacement-assessment',
+          actions: ['manage'],
+          subjects: ['cid-issuance-replacement-assessment']
+        },
+        {
+          id: 'perm-30',
+          name: 'manage:cid-issuance-replacement-payment',
+          actions: ['manage'],
+          subjects: ['cid-issuance-replacement-payment']
+        },
+        {
+          id: 'perm-31',
+          name: 'manage:cid-issuance-replacement-approval',
+          actions: ['manage'],
+          subjects: ['cid-issuance-replacement-approval']
+        },
+        {
+          id: 'perm-32',
+          name: 'manage:nationality-certificate-assessment',
+          actions: ['manage'],
+          subjects: ['nationality-certificate-assessment']
+        },
+        {
+          id: 'perm-33',
+          name: 'manage:nationality-certificate-payment',
+          actions: ['manage'],
+          subjects: ['nationality-certificate-payment']
+        },
+        {
+          id: 'perm-34',
+          name: 'manage:nationality-certificate-approval',
+          actions: ['manage'],
+          subjects: ['nationality-certificate-approval']
+        },
+        {
+          id: 'perm-35',
+          name: 'manage:relation-certificate-assessment',
+          actions: ['manage'],
+          subjects: ['relation-certificate-assessment']
+        },
+        {
+          id: 'perm-36',
+          name: 'manage:relation-certificate-payment',
+          actions: ['manage'],
+          subjects: ['relation-certificate-payment']
+        },
+        {
+          id: 'perm-37',
+          name: 'manage:relation-certificate-approval',
+          actions: ['manage'],
+          subjects: ['relation-certificate-approval']
+        }
+      ]
+    }
+  };
+
+  if (MOCK_ROLES[id]) {
+    return { success: true, data: MOCK_ROLES[id] };
+  }
+
+  return { success: false, error: 'Role not found', data: null };
+
   try {
     const headers = await instance();
     const url = `${API_URL}/roles/${id}`;

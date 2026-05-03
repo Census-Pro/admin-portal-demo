@@ -1,169 +1,97 @@
 'use server';
 
-import { instance } from '../instance';
+// DEMO MODE: Mock admin data matching demo users
+const MOCK_ADMINS: Record<string, any> = {
+  '1': {
+    id: '1',
+    cidNo: '10910001327',
+    fullName: 'Super Admin',
+    email: 'admin@demo.gov.bt',
+    mobileNo: '+97517111111',
+    roleType: 'SUPER_ADMIN',
+    agencyName: 'Department of Civil Registration',
+    officeLocationName: 'Thimphu',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  '5': {
+    id: '5',
+    cidNo: '11407002841',
+    fullName: 'Tsogpa',
+    email: 'tsogpa@demo.gov.bt',
+    mobileNo: '+97517555555',
+    roleType: 'Registration Officer',
+    agencyName: 'Department of Civil Registration',
+    officeLocationName: 'Thimphu',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  '8': {
+    id: '8',
+    cidNo: '10904003521',
+    fullName: 'Gup',
+    email: 'gup@demo.gov.bt',
+    mobileNo: '+97517888888',
+    roleType: 'Gup',
+    agencyName: 'Gewog Administration',
+    officeLocationName: 'Punakha',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  '9': {
+    id: '9',
+    cidNo: '11302004178',
+    fullName: 'Headquarters',
+    email: 'hq@demo.gov.bt',
+    mobileNo: '+97517999999',
+    roleType: 'Headquarters',
+    agencyName: 'Department of Civil Registration',
+    officeLocationName: 'Thimphu',
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+};
 
-const API_URL =
-  process.env.AUTH_SERVICE || process.env.API_URL || 'http://localhost:5001';
+const MOCK_ROLES: Record<string, any[]> = {
+  '1': [
+    { id: 'role-1', name: 'Super Admin', description: 'Full system access' }
+  ],
+  '5': [
+    {
+      id: 'role-5',
+      name: 'Tsogpa',
+      description: 'Registration verification and relieving'
+    }
+  ],
+  '8': [{ id: 'role-8', name: 'Gup', description: 'Endorsement functions' }],
+  '9': [
+    {
+      id: 'role-9',
+      name: 'Headquarters',
+      description: 'Approval and issuance functions'
+    }
+  ]
+};
 
 export async function getAdminById(adminId: string) {
-  try {
-    const headers = await instance();
-    const url = `${API_URL}/admin/${adminId}`;
-
-    console.log('[getAdminById] Fetching admin from:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch admin details';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      if (response.status === 404) {
-        errorMessage = 'User not found';
-      }
-
-      console.error('[getAdminById] API Error:', errorMessage);
-
-      return {
-        success: false,
-        error: errorMessage,
-        data: null
-      };
-    }
-
-    const result = await response.json();
-    console.log('[getAdminById] Admin fetched successfully');
-
-    return {
-      success: true,
-      data: result.data || result
-    };
-  } catch (error) {
-    console.error('[getAdminById] Unexpected error:', error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'An unexpected error occurred',
-      data: null
-    };
-  }
+  const admin = MOCK_ADMINS[adminId];
+  if (admin) return { success: true, data: admin };
+  return { success: false, error: 'User not found', data: null };
 }
 
 export async function getAdminRoles(adminId: string) {
-  try {
-    const headers = await instance();
-    const url = `${API_URL}/admin-role/admin/${adminId}`;
-
-    console.log('[getAdminRoles] Fetching admin roles from:', url);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers,
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to fetch admin roles';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      console.error('[getAdminRoles] API Error:', errorMessage);
-
-      return {
-        success: false,
-        error: errorMessage,
-        data: []
-      };
-    }
-
-    const result = await response.json();
-
-    // The new API returns adminRole objects with role relation
-    const roles =
-      result
-        ?.map((ar: any) => ({
-          id: ar.role?.id,
-          name: ar.role?.name,
-          description: ar.role?.description
-        }))
-        .filter((role: any) => role.id) || [];
-
-    console.log('[getAdminRoles] Roles fetched successfully:', roles.length);
-
-    return {
-      success: true,
-      data: roles
-    };
-  } catch (error) {
-    console.error('[getAdminRoles] Unexpected error:', error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'An unexpected error occurred',
-      data: []
-    };
-  }
+  return { success: true, data: MOCK_ROLES[adminId] || [] };
 }
 
 export async function removeRoleFromAdmin(data: {
   adminId: string;
   roleId: string;
 }) {
-  try {
-    const headers = await instance();
-    const url = `${API_URL}/admin-role/admin/${data.adminId}/role/${data.roleId}`;
-
-    console.log('[removeRoleFromAdmin] Deleting from:', url);
-
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to remove role from admin';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      console.error('[removeRoleFromAdmin] Error:', errorMessage);
-      return {
-        success: false,
-        error: errorMessage
-      };
-    }
-
-    const result = await response.json();
-    console.log('[removeRoleFromAdmin] Success:', result);
-
-    return {
-      success: true,
-      message: 'Role removed from admin successfully'
-    };
-  } catch (error) {
-    console.error('[removeRoleFromAdmin] Unexpected error:', error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'An unexpected error occurred'
-    };
-  }
+  return { success: true, message: 'Role removed successfully' };
 }
 
 export async function updateAdmin(
@@ -179,101 +107,12 @@ export async function updateAdmin(
     email?: string;
   }
 ) {
-  try {
-    const headers = await instance();
-    const url = `${API_URL}/admin/${adminId}`;
-
-    console.log('[updateAdmin] Updating admin at:', url);
-
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(updateData)
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to update admin';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      console.error('[updateAdmin] API Error:', errorMessage);
-
-      return {
-        success: false,
-        error: errorMessage
-      };
-    }
-
-    const result = await response.json();
-    console.log('[updateAdmin] Admin updated successfully');
-
-    return {
-      success: true,
-      data: result.data || result
-    };
-  } catch (error) {
-    console.error('[updateAdmin] Unexpected error:', error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'An unexpected error occurred'
-    };
+  if (MOCK_ADMINS[adminId]) {
+    return { success: true, data: { ...MOCK_ADMINS[adminId], ...updateData } };
   }
+  return { success: false, error: 'User not found' };
 }
 
 export async function resetAdminPassword(adminId: string, newPassword: string) {
-  try {
-    const headers = await instance();
-    const url = `${API_URL}/admin/${adminId}/reset-password`;
-
-    console.log('[resetAdminPassword] Resetting password for admin:', adminId);
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        ...headers,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ newPassword })
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to reset password';
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
-      console.error('[resetAdminPassword] API Error:', errorMessage);
-
-      return {
-        success: false,
-        error: errorMessage
-      };
-    }
-
-    const result = await response.json();
-    console.log('[resetAdminPassword] Password reset successfully');
-
-    return {
-      success: true,
-      message: result.message || 'Password reset successfully'
-    };
-  } catch (error) {
-    console.error('[resetAdminPassword] Unexpected error:', error);
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'An unexpected error occurred'
-    };
-  }
+  return { success: true, message: 'Password reset successfully' };
 }

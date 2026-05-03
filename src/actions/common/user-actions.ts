@@ -9,135 +9,47 @@ const API_URL = process.env.API_URL || 'http://localhost:5001';
 const DUMMY_USERS = [
   {
     id: '1',
-    name: 'Tashi Wangmo',
-    cidNo: '12345678901',
-    email: 'tashi.wangmo@gov.bt',
+    name: 'Super Admin',
+    cidNo: '10910001327',
+    email: 'admin@demo.gov.bt',
     role: 'SUPER_ADMIN',
-    agencyName: 'Ministry of Home Affairs',
+    agencyName: 'Department of Civil Registration',
     officeLocationName: 'Thimphu',
     status: 'Active' as const,
-    lastActive: '2025-04-30T10:30:00Z'
-  },
-  {
-    id: '2',
-    name: 'Karma Dorji',
-    cidNo: '12345678902',
-    email: 'karma.dorji@gov.bt',
-    role: 'ADMIN',
-    agencyName: 'Department of Immigration',
-    officeLocationName: 'Phuentsholing',
-    status: 'Active' as const,
-    lastActive: '2025-04-30T09:15:00Z'
-  },
-  {
-    id: '3',
-    name: 'Sonam Choden',
-    cidNo: '12345678903',
-    email: 'sonam.choden@gov.bt',
-    role: 'OFFICER',
-    agencyName: 'Regional Immigration Office',
-    officeLocationName: 'Paro',
-    status: 'Active' as const,
-    lastActive: '2025-04-30T08:45:00Z'
-  },
-  {
-    id: '4',
-    name: 'Dawa Gyeltshen',
-    cidNo: '12345678904',
-    email: 'dawa.gyeltshen@gov.bt',
-    role: 'OFFICER',
-    agencyName: 'Dzongkhag Administration',
-    officeLocationName: 'Punakha',
-    status: 'Inactive' as const,
-    lastActive: '2025-04-28T16:20:00Z'
+    lastActive: new Date().toISOString()
   },
   {
     id: '5',
-    name: 'Dechen Wangmo',
-    cidNo: '12345678905',
-    email: 'dechen.wangmo@gov.bt',
-    role: 'CLERK',
-    agencyName: 'Local Government Office',
-    officeLocationName: 'Wangdue',
-    status: 'Active' as const,
-    lastActive: '2025-04-30T11:00:00Z'
-  },
-  {
-    id: '6',
-    name: 'Lhendup Dorji',
-    cidNo: '12345678906',
-    email: 'lhendup.dorji@gov.bt',
-    role: 'OFFICER',
-    agencyName: 'Ministry of Home Affairs',
+    name: 'Tsogpa',
+    cidNo: '11407002841',
+    email: 'tsogpa@demo.gov.bt',
+    role: 'ADMIN',
+    agencyName: 'Department of Civil Registration',
     officeLocationName: 'Thimphu',
     status: 'Active' as const,
-    lastActive: '2025-04-30T07:30:00Z'
-  },
-  {
-    id: '7',
-    name: 'Pema Lhamo',
-    cidNo: '12345678907',
-    email: 'pema.lhamo@gov.bt',
-    role: 'ADMIN',
-    agencyName: 'Department of Immigration',
-    officeLocationName: 'Gelephu',
-    status: 'Pending' as const,
-    lastActive: '2025-04-29T14:15:00Z'
+    lastActive: new Date().toISOString()
   },
   {
     id: '8',
-    name: 'Tandin Bidha',
-    cidNo: '12345678908',
-    email: 'tandin.bidha@gov.bt',
-    role: 'CLERK',
-    agencyName: 'Regional Immigration Office',
-    officeLocationName: 'Samdrup Jongkhar',
+    name: 'Gup',
+    cidNo: '10904003521',
+    email: 'gup@demo.gov.bt',
+    role: 'ADMIN',
+    agencyName: 'Gewog Administration',
+    officeLocationName: 'Punakha',
     status: 'Active' as const,
-    lastActive: '2025-04-30T12:45:00Z'
+    lastActive: new Date().toISOString()
   },
   {
     id: '9',
-    name: 'Kinley Wangchuk',
-    cidNo: '12345678909',
-    email: 'kinley.wangchuk@gov.bt',
-    role: 'OFFICER',
-    agencyName: 'Dzongkhag Administration',
-    officeLocationName: 'Trashigang',
-    status: 'Active' as const,
-    lastActive: '2025-04-30T10:00:00Z'
-  },
-  {
-    id: '10',
-    name: 'Chimi Dema',
-    cidNo: '12345678910',
-    email: 'chimi.dema@gov.bt',
-    role: 'CLERK',
-    agencyName: 'Local Government Office',
-    officeLocationName: 'Mongar',
-    status: 'Active' as const,
-    lastActive: '2025-04-30T09:30:00Z'
-  },
-  {
-    id: '11',
-    name: 'Sonam Tshering',
-    cidNo: '12345678911',
-    email: 'sonam.tshering@gov.bt',
+    name: 'Headquarters',
+    cidNo: '11302004178',
+    email: 'hq@demo.gov.bt',
     role: 'ADMIN',
-    agencyName: 'Ministry of Home Affairs',
+    agencyName: 'Department of Civil Registration',
     officeLocationName: 'Thimphu',
     status: 'Active' as const,
-    lastActive: '2025-04-30T13:15:00Z'
-  },
-  {
-    id: '12',
-    name: 'Karma Yangki',
-    cidNo: '12345678912',
-    email: 'karma.yangki@gov.bt',
-    role: 'OFFICER',
-    agencyName: 'Department of Immigration',
-    officeLocationName: 'Samtse',
-    status: 'Active' as const,
-    lastActive: '2025-04-30T08:00:00Z'
+    lastActive: new Date().toISOString()
   }
 ];
 

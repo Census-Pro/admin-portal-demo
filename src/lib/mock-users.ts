@@ -59,106 +59,6 @@ export const DEMO_USERS: MockUser[] = [
     updatedAt: new Date().toISOString()
   },
   {
-    id: '2',
-    fullName: 'Registration Officer',
-    cidNumber: '22222222222',
-    password: 'officer123',
-    email: 'officer@demo.gov.bt',
-    mobileNo: '+97517222222',
-    roleType: 'Registration Officer',
-    status: 'active',
-    avatar: null,
-    roles: [
-      {
-        id: 'role-2',
-        name: 'Registration Officer',
-        permissions: [
-          { id: 'perm-2', name: 'manage:birth-registration' },
-          { id: 'perm-3', name: 'manage:death-registration' }
-        ]
-      }
-    ],
-    ability: [
-      {
-        name: 'Birth Registration',
-        action: ['create', 'read', 'update'],
-        subject: 'birth-registration'
-      },
-      {
-        name: 'Death Registration',
-        action: ['create', 'read', 'update'],
-        subject: 'death-registration'
-      },
-      { name: 'Household View', action: ['read'], subject: 'household' },
-      { name: 'Citizen View', action: ['read'], subject: 'citizen' }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '3',
-    fullName: 'Approval Officer',
-    cidNumber: '33333333333',
-    password: 'approval123',
-    email: 'approval@demo.gov.bt',
-    mobileNo: '+97517333333',
-    roleType: 'Approval Officer',
-    status: 'active',
-    avatar: null,
-    roles: [
-      {
-        id: 'role-3',
-        name: 'Approval Officer',
-        permissions: [
-          { id: 'perm-4', name: 'approve:birth-registration' },
-          { id: 'perm-5', name: 'approve:death-registration' }
-        ]
-      }
-    ],
-    ability: [
-      {
-        name: 'Birth Registration Approval',
-        action: ['read', 'update'],
-        subject: 'birth-registration'
-      },
-      {
-        name: 'Death Registration Approval',
-        action: ['read', 'update'],
-        subject: 'death-registration'
-      },
-      { name: 'Household View', action: ['read'], subject: 'household' },
-      { name: 'Citizen View', action: ['read'], subject: 'citizen' },
-      {
-        name: 'Reports Management',
-        action: ['read', 'create'],
-        subject: 'reports'
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '4',
-    fullName: 'Viewer User',
-    cidNumber: '44444444444',
-    password: 'viewer123',
-    email: 'viewer@demo.gov.bt',
-    mobileNo: '+97517444444',
-    roleType: 'Viewer',
-    status: 'active',
-    avatar: null,
-    roles: [
-      {
-        id: 'role-4',
-        name: 'Viewer',
-        permissions: [{ id: 'perm-6', name: 'read:all' }]
-      }
-    ],
-    ability: [{ name: 'Read All', action: ['read'], subject: 'all' }],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
     id: '5',
     fullName: 'Tsogpa',
     cidNumber: '11407002841',
@@ -194,88 +94,6 @@ export const DEMO_USERS: MockUser[] = [
         name: 'Move In Out Relieving',
         action: ['manage'],
         subject: 'Move In Out Relieving'
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '6',
-    fullName: 'Karma',
-    cidNumber: '66666666666',
-    password: 'karma123',
-    email: 'karma@demo.gov.bt',
-    mobileNo: '+97517666666',
-    roleType: 'Registration Officer',
-    status: 'active',
-    avatar: null,
-    roles: [
-      {
-        id: 'role-6',
-        name: 'Registration Officer',
-        permissions: [
-          { id: 'perm-10', name: 'manage:birth-registration-verify' },
-          { id: 'perm-11', name: 'manage:death-registration-verify' },
-          { id: 'perm-12', name: 'manage:move-in-out' }
-        ]
-      }
-    ],
-    ability: [
-      {
-        name: 'Birth Registration Verify',
-        action: ['manage'],
-        subject: 'birth-registration-verify'
-      },
-      {
-        name: 'Death Registration Verify',
-        action: ['manage'],
-        subject: 'death-registration-verify'
-      },
-      {
-        name: 'Move In Out',
-        action: ['manage'],
-        subject: 'move-in-out'
-      }
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: '7',
-    fullName: 'Tenzin',
-    cidNumber: '77777777777',
-    password: 'tenzin123',
-    email: 'tenzin@demo.gov.bt',
-    mobileNo: '+97517777777',
-    roleType: 'Registration Officer',
-    status: 'active',
-    avatar: null,
-    roles: [
-      {
-        id: 'role-7',
-        name: 'Registration Officer',
-        permissions: [
-          { id: 'perm-13', name: 'manage:birth-registration-verify' },
-          { id: 'perm-14', name: 'manage:death-registration-verify' },
-          { id: 'perm-15', name: 'manage:move-in-out' }
-        ]
-      }
-    ],
-    ability: [
-      {
-        name: 'Birth Registration Verify',
-        action: ['manage'],
-        subject: 'birth-registration-verify'
-      },
-      {
-        name: 'Death Registration Verify',
-        action: ['manage'],
-        subject: 'death-registration-verify'
-      },
-      {
-        name: 'Move In Out',
-        action: ['manage'],
-        subject: 'move-in-out'
       }
     ],
     createdAt: new Date().toISOString(),
@@ -339,7 +157,22 @@ export const DEMO_USERS: MockUser[] = [
         permissions: [
           { id: 'perm-20', name: 'manage:birth-registration-approve' },
           { id: 'perm-21', name: 'manage:death-registration-approve' },
-          { id: 'perm-22', name: 'manage:move-in-out-receiving-approve' }
+          { id: 'perm-22', name: 'manage:move-in-out-receiving-approve' },
+          { id: 'perm-23', name: 'manage:cid-issuance-fresh-assessment' },
+          { id: 'perm-24', name: 'manage:cid-issuance-fresh-payment' },
+          { id: 'perm-25', name: 'manage:cid-issuance-fresh-approval' },
+          { id: 'perm-26', name: 'manage:cid-issuance-renewal-assessment' },
+          { id: 'perm-27', name: 'manage:cid-issuance-renewal-payment' },
+          { id: 'perm-28', name: 'manage:cid-issuance-renewal-approval' },
+          { id: 'perm-29', name: 'manage:cid-issuance-replacement-assessment' },
+          { id: 'perm-30', name: 'manage:cid-issuance-replacement-payment' },
+          { id: 'perm-31', name: 'manage:cid-issuance-replacement-approval' },
+          { id: 'perm-32', name: 'manage:nationality-certificate-assessment' },
+          { id: 'perm-33', name: 'manage:nationality-certificate-payment' },
+          { id: 'perm-34', name: 'manage:nationality-certificate-approval' },
+          { id: 'perm-35', name: 'manage:relation-certificate-assessment' },
+          { id: 'perm-36', name: 'manage:relation-certificate-payment' },
+          { id: 'perm-37', name: 'manage:relation-certificate-approval' }
         ]
       }
     ],
@@ -358,6 +191,86 @@ export const DEMO_USERS: MockUser[] = [
         name: 'Move In Out Receiving Approve',
         action: ['manage'],
         subject: 'Move In Out Receiving Approve'
+      },
+      {
+        name: 'CID Issuance Fresh Assessment',
+        action: ['manage'],
+        subject: 'CID Issuance Fresh Assessment'
+      },
+      {
+        name: 'CID Issuance Fresh Payment',
+        action: ['manage'],
+        subject: 'CID Issuance Fresh Payment'
+      },
+      {
+        name: 'CID Issuance Fresh Approval',
+        action: ['manage'],
+        subject: 'CID Issuance Fresh Approval'
+      },
+      {
+        name: 'CID Issuance Renewal Assessment',
+        action: ['manage'],
+        subject: 'CID Issuance Renewal Assessment'
+      },
+      {
+        name: 'CID Issuance Renewal Payment',
+        action: ['manage'],
+        subject: 'CID Issuance Renewal Payment'
+      },
+      {
+        name: 'CID Issuance Renewal Approval',
+        action: ['manage'],
+        subject: 'CID Issuance Renewal Approval'
+      },
+      {
+        name: 'CID Issuance Replacement Assessment',
+        action: ['manage'],
+        subject: 'CID Issuance Replacement Assessment'
+      },
+      {
+        name: 'CID Issuance Replacement Payment',
+        action: ['manage'],
+        subject: 'CID Issuance Replacement Payment'
+      },
+      {
+        name: 'CID Issuance Replacement Approval',
+        action: ['manage'],
+        subject: 'CID Issuance Replacement Approval'
+      },
+      {
+        name: 'Nationality Certificate Assessment',
+        action: ['manage'],
+        subject: 'Nationality Certificate Assessment'
+      },
+      {
+        name: 'Nationality Certificate Payment',
+        action: ['manage'],
+        subject: 'Nationality Certificate Payment'
+      },
+      {
+        name: 'Nationality Certificate Approval',
+        action: ['manage'],
+        subject: 'Nationality Certificate Approval'
+      },
+      {
+        name: 'Relation Certificate Assessment',
+        action: ['manage'],
+        subject: 'Relation Certificate Assessment'
+      },
+      {
+        name: 'Relation Certificate Payment',
+        action: ['manage'],
+        subject: 'Relation Certificate Payment'
+      },
+      {
+        name: 'Relation Certificate Approval',
+        action: ['manage'],
+        subject: 'Relation Certificate Approval'
+      },
+      {
+        name: 'HOH Change Approve',
+        action: ['manage'],
+        subject: 'HOH Change Approve'
       }
     ],
     createdAt: new Date().toISOString(),
