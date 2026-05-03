@@ -91,7 +91,7 @@ export async function removeRoleFromAdmin(data: {
   adminId: string;
   roleId: string;
 }) {
-  return { success: true, message: 'Role removed successfully' };
+  return { success: true, message: 'Role removed successfully', error: null };
 }
 
 export async function updateAdmin(
@@ -114,5 +114,5 @@ export async function updateAdmin(
 }
 
 export async function resetAdminPassword(adminId: string, newPassword: string) {
-  return { success: true, message: 'Password reset successfully' };
+  return { success: true, message: 'Password reset successfully', error: null };
 }

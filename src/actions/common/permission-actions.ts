@@ -362,14 +362,12 @@ export async function getPermissions(page: number = 1, take: number = 100) {
     };
   } catch (error: unknown) {
     console.error('🔴 [getPermissions] Unexpected error:', error);
-    if (error instanceof Error) {
-      console.error('🔴 [getPermissions] Error message:', error.message);
-      console.error('🔴 [getPermissions] Error stack:', error.stack);
-    }
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : 'An unexpected error occurred',
+        error instanceof Error
+          ? (error as Error).message
+          : 'An unexpected error occurred',
       data: []
     };
   }
@@ -447,7 +445,9 @@ export async function createPermission(data: {
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : 'An unexpected error occurred'
+        error instanceof Error
+          ? (error as Error).message
+          : 'An unexpected error occurred'
     };
   }
 }
@@ -530,7 +530,9 @@ export async function updatePermission(data: {
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : 'An unexpected error occurred'
+        error instanceof Error
+          ? (error as Error).message
+          : 'An unexpected error occurred'
     };
   }
 }
@@ -571,7 +573,9 @@ export async function deletePermission(id: string) {
     return {
       success: false,
       error:
-        error instanceof Error ? error.message : 'An unexpected error occurred'
+        error instanceof Error
+          ? (error as Error).message
+          : 'An unexpected error occurred'
     };
   }
 }
