@@ -360,7 +360,7 @@ export async function getPermissions(page: number = 1, take: number = 100) {
       success: true,
       data: result.data || []
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('🔴 [getPermissions] Unexpected error:', error);
     if (error instanceof Error) {
       console.error('🔴 [getPermissions] Error message:', error.message);
